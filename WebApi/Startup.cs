@@ -7,12 +7,15 @@ using DataAccessLibrary.Data;
 using DataAccessLibrary.DataAccess;
 using DataAccessLibrary.Storage;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using WebApi.Jwt;
 using WebApi.Models;
 
 namespace WebApi
@@ -35,6 +38,23 @@ namespace WebApi
             {
                 options.LoginPath = "/login";
                 options.LogoutPath = "/logout";
+            });
+
+            var tokenProvider = new RsaJwtTokenProvider("issuer", "audience", "keyName");
+            services.AddSingleton<ITokenProvider>(tokenProvider);
+
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
+            {
+                options.RequireHttpsMetadata = false;
+                options.TokenValidationParameters = tokenProvider.GetValidationParameters();
+            });
+
+            services.AddAuthorization(auth =>
+            {
+                auth.DefaultPolicy = new AuthorizationPolicyBuilder()
+                    .AddAuthenticationSchemes(JwtBearerDefaults.AuthenticationScheme)
+                    .RequireAuthenticatedUser()
+                    .Build();
             });
 
             services.AddSingleton(ConfigureMapper());
@@ -92,7 +112,7 @@ namespace WebApi
                 MinimumSameSitePolicy = Microsoft.AspNetCore.Http.SameSiteMode.Lax
             };
 
-            app.UseCookiePolicy(cookiePolicyOptions);
+            app.UseCookiePolicy(cookiePolicyOptions);            
         }
     }
 }
