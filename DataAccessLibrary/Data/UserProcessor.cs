@@ -3,6 +3,7 @@ using DataAccessLibrary.Security;
 using DataAccessLibrary.Storage;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -101,6 +102,28 @@ namespace DataAccessLibrary.Data
             else
             {
                 throw new ArgumentException("Provided username is already in use.");
+            }
+        }
+
+        public async Task AddRole(string userid, RoleModel role)
+        {
+            if (ValidateQuery(await _userTable.SelectById(userid), out UserModel user)) // Get user from provided ID
+            {
+                if (!user.Roles.Any(r => r.Name == role.Name)) // Check that the user does not already have the provided role
+                {
+                    if (ValidateQuery(await _roleTable.SelectById(role.RoleId))) // Check that the role exists
+                    {
+                        await _userRoleTable.Insert(new UserRoleModel { UserId = userid, RoleId = role.RoleId }); // Insert new user role relation
+                    }
+                }
+            }
+        }
+
+        public async Task AddRoles(string userid, List<RoleModel> roles)
+        {
+            foreach (RoleModel role in roles)
+            {
+                await AddRole(userid, role);
             }
         }
 
