@@ -73,6 +73,7 @@ namespace WebApi
             {
                 cfg.CreateMap<DataAccessLibrary.Models.UserModel, UserModel>().ReverseMap();
                 cfg.CreateMap<DataAccessLibrary.Models.RoleModel, RoleModel>().ReverseMap();
+                cfg.CreateMap<DataAccessLibrary.Models.ApplicationModel, ApplicationModel>().ReverseMap();
             });
 
             var mapper = mapperConfig.CreateMapper();

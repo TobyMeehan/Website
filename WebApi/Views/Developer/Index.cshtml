@@ -1,0 +1,54 @@
+﻿@model IEnumerable<WebApi.Models.ApplicationModel>
+
+@{
+    ViewData["Title"] = "Developer";
+}
+<p>
+    @if  (!Model.Any())
+    {
+        <text>You haven't created any applications.</text>
+    }
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.AppId)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Name)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.RedirectUri)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Secret)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.AppId)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.RedirectUri)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Secret)
+            </td>
+            <td>
+                @Html.ActionLink("Edit", "Edit", new { /* id=item.PrimaryKey */ }) |
+                @Html.ActionLink("Details", "Details", new { /* id=item.PrimaryKey */ }) |
+                @Html.ActionLink("Delete", "Delete", new { /* id=item.PrimaryKey */ })
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
