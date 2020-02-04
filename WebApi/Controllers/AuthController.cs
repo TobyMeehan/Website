@@ -64,6 +64,8 @@ namespace WebApi.Controllers
         }
 
         [Route("/login")]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
         public IActionResult Login([FromQuery]string rediraction = "Index", [FromQuery]string redircontroller = "Home")
         {
             return View();
@@ -71,17 +73,25 @@ namespace WebApi.Controllers
 
         [Route("/login")]
         [HttpPost]
-        public async Task<IActionResult> Login(LoginViewModel login, [FromQuery]string rediraction = "Index", [FromQuery]string redircontroller = "Home")
+        public async Task<IActionResult> Login(LoginFormModel login, [FromQuery]string rediraction = "Index", [FromQuery]string redircontroller = "Home")
         {
-            if (await Authenticate(login.Username, login.Password))
+            if (ModelState.IsValid)
             {
-                return RedirectToAction(rediraction, redircontroller);
+                if (await Authenticate(login.Username, login.Password))
+                {
+                    return RedirectToAction(rediraction, redircontroller);
+                }
+                else
+                {
+                    ModelState.AddModelError("Username", "Invalid username and password combination.");
+                    ModelState.AddModelError("Password", "Invalid username and password combination.");
+
+                    login.Password = "";
+                    return View(login);
+                }
             }
             else
             {
-                ModelState.AddModelError("Username", "Invalid username and password combination.");
-                ModelState.AddModelError("Password", "Invalid username and password combination.");
-
                 login.Password = "";
                 return View(login);
             }
