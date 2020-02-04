@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace DataAccessLibrary.Data
 {
-    public class RoleProcessor : ProcessorBase
+    public class RoleProcessor : ProcessorBase, IRoleProcessor
     {
         private readonly IRoleTable _roleTable;
 

@@ -16,11 +16,13 @@ namespace WebApi.Controllers
     {
         private readonly IMapper _mapper;
         private readonly IUserProcessor _userProcessor;
+        private readonly IRoleProcessor _roleProcessor;
 
-        public AuthController(IMapper mapper, IUserProcessor userProcessor)
+        public AuthController(IMapper mapper, IUserProcessor userProcessor, IRoleProcessor roleProcessor)
         {
             _mapper = mapper;
             _userProcessor = userProcessor;
+            _roleProcessor = roleProcessor;
         }
 
         public async Task SignIn(string username)

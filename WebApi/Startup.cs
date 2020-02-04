@@ -64,14 +64,15 @@ namespace WebApi
             services.AddTransient<IRoleTable, RoleTable>();
             services.AddTransient<IUserRoleTable, UserRoleTable>();
             services.AddTransient<IUserProcessor, UserProcessor>();
+            services.AddTransient<IRoleProcessor, RoleProcessor>();
         }
 
         private IMapper ConfigureMapper()
         {
             var mapperConfig = new MapperConfiguration(cfg =>
             {
-                cfg.CreateMap<DataAccessLibrary.Models.UserModel, UserModel>();
-                cfg.CreateMap<DataAccessLibrary.Models.RoleModel, RoleModel>();
+                cfg.CreateMap<DataAccessLibrary.Models.UserModel, UserModel>().ReverseMap();
+                cfg.CreateMap<DataAccessLibrary.Models.RoleModel, RoleModel>().ReverseMap();
             });
 
             var mapper = mapperConfig.CreateMapper();
