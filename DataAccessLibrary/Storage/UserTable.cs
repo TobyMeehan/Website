@@ -82,7 +82,7 @@ namespace DataAccessLibrary.Storage
         /// <returns></returns>
         public async Task Insert(UserModel user, string hashedPassword)
         {
-            string sql = "INSERT INTO `users` (UserId, Username, Email, Password) VALUES (UUID(), @Username, @Email, @hashedPassword";
+            string sql = "INSERT INTO `users` (UserId, Username, Email, HashedPassword) VALUES (UUID(), @Username, @Email, @hashedPassword)";
 
             object parameters = new
             {
@@ -140,7 +140,7 @@ namespace DataAccessLibrary.Storage
         /// <returns></returns>
         public async Task UpdatePassword(string userid, string hashedPassword)
         {
-            string sql = "UPDATE `users` SET Password = @hashedPassword WHERE UserId = @userid";
+            string sql = "UPDATE `users` SET HashedPassword = @hashedPassword WHERE UserId = @userid";
 
             object parameters = new
             {
