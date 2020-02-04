@@ -14,7 +14,7 @@ namespace DataAccessLibrary.DataAccess
     {
         private readonly IConfiguration _config;
 
-        public string ConnectionStringName { get; set; } = "DefaultConnection";
+        public string ConnectionStringName { get; set; } = "Default";
 
         public SqlDataAccess(IConfiguration config)
         {
