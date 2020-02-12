@@ -146,5 +146,31 @@ namespace DataAccessLibrary.Data
                 throw new ArgumentException("Provided user could not be found.");
             }
         }
+
+        public async Task UpdateApplication(ApplicationModel app)
+        {
+            if (ValidateQuery(await _userTable.SelectById(app.Author.UserId))) // If provided app author exists
+            {
+                if (ValidateQuery(await _applicationTable.SelectById(app.AppId))) // If provided app ID exists
+                {
+                    if (ValidateQuery(await _applicationTable.SelectByUserAndName(app.UserId, app.Name), out ApplicationModel match) && match.AppId == app.AppId) // Check if an application with the same name has already been created. Check that the ID of the two applications match
+                    {
+                        await _applicationTable.Update(app);
+                    }
+                    else
+                    {
+                        throw new ArgumentException("Application with the same name has already been created by the user.");
+                    }
+                }
+                else
+                {
+                    throw new ArgumentException("Provided application ID could not be found.");
+                }
+            }
+            else
+            {
+                throw new ArgumentException("Provided user could not be found.");
+            }
+        }
     }
 }

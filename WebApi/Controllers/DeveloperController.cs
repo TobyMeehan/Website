@@ -63,7 +63,7 @@ namespace WebApi.Controllers
 
                     await _applicationProcessor.CreateApplication(_mapper.Map<DataAccessLibrary.Models.ApplicationModel>(app), secret);
 
-                    return RedirectToAction("List");
+                    return RedirectToAction("Index");
                 }
                 else
                 {
@@ -77,5 +77,69 @@ namespace WebApi.Controllers
                 return View(appForm);
             }
         }
+
+        [Authorize(AuthenticationSchemes = CookieAuthenticationDefaults.AuthenticationScheme)]
+        [Route("/Edit/{appid}")]
+        public async Task<IActionResult> Edit(string appid)
+        {
+            ApplicationModel app = _mapper.Map<ApplicationModel>(await _applicationProcessor.GetApplicationById(appid));
+
+            if (app == null)
+            {
+                return RedirectToAction("Index");
+            }
+            else
+            {
+                ApplicationFormModel viewModel = new ApplicationFormModel
+                {
+                    Name = app.Name,
+                    RedirectUri = app.RedirectUri
+                };
+
+                return View(viewModel);
+            }
+        }
+
+        [Authorize(AuthenticationSchemes = CookieAuthenticationDefaults.AuthenticationScheme)]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Route("/Edit/{appid}")]
+        public async Task<IActionResult> Edit(string appid, ApplicationFormModel appForm)
+        {
+            if (ModelState.IsValid)
+            {
+                if (await _applicationProcessor.GetApplicationByUserAndName(User.Identity.Name, appForm.Name) == null)
+                {
+                    if (string.IsNullOrWhiteSpace(appForm.RedirectUri))
+                    {
+                        appForm.RedirectUri = "localhost:6969";
+                    }
+
+                    var app = new ApplicationModel
+                    {
+                        AppId = appid,
+                        Author = _mapper.Map<UserModel>(await _userProcessor.GetUserById(User.Identity.Name)),
+                        Name = appForm.Name,
+                        RedirectUri = appForm.RedirectUri
+                    };
+
+                    await _applicationProcessor.UpdateApplication(_mapper.Map<DataAccessLibrary.Models.ApplicationModel>(app));
+
+                    return RedirectToAction("Index");
+                }
+                else
+                {
+                    ModelState.AddModelError("Name", "You have already created an application with this name.");
+
+                    return View(appForm);
+                }
+            }
+            else
+            {
+                return View(appForm);
+            }
+        }
+
+
     }
 }

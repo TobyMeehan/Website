@@ -12,5 +12,6 @@ namespace DataAccessLibrary.Storage
         Task<List<ApplicationModel>> SelectByName(string name);
         Task<List<ApplicationModel>> SelectByUser(string userid);
         Task<List<ApplicationModel>> SelectByUserAndName(string userid, string name);
+        Task Update(ApplicationModel app);
     }
 }

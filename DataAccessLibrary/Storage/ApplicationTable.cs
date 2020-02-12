@@ -83,5 +83,12 @@ namespace DataAccessLibrary.Storage
 
             await _sqlDataAccess.SaveData(sql, parameters);
         }
+
+        public async Task Update(ApplicationModel app)
+        {
+            string sql = "UPDATE `applications` SET `Name` = @Name, `RedirectUri` = @RedirectUri WHERE `AppId` = @AppId";
+
+            await _sqlDataAccess.SaveData(sql, app);
+        }
     }
 }

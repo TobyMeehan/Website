@@ -11,5 +11,6 @@ namespace DataAccessLibrary.Data
         Task<ApplicationModel> GetApplicationByUserAndName(string userid, string name);
         Task<List<ApplicationModel>> GetApplicationsByName(string name);
         Task<List<ApplicationModel>> GetApplicationsByUser(string userid);
+        Task UpdateApplication(ApplicationModel app);
     }
 }
