@@ -17,6 +17,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using WebApi.Jwt;
 using WebApi.Models;
+using WebApi.ResourceAuth;
 
 namespace WebApi
 {
@@ -51,11 +52,22 @@ namespace WebApi
 
             services.AddAuthorization(auth =>
             {
-                auth.DefaultPolicy = new AuthorizationPolicyBuilder()
+                auth.AddPolicy("Cookies", new AuthorizationPolicyBuilder()
+                    .AddAuthenticationSchemes(CookieAuthenticationDefaults.AuthenticationScheme)
+                    .RequireAuthenticatedUser()
+                    .Build());
+                auth.AddPolicy("Bearer", new AuthorizationPolicyBuilder()
                     .AddAuthenticationSchemes(JwtBearerDefaults.AuthenticationScheme)
                     .RequireAuthenticatedUser()
-                    .Build();
+                    .Build());
+
+                auth.AddPolicy("ApplicationPolicy", policy =>
+                    policy.Requirements.Add(new ApplicationAuthorRequirement()));
+
+                auth.DefaultPolicy = auth.GetPolicy("Bearer");
             });
+
+            services.AddSingleton<IAuthorizationHandler, ApplicationAuthorizationHandler>();
 
             services.AddSingleton(ConfigureMapper());
 

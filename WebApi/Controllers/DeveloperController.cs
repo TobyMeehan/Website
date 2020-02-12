@@ -14,12 +14,14 @@ namespace WebApi.Controllers
     public class DeveloperController : Controller
     {
         private readonly IMapper _mapper;
+        private readonly IAuthorizationService _authorizationService;
         private readonly IUserProcessor _userProcessor;
         private readonly IApplicationProcessor _applicationProcessor;
 
-        public DeveloperController(IMapper mapper, IUserProcessor userProcessor, IApplicationProcessor applicationProcessor)
+        public DeveloperController(IMapper mapper, IAuthorizationService authorizationService, IUserProcessor userProcessor, IApplicationProcessor applicationProcessor)
         {
             _mapper = mapper;
+            _authorizationService = authorizationService;
             _userProcessor = userProcessor;
             _applicationProcessor = applicationProcessor;
         }
@@ -90,13 +92,22 @@ namespace WebApi.Controllers
             }
             else
             {
-                ApplicationFormModel viewModel = new ApplicationFormModel
-                {
-                    Name = app.Name,
-                    RedirectUri = app.RedirectUri
-                };
+                var authorizationResult = await _authorizationService.AuthorizeAsync(User, app, "ApplicationPolicy");
 
-                return View(viewModel);
+                if (authorizationResult.Succeeded)
+                {
+                    ApplicationFormModel viewModel = new ApplicationFormModel
+                    {
+                        Name = app.Name,
+                        RedirectUri = app.RedirectUri
+                    };
+
+                    return View(viewModel);
+                }
+                else
+                {
+                    return RedirectToAction("Index");
+                }
             }
         }
 
@@ -108,30 +119,52 @@ namespace WebApi.Controllers
         {
             if (ModelState.IsValid)
             {
-                if (await _applicationProcessor.GetApplicationByUserAndName(User.Identity.Name, appForm.Name) == null)
+                ApplicationModel app = _mapper.Map<ApplicationModel>(_applicationProcessor.GetApplicationById(appid));
+
+                if (app != null)
                 {
-                    if (string.IsNullOrWhiteSpace(appForm.RedirectUri))
+                    if ((await _authorizationService.AuthorizeAsync(User, app, "ApplicationPolicy")).Succeeded)
                     {
-                        appForm.RedirectUri = "localhost:6969";
+                        if (await _applicationProcessor.GetApplicationByUserAndName(User.Identity.Name, appForm.Name) == null)
+                        {
+                            if (string.IsNullOrWhiteSpace(appForm.RedirectUri))
+                            {
+                                appForm.RedirectUri = "localhost:6969";
+                            }
+
+                            app = new ApplicationModel
+                            {
+                                AppId = appid,
+                                Author = _mapper.Map<UserModel>(await _userProcessor.GetUserById(User.Identity.Name)),
+                                Name = appForm.Name,
+                                RedirectUri = appForm.RedirectUri
+                            };
+
+                            await _applicationProcessor.UpdateApplication(_mapper.Map<DataAccessLibrary.Models.ApplicationModel>(app));
+
+                            return RedirectToAction("Index");
+
+                            // TODO: Add alert with success message
+                        }
+                        else
+                        {
+                            ModelState.AddModelError("Name", "You have already created an application with this name.");
+
+                            return View(appForm);
+                        }
                     }
-
-                    var app = new ApplicationModel
+                    else
                     {
-                        AppId = appid,
-                        Author = _mapper.Map<UserModel>(await _userProcessor.GetUserById(User.Identity.Name)),
-                        Name = appForm.Name,
-                        RedirectUri = appForm.RedirectUri
-                    };
+                        return RedirectToAction("Index");
 
-                    await _applicationProcessor.UpdateApplication(_mapper.Map<DataAccessLibrary.Models.ApplicationModel>(app));
-
-                    return RedirectToAction("Index");
+                        // TODO: Add alert with unauthorized error
+                    }
                 }
                 else
                 {
-                    ModelState.AddModelError("Name", "You have already created an application with this name.");
+                    throw new ArgumentException("Application does not exist.");
 
-                    return View(appForm);
+                    // TODO: Add alert with error
                 }
             }
             else
