@@ -60,11 +60,15 @@ namespace WebApi
             services.AddSingleton(ConfigureMapper());
 
             services.AddTransient<ISqlDataAccess, SqlDataAccess>();
+
             services.AddTransient<IUserTable, UserTable>();
             services.AddTransient<IRoleTable, RoleTable>();
+            services.AddTransient<IApplicationTable, ApplicationTable>();
             services.AddTransient<IUserRoleTable, UserRoleTable>();
+
             services.AddTransient<IUserProcessor, UserProcessor>();
             services.AddTransient<IRoleProcessor, RoleProcessor>();
+            services.AddTransient<IApplicationProcessor, ApplicationProcessor>();
         }
 
         private IMapper ConfigureMapper()
@@ -114,7 +118,7 @@ namespace WebApi
                 MinimumSameSitePolicy = Microsoft.AspNetCore.Http.SameSiteMode.Lax
             };
 
-            app.UseCookiePolicy(cookiePolicyOptions);            
+            app.UseCookiePolicy(cookiePolicyOptions);
         }
     }
 }
