@@ -125,7 +125,7 @@ namespace DataAccessLibrary.Data
             {
                 app.UserId = app.Author.UserId;
 
-                if (ValidateQuery(await _applicationTable.SelectByUserAndName(app.UserId, app.Name))) // If an app with the same name has already been created by the author
+                if (!ValidateQuery(await _applicationTable.SelectByUserAndName(app.UserId, app.Name))) // If an app with the same name has not already been created by the author
                 {
                     if (secret)
                     {
