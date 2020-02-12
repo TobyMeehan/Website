@@ -1,0 +1,36 @@
+﻿@model WebApi.Models.ApplicationFormModel
+
+@{
+    ViewData["Title"] = "Create";
+    Layout = "~/Views/Shared/_DeveloperLayout.cshtml";
+}
+<form asp-action="Create">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <div class="form-group">
+        <label asp-for="Name" class="control-label"></label>
+        <input asp-for="Name" class="form-control" />
+        <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="RedirectUri" class="control-label"></label>
+        <input asp-for="RedirectUri" class="form-control" />
+        <span asp-validation-for="RedirectUri" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Type" class="control-label"></label>
+        <select asp-for="Type" asp-items="Html.GetEnumSelectList<ApplicationFormModel.ApplicationType>()" class="form-control">
+            <option selected="selected" value=""></option>
+        </select>
+        <span asp-validation-for="Type" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <input type="submit" value="Create" class="btn btn-primary" />
+    </div>
+</form>
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

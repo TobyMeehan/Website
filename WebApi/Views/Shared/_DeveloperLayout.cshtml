@@ -1,33 +1,39 @@
 ﻿@using WebApi.Extensions;
 
 @{
-    
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
 <h1>Developer</h1>
 
 <p>Using the API you can make your own applications which connect to registered users on the site. Here you can view and manage applications you've created.</p>
 
-<div class="col-sm-2"></div>
+<div class="row">
+    <div class="col-sm-2"></div>
 
-<div class="col-sm-8">
-    <div class="card my-3">
-        <div class="card-body">
-            <ul class="nav nav-pills">
-                <li class="nav-item">
-                    <a asp-action="Index" class="nav-link @Html.ActivePage(actions: "Index", controllers: "Developer")">Your Applications</a>
-                </li>
-            </ul>
-            <ul class="nav nav-pills">
-                <li class="nav-item">
-                    <a asp-action="Create" class="nav-link @Html.ActivePage(actions: "Create", controllers: "Developer")">Create New Application</a>
-                </li>
-            </ul>
+    <div class="col-sm-8">
+        <div class="card my-3">
+            <div class="card-body">
+                <div>
+                    <ul class="nav nav-pills mb-3">
+                        <li class="nav-item">
+                            <a asp-action="Index" class="nav-link @Html.ActivePage(actions: "Index", controllers: "Developer")">Your Applications</a>
+                        </li>
+                        <li class="nav-item">
+                            <a asp-action="Create" class="nav-link @Html.ActivePage(actions: "Create", controllers: "Developer")">Create New Application</a>
+                        </li>
+                    </ul>
+                </div>
 
-            @RenderBody()
+                @RenderBody()
+            </div>
         </div>
+
     </div>
 
+    <div class="col-sm-2"></div>
 </div>
 
-<div class="col-sm-2"></div>
+@section Scripts {
+    @RenderSection("Scripts", required: false)
+}
