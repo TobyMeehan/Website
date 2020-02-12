@@ -79,7 +79,7 @@ namespace WebApi.Controllers
         }
 
         [Authorize(AuthenticationSchemes = CookieAuthenticationDefaults.AuthenticationScheme)]
-        [Route("/Edit/{appid}")]
+        [Route("/Developer/Edit/{appid}")]
         public async Task<IActionResult> Edit(string appid)
         {
             ApplicationModel app = _mapper.Map<ApplicationModel>(await _applicationProcessor.GetApplicationById(appid));
@@ -103,7 +103,7 @@ namespace WebApi.Controllers
         [Authorize(AuthenticationSchemes = CookieAuthenticationDefaults.AuthenticationScheme)]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Route("/Edit/{appid}")]
+        [Route("/Developer/Edit/{appid}")]
         public async Task<IActionResult> Edit(string appid, ApplicationFormModel appForm)
         {
             if (ModelState.IsValid)
@@ -140,6 +140,31 @@ namespace WebApi.Controllers
             }
         }
 
+        [Authorize(AuthenticationSchemes = CookieAuthenticationDefaults.AuthenticationScheme)]
+        [Route("/Developer/Delete/{appid}")]
+        public async Task<IActionResult> Delete(string appid)
+        {
+            ApplicationModel app = _mapper.Map<ApplicationModel>(await _applicationProcessor.GetApplicationById(appid));
 
+            if (app == null)
+            {
+                return RedirectToAction("Index");
+            }
+            else
+            {
+                return View(app);
+            }
+        }
+
+        [Authorize(AuthenticationSchemes = CookieAuthenticationDefaults.AuthenticationScheme)]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Route("/Delete/{appid}")]
+        public async Task<IActionResult> ConfirmDelete(string appid)
+        {
+            await _applicationProcessor.DeleteApplication(appid);
+
+            return RedirectToAction("Index");
+        }
     }
 }

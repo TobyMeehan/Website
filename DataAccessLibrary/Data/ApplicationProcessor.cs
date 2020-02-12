@@ -172,5 +172,11 @@ namespace DataAccessLibrary.Data
                 throw new ArgumentException("Provided user could not be found.");
             }
         }
+
+        public async Task DeleteApplication(string appid)
+        {
+            await _applicationTable.Delete(appid);
+            // TODO: Could add additional validation, I don't think it's necessary
+        }
     }
 }
