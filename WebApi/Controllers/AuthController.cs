@@ -64,22 +64,21 @@ namespace WebApi.Controllers
         }
 
         [Route("/login")]
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public IActionResult Login([FromQuery]string rediraction = "Index", [FromQuery]string redircontroller = "Home")
+        public IActionResult Login()
         {
             return View();
         }
 
         [Route("/login")]
         [HttpPost]
-        public async Task<IActionResult> Login(LoginFormModel login, [FromQuery]string rediraction = "Index", [FromQuery]string redircontroller = "Home")
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Login(LoginFormModel login)
         {
             if (ModelState.IsValid)
             {
                 if (await Authenticate(login.Username, login.Password))
                 {
-                    return RedirectToAction(rediraction, redircontroller);
+                    return RedirectToAction("Index", "Home");
                 }
                 else
                 {
