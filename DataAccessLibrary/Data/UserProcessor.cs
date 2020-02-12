@@ -37,9 +37,13 @@ namespace DataAccessLibrary.Data
                 }
 
                 // TODO: repeat for alerts and anything else which needs to be added.
-            }
 
-            throw new ArgumentException("Provided user ID could not be found.");
+                return user;
+            }
+            else
+            {
+                throw new ArgumentException("Provided user ID could not be found.");
+            }
         }
 
         public async Task<UserModel> GetUserByUsername(string username)
