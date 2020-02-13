@@ -11,6 +11,7 @@ using WebApi.Models;
 
 namespace WebApi.Controllers
 {
+    [Authorize(AuthenticationSchemes = CookieAuthenticationDefaults.AuthenticationScheme)]
     public class DeveloperController : Controller
     {
         private readonly IMapper _mapper;
@@ -26,7 +27,6 @@ namespace WebApi.Controllers
             _applicationProcessor = applicationProcessor;
         }
 
-        [Authorize(AuthenticationSchemes = CookieAuthenticationDefaults.AuthenticationScheme)]
         public async Task<IActionResult> Index()
         {
             List<ApplicationModel> apps = _mapper.Map<List<ApplicationModel>>(await _applicationProcessor.GetApplicationsByUser(User.Identity.Name));
@@ -34,13 +34,11 @@ namespace WebApi.Controllers
             return View(apps);
         }
 
-        [Authorize(AuthenticationSchemes = CookieAuthenticationDefaults.AuthenticationScheme)]
         public IActionResult Create()
         {
             return View();
         }
 
-        [Authorize(AuthenticationSchemes = CookieAuthenticationDefaults.AuthenticationScheme)]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(ApplicationFormModel appForm)
@@ -80,7 +78,6 @@ namespace WebApi.Controllers
             }
         }
 
-        [Authorize(AuthenticationSchemes = CookieAuthenticationDefaults.AuthenticationScheme)]
         [Route("/Developer/Edit/{appid}")]
         public async Task<IActionResult> Edit(string appid)
         {
@@ -111,7 +108,6 @@ namespace WebApi.Controllers
             }
         }
 
-        [Authorize(AuthenticationSchemes = CookieAuthenticationDefaults.AuthenticationScheme)]
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Route("/Developer/Edit/{appid}")]
@@ -173,7 +169,6 @@ namespace WebApi.Controllers
             }
         }
 
-        [Authorize(AuthenticationSchemes = CookieAuthenticationDefaults.AuthenticationScheme)]
         [Route("/Developer/Delete/{appid}")]
         public async Task<IActionResult> Delete(string appid)
         {
@@ -189,7 +184,6 @@ namespace WebApi.Controllers
             }
         }
 
-        [Authorize(AuthenticationSchemes = CookieAuthenticationDefaults.AuthenticationScheme)]
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Route("/Delete/{appid}")]

@@ -7,11 +7,13 @@ using AutoMapper;
 using DataAccessLibrary.Data;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using WebApi.Models;
 
 namespace WebApi.Controllers
 {
+    [Authorize(AuthenticationSchemes = CookieAuthenticationDefaults.AuthenticationScheme)]
     public class AuthController : Controller
     {
         private readonly IMapper _mapper;
@@ -64,6 +66,7 @@ namespace WebApi.Controllers
         }
 
         [Route("/login")]
+        [AllowAnonymous]
         public IActionResult Login()
         {
             return View();
@@ -72,6 +75,7 @@ namespace WebApi.Controllers
         [Route("/login")]
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [AllowAnonymous]
         public async Task<IActionResult> Login(LoginFormModel login)
         {
             if (ModelState.IsValid)
