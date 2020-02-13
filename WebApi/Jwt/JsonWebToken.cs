@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace WebApi.Models
+namespace WebApi.Jwt
 {
     public class JsonWebToken
     {
@@ -14,6 +14,5 @@ namespace WebApi.Models
         public int expires_in { get; set; }
 
         public string refresh_token { get; set; }
-
     }
 }
