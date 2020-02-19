@@ -135,5 +135,10 @@ namespace DataAccessLibrary.Data
         {
             return ValidateQuery(await _userTable.SelectByUsername(username));
         }
+
+        public async Task DeleteUser(string userid)
+        {
+            await _userTable.Delete(userid);
+        }
     }
 }

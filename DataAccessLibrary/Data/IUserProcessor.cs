@@ -11,5 +11,6 @@ namespace DataAccessLibrary.Data
         Task<UserModel> GetUserById(string userid);
         Task<UserModel> GetUserByUsername(string username);
         Task<bool> UserExists(string username);
+        Task DeleteUser(string userid);
     }
 }
