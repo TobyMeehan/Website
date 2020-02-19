@@ -1,0 +1,26 @@
+﻿@inherits LayoutComponentBase
+
+<div class="jumbotron large-background"></div>
+
+<NavMenu/>
+
+<div class="container-fluid text-center">
+    <div class="row">
+        <div class="col-sm-2"></div>
+
+        <div class="col-sm-8 text-left">
+            @Body
+        </div>
+
+        <div class="col-sm-2"></div>
+    </div>
+</div>
+
+<hr />
+
+<footer class="container-fluid text-center">
+    <p>&copy; @DateTime.Now.Year Toby Meehan</p>
+    <p>
+        <a href="/update">Version 1.3</a>
+    </p>
+</footer>
