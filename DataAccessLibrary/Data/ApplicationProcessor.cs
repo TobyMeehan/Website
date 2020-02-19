@@ -129,7 +129,7 @@ namespace DataAccessLibrary.Data
                 {
                     if (secret)
                     {
-                        app.Secret = ClientSecret.Generate();
+                        app.Secret = SecureSecret.Generate();
                     }
 
                     await _applicationTable.Insert(app);

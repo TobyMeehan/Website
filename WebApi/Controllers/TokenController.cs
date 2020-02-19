@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
+using DataAccessLibrary;
+using DataAccessLibrary.Data;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using WebApi.Jwt;
@@ -14,10 +17,18 @@ namespace WebApi.Controllers
     public class TokenController : ControllerBase
     {
         private readonly ITokenProvider _tokenProvider;
+        private readonly IMapper _mapper;
+        private readonly IConnectionProcessor _connectionProcessor;
+        private readonly IUserProcessor _userProcessor;
+        private readonly IApplicationProcessor _applicationProcessor;
 
-        public TokenController(ITokenProvider tokenProvider)
+        public TokenController(ITokenProvider tokenProvider, IMapper mapper, IConnectionProcessor connectionProcessor, IUserProcessor userProcessor, IApplicationProcessor applicationProcessor)
         {
             _tokenProvider = tokenProvider;
+            _mapper = mapper;
+            _connectionProcessor = connectionProcessor;
+            _userProcessor = userProcessor;
+            _applicationProcessor = applicationProcessor;
         }
 
         /* POST https://api.authorization-server.com/token
@@ -28,10 +39,17 @@ namespace WebApi.Controllers
             client_secret=CLIENT_SECRET*/
         public async Task<IActionResult> Post(AuthCodeTokenRequest request)
         {
-            // TODO: GetConnectionByAuthCode
-            ConnectionModel connection = new ConnectionModel();
+            if (await _connectionProcessor.ValidateAuthCode(request.code))
+            {
+                ConnectionModel connection = _mapper.Map<ConnectionModel>(await _connectionProcessor.GetConnectionByAuthCode(request.code));
 
-            return Token(connection);
+                if (connection.Application.AppId == request.client_id && connection.Application.Secret == request.client_secret)
+                {
+                    return Token(connection);
+                }
+            }
+
+            return Forbid();
         }
 
         /* POST https://api.authorization-server.com/token
@@ -41,25 +59,47 @@ namespace WebApi.Controllers
             client_id=CLIENT_ID */
         public async Task<IActionResult> Post(PasswordTokenRequest request)
         {
-            // TODO: authorize user then get application by client id
-            ConnectionModel connection = new ConnectionModel();
+            ApplicationModel app = _mapper.Map<ApplicationModel>(await _applicationProcessor.GetApplicationById(request.client_id));
 
-            return Token(connection);
+            if (app != null)
+            {
+                if (app.Role == ApplicationRoles.FirstParty)
+                {
+                    if (await _userProcessor.UserExists(request.username))
+                    {
+                        if (await _userProcessor.Authenticate(request.username, request.password))
+                        {
+                            ConnectionModel connection = new ConnectionModel
+                            {
+                                User = _mapper.Map<UserModel>(await _userProcessor.GetUserByUsername(request.username)),
+                                Application = app
+                            };
+
+                            connection = _mapper.Map<ConnectionModel>(await _connectionProcessor.CreateConnection(_mapper.Map<DataAccessLibrary.Models.ConnectionModel>(connection)));
+
+                            return Token(connection);
+                        }
+                    }
+                }
+            }
+
+            return Forbid();
         }
 
+        // TODO: Consider whether client credentials is necessary
         /* POST https://api.authorization-server.com/token
             grant_type=client_credentials&
             client_id=CLIENT_ID&
             client_secret=CLIENT_SECRET */
-        public async Task<IActionResult> Post(ClientCredentialTokenRequest request)
-        {
-            // TODO: get application by client id
-            ConnectionModel connection = new ConnectionModel();
+        //public async Task<IActionResult> Post(ClientCredentialTokenRequest request)
+        //{
+        //    // TODO: get application by client id
+        //    ConnectionModel connection = new ConnectionModel();
 
-            return Token(connection);
-        }
+        //    return Token(connection);
+        //}
 
-        public IActionResult Token(ConnectionModel connection)
+        public JsonResult Token(ConnectionModel connection)
         {
             DateTime expiry = DateTime.UtcNow.AddDays(7);
 

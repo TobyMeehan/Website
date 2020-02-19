@@ -8,10 +8,10 @@ namespace DataAccessLibrary.Security
     /// <summary>
     /// Generator for API client secrets.
     /// </summary>
-    class ClientSecret
+    class SecureSecret
     {
         /// <summary>
-        /// Generates a secure random string for use as a client secret.
+        /// Generates a secure random string for use as a secure secret.
         /// </summary>
         /// <param name="length">Length of secret. Defaults to 32.</param>
         /// <returns></returns>

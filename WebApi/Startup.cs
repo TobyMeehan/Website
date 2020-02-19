@@ -78,10 +78,12 @@ namespace WebApi
             services.AddTransient<IRoleTable, RoleTable>();
             services.AddTransient<IApplicationTable, ApplicationTable>();
             services.AddTransient<IUserRoleTable, UserRoleTable>();
+            services.AddTransient<IConnectionTable, ConnectionTable>();
 
             services.AddTransient<IUserProcessor, UserProcessor>();
             services.AddTransient<IRoleProcessor, RoleProcessor>();
             services.AddTransient<IApplicationProcessor, ApplicationProcessor>();
+            services.AddTransient<IConnectionProcessor, ConnectionProcessor>();
         }
 
         private IMapper ConfigureMapper()
@@ -91,6 +93,7 @@ namespace WebApi
                 cfg.CreateMap<DataAccessLibrary.Models.UserModel, UserModel>().ReverseMap();
                 cfg.CreateMap<DataAccessLibrary.Models.RoleModel, RoleModel>().ReverseMap();
                 cfg.CreateMap<DataAccessLibrary.Models.ApplicationModel, ApplicationModel>().ReverseMap();
+                cfg.CreateMap<DataAccessLibrary.Models.ConnectionModel, ConnectionModel>().ReverseMap();
             });
 
             var mapper = mapperConfig.CreateMapper();

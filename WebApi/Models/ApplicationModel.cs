@@ -16,5 +16,7 @@ namespace WebApi.Models
         public string RedirectUri { get; set; }
         [Display(Name = "Client Secret")]
         public string Secret { get; set; }
+        public string Role { get; set; }
+
     }
 }

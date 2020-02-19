@@ -36,10 +36,14 @@ namespace WebApi.Jwt
 
             List<Claim> claims = new List<Claim>
             {
-               new Claim(ClaimTypes.Name, connection.ConnectionId)
+               new Claim(ClaimTypes.Name, connection.User.UserId),
+               new Claim(ClaimTypes.Role, connection.Application.Role)
             };
 
-            connection.Application.Roles.ForEach(role => claims.Add(new Claim(ClaimTypes.Role, role.Name)));
+            foreach (RoleModel role in connection.User.Roles)
+            {
+                claims.Add(new Claim(ClaimTypes.Role, role.Name));
+            }
 
             ClaimsIdentity identity = new ClaimsIdentity(claims, "jwt");
 
