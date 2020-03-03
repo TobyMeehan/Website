@@ -7,7 +7,7 @@ namespace DataAccessLibrary.Models
     public class UserRoleModel
     {
         public string UserId { get; set; }
-        public int RoleId { get; set; }
+        public string RoleId { get; set; }
 
     }
 }

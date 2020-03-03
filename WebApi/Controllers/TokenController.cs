@@ -41,7 +41,7 @@ namespace WebApi.Controllers
         {
             if (await _connectionProcessor.ValidateAuthCode(request.code))
             {
-                ConnectionModel connection = _mapper.Map<ConnectionModel>(await _connectionProcessor.GetConnectionByAuthCode(request.code));
+                Connection connection = _mapper.Map<Connection>(await _connectionProcessor.GetConnectionByAuthCode(request.code));
 
                 if (connection.Application.AppId == request.client_id && connection.Application.Secret == request.client_secret)
                 {
@@ -59,7 +59,7 @@ namespace WebApi.Controllers
             client_id=CLIENT_ID */
         public async Task<IActionResult> Post(PasswordTokenRequest request)
         {
-            ApplicationModel app = _mapper.Map<ApplicationModel>(await _applicationProcessor.GetApplicationById(request.client_id));
+            Application app = _mapper.Map<Application>(await _applicationProcessor.GetApplicationById(request.client_id));
 
             if (app != null)
             {
@@ -69,13 +69,13 @@ namespace WebApi.Controllers
                     {
                         if (await _userProcessor.Authenticate(request.username, request.password))
                         {
-                            ConnectionModel connection = new ConnectionModel
+                            Connection connection = new Connection
                             {
-                                User = _mapper.Map<UserModel>(await _userProcessor.GetUserByUsername(request.username)),
+                                User = _mapper.Map<User>(await _userProcessor.GetUserByUsername(request.username)),
                                 Application = app
                             };
 
-                            connection = _mapper.Map<ConnectionModel>(await _connectionProcessor.CreateConnection(_mapper.Map<DataAccessLibrary.Models.ConnectionModel>(connection)));
+                            connection = _mapper.Map<Connection>(await _connectionProcessor.CreateConnection(_mapper.Map<DataAccessLibrary.Models.Connection>(connection)));
 
                             return Token(connection);
                         }
@@ -99,7 +99,7 @@ namespace WebApi.Controllers
         //    return Token(connection);
         //}
 
-        public JsonResult Token(ConnectionModel connection)
+        public JsonResult Token(Connection connection)
         {
             DateTime expiry = DateTime.UtcNow.AddDays(7);
 

@@ -5,9 +5,9 @@ namespace DataAccessLibrary.Data
 {
     public interface IRoleProcessor
     {
-        Task CreateRole(RoleModel role);
-        Task DeleteRole(RoleModel role);
-        Task<RoleModel> GetRoleById(int roleid);
-        Task<RoleModel> GetRoleByName(string name);
+        Task CreateRole(Role role);
+        Task DeleteRole(Role role);
+        Task<Role> GetRoleById(string roleid);
+        Task<Role> GetRoleByName(string name);
     }
 }

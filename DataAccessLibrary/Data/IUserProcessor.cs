@@ -7,9 +7,9 @@ namespace DataAccessLibrary.Data
     public interface IUserProcessor
     {
         Task<bool> Authenticate(string username, string password);
-        Task<UserModel> CreateUser(UserModel user, string password, List<RoleModel> roles);
-        Task<UserModel> GetUserById(string userid);
-        Task<UserModel> GetUserByUsername(string username);
+        Task<User> CreateUser(User user, string password, List<Role> roles);
+        Task<User> GetUserById(string userid);
+        Task<User> GetUserByUsername(string username);
         Task<bool> UserExists(string username);
         Task DeleteUser(string userid);
     }

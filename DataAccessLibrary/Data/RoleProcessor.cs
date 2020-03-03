@@ -16,9 +16,9 @@ namespace DataAccessLibrary.Data
             _roleTable = roleTable;
         }
 
-        public async Task<RoleModel> GetRoleById(int roleid)
+        public async Task<Role> GetRoleById(string roleid)
         {
-            if (ValidateQuery(await _roleTable.SelectById(roleid), out RoleModel role))
+            if (ValidateQuery(await _roleTable.SelectById(roleid), out Role role))
             {
                 return role;
             }
@@ -28,9 +28,9 @@ namespace DataAccessLibrary.Data
             }
         }
 
-        public async Task<RoleModel> GetRoleByName(string name)
+        public async Task<Role> GetRoleByName(string name)
         {
-            if (ValidateQuery(await _roleTable.SelectByName(name), out RoleModel role))
+            if (ValidateQuery(await _roleTable.SelectByName(name), out Role role))
             {
                 return role;
             }
@@ -40,7 +40,7 @@ namespace DataAccessLibrary.Data
             }
         }
 
-        public async Task CreateRole(RoleModel role)
+        public async Task CreateRole(Role role)
         {
             if (!ValidateQuery(await _roleTable.SelectByName(role.Name))) // Check if role name already exists
             {
@@ -52,15 +52,15 @@ namespace DataAccessLibrary.Data
             }
         }
 
-        public async Task DeleteRole(RoleModel role)
+        public async Task DeleteRole(Role role)
         {
-            if (ValidateQuery(await _roleTable.SelectById(role.RoleId))) // Check that role exists
+            if (ValidateQuery(await _roleTable.SelectById(role.Id))) // Check that role exists
             {
-                await _roleTable.Delete(role.RoleId);
+                await _roleTable.Delete(role.Id);
             }
             else if (ValidateQuery(await _roleTable.SelectByName(role.Name), out role)) // Check that provided name exists
             {
-                await _roleTable.Delete(role.RoleId);
+                await _roleTable.Delete(role.Id);
             }
             else
             {

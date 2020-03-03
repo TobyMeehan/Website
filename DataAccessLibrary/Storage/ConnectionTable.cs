@@ -16,14 +16,14 @@ namespace DataAccessLibrary.Storage
             _sqlDataAccess = sqlDataAccess;
         }
 
-        public async Task Insert(ConnectionModel connection)
+        public async Task Insert(Connection connection)
         {
             string sql = "INSERT INTO `connections` (AppId, UserId, AuthorizationCode) VALUES (@AppId, @UserId, @AuthorizationCode)";
 
             await _sqlDataAccess.SaveData(sql, connection);
         }
 
-        public async Task<List<ConnectionModel>> SelectByAuthCode(string authorizationCode)
+        public async Task<List<Connection>> SelectByAuthCode(string authorizationCode)
         {
             string sql = "SELECT * FROM `connections` WHERE `AuthorizationCode` = @authorizationCode";
 
@@ -32,10 +32,10 @@ namespace DataAccessLibrary.Storage
                 authorizationCode
             };
 
-            return await _sqlDataAccess.LoadData<ConnectionModel>(sql, parameters);
+            return await _sqlDataAccess.LoadData<Connection>(sql, parameters);
         }
 
-        public async Task<List<ConnectionModel>> SelectByUserAndApplication(string userid, string appid)
+        public async Task<List<Connection>> SelectByUserAndApplication(string userid, string appid)
         {
             string sql = "SELECT * FROM `connections` WHERE `UserId` = @userid AND `AppId` = @appid";
 
@@ -45,10 +45,10 @@ namespace DataAccessLibrary.Storage
                 appid
             };
 
-            return await _sqlDataAccess.LoadData<ConnectionModel>(sql, parameters);
+            return await _sqlDataAccess.LoadData<Connection>(sql, parameters);
         }
 
-        public async Task Update(ConnectionModel connection)
+        public async Task Update(Connection connection)
         {
             string sql = "UPDATE `connections` SET `AuthorizationCode` = @AuthorizationCode WHERE `UserId` = @UserId AND `AppId` = @AppId";
 

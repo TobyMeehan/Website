@@ -21,11 +21,11 @@ namespace DataAccessLibrary.Data
             _userProcessor = userProcessor;
         }
 
-        public async Task<ApplicationModel> GetApplicationById(string appid)
+        public async Task<Application> GetApplicationById(string appid)
         {
-            if (ValidateQuery(await _applicationTable.SelectById(appid), out ApplicationModel app)) // If the application exists
+            if (ValidateQuery(await _applicationTable.SelectById(appid), out Application app)) // If the application exists
             {
-                if (ValidateQuery(await _userTable.SelectById(app.UserId), out UserModel author)) // If the application's author exists
+                if (ValidateQuery(await _userTable.SelectById(app.UserId), out User author)) // If the application's author exists
                 {
                     app.Author = author;
 
@@ -42,11 +42,11 @@ namespace DataAccessLibrary.Data
             }
         }
 
-        public async Task<ApplicationModel> GetApplicationByUserAndName(string userid, string name)
+        public async Task<Application> GetApplicationByUserAndName(string userid, string name)
         {
-            if (ValidateQuery(await _userTable.SelectById(userid), out UserModel author)) // Check user exists
+            if (ValidateQuery(await _userTable.SelectById(userid), out User author)) // Check user exists
             {
-                if (ValidateQuery(await _applicationTable.SelectByUserAndName(userid, name), out ApplicationModel app))
+                if (ValidateQuery(await _applicationTable.SelectByUserAndName(userid, name), out Application app))
                 {
                     app.Author = author;
 
@@ -64,15 +64,15 @@ namespace DataAccessLibrary.Data
 
         }
 
-        public async Task<List<ApplicationModel>> GetApplicationsByName(string name)
+        public async Task<List<Application>> GetApplicationsByName(string name)
         {
             var apps = await _applicationTable.SelectByName(name);
 
             if (ValidateQuery(apps)) // Check at least one application has provided name
             {
-                foreach (ApplicationModel app in apps)
+                foreach (Application app in apps)
                 {
-                    if (ValidateQuery(await _userTable.SelectById(app.UserId), out UserModel author)) // Check author of each application with provided name
+                    if (ValidateQuery(await _userTable.SelectById(app.UserId), out User author)) // Check author of each application with provided name
                     {
                         app.Author = author;
                     }
@@ -90,9 +90,9 @@ namespace DataAccessLibrary.Data
             }
         }
 
-        public async Task<List<ApplicationModel>> GetApplicationsByUser(string userid)
+        public async Task<List<Application>> GetApplicationsByUser(string userid)
         {
-            if (ValidateQuery(await _userTable.SelectById(userid), out UserModel user)) // Check user id exists and get user it represents
+            if (ValidateQuery(await _userTable.SelectById(userid), out User user)) // Check user id exists and get user it represents
             {
                 var apps = await _applicationTable.SelectByUser(userid);
 
@@ -104,12 +104,12 @@ namespace DataAccessLibrary.Data
                 }
                 else
                 {
-                    return new List<ApplicationModel>(); // Return empty list
+                    return new List<Application>(); // Return empty list
                 }
             }
             else
             {
-                return new List<ApplicationModel>();
+                return new List<Application>();
             }
         }
 
@@ -119,11 +119,11 @@ namespace DataAccessLibrary.Data
         /// <param name="app">Application model to add.</param>
         /// <param name="secret">Whether to generate a client secret.</param>
         /// <returns></returns>
-        public async Task<ApplicationModel> CreateApplication(ApplicationModel app, bool secret)
+        public async Task<Application> CreateApplication(Application app, bool secret)
         {
-            if (ValidateQuery(await _userTable.SelectById(app.Author.UserId))) // If provided app author exists
+            if (ValidateQuery(await _userTable.SelectById(app.Author.Id))) // If provided app author exists
             {
-                app.UserId = app.Author.UserId;
+                app.UserId = app.Author.Id;
 
                 if (!ValidateQuery(await _applicationTable.SelectByUserAndName(app.UserId, app.Name))) // If an app with the same name has not already been created by the author
                 {
@@ -147,13 +147,13 @@ namespace DataAccessLibrary.Data
             }
         }
 
-        public async Task UpdateApplication(ApplicationModel app)
+        public async Task UpdateApplication(Application app)
         {
-            if (ValidateQuery(await _userTable.SelectById(app.Author.UserId))) // If provided app author exists
+            if (ValidateQuery(await _userTable.SelectById(app.Author.Id))) // If provided app author exists
             {
-                if (ValidateQuery(await _applicationTable.SelectById(app.AppId))) // If provided app ID exists
+                if (ValidateQuery(await _applicationTable.SelectById(app.Id))) // If provided app ID exists
                 {
-                    if (ValidateQuery(await _applicationTable.SelectByUserAndName(app.UserId, app.Name), out ApplicationModel match) && match.AppId == app.AppId) // Check if an application with the same name has already been created. Check that the ID of the two applications match
+                    if (ValidateQuery(await _applicationTable.SelectByUserAndName(app.UserId, app.Name), out Application match) && match.Id == app.Id) // Check if an application with the same name has already been created. Check that the ID of the two applications match
                     {
                         await _applicationTable.Update(app);
                     }

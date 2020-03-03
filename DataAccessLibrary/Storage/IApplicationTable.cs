@@ -7,11 +7,11 @@ namespace DataAccessLibrary.Storage
     public interface IApplicationTable
     {
         Task Delete(string appid);
-        Task Insert(ApplicationModel app);
-        Task<List<ApplicationModel>> SelectById(string appid);
-        Task<List<ApplicationModel>> SelectByName(string name);
-        Task<List<ApplicationModel>> SelectByUser(string userid);
-        Task<List<ApplicationModel>> SelectByUserAndName(string userid, string name);
-        Task Update(ApplicationModel app);
+        Task Insert(Application app);
+        Task<List<Application>> SelectById(string appid);
+        Task<List<Application>> SelectByName(string name);
+        Task<List<Application>> SelectByUser(string userid);
+        Task<List<Application>> SelectByUserAndName(string userid, string name);
+        Task Update(Application app);
     }
 }

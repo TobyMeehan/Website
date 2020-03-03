@@ -21,11 +21,11 @@ namespace DataAccessLibrary.Storage
         /// Selects all users
         /// </summary>
         /// <returns></returns>
-        public async Task<List<UserModel>> Select()
+        public async Task<List<User>> Select()
         {
             string sql = "SELECT * FROM `users`";
 
-            return await _sqlDataAccess.LoadData<UserModel>(sql);
+            return await _sqlDataAccess.LoadData<User>(sql);
         }
 
         /// <summary>
@@ -33,7 +33,7 @@ namespace DataAccessLibrary.Storage
         /// </summary>
         /// <param name="userid"></param>
         /// <returns></returns>
-        public async Task<List<UserModel>> SelectById(string userid)
+        public async Task<List<User>> SelectById(string userid)
         {
             string sql = "SELECT * FROM `users` WHERE `UserId` = @userid";
 
@@ -42,7 +42,7 @@ namespace DataAccessLibrary.Storage
                 userid
             };
 
-            return await _sqlDataAccess.LoadData<UserModel>(sql, parameters);
+            return await _sqlDataAccess.LoadData<User>(sql, parameters);
         }
 
         /// <summary>
@@ -50,7 +50,7 @@ namespace DataAccessLibrary.Storage
         /// </summary>
         /// <param name="username"></param>
         /// <returns></returns>
-        public async Task<List<UserModel>> SelectByUsername(string username)
+        public async Task<List<User>> SelectByUsername(string username)
         {
             string sql = "SELECT * FROM `users` WHERE `Username` = @username";
 
@@ -59,7 +59,7 @@ namespace DataAccessLibrary.Storage
                 username
             };
 
-            return await _sqlDataAccess.LoadData<UserModel>(sql, parameters);
+            return await _sqlDataAccess.LoadData<User>(sql, parameters);
         }
 
         public async Task<List<PasswordModel>> SelectPassword(string username)
@@ -80,7 +80,7 @@ namespace DataAccessLibrary.Storage
         /// <param name="user"></param>
         /// <param name="hashedPassword"></param>
         /// <returns></returns>
-        public async Task Insert(UserModel user, string hashedPassword)
+        public async Task Insert(User user, string hashedPassword)
         {
             string sql = "INSERT INTO `users` (UserId, Username, Email, HashedPassword) VALUES (UUID(), @Username, @Email, @hashedPassword)";
 

@@ -6,10 +6,10 @@ namespace DataAccessLibrary.Storage
 {
     public interface IRoleTable
     {
-        Task Delete(int roleid);
+        Task Delete(string roleid);
         Task Insert(string name);
-        Task<List<RoleModel>> Select();
-        Task<List<RoleModel>> SelectById(int roleid);
-        Task<List<RoleModel>> SelectByName(string name);
+        Task<List<Role>> Select();
+        Task<List<Role>> SelectById(string roleid);
+        Task<List<Role>> SelectByName(string name);
     }
 }

@@ -22,15 +22,15 @@ namespace DataAccessLibrary.Data
             _userRoleTable = userRoleTable;
         }
 
-        public async Task<UserModel> GetUserById(string userid)
+        public async Task<User> GetUserById(string userid)
         {
-            if (ValidateQuery(await _userTable.SelectById(userid), out UserModel user)) // Get user with specified id, check if user exists
+            if (ValidateQuery(await _userTable.SelectById(userid), out User user)) // Get user with specified id, check if user exists
             {
                 List<UserRoleModel> userRoles = await _userRoleTable.SelectByUser(userid); // Get user role relations for the user
 
                 foreach (UserRoleModel userRole in userRoles)
                 {
-                    if (ValidateQuery(await _roleTable.SelectById(userRole.RoleId), out RoleModel role)) // Get role associated with role id
+                    if (ValidateQuery(await _roleTable.SelectById(userRole.RoleId), out Role role)) // Get role associated with role id
                     {
                         user.Roles.Add(role); // Add role to user's list of roles
                     }
@@ -46,15 +46,15 @@ namespace DataAccessLibrary.Data
             }
         }
 
-        public async Task<UserModel> GetUserByUsername(string username)
+        public async Task<User> GetUserByUsername(string username)
         {
-            if (ValidateQuery(await _userTable.SelectByUsername(username), out UserModel user)) // Get user with specified username, check if user exists
+            if (ValidateQuery(await _userTable.SelectByUsername(username), out User user)) // Get user with specified username, check if user exists
             {
-                List<UserRoleModel> userRoles = await _userRoleTable.SelectByUser(user.UserId); // Get user role relations for the user
+                List<UserRoleModel> userRoles = await _userRoleTable.SelectByUser(user.Id); // Get user role relations for the user
 
                 foreach (UserRoleModel userRole in userRoles)
                 {
-                    if (ValidateQuery(await _roleTable.SelectById(userRole.RoleId), out RoleModel role)) // Get role associated with role id
+                    if (ValidateQuery(await _roleTable.SelectById(userRole.RoleId), out Role role)) // Get role associated with role id
                     {
                         user.Roles.Add(role); // Add role to user's list of roles
                     }
@@ -74,11 +74,11 @@ namespace DataAccessLibrary.Data
             }
             else
             {
-                throw new ArgumentException("Provided username could not be found.");
+                return false;
             }
         }
 
-        public async Task<UserModel> CreateUser(UserModel user, string password, List<RoleModel> roles)
+        public async Task<User> CreateUser(User user, string password, List<Role> roles)
         {
             if (!ValidateQuery(await _userTable.SelectByUsername(user.Username))) // Check if username already exists
             {
@@ -88,11 +88,11 @@ namespace DataAccessLibrary.Data
 
                 user = await GetUserByUsername(user.Username);
 
-                foreach (RoleModel role in roles)
+                foreach (Role role in roles)
                 {
-                    if (ValidateQuery(await _roleTable.SelectById(role.RoleId))) // Check if role exists
+                    if (ValidateQuery(await _roleTable.SelectById(role.Id))) // Check if role exists
                     {
-                        await _userRoleTable.Insert(new UserRoleModel { UserId = user.UserId, RoleId = role.RoleId }); // Insert new user role relation
+                        await _userRoleTable.Insert(new UserRoleModel { UserId = user.Id, RoleId = role.Id }); // Insert new user role relation
                     }
                     else
                     {
@@ -101,7 +101,7 @@ namespace DataAccessLibrary.Data
                     }
                 }
 
-                return await GetUserById(user.UserId);
+                return await GetUserById(user.Id);
             }
             else
             {
@@ -109,23 +109,23 @@ namespace DataAccessLibrary.Data
             }
         }
 
-        public async Task AddRole(string userid, RoleModel role)
+        public async Task AddRole(string userid, Role role)
         {
-            if (ValidateQuery(await _userTable.SelectById(userid), out UserModel user)) // Get user from provided ID
+            if (ValidateQuery(await _userTable.SelectById(userid), out User user)) // Get user from provided ID
             {
                 if (!user.Roles.Any(r => r.Name == role.Name)) // Check that the user does not already have the provided role
                 {
-                    if (ValidateQuery(await _roleTable.SelectById(role.RoleId))) // Check that the role exists
+                    if (ValidateQuery(await _roleTable.SelectById(role.Id))) // Check that the role exists
                     {
-                        await _userRoleTable.Insert(new UserRoleModel { UserId = userid, RoleId = role.RoleId }); // Insert new user role relation
+                        await _userRoleTable.Insert(new UserRoleModel { UserId = userid, RoleId = role.Id }); // Insert new user role relation
                     }
                 }
             }
         }
 
-        public async Task AddRoles(string userid, List<RoleModel> roles)
+        public async Task AddRoles(string userid, List<Role> roles)
         {
-            foreach (RoleModel role in roles)
+            foreach (Role role in roles)
             {
                 await AddRole(userid, role);
             }

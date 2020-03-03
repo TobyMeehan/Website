@@ -90,10 +90,10 @@ namespace WebApi
         {
             var mapperConfig = new MapperConfiguration(cfg =>
             {
-                cfg.CreateMap<DataAccessLibrary.Models.UserModel, UserModel>().ReverseMap();
-                cfg.CreateMap<DataAccessLibrary.Models.RoleModel, RoleModel>().ReverseMap();
-                cfg.CreateMap<DataAccessLibrary.Models.ApplicationModel, ApplicationModel>().ReverseMap();
-                cfg.CreateMap<DataAccessLibrary.Models.ConnectionModel, ConnectionModel>().ReverseMap();
+                cfg.CreateMap<DataAccessLibrary.Models.User, User>().ReverseMap();
+                cfg.CreateMap<DataAccessLibrary.Models.Role, Role>().ReverseMap();
+                cfg.CreateMap<DataAccessLibrary.Models.Application, Application>().ReverseMap();
+                cfg.CreateMap<DataAccessLibrary.Models.Connection, Connection>().ReverseMap();
             });
 
             var mapper = mapperConfig.CreateMapper();

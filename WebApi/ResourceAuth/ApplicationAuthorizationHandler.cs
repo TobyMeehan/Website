@@ -7,11 +7,11 @@ using WebApi.Models;
 
 namespace WebApi.ResourceAuth
 {
-    public class ApplicationAuthorizationHandler : AuthorizationHandler<ApplicationAuthorRequirement, ApplicationModel>
+    public class ApplicationAuthorizationHandler : AuthorizationHandler<ApplicationAuthorRequirement, Application>
     {
-        protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, ApplicationAuthorRequirement requirement, ApplicationModel resource)
+        protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, ApplicationAuthorRequirement requirement, Application resource)
         {
-            if (context.User.Identity.Name == resource.Author.UserId)
+            if (context.User.Identity.Name == resource.Author.Id)
             {
                 context.Succeed(requirement);
             }

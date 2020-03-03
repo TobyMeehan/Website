@@ -29,11 +29,11 @@ namespace WebApi.Controllers
 
         public async Task SignIn(string username)
         {
-            UserModel user = _mapper.Map<UserModel>(await _userProcessor.GetUserByUsername(username));
+            User user = _mapper.Map<User>(await _userProcessor.GetUserByUsername(username));
 
             var claims = new List<Claim>
             {
-                new Claim(ClaimTypes.Name, user.UserId)
+                new Claim(ClaimTypes.Name, user.Id)
             };
 
             user.Roles.ForEach(role => claims.Add(new Claim(ClaimTypes.Role, role.Name)));

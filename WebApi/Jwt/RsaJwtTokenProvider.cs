@@ -30,17 +30,17 @@ namespace WebApi.Jwt
             _audience = audience;
         }
 
-        public string CreateToken(ConnectionModel connection, DateTime expiry)
+        public string CreateToken(Connection connection, DateTime expiry)
         {
             JwtSecurityTokenHandler tokenHandler = new JwtSecurityTokenHandler();
 
             List<Claim> claims = new List<Claim>
             {
-               new Claim(ClaimTypes.Name, connection.User.UserId),
+               new Claim(ClaimTypes.Name, connection.User.Id),
                new Claim(ClaimTypes.Role, connection.Application.Role)
             };
 
-            foreach (RoleModel role in connection.User.Roles)
+            foreach (Role role in connection.User.Roles)
             {
                 claims.Add(new Claim(ClaimTypes.Role, role.Name));
             }

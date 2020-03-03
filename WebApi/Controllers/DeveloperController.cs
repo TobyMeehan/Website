@@ -29,7 +29,7 @@ namespace WebApi.Controllers
 
         public async Task<IActionResult> Index()
         {
-            List<ApplicationModel> apps = _mapper.Map<List<ApplicationModel>>(await _applicationProcessor.GetApplicationsByUser(User.Identity.Name));
+            List<Application> apps = _mapper.Map<List<Application>>(await _applicationProcessor.GetApplicationsByUser(User.Identity.Name));
 
             return View(apps);
         }
@@ -54,14 +54,14 @@ namespace WebApi.Controllers
                         appForm.RedirectUri = "localhost:6969";
                     }
 
-                    var app = new ApplicationModel
+                    var app = new Application
                     {
-                        Author = _mapper.Map<UserModel>(await _userProcessor.GetUserById(User.Identity.Name)),
+                        Author = _mapper.Map<User>(await _userProcessor.GetUserById(User.Identity.Name)),
                         Name = appForm.Name,
                         RedirectUri = appForm.RedirectUri
                     };
 
-                    await _applicationProcessor.CreateApplication(_mapper.Map<DataAccessLibrary.Models.ApplicationModel>(app), secret);
+                    await _applicationProcessor.CreateApplication(_mapper.Map<DataAccessLibrary.Models.Application>(app), secret);
 
                     return RedirectToAction("Index");
                 }
@@ -81,7 +81,7 @@ namespace WebApi.Controllers
         [Route("/Developer/Edit/{appid}")]
         public async Task<IActionResult> Edit(string appid)
         {
-            ApplicationModel app = _mapper.Map<ApplicationModel>(await _applicationProcessor.GetApplicationById(appid));
+            Application app = _mapper.Map<Application>(await _applicationProcessor.GetApplicationById(appid));
 
             if (app == null)
             {
@@ -115,7 +115,7 @@ namespace WebApi.Controllers
         {
             if (ModelState.IsValid)
             {
-                ApplicationModel app = _mapper.Map<ApplicationModel>(_applicationProcessor.GetApplicationById(appid));
+                Application app = _mapper.Map<Application>(_applicationProcessor.GetApplicationById(appid));
 
                 if (app != null)
                 {
@@ -128,15 +128,15 @@ namespace WebApi.Controllers
                                 appForm.RedirectUri = "localhost:6969";
                             }
 
-                            app = new ApplicationModel
+                            app = new Application
                             {
                                 AppId = appid,
-                                Author = _mapper.Map<UserModel>(await _userProcessor.GetUserById(User.Identity.Name)),
+                                Author = _mapper.Map<User>(await _userProcessor.GetUserById(User.Identity.Name)),
                                 Name = appForm.Name,
                                 RedirectUri = appForm.RedirectUri
                             };
 
-                            await _applicationProcessor.UpdateApplication(_mapper.Map<DataAccessLibrary.Models.ApplicationModel>(app));
+                            await _applicationProcessor.UpdateApplication(_mapper.Map<DataAccessLibrary.Models.Application>(app));
 
                             return RedirectToAction("Index");
 
@@ -172,7 +172,7 @@ namespace WebApi.Controllers
         [Route("/Developer/Delete/{appid}")]
         public async Task<IActionResult> Delete(string appid)
         {
-            ApplicationModel app = _mapper.Map<ApplicationModel>(await _applicationProcessor.GetApplicationById(appid));
+            Application app = _mapper.Map<Application>(await _applicationProcessor.GetApplicationById(appid));
 
             if (app == null)
             {

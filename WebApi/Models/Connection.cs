@@ -5,10 +5,10 @@ using System.Threading.Tasks;
 
 namespace WebApi.Models
 {
-    public class ConnectionModel
+    public class Connection
     {
-        public ApplicationModel Application { get; set; }
-        public UserModel User { get; set; }
+        public Application Application { get; set; }
+        public User User { get; set; }
         public string Token { get; set; }
         public string AuthorizationCode { get; set; }
     }

@@ -6,7 +6,7 @@ namespace WebApi.Jwt
 {
     public interface ITokenProvider
     {
-        string CreateToken(ConnectionModel connection, DateTime expiry);
+        string CreateToken(Connection connection, DateTime expiry);
         TokenValidationParameters GetValidationParameters();
     }
 }

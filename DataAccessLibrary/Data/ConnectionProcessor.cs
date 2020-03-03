@@ -26,18 +26,18 @@ namespace DataAccessLibrary.Data
             return $"{SecureSecret.Generate(length)}{DateTime.Now.ToBinary()}";
         }
 
-        public async Task<ConnectionModel> CreateConnection(ConnectionModel connection)
+        public async Task<Connection> CreateConnection(Connection connection)
         {
-            if (ValidateQuery(await _userTable.SelectById(connection.User.UserId))) // Check that provided user exists
+            if (ValidateQuery(await _userTable.SelectById(connection.User.Id))) // Check that provided user exists
             {
-                if (ValidateQuery(await _applicationTable.SelectById(connection.Application.AppId))) // Check that provided application exists
+                if (ValidateQuery(await _applicationTable.SelectById(connection.Application.Id))) // Check that provided application exists
                 {
-                    connection.UserId = connection.User.UserId;
-                    connection.AppId = connection.Application.AppId;
+                    connection.UserId = connection.User.Id;
+                    connection.AppId = connection.Application.Id;
 
                     connection.AuthorizationCode = GenerateAuthCode();
 
-                    if (ValidateQuery(await _connectionTable.SelectByUserAndApplication(connection.User.UserId, connection.Application.AppId))) // If a connection between the provided user and application already exists
+                    if (ValidateQuery(await _connectionTable.SelectByUserAndApplication(connection.User.Id, connection.Application.Id))) // If a connection between the provided user and application already exists
                     {
                         await _connectionTable.Update(connection);
                     }
@@ -46,7 +46,7 @@ namespace DataAccessLibrary.Data
                         await _connectionTable.Insert(connection);
                     }
 
-                    if (ValidateQuery(await _connectionTable.SelectByUserAndApplication(connection.UserId, connection.AppId), out ConnectionModel output))
+                    if (ValidateQuery(await _connectionTable.SelectByUserAndApplication(connection.UserId, connection.AppId), out Connection output))
                     {
                         return output;
                     }
@@ -66,13 +66,13 @@ namespace DataAccessLibrary.Data
             }
         }
 
-        public async Task<ConnectionModel> GetConnectionByAuthCode(string authorizationCode)
+        public async Task<Connection> GetConnectionByAuthCode(string authorizationCode)
         {
-            if (ValidateQuery(await _connectionTable.SelectByAuthCode(authorizationCode), out ConnectionModel connection))
+            if (ValidateQuery(await _connectionTable.SelectByAuthCode(authorizationCode), out Connection connection))
             {
-                if (ValidateQuery(await _userTable.SelectById(connection.UserId), out UserModel user))
+                if (ValidateQuery(await _userTable.SelectById(connection.UserId), out User user))
                 {
-                    if (ValidateQuery(await _applicationTable.SelectById(connection.AppId), out ApplicationModel app))
+                    if (ValidateQuery(await _applicationTable.SelectById(connection.AppId), out Application app))
                     {
                         connection.User = user;
                         connection.Application = app;

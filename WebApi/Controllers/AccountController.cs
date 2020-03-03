@@ -30,9 +30,9 @@ namespace WebApi.Controllers
             _connectionProcessor = connectionProcessor;
         }
 
-        public async Task<UserModel> Get()
+        public async Task<User> Get()
         {
-            return _mapper.Map<UserModel>(await _userProcessor.GetUserById(User.Identity.Name));
+            return _mapper.Map<User>(await _userProcessor.GetUserById(User.Identity.Name));
         }
     }
 }

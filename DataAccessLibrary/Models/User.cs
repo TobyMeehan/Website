@@ -4,12 +4,12 @@ using System.Text;
 
 namespace DataAccessLibrary.Models
 {
-    public class UserModel
+    public class User
     {
-        public string UserId { get; set; }
+        public string Id { get; set; }
         public string Username { get; set; }
         public string Email { get; set; }
-        public List<RoleModel> Roles { get; set; }
+        public List<Role> Roles { get; set; }
 
     }
 }

@@ -4,9 +4,9 @@ using System.Text;
 
 namespace DataAccessLibrary.Models
 {
-    public class RoleModel
+    public class Role
     {
-        public int RoleId { get; set; }
+        public string Id { get; set; }
         public string Name { get; set; }
 
     }

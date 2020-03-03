@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 
 namespace WebApi.Models
 {
-    public class ApplicationModel
+    public class Application
     {
         [Display(Name = "App ID")]
         public string AppId { get; set; }
-        public UserModel Author { get; set; }
+        public User Author { get; set; }
         public string Name { get; set; }
         [Display(Name = "Redirect Uri")]
         public string RedirectUri { get; set; }

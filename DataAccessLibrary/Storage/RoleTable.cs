@@ -20,11 +20,11 @@ namespace DataAccessLibrary.Storage
         /// Selects all roles
         /// </summary>
         /// <returns></returns>
-        public async Task<List<RoleModel>> Select()
+        public async Task<List<Role>> Select()
         {
             string sql = "SELECT * FROM `roles`";
 
-            return await _sqlDataAccess.LoadData<RoleModel>(sql);
+            return await _sqlDataAccess.LoadData<Role>(sql);
         }
 
         /// <summary>
@@ -32,7 +32,7 @@ namespace DataAccessLibrary.Storage
         /// </summary>
         /// <param name="roleid"></param>
         /// <returns></returns>
-        public async Task<List<RoleModel>> SelectById(int roleid)
+        public async Task<List<Role>> SelectById(string roleid)
         {
             string sql = "SELECT * FROM `roles` WHERE RoleId = @roleid";
 
@@ -41,7 +41,7 @@ namespace DataAccessLibrary.Storage
                 roleid
             };
 
-            return await _sqlDataAccess.LoadData<RoleModel>(sql, parameters);
+            return await _sqlDataAccess.LoadData<Role>(sql, parameters);
         }
 
         /// <summary>
@@ -49,7 +49,7 @@ namespace DataAccessLibrary.Storage
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
-        public async Task<List<RoleModel>> SelectByName(string name)
+        public async Task<List<Role>> SelectByName(string name)
         {
             string sql = "SELECT * FROM `roles` WHERE Name = @name";
 
@@ -58,7 +58,7 @@ namespace DataAccessLibrary.Storage
                 name
             };
 
-            return await _sqlDataAccess.LoadData<RoleModel>(sql, parameters);
+            return await _sqlDataAccess.LoadData<Role>(sql, parameters);
         }
 
         /// <summary>
@@ -83,7 +83,7 @@ namespace DataAccessLibrary.Storage
         /// </summary>
         /// <param name="roleid"></param>
         /// <returns></returns>
-        public async Task Delete(int roleid)
+        public async Task Delete(string roleid)
         {
             string sql = "DELETE FROM `roles` WHERE RoleId = @roleid";
 

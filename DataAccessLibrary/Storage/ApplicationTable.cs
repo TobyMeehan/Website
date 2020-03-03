@@ -16,7 +16,7 @@ namespace DataAccessLibrary.Storage
             _sqlDataAccess = sqlDataAccess;
         }
 
-        public async Task<List<ApplicationModel>> SelectById(string appid)
+        public async Task<List<Application>> SelectById(string appid)
         {
             string sql = "SELECT * FROM `applications` WHERE `AppId` = @appid";
 
@@ -25,10 +25,10 @@ namespace DataAccessLibrary.Storage
                 appid
             };
 
-            return await _sqlDataAccess.LoadData<ApplicationModel>(sql, parameters);
+            return await _sqlDataAccess.LoadData<Application>(sql, parameters);
         }
 
-        public async Task<List<ApplicationModel>> SelectByName(string name)
+        public async Task<List<Application>> SelectByName(string name)
         {
             string sql = "SELECT * FROM `applications` WHERE `Name` = @name";
 
@@ -37,10 +37,10 @@ namespace DataAccessLibrary.Storage
                 name
             };
 
-            return await _sqlDataAccess.LoadData<ApplicationModel>(sql, parameters);
+            return await _sqlDataAccess.LoadData<Application>(sql, parameters);
         }
 
-        public async Task<List<ApplicationModel>> SelectByUser(string userid)
+        public async Task<List<Application>> SelectByUser(string userid)
         {
             string sql = "SELECT * FROM `applications` WHERE `UserId` = @userid";
 
@@ -49,10 +49,10 @@ namespace DataAccessLibrary.Storage
                 userid
             };
 
-            return await _sqlDataAccess.LoadData<ApplicationModel>(sql, parameters);
+            return await _sqlDataAccess.LoadData<Application>(sql, parameters);
         }
 
-        public async Task<List<ApplicationModel>> SelectByUserAndName(string userid, string name)
+        public async Task<List<Application>> SelectByUserAndName(string userid, string name)
         {
             string sql = "SELECT * FROM `applications` WHERE `UserId` = @userid AND `Name` = @name";
 
@@ -62,10 +62,10 @@ namespace DataAccessLibrary.Storage
                 name
             };
 
-            return await _sqlDataAccess.LoadData<ApplicationModel>(sql, parameters);
+            return await _sqlDataAccess.LoadData<Application>(sql, parameters);
         }
 
-        public async Task Insert(ApplicationModel app)
+        public async Task Insert(Application app)
         {
             string sql = "INSERT INTO `applications` (AppId, UserId, Name, RedirectUri, Secret) VALUES (UUID(), @UserId, @Name, @RedirectUri, @Secret)";
 
@@ -84,7 +84,7 @@ namespace DataAccessLibrary.Storage
             await _sqlDataAccess.SaveData(sql, parameters);
         }
 
-        public async Task Update(ApplicationModel app)
+        public async Task Update(Application app)
         {
             string sql = "UPDATE `applications` SET `Name` = @Name, `RedirectUri` = @RedirectUri WHERE `AppId` = @AppId";
 
