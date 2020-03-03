@@ -1,0 +1,19 @@
+﻿@using System.Web;
+
+<AuthorizeView>
+    <Authorized>
+        <div class="btn-group">
+            <a class="btn btn-outline-light my-2 my-sm-0" href="/me">@context.User.Identity.Name</a>
+
+            <div class="btn-group">
+                <button id="BtnAccountsDropdown" type="button" class="btn btn-outline-light dropdown-toggle" data-toggle="dropdown"></button>
+                <div class="dropdown-menu dropdown-menu-right" aria-labelledby="BtnAccountsDropdown">
+                    <a class="dropdown-item" href="/logout">Logout</a>
+                </div>
+            </div>
+        </div>
+    </Authorized>
+    <NotAuthorized>
+        <a class="btn btn-outline-light my-2 my-sm-0" href="/login">Login</a>
+    </NotAuthorized>
+</AuthorizeView>

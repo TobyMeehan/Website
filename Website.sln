@@ -9,7 +9,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataAccessLibrary", "DataAc
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlazorUI", "BlazorUI\BlazorUI.csproj", "{318997D2-3EC1-4419-9091-4B2A9FD6092E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MvcUI", "MvcUI\MvcUI.csproj", "{DAF2F86E-07DF-4614-AEDC-8E951BA2D313}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MvcUI", "MvcUI\MvcUI.csproj", "{DAF2F86E-07DF-4614-AEDC-8E951BA2D313}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

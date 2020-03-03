@@ -13,11 +13,21 @@ a, .btn-link {
     border-color: #1861ac;
 }
 
-.large-background {
+.banner {
+    margin-bottom: 0;
+    border-radius: 0;
+    background-image: url("/img/Banner.svg");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+    padding: 0;
+}
+
+.banner-logo {
     margin-bottom: 0;
     border-radius: 0;
     height: 250px;
-    background-image: url("/img/Jumbotron.svg");
+    background-image: url("/img/BannerLogo.svg");
     background-repeat: no-repeat;
     background-position: center;
     background-size: cover;
