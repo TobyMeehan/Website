@@ -44,7 +44,7 @@ namespace BlazorUI
 
                 var claims = new List<Claim>
                 {
-                    new Claim(ClaimTypes.Name, user.Id)
+                    new Claim(ClaimTypes.Name, user.Username)
                 };
 
                 user.Roles.ForEach(role =>
