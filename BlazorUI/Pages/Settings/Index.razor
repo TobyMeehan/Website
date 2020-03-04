@@ -1,0 +1,148 @@
+﻿@page "/me"
+@layout SettingsLayout
+@attribute [Authorize]
+
+<AuthorizeView>
+    <div class="card my-3">
+        <div class="card-body">
+            <div class="d-flex flex-row">
+                <h3 class="p-2">@(context.User.Identity.Name)</h3>
+                <a href="#" class="p-2 my-1" title="Change Username" role="button" data-toggle="modal" data-target="#InformationModal" onclick="Settings_Index_ShowUsernameTab()">Change</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="card my-3">
+        <div class="card-body">
+
+            <div class="form-group">
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">Password</span>
+                    </div>
+                    <input type="password" class="form-control" placeholder="••••••••" readonly />
+                    <div class="input-group-append">
+                        <button class="btn btn-warning" data-toggle="modal" data-target="#InformationModal" onclick="Settings_Index_ShowPasswordTab()">Change Password</button>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <button class="btn btn-danger btn-lg" data-toggle="modal" data-target="#InformationModal" onclick="Settings_Index_ShowAccountTab()">Delete Account</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="InformationModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title"><i class="fas fa-user-edit"></i> Account Information</h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+
+                <div class="modal-body">
+                    <ul class="nav nav-tabs" id="InformationTabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" id="UsernameTab" data-toggle="tab" href="#UsernameContent" role="tab" aria-controls="username" aria-selected="true">Username</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="PasswordTab" data-toggle="tab" href="#PasswordContent" role="tab" aria-controls="password" aria-selected="false">Password</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="AccountTab" data-toggle="tab" href="#AccountContent" role="tab" aria-controls="account" aria-selected="false">Account</a>
+                        </li>
+                    </ul>
+                    <div class="tab-content" id="InformationContent">
+                        <div class="tab-pane fade show active" id="UsernameContent" role="tabpanel" aria-labelledby="UsernameTab">
+                            <h5>Change Username</h5>
+
+                            <EditForm Model="_usernameModel" Context="usernameFormContext">
+                                <DataAnnotationsValidator />
+                                <ValidationSummary />
+
+                                <div class="form-group">
+                                    <label for="Username" class="col-md-2">Username</label>
+                                    <div class="col-md-10">
+                                        <InputText id="Username" @bind-Value="_usernameModel.Username" class="form-control" />
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <div class="col-md-offset-2 col-md-10">
+                                        <button type="submit" class="btn btn-dark">Update</button>
+                                    </div>
+                                </div>
+                            </EditForm>
+                        </div>
+                        <div class="tab-pane fade" id="PasswordContent" role="tabpanel" aria-labelledby="PasswordTab">
+                            <h5>Change Password</h5>
+                            <EditForm Model="_changePasswordModel" Context="changePasswordFormContext">
+                                <div class="form-group">
+                                    <label for="CurrentPassword" class="col-md-10">Current Password</label>
+                                    <div class="col-md-10">
+                                        <InputText id="CurrentPassword" @bind-Value="_changePasswordModel.CurrentPassword" class="form-control" />
+                                        <ValidationMessage For="@(() => _changePasswordModel.CurrentPassword)" />
+
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="NewPassword" class="col-md-10">New Password</label>
+                                    <div class="col-md-10">
+                                        <InputText id="NewPassword" @bind-Value="_changePasswordModel.NewPassword" class="form-control" />
+                                        <ValidationMessage For="@(() => _changePasswordModel.NewPassword)" class="text-danger" />
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="ConfirmNewPassword" class="col-md-10">Confirm New Password</label>
+                                    <div class="col-md-10">
+                                        <InputText id="ConfirmNewPassword" @bind-Value="_changePasswordModel.ConfirmNewPassword" class="form-control" />
+                                        <ValidationMessage For="@(() => _changePasswordModel.ConfirmNewPassword)" class="text-danger" />
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-md-10">
+                                        <button type="submit" class="btn btn-dark">Change</button>
+                                    </div>
+                                </div>
+                            </EditForm>
+                        </div>
+                        <div class="tab-pane fade" id="AccountContent" role="tabpanel" aria-labelledby="AccountTab">
+                            <h5>Delete Account</h5>
+                            <AuthorizeView Roles="Admin" Context="adminContext">
+                                <Authorized>
+                                    <p class="text-danger">Admin accounts cannot be deleted automatically.</p>
+                                </Authorized>
+                                <NotAuthorized>
+                                    <EditForm Model="_passwordModel" Context="passwordFormContext">
+                                        <div class="form-group">
+                                            <label for="Password" class="col-md-10">Password</label>
+                                            <div class="col-md-10">
+                                                <InputText id="Password" @bind-Value="_passwordModel.Password" class="form-control" />
+                                                <ValidationMessage For="@(() => _passwordModel.Password)" class="text-danger" />
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <div class="col-md-10">
+                                                <button type="submit" class="btn btn-danger">Delete</button>
+                                            </div>
+                                        </div>
+                                    </EditForm>
+                                </NotAuthorized>
+                            </AuthorizeView>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</AuthorizeView>
+
+@code {
+    private Models.UsernameFormModel _usernameModel = new Models.UsernameFormModel();
+    private Models.ChangePasswordFormModel _changePasswordModel = new Models.ChangePasswordFormModel();
+    private Models.PasswordFormModel _passwordModel = new Models.PasswordFormModel();
+}
