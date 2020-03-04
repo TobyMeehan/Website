@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace BlazorUI
 {
+    [AutoValidateAntiforgeryToken]
     public class LoginModel : PageModel
     {
         private readonly IMapper _mapper;
@@ -31,6 +32,7 @@ namespace BlazorUI
 
         [BindProperty]
         public LoginFormModel Login { get; set; }
+
         public async Task<IActionResult> OnPost()
         {
             if (!ModelState.IsValid)
@@ -69,8 +71,8 @@ namespace BlazorUI
             }
             else
             {
-                ModelState.AddModelError("Username", "Invalid username and password combination.");
-                ModelState.AddModelError("Password", "Invalid username and password combination.");
+                ModelState.AddModelError("Login.Username", "Invalid username and password combination.");
+                ModelState.AddModelError("Login.Password", "Invalid username and password combination.");
 
                 return Page();
             }

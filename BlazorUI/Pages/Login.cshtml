@@ -23,7 +23,7 @@
                 <h1>Login</h1>
                 <p>Some text... <!--TODO: some text--></p>
 
-                <form method="post">
+                <form method="post" asp-antiforgery="true">
                     <div class="form-group">
                         <label asp-for="Login.Username"></label>
                         <input asp-for="Login.Username" class="form-control" />
