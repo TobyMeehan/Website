@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using DataAccessLibrary;
 using DataAccessLibrary.Data;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -14,7 +15,7 @@ namespace WebApi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class AccountController : ControllerBase
     {
         private readonly IMapper _mapper;

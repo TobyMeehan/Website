@@ -38,8 +38,10 @@ namespace WebApi
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(options =>
             {
                 options.LoginPath = "/login";
-                options.LogoutPath = "/logout";
+                options.AccessDeniedPath = "/login";
+                options.Validate();
             });
+
 
             var tokenProvider = new RsaJwtTokenProvider("issuer", "audience", "keyName");
             services.AddSingleton<ITokenProvider>(tokenProvider);
@@ -65,7 +67,7 @@ namespace WebApi
                 auth.AddPolicy("ApplicationPolicy", policy =>
                     policy.Requirements.Add(new ApplicationAuthorRequirement()));
 
-                auth.DefaultPolicy = auth.GetPolicy("Bearer");
+                auth.DefaultPolicy = auth.GetPolicy("Cookies");
             });
 
             services.AddSingleton<IAuthorizationHandler, ApplicationAuthorizationHandler>();
