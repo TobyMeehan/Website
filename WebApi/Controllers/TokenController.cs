@@ -43,7 +43,7 @@ namespace WebApi.Controllers
             {
                 Connection connection = _mapper.Map<Connection>(await _connectionProcessor.GetConnectionByAuthCode(request.code));
 
-                if (connection.Application.AppId == request.client_id && connection.Application.Secret == request.client_secret)
+                if (connection.Application.Id == request.client_id && connection.Application.Secret == request.client_secret)
                 {
                     return Token(connection);
                 }

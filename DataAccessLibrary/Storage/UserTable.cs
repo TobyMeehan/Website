@@ -35,7 +35,7 @@ namespace DataAccessLibrary.Storage
         /// <returns></returns>
         public async Task<List<User>> SelectById(string userid)
         {
-            string sql = "SELECT * FROM `users` WHERE `UserId` = @userid";
+            string sql = "SELECT * FROM `users` WHERE `Id` = @userid";
 
             object parameters = new
             {
@@ -64,7 +64,7 @@ namespace DataAccessLibrary.Storage
 
         public async Task<List<PasswordModel>> SelectPassword(string username)
         {
-            string sql = "SELECT Username, HashedPassword FROM `users` WHERE `Username` = @username";
+            string sql = "SELECT `Username`, `HashedPassword` FROM `users` WHERE `Username` = @username";
 
             object parameters = new
             {
@@ -82,7 +82,7 @@ namespace DataAccessLibrary.Storage
         /// <returns></returns>
         public async Task Insert(User user, string hashedPassword)
         {
-            string sql = "INSERT INTO `users` (UserId, Username, Email, HashedPassword) VALUES (UUID(), @Username, @Email, @hashedPassword)";
+            string sql = "INSERT INTO `users` (Id, Username, Email, HashedPassword) VALUES (UUID(), @Username, @Email, @hashedPassword)";
 
             object parameters = new
             {
@@ -102,7 +102,7 @@ namespace DataAccessLibrary.Storage
         /// <returns></returns>
         public async Task UpdateUsername(string userid, string username)
         {
-            string sql = "UPDATE `users` SET Username = @username WHERE UserId = @userid";
+            string sql = "UPDATE `users` SET `Username` = @username WHERE `Id` = @userid";
 
             object parameters = new
             {
@@ -121,7 +121,7 @@ namespace DataAccessLibrary.Storage
         /// <returns></returns>
         public async Task UpdateEmail(string userid, string email)
         {
-            string sql = "UPDATE `users` SET Email = @email WHERE UserId = @userid";
+            string sql = "UPDATE `users` SET `Email` = @email WHERE `Id` = @userid";
 
             object parameters = new
             {
@@ -140,7 +140,7 @@ namespace DataAccessLibrary.Storage
         /// <returns></returns>
         public async Task UpdatePassword(string userid, string hashedPassword)
         {
-            string sql = "UPDATE `users` SET HashedPassword = @hashedPassword WHERE UserId = @userid";
+            string sql = "UPDATE `users` SET `HashedPassword` = @hashedPassword WHERE `Id` = @userid";
 
             object parameters = new
             {
@@ -158,7 +158,7 @@ namespace DataAccessLibrary.Storage
         /// <returns></returns>
         public async Task Delete(string userid)
         {
-            string sql = "DELETE FROM `users` WHERE UserId = @userid";
+            string sql = "DELETE FROM `users` WHERE `Id` = @userid";
 
             object parameters = new
             {

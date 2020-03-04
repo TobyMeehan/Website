@@ -18,7 +18,7 @@ namespace DataAccessLibrary.Storage
 
         public async Task<List<Application>> SelectById(string appid)
         {
-            string sql = "SELECT * FROM `applications` WHERE `AppId` = @appid";
+            string sql = "SELECT * FROM `applications` WHERE `Id` = @appid";
 
             object parameters = new
             {
@@ -67,14 +67,14 @@ namespace DataAccessLibrary.Storage
 
         public async Task Insert(Application app)
         {
-            string sql = "INSERT INTO `applications` (AppId, UserId, Name, RedirectUri, Secret) VALUES (UUID(), @UserId, @Name, @RedirectUri, @Secret)";
+            string sql = "INSERT INTO `applications` (Id, UserId, Name, RedirectUri, Secret) VALUES (UUID(), @UserId, @Name, @RedirectUri, @Secret)";
 
             await _sqlDataAccess.SaveData(sql, app);
         }
 
         public async Task Delete(string appid)
         {
-            string sql = "DELETE FROM `applications` WHERE `AppId` = @appid";
+            string sql = "DELETE FROM `applications` WHERE `Id` = @appid";
 
             object parameters = new
             {
@@ -86,7 +86,7 @@ namespace DataAccessLibrary.Storage
 
         public async Task Update(Application app)
         {
-            string sql = "UPDATE `applications` SET `Name` = @Name, `RedirectUri` = @RedirectUri WHERE `AppId` = @AppId";
+            string sql = "UPDATE `applications` SET `Name` = @Name, `RedirectUri` = @RedirectUri WHERE `Id` = @AppId";
 
             await _sqlDataAccess.SaveData(sql, app);
         }

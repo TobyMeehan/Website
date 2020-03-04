@@ -9,7 +9,7 @@ namespace WebApi.Models
     public class Application
     {
         [Display(Name = "App ID")]
-        public string AppId { get; set; }
+        public string Id { get; set; }
         public User Author { get; set; }
         public string Name { get; set; }
         [Display(Name = "Redirect Uri")]

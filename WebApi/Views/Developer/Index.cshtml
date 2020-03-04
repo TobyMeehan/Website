@@ -9,7 +9,7 @@
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.AppId)
+                @Html.DisplayNameFor(model => model.Id)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.Name)
@@ -28,7 +28,7 @@
         {
             <tr>
                 <td>
-                    @Html.DisplayFor(modelItem => item.AppId)
+                    @Html.DisplayFor(modelItem => item.Id)
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.Name)
@@ -40,8 +40,8 @@
                     @Html.DisplayFor(modelItem => item.Secret)
                 </td>
                 <td>
-                    @Html.ActionLink("Edit", "Edit", new { appid = item.AppId }) |
-                    @Html.ActionLink("Delete", "Delete", new { appid = item.AppId })
+                    @Html.ActionLink("Edit", "Edit", new { appid = item.Id }) |
+                    @Html.ActionLink("Delete", "Delete", new { appid = item.Id })
                 </td>
             </tr>
         }

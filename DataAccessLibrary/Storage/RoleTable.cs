@@ -34,7 +34,7 @@ namespace DataAccessLibrary.Storage
         /// <returns></returns>
         public async Task<List<Role>> SelectById(string roleid)
         {
-            string sql = "SELECT * FROM `roles` WHERE RoleId = @roleid";
+            string sql = "SELECT * FROM `roles` WHERE `Id` = @roleid";
 
             object parameters = new
             {
@@ -51,7 +51,7 @@ namespace DataAccessLibrary.Storage
         /// <returns></returns>
         public async Task<List<Role>> SelectByName(string name)
         {
-            string sql = "SELECT * FROM `roles` WHERE Name = @name";
+            string sql = "SELECT * FROM `roles` WHERE `Name` = @name";
 
             object parameters = new
             {
@@ -85,7 +85,7 @@ namespace DataAccessLibrary.Storage
         /// <returns></returns>
         public async Task Delete(string roleid)
         {
-            string sql = "DELETE FROM `roles` WHERE RoleId = @roleid";
+            string sql = "DELETE FROM `roles` WHERE `Id` = @roleid";
 
             object parameters = new
             {

@@ -130,7 +130,7 @@ namespace WebApi.Controllers
 
                             app = new Application
                             {
-                                AppId = appid,
+                                Id = appid,
                                 Author = _mapper.Map<User>(await _userProcessor.GetUserById(User.Identity.Name)),
                                 Name = appForm.Name,
                                 RedirectUri = appForm.RedirectUri
