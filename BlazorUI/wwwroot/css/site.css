@@ -3,8 +3,12 @@
 html, body {
 }
 
-a, .btn-link {
-    color: #0366d6;
+.text-darklink {
+    color: #79828a;
+}
+
+.text-darklink:focus, .text-darklink:hover {
+    color: #6c757d;
 }
 
 .btn-primary {

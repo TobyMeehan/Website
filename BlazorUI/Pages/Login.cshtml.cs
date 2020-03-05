@@ -49,11 +49,6 @@ namespace BlazorUI
                     new Claim(ClaimTypes.Name, user.Username)
                 };
 
-                user.Roles.ForEach(role =>
-                {
-                    claims.Add(new Claim(ClaimTypes.Role, role.Name));
-                });
-
                 user.Roles.ForEach(role => claims.Add(new Claim(ClaimTypes.Role, role.Name)));
 
                 var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);

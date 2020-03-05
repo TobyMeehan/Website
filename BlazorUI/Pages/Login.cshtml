@@ -27,19 +27,21 @@
                     <div class="form-group">
                         <label asp-for="Login.Username"></label>
                         <input asp-for="Login.Username" class="form-control" />
-                        <span asp-validation-for="Login.Username"></span>
+                        <span asp-validation-for="Login.Username" class="text-danger"></span>
                     </div>
                     <div class="form-group">
                         <label asp-for="Login.Password"></label>
                         <input asp-for="Login.Password" class="form-control" />
-                        <span asp-validation-for="Login.Password"></span>
+                        <span asp-validation-for="Login.Password" class="text-danger"></span>
                     </div>
-
-                    <button type="submit" class="btn btn-light">Log In</button>
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-light">Log In</button>
+                    </div>
                 </form>
+                <p>Don't have an account? <a href="/register" class="text-darklink">Register</a></p>
             </div>
         </div>
     </div>
-    
+
 </body>
 </html>

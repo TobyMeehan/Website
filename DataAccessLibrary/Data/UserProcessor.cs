@@ -78,7 +78,7 @@ namespace DataAccessLibrary.Data
             }
         }
 
-        public async Task<User> CreateUser(User user, string password, List<Role> roles)
+        public async Task<User> CreateUser(User user, string password)
         {
             if (!ValidateQuery(await _userTable.SelectByUsername(user.Username))) // Check if username already exists
             {
@@ -88,7 +88,7 @@ namespace DataAccessLibrary.Data
 
                 user = await GetUserByUsername(user.Username);
 
-                foreach (Role role in roles)
+                foreach (Role role in user.Roles)
                 {
                     if (ValidateQuery(await _roleTable.SelectById(role.Id))) // Check if role exists
                     {
