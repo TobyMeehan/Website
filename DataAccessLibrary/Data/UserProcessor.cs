@@ -109,6 +109,25 @@ namespace DataAccessLibrary.Data
             }
         }
 
+        public async Task UpdateUsername(string userid, string username)
+        {
+            if (!ValidateQuery(await _userTable.SelectByUsername(username)))
+            {
+                if (ValidateQuery(await _userTable.SelectById(userid)))
+                {
+                    await _userTable.UpdateUsername(userid, username);
+                }
+                else
+                {
+                    throw new ArgumentException("Provided user id could not be found.");
+                }
+            }
+            else
+            {
+                throw new ArgumentException("Provided username is already in use.");
+            }
+        }
+
         public async Task AddRole(string userid, Role role)
         {
             if (ValidateQuery(await _userTable.SelectById(userid), out User user)) // Get user from provided ID
@@ -139,6 +158,20 @@ namespace DataAccessLibrary.Data
         public async Task DeleteUser(string userid)
         {
             await _userTable.Delete(userid);
+        }
+
+        public async Task UpdatePassword(string userid, string password)
+        {
+            if (ValidateQuery(await _userTable.SelectById(userid)))
+            {
+                string hashedPassword = BCrypt.HashPassword(password, BCrypt.GenerateSalt());
+
+                await _userTable.UpdatePassword(userid, hashedPassword);
+            }
+            else
+            {
+                throw new ArgumentException("Provided user id could not be found.");
+            }
         }
     }
 }

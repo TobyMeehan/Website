@@ -16,6 +16,7 @@ namespace BlazorUI.Models
         [Required(ErrorMessage = "Please enter new password.")]
         [Display(Name = "New Password")]
         [StringLength(100, MinimumLength = 8, ErrorMessage = "Password must be between 8 - 100 characters.")]
+        [Compare("ConfirmNewPassword", ErrorMessage = "Passwords must match.")]
         [DataType(DataType.Password)]
         public string NewPassword { get; set; }
 

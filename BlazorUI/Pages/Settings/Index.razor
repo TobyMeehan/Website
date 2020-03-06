@@ -7,6 +7,7 @@
 
 @inject IUserProcessor userProcessor
 @inject AuthenticationStateProvider AuthenticationStateProvider
+@inject NavigationManager NavigationManager
 
 <AuthorizeView>
     <div class="card my-3">
@@ -177,17 +178,55 @@
         }
         else
         {
-
+            await userProcessor.UpdateUsername(context.User.GetUserId(), _usernameModel.Username);
+            NavigationManager.NavigateTo("/me");
         }
     }
 
     async Task ChangePassword(EditContext editContext)
     {
+        Dictionary<string, List<string>> errors = new Dictionary<string, List<string>>();
+        if (_changePasswordModel.NewPassword == _changePasswordModel.ConfirmNewPassword) // this is checked by the validator but has caused some issues in some versions of blazor
+        {
+            if (await userProcessor.Authenticate(context.User.GetUsername(), _changePasswordModel.CurrentPassword))
+            {
+                await userProcessor.UpdatePassword(context.User.GetUserId(), _changePasswordModel.NewPassword);
+                NavigationManager.NavigateTo("/me");
+            }
+            else
+            {
+                errors.Add("CurrentPassword", new List<string> { "Incorrect current password." });
+            }
+        }
+        else
+        {
+            List<string> message = new List<string> { "Passwords do not match." };
+            errors.Add("NewPassword", message);
+            errors.Add("ConfirmNewPassword", message);
+        }
 
+        if (errors.Any())
+        {
+            changePasswordValidator.DisplayErrors(errors);
+        }
+        else
+        {
+
+        }
     }
 
     async Task DeleteAccount(EditContext editContext)
     {
-
+        if (await userProcessor.Authenticate(context.User.GetUsername(), _passwordModel.Password))
+        {
+            await userProcessor.DeleteUser(context.User.GetUserId());
+            NavigationManager.NavigateTo("/logout", true);
+        }
+        else
+        {
+            Dictionary<string, List<string>> errors = new Dictionary<string, List<string>>();
+            errors.Add("Password", new List<string> { "Incorrect password." });
+            deleteValidator.DisplayErrors(errors);
+        }
     }
 }

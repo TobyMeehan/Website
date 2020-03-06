@@ -8,6 +8,8 @@ namespace DataAccessLibrary.Data
     {
         Task<bool> Authenticate(string username, string password);
         Task<User> CreateUser(User user, string password);
+        Task UpdateUsername(string userid, string username);
+        Task UpdatePassword(string userid, string newPassword);
         Task<User> GetUserById(string userid);
         Task<User> GetUserByUsername(string username);
         Task<bool> UserExists(string username);
