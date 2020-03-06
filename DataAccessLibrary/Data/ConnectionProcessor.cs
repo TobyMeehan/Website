@@ -3,6 +3,7 @@ using DataAccessLibrary.Security;
 using DataAccessLibrary.Storage;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -28,16 +29,16 @@ namespace DataAccessLibrary.Data
 
         public async Task<Connection> CreateConnection(Connection connection)
         {
-            if (ValidateQuery(await _userTable.SelectById(connection.User.Id))) // Check that provided user exists
+            if ((await _userTable.SelectById(connection.User.Id)).Any()) // Check that provided user exists
             {
-                if (ValidateQuery(await _applicationTable.SelectById(connection.Application.Id))) // Check that provided application exists
+                if ((await _applicationTable.SelectById(connection.Application.Id)).Any()) // Check that provided application exists
                 {
                     connection.UserId = connection.User.Id;
                     connection.AppId = connection.Application.Id;
 
                     connection.AuthorizationCode = GenerateAuthCode();
 
-                    if (ValidateQuery(await _connectionTable.SelectByUserAndApplication(connection.User.Id, connection.Application.Id))) // If a connection between the provided user and application already exists
+                    if ((await _connectionTable.SelectByUserAndApplication(connection.User.Id, connection.Application.Id)).Any()) // If a connection between the provided user and application already exists
                     {
                         await _connectionTable.Update(connection);
                     }
@@ -105,7 +106,7 @@ namespace DataAccessLibrary.Data
 
                 if (DateTime.Now < validDate)
                 {
-                    if (ValidateQuery(await _connectionTable.SelectByAuthCode(authorizationCode)))
+                    if ((await _connectionTable.SelectByAuthCode(authorizationCode)).Any())
                     {
                         return true;
                     }

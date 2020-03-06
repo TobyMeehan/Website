@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace DataAccessLibrary.Data
@@ -15,32 +16,16 @@ namespace DataAccessLibrary.Data
         /// <returns></returns>
         public bool ValidateQuery<T>(List<T> value, out T item)
         {
-            if (value.Count > 1)
+            try
             {
-                item = default;
-                return false;
-            }
-            else if (value.Count < 1 || value == null)
-            {
-                item = default;
-                return false;
-            }
-            else
-            {
-                item = value[0];
+                item = value.Single();
                 return true;
             }
-        }
-
-        /// <summary>
-        /// Confirms whether an item exists in the provided query result. Does not check against multiple items.
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="value"></param>
-        /// <returns></returns>
-        public bool ValidateQuery<T>(List<T> value)
-        {
-            return value.Count > 0;
+            catch (Exception)
+            {
+                item = default;
+                return false;
+            }
         }
     }
 }

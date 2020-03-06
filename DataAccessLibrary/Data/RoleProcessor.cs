@@ -2,6 +2,7 @@
 using DataAccessLibrary.Storage;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -42,7 +43,7 @@ namespace DataAccessLibrary.Data
 
         public async Task CreateRole(Role role)
         {
-            if (!ValidateQuery(await _roleTable.SelectByName(role.Name))) // Check if role name already exists
+            if (!(await _roleTable.SelectByName(role.Name)).Any()) // Check if role name already exists
             {
                 await _roleTable.Insert(role.Name);
             }
@@ -54,7 +55,7 @@ namespace DataAccessLibrary.Data
 
         public async Task DeleteRole(Role role)
         {
-            if (ValidateQuery(await _roleTable.SelectById(role.Id))) // Check that role exists
+            if ((await _roleTable.SelectById(role.Id)).Any()) // Check that role exists
             {
                 await _roleTable.Delete(role.Id);
             }

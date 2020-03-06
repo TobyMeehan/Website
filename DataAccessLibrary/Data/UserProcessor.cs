@@ -80,7 +80,7 @@ namespace DataAccessLibrary.Data
 
         public async Task<User> CreateUser(User user, string password)
         {
-            if (!ValidateQuery(await _userTable.SelectByUsername(user.Username))) // Check if username already exists
+            if (!(await _userTable.SelectByUsername(user.Username)).Any()) // Check if username already exists
             {
                 string hashedPassword = BCrypt.HashPassword(password, BCrypt.GenerateSalt()); // Hash password
 
@@ -90,7 +90,7 @@ namespace DataAccessLibrary.Data
 
                 foreach (Role role in user.Roles)
                 {
-                    if (ValidateQuery(await _roleTable.SelectById(role.Id))) // Check if role exists
+                    if ((await _roleTable.SelectById(role.Id)).Any()) // Check if role exists
                     {
                         await _userRoleTable.Insert(new UserRoleModel { UserId = user.Id, RoleId = role.Id }); // Insert new user role relation
                     }
@@ -111,9 +111,9 @@ namespace DataAccessLibrary.Data
 
         public async Task UpdateUsername(string userid, string username)
         {
-            if (!ValidateQuery(await _userTable.SelectByUsername(username)))
+            if (!(await _userTable.SelectByUsername(username)).Any())
             {
-                if (ValidateQuery(await _userTable.SelectById(userid)))
+                if ((await _userTable.SelectById(userid)).Any())
                 {
                     await _userTable.UpdateUsername(userid, username);
                 }
@@ -134,7 +134,7 @@ namespace DataAccessLibrary.Data
             {
                 if (!user.Roles.Any(r => r.Name == role.Name)) // Check that the user does not already have the provided role
                 {
-                    if (ValidateQuery(await _roleTable.SelectById(role.Id))) // Check that the role exists
+                    if ((await _roleTable.SelectById(role.Id)).Any()) // Check that the role exists
                     {
                         await _userRoleTable.Insert(new UserRoleModel { UserId = userid, RoleId = role.Id }); // Insert new user role relation
                     }
@@ -152,7 +152,7 @@ namespace DataAccessLibrary.Data
 
         public async Task<bool> UserExists(string username)
         {
-            return ValidateQuery(await _userTable.SelectByUsername(username));
+            return (await _userTable.SelectByUsername(username)).Any();
         }
 
         public async Task DeleteUser(string userid)
@@ -162,7 +162,7 @@ namespace DataAccessLibrary.Data
 
         public async Task UpdatePassword(string userid, string password)
         {
-            if (ValidateQuery(await _userTable.SelectById(userid)))
+            if ((await _userTable.SelectById(userid)).Any())
             {
                 string hashedPassword = BCrypt.HashPassword(password, BCrypt.GenerateSalt());
 

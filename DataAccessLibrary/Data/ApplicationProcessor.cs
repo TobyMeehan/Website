@@ -3,6 +3,7 @@ using DataAccessLibrary.Security;
 using DataAccessLibrary.Storage;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -68,7 +69,7 @@ namespace DataAccessLibrary.Data
         {
             var apps = await _applicationTable.SelectByName(name);
 
-            if (ValidateQuery(apps)) // Check at least one application has provided name
+            if (apps.Any()) // Check at least one application has provided name
             {
                 foreach (Application app in apps)
                 {
@@ -96,7 +97,7 @@ namespace DataAccessLibrary.Data
             {
                 var apps = await _applicationTable.SelectByUser(userid);
 
-                if (ValidateQuery(apps)) // If user has created at least one application
+                if (apps.Any()) // If user has created at least one application
                 {
                     apps.ForEach(app => app.Author = user);
 
@@ -121,11 +122,11 @@ namespace DataAccessLibrary.Data
         /// <returns></returns>
         public async Task<Application> CreateApplication(Application app, bool secret)
         {
-            if (ValidateQuery(await _userTable.SelectById(app.Author.Id))) // If provided app author exists
+            if ((await _userTable.SelectById(app.Author.Id)).Any()) // If provided app author exists
             {
                 app.UserId = app.Author.Id;
 
-                if (!ValidateQuery(await _applicationTable.SelectByUserAndName(app.UserId, app.Name))) // If an app with the same name has not already been created by the author
+                if (!(await _applicationTable.SelectByUserAndName(app.UserId, app.Name)).Any()) // If an app with the same name has not already been created by the author
                 {
                     if (secret)
                     {
@@ -149,9 +150,9 @@ namespace DataAccessLibrary.Data
 
         public async Task UpdateApplication(Application app)
         {
-            if (ValidateQuery(await _userTable.SelectById(app.Author.Id))) // If provided app author exists
+            if ((await _userTable.SelectById(app.Author.Id)).Any()) // If provided app author exists
             {
-                if (ValidateQuery(await _applicationTable.SelectById(app.Id))) // If provided app ID exists
+                if ((await _applicationTable.SelectById(app.Id)).Any()) // If provided app ID exists
                 {
                     if (ValidateQuery(await _applicationTable.SelectByUserAndName(app.UserId, app.Name), out Application match) && match.Id == app.Id) // Check if an application with the same name has already been created. Check that the ID of the two applications match
                     {
