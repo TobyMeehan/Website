@@ -13,22 +13,21 @@ namespace BlazorUI.Extensions
     {
         public static IUserProcessor UserProcessor { get; set; }
 
-        public static IMapper Mapper { get; set; }
+        public static IMapper Mapper { get; set; }        
 
         public static async Task<User> GetUser(this ClaimsPrincipal user)
         {
             return Mapper.Map<User>(await UserProcessor.GetUserByUsername(user.Identity.Name));
         }
 
-        public static string GetUsername(this ClaimsPrincipal user)
+        public static string GetUserId(this ClaimsPrincipal user)
         {
             return user.Identity.Name;
         }
 
-        public static async Task<string> GetUserId(this ClaimsPrincipal user)
+        public static string GetUsername(this ClaimsPrincipal user)
         {
-            var u = await GetUser(user);
-            return u.Id;
+            return user.Claims.Where(claim => claim.Type == "Username").ToList().Single().Value;
         }
     }
 }

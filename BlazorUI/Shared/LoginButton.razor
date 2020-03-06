@@ -4,7 +4,7 @@
 <AuthorizeView>
     <Authorized>
         <div class="btn-group">
-            <a class="btn btn-outline-light my-2 my-sm-0" href="/me"><DisplayUser Username="@(context.User.Identity.Name)" /></a>
+            <a class="btn btn-outline-light my-2 my-sm-0" href="/me"><DisplayUser Username="@(context.User.GetUsername())" /></a>
 
             <div class="btn-group">
                 <button id="BtnAccountsDropdown" type="button" class="btn btn-outline-light dropdown-toggle" data-toggle="dropdown"></button>
