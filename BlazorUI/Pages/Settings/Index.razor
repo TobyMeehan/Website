@@ -1,12 +1,18 @@
-﻿@page "/me"
+﻿@using DataAccessLibrary.Data;
+@using BlazorUI.Extensions;
+
+@page "/me"
 @layout SettingsLayout
 @attribute [Authorize]
+
+@inject IUserProcessor userProcessor
+@inject AuthenticationStateProvider AuthenticationStateProvider
 
 <AuthorizeView>
     <div class="card my-3">
         <div class="card-body">
             <div class="d-flex flex-row">
-                <h3 class="p-2">@(context.User.Identity.Name)</h3>
+                <h3 class="p-2">@(context.User.GetUsername())</h3>
                 <a href="#" class="p-2 my-1" title="Change Username" role="button" data-toggle="modal" data-target="#InformationModal" onclick="Settings_Index_ShowUsernameTab()">Change</a>
             </div>
         </div>
@@ -56,14 +62,15 @@
                         <div class="tab-pane fade show active" id="UsernameContent" role="tabpanel" aria-labelledby="UsernameTab">
                             <h5>Change Username</h5>
 
-                            <EditForm Model="_usernameModel" Context="usernameFormContext">
+                            <EditForm Model="_usernameModel" Context="usernameFormContext" OnValidSubmit="ChangeUsername">
                                 <DataAnnotationsValidator />
-                                <ValidationSummary />
+                                <ServerSideValidator @ref="usernameValidator" />
 
                                 <div class="form-group">
                                     <label for="Username" class="col-md-2">Username</label>
                                     <div class="col-md-10">
                                         <InputText id="Username" @bind-Value="_usernameModel.Username" class="form-control" />
+                                        <ValidationMessage For="@(() => _usernameModel.Username)" />
                                     </div>
                                 </div>
 
@@ -76,7 +83,9 @@
                         </div>
                         <div class="tab-pane fade" id="PasswordContent" role="tabpanel" aria-labelledby="PasswordTab">
                             <h5>Change Password</h5>
-                            <EditForm Model="_changePasswordModel" Context="changePasswordFormContext">
+                            <EditForm Model="_changePasswordModel" Context="changePasswordFormContext" OnValidSubmit="ChangePassword">
+                                <DataAnnotationsValidator />
+                                <ServerSideValidator @ref="changePasswordValidator" />
                                 <div class="form-group">
                                     <label for="CurrentPassword" class="col-md-10">Current Password</label>
                                     <div class="col-md-10">
@@ -113,7 +122,9 @@
                                     <p class="text-danger">Admin accounts cannot be deleted automatically.</p>
                                 </Authorized>
                                 <NotAuthorized>
-                                    <EditForm Model="_passwordModel" Context="passwordFormContext">
+                                    <EditForm Model="_passwordModel" Context="passwordFormContext" OnValidSubmit="DeleteAccount">
+                                        <DataAnnotationsValidator />
+                                        <ServerSideValidator @ref="deleteValidator" />
                                         <div class="form-group">
                                             <label for="Password" class="col-md-10">Password</label>
                                             <div class="col-md-10">
@@ -145,4 +156,38 @@
     private Models.UsernameFormModel _usernameModel = new Models.UsernameFormModel();
     private Models.ChangePasswordFormModel _changePasswordModel = new Models.ChangePasswordFormModel();
     private Models.PasswordFormModel _passwordModel = new Models.PasswordFormModel();
+    private AuthenticationState context;
+
+    ServerSideValidator usernameValidator;
+    ServerSideValidator changePasswordValidator;
+    ServerSideValidator deleteValidator;
+
+    protected override async Task OnInitializedAsync()
+    {
+        context = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+    }
+
+    async Task ChangeUsername(EditContext editContext)
+    {
+        if (await userProcessor.UserExists(_usernameModel.Username) && _usernameModel.Username != context.User.GetUsername())
+        {
+            Dictionary<string, List<string>> errors = new Dictionary<string, List<string>>();
+            errors.Add("Username", new List<string> { "That username is already in use." });
+            usernameValidator.DisplayErrors(errors);
+        }
+        else
+        {
+
+        }
+    }
+
+    async Task ChangePassword(EditContext editContext)
+    {
+
+    }
+
+    async Task DeleteAccount(EditContext editContext)
+    {
+
+    }
 }
