@@ -7,6 +7,8 @@ namespace DataAccessLibrary.Models
     public class Download
     {
         public string Id { get; set; }
+        public string CreatorId { get; set; }
+        public User Creator => Authors.Find(user => user.Id == CreatorId);
         public string Title { get; set; }
         public string ShortDescription { get; set; }
         public string LongDescription { get; set; }
