@@ -68,7 +68,7 @@ namespace DataAccessLibrary.Storage
         /// <returns></returns>
         public async Task Insert(string name)
         {
-            string sql = "INSERT INTO `roles` (Name) VALUES (@name)";
+            string sql = "INSERT INTO `roles` (Id, Name) VALUES (UUID(), @name)";
 
             object parameters = new
             {

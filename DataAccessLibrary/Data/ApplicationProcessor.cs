@@ -130,7 +130,7 @@ namespace DataAccessLibrary.Data
                 {
                     if (secret)
                     {
-                        app.Secret = SecureSecret.Generate();
+                        app.Secret = RandomString.GenerateCrypto();
                     }
 
                     await _applicationTable.Insert(app);

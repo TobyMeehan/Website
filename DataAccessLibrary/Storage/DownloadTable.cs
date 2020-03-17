@@ -61,7 +61,7 @@ namespace DataAccessLibrary.Storage
 
         public async Task Insert(Download download)
         {
-            string sql = "INSERT INTO `downloads` (Id, CreatorId, Title, ShortDescription, LongDescription, Version, Updated) VALUES (UUID(), @CreatorId, @Title, @ShortDescription, @LongDescription, @Version, @Updated";
+            string sql = "INSERT INTO `downloads` (Id, CreatorId, Title, ShortDescription, LongDescription, Version, Updated) VALUES (@Id, @CreatorId, @Title, @ShortDescription, @LongDescription, @Version, @Updated)";
 
             await _sqlDataAccess.SaveData(sql, download);
         }

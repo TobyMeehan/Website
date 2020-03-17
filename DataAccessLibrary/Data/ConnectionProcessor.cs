@@ -24,7 +24,7 @@ namespace DataAccessLibrary.Data
 
         public string GenerateAuthCode(int length = 32)
         {
-            return $"{SecureSecret.Generate(length)}{DateTime.Now.ToBinary()}";
+            return $"{RandomString.GenerateCrypto(length)}{DateTime.Now.ToBinary()}";
         }
 
         public async Task<Connection> CreateConnection(Connection connection)
