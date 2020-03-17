@@ -11,7 +11,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlazorUI", "BlazorUI\Blazor
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MvcUI", "MvcUI\MvcUI.csproj", "{DAF2F86E-07DF-4614-AEDC-8E951BA2D313}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DownloadHost", "DownloadHost\DownloadHost.csproj", "{21E76ABC-94A9-4E7E-8358-1B15C327C725}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DownloadHost", "DownloadHost\DownloadHost.csproj", "{21E76ABC-94A9-4E7E-8358-1B15C327C725}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
