@@ -1,13 +1,16 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
 using AutoMapper;
+using BlazorUI.Authorization;
 using BlazorUI.Models;
 using DataAccessLibrary.Data;
 using DataAccessLibrary.DataAccess;
 using DataAccessLibrary.Storage;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Hosting;
@@ -38,6 +41,7 @@ namespace BlazorUI
                 options.MinimumSameSitePolicy = SameSiteMode.None;
 
             });
+
             services.AddAuthentication(
                 CookieAuthenticationDefaults.AuthenticationScheme)
                 .AddCookie();
@@ -45,22 +49,46 @@ namespace BlazorUI
             services.AddRazorPages();
             services.AddServerSideBlazor();
 
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy("EditDownloadPolicy", policy =>
+                    policy.Requirements.Add(new DownloadAuthorRequirement()));
+
+                options.AddPolicy(Policies.IsVerified, Policies.IsVerifiedPolicy());
+            });
+
+            services.AddSingleton<IAuthorizationHandler, EditDownloadAuthorizationHandler>();
+
             services.AddHttpContextAccessor();
+
+            HttpClient client = new HttpClient();
+            client.DefaultRequestHeaders.Accept.Clear();
+            client.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
+            client.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/octet-stream"));
+
+            services.AddSingleton(client);
 
             services.AddSingleton(ConfigureMapper());
 
             services.AddTransient<ISqlDataAccess, SqlDataAccess>();
+            services.AddTransient<IHttpDataAccess, HttpDataAccess>();
 
             services.AddTransient<IUserTable, UserTable>();
             services.AddTransient<IRoleTable, RoleTable>();
             services.AddTransient<IApplicationTable, ApplicationTable>();
             services.AddTransient<IUserRoleTable, UserRoleTable>();
             services.AddTransient<IConnectionTable, ConnectionTable>();
+            services.AddTransient<IDownloadTable, DownloadTable>();
+            services.AddTransient<IDownloadAuthorTable, DownloadAuthorTable>();
+            services.AddTransient<IDownloadFileTable, DownloadFileTable>();
+
+            services.AddTransient<IDownloadFileApi, DownloadFileApi>();
 
             services.AddTransient<IUserProcessor, UserProcessor>();
             services.AddTransient<IRoleProcessor, RoleProcessor>();
             services.AddTransient<IApplicationProcessor, ApplicationProcessor>();
             services.AddTransient<IConnectionProcessor, ConnectionProcessor>();
+            services.AddTransient<IDownloadProcessor, DownloadProcessor>();
         }
 
         private IMapper ConfigureMapper()
@@ -69,6 +97,7 @@ namespace BlazorUI
             {
                 cfg.CreateMap<DataAccessLibrary.Models.User, User>().ReverseMap();
                 cfg.CreateMap<DataAccessLibrary.Models.Role, Role>().ReverseMap();
+                cfg.CreateMap<DataAccessLibrary.Models.Download, Download>().ReverseMap();
             });
 
             var mapper = mapperConfig.CreateMapper();

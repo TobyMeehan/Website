@@ -3,7 +3,7 @@
         <Found Context="routeData">
             <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)">
                 <NotAuthorized>
-                    <BlazorUI.Pages.RedirectToLogin />
+                    <Redirect Path="/login" />
                 </NotAuthorized>
                 <Authorizing>
                     <p>Something was up and it's taking a while to authorize you. Don't worry you're not in trouble.</p>
