@@ -26,6 +26,8 @@ namespace DataAccessLibrary.Data
         {
             if (ValidateQuery(await _userTable.SelectById(userid), out User user)) // Get user with specified id, check if user exists
             {
+                user.Roles = new List<Role>();
+
                 List<UserRoleModel> userRoles = await _userRoleTable.SelectByUser(userid); // Get user role relations for the user
 
                 foreach (UserRoleModel userRole in userRoles)
@@ -50,6 +52,8 @@ namespace DataAccessLibrary.Data
         {
             if (ValidateQuery(await _userTable.SelectByUsername(username), out User user)) // Get user with specified username, check if user exists
             {
+                user.Roles = new List<Role>();
+
                 List<UserRoleModel> userRoles = await _userRoleTable.SelectByUser(user.Id); // Get user role relations for the user
 
                 foreach (UserRoleModel userRole in userRoles)
@@ -132,6 +136,18 @@ namespace DataAccessLibrary.Data
         {
             if (ValidateQuery(await _userTable.SelectById(userid), out User user)) // Get user from provided ID
             {
+                user.Roles = new List<Role>();
+
+                List<UserRoleModel> userRoles = await _userRoleTable.SelectByUser(userid); // Get user role relations for the user
+
+                foreach (UserRoleModel userRole in userRoles)
+                {
+                    if (ValidateQuery(await _roleTable.SelectById(userRole.RoleId), out Role r)) // Get role associated with role id
+                    {
+                        user.Roles.Add(r); // Add role to user's list of roles
+                    }
+                }
+
                 if (!user.Roles.Any(r => r.Name == role.Name)) // Check that the user does not already have the provided role
                 {
                     if ((await _roleTable.SelectById(role.Id)).Any()) // Check that the role exists
