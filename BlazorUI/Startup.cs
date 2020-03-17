@@ -97,7 +97,10 @@ namespace BlazorUI
             {
                 cfg.CreateMap<DataAccessLibrary.Models.User, User>().ReverseMap();
                 cfg.CreateMap<DataAccessLibrary.Models.Role, Role>().ReverseMap();
+
                 cfg.CreateMap<DataAccessLibrary.Models.Download, Download>().ReverseMap();
+                cfg.CreateMap<DataAccessLibrary.Models.Download, DownloadFormModel>().ReverseMap();
+                cfg.CreateMap<DownloadFormModel, Download>().ReverseMap();
             });
 
             var mapper = mapperConfig.CreateMapper();

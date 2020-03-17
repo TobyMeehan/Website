@@ -72,7 +72,8 @@ namespace DataAccessLibrary.Storage
                 $"{(download.Title != null ? "Title = @Title," : "")} " +
                 $"{(download.ShortDescription != null ? "ShortDescription = @ShortDescription," : "")} " +
                 $"{(download.LongDescription != null ? "LongDescription = @LongDescription," : "")} " +
-                $"Updated = @Updated";
+                $"Updated = @Updated " +
+                $"WHERE Id = @Id";
 
             await _sqlDataAccess.SaveData(sql, download);
         }
