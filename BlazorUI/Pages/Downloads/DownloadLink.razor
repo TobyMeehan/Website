@@ -1,0 +1,50 @@
+﻿@inherits ComponentBase
+
+<a href="@_action" class="@CssClass">@ChildContent</a>
+
+@code {
+    [Parameter]
+    public string Id { get; set; }
+
+    [Parameter]
+    public ActionType Action { get; set; }
+
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+
+    [Parameter]
+    public string CssClass { get; set; }
+
+    private string _action;
+
+    public enum ActionType
+    {
+        View,
+        Edit,
+        Delete,
+        Add
+    }
+
+    protected override void OnInitialized()
+    {
+        _action = "/downloads";
+        switch (Action)
+        {
+            case ActionType.View:
+                _action += $"/{Id}";
+                break;
+            case ActionType.Edit:
+                _action += $"/{Id}/edit";
+                break;
+            case ActionType.Delete:
+                _action += $"/{Id}/delete";
+                break;
+            case ActionType.Add:
+                _action += "/add";
+                break;
+            default:
+                _action += "";
+                break;
+        }
+    }
+}

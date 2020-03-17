@@ -1,0 +1,70 @@
+﻿@using BlazorUI.Models;
+@using DataAccessLibrary.Data;
+@using AutoMapper;
+
+@page "/downloads"
+
+@inject IDownloadProcessor downloadProcessor
+@inject IMapper mapper
+@inject IAuthorizationService authorizationService
+
+<h1>Downloads</h1>
+
+<p>Some text...</p> <!--TODO: Some text-->
+<AuthorizeView Policy="IsVerified">
+    <p>
+        <DownloadLink Action="DownloadLink.ActionType.Add">Add Download</DownloadLink>
+    </p>
+</AuthorizeView>
+
+<hr />
+
+@if (Downloads == null)
+{
+    <div class="d-flex justify-content-center">
+        <div class="spinner-border" role="status">
+            <span class="sr-only">Loading...</span>
+        </div>
+    </div>
+}
+else
+{
+    <div class="card-deck card-deck-responsive">
+        @foreach (Download download in Downloads)
+        {
+            <div class="card my-3">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        @download.Title
+                    </h5>
+                    <p class="card-text">@download.ShortDescription</p>
+                </div>
+                <ul class="list-group list-group-flush">
+                    <AuthorizeView Resource="download" Policy="EditDownloadPolicy">
+                        <li class="list-group-item">
+                            <DownloadLink Id="@(download.Id)" Action="DownloadLink.ActionType.Edit" CssClass="card-link">Edit</DownloadLink>
+                            <DownloadLink Id="@(download.Id)" Action="DownloadLink.ActionType.Delete" CssClass="card-link">Delete</DownloadLink>
+                        </li>
+                    </AuthorizeView>
+                    <li class="list-group-item">
+                        <DownloadLink Id="@(download.Id)" Action="DownloadLink.ActionType.View" CssClass="btn btn-outline-primary btn-block">View Page</DownloadLink>
+                    </li>
+                </ul>
+                <div class="card-footer">
+                    <p class="text-muted mb-0">Created by <DisplayUser Id="@(download.CreatorId)" /></p>
+                </div>
+            </div>
+        }
+    </div>
+}
+
+
+
+@code {
+    protected List<Download> Downloads { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        Downloads = await Task.Run(async () => mapper.Map<List<Download>>(await downloadProcessor.GetDownloads()));
+    }
+}
