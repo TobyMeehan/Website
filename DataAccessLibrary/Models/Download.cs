@@ -16,6 +16,24 @@ namespace DataAccessLibrary.Models
         public string Version { get; set; }
         public DateTime Updated { get; set; }
         public List<User> Authors { get; set; }
+        public DownloadVerification Verified { get; set; }
+        public virtual int VerifiedId
+        {
+            get
+            {
+                return (int)Verified;
+            }
+            set
+            {
+                Verified = (DownloadVerification)value;
+            }
+        }
+    }
 
+    public enum DownloadVerification
+    {
+        Dangerous,
+        None,
+        Verified
     }
 }
