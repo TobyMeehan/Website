@@ -6,8 +6,10 @@ namespace DataAccessLibrary.Data
 {
     public interface IDownloadProcessor
     {
-        Task CreateDownload(Download download);
+        Task<Download> CreateDownload(Download download);
+        Task CreateFile(DownloadFileModel file, byte[] contents);
         Task DeleteDownload(string downloadid);
+        Task DeleteFile(DownloadFileModel file);
         Task<Download> GetDownloadById(string downloadid);
         Task<List<Download>> GetDownloads();
         Task<List<Download>> GetDownloadsByAuthor(string userid);

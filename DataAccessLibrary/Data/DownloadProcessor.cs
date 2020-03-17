@@ -12,12 +12,16 @@ namespace DataAccessLibrary.Data
     {
         private readonly IDownloadTable _downloadTable;
         private readonly IDownloadAuthorTable _downloadAuthorTable;
+        private readonly IDownloadFileTable _downloadFileTable;
+        private readonly IDownloadFileApi _downloadFileApi;
         private readonly IUserTable _userTable;
 
-        public DownloadProcessor(IDownloadTable downloadTable, IDownloadAuthorTable downloadAuthorTable, IUserTable userTable)
+        public DownloadProcessor(IDownloadTable downloadTable, IDownloadAuthorTable downloadAuthorTable, IDownloadFileTable downloadFileTable, IDownloadFileApi downloadFileApi, IUserTable userTable)
         {
             _downloadTable = downloadTable;
             _downloadAuthorTable = downloadAuthorTable;
+            _downloadFileTable = downloadFileTable;
+            _downloadFileApi = downloadFileApi;
             _userTable = userTable;
         }
 
@@ -26,7 +30,10 @@ namespace DataAccessLibrary.Data
             if (ValidateQuery(await _userTable.SelectById(download.CreatorId), out User creator))
             {
                 download.CreatorId = creator.Id;
-                download.Authors.Add(creator);
+                download.Authors = new List<User>
+                {
+                    creator
+                };
             }
             else
             {
@@ -45,7 +52,6 @@ namespace DataAccessLibrary.Data
 
             return download;
         }
-
         private async Task<List<Download>> PopulateAuthor(List<Download> downloads)
         {
             foreach (Download download in downloads)
@@ -55,19 +61,55 @@ namespace DataAccessLibrary.Data
 
             return downloads;
         }
+        private async Task<Download> PopulateFiles(Download download)
+        {
+            var files = await _downloadFileTable.Select(download.Id);
+            download.Files = new List<string>();
+
+            foreach (DownloadFileModel file in files)
+            {
+                download.Files.Add(file.Filename);
+            }
+
+            return download;
+        }
+        private async Task<List<Download>> PopulateFiles(List<Download> downloads)
+        {
+            foreach (Download download in downloads)
+            {
+                await PopulateFiles(download);
+            }
+
+            return downloads;
+        }
+        private async Task<Download> Populate(Download download)
+        {
+            download = await PopulateFiles(await PopulateAuthor(download));
+            return download;
+        }
+        private async Task<List<Download>> Populate(List<Download> downloads)
+        {
+            foreach (Download download in downloads)
+            {
+                await Populate(download);
+            }
+
+            return downloads;
+        }
+
 
         public async Task<List<Download>> GetDownloads()
         {
             List<Download> downloads = await _downloadTable.Select();
 
-            return await PopulateAuthor(downloads);
+            return await Populate(downloads);
         }
 
         public async Task<List<Download>> GetDownloadsByCreator(string userid)
         {
             List<Download> downloads = await _downloadTable.SelectByUser(userid);
 
-            return await PopulateAuthor(downloads);
+            return await Populate(downloads);
         }
 
         public async Task<List<Download>> GetDownloadsByAuthor(string userid)
@@ -83,14 +125,14 @@ namespace DataAccessLibrary.Data
                 }
             }
 
-            return await PopulateAuthor(downloads);
+            return await Populate(downloads);
         }
 
         public async Task<Download> GetDownloadById(string downloadid)
         {
             if (ValidateQuery(await _downloadTable.SelectById(downloadid), out Download download))
             {
-                return await PopulateAuthor(download);
+                return await Populate(download);
             }
             else
             {
@@ -102,13 +144,24 @@ namespace DataAccessLibrary.Data
         {
             List<Download> downloads = await _downloadTable.Search(query);
 
-            return await PopulateAuthor(downloads);
+            return await Populate(downloads);
         }
 
-        public async Task CreateDownload(Download download)
+        public async Task<Download> CreateDownload(Download download)
         {
             download.Updated = DateTime.Now;
+            download.Id = Security.RandomString.GeneratePseudo();
             await _downloadTable.Insert(download);
+            return await GetDownloadById(download.Id);
+        }
+
+        public async Task CreateFile(DownloadFileModel file, byte[] contents)
+        {
+            if ((await _downloadTable.SelectById(file.DownloadId)).Any())
+            {
+                await _downloadFileTable.Insert(file);
+                await _downloadFileApi.Post(file, contents);
+            }
         }
 
         public async Task UpdateDownload(Download download)
@@ -120,6 +173,18 @@ namespace DataAccessLibrary.Data
         public async Task DeleteDownload(string downloadid)
         {
             await _downloadTable.Delete(downloadid);
+        }
+
+        public async Task DeleteFile(DownloadFileModel file)
+        {
+            if ((await _downloadTable.SelectById(file.DownloadId)).Any())
+            {
+                if ((await _downloadFileTable.Select(file.DownloadId)).Where(f => f.Filename == file.Filename).Any())
+                {
+                    await _downloadFileTable.DeleteByFile(file);
+                    await _downloadFileApi.Delete(file.DownloadId, file.Filename);
+                }
+            }
         }
     }
 }
