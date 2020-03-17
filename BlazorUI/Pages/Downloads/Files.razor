@@ -1,0 +1,60 @@
+﻿@using AutoMapper;
+@using DataAccessLibrary.Data;
+
+@page "/downloads/{Id}/files"
+
+@inject IMapper mapper
+@inject IDownloadProcessor downloadProcessor
+
+<h1>
+    File Manager
+    <small class="text-muted">@_download.Title</small>
+</h1>
+
+<div class="custom-file mb-3">
+    <EditForm Model="_download">
+        <InputFile class="custom-file-input" OnChange="UploadFile" />
+    </EditForm>
+    <label class="custom-file-label" for="FileInput">Upload file</label>
+</div>
+
+<table class="table table-hover table-sm">
+    <tbody>
+        @foreach (string file in _download.Files)
+        {
+            <tr>
+                <td class="my-auto">@file</td>
+                <td>
+                    <button class="btn btn-sm btn-outline-danger" @onclick="@(e => DeleteFile(file))">Delete</button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@code {
+    [Parameter]
+    public string Id { get; set; }
+
+    private Models.Download _download;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _download = mapper.Map<Models.Download>(await downloadProcessor.GetDownloadById(Id));
+    }
+
+    async Task UploadFile(IFileListEntry[] files)
+    {
+        var file = files.FirstOrDefault();
+        byte[] contents = (await file.ReadAllAsync()).ToArray();
+        await downloadProcessor.CreateFile(new DataAccessLibrary.Models.DownloadFileModel { DownloadId = _download.Id, Filename = file.Name }, contents);
+
+        _download.Files.Add(file.Name);
+    }
+
+    async Task DeleteFile(string filename)
+    {
+        await downloadProcessor.DeleteFile(new DataAccessLibrary.Models.DownloadFileModel { DownloadId = _download.Id, Filename = filename });
+        _download.Files.Remove(filename);
+    }
+}
