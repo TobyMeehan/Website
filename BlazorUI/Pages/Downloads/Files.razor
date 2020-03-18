@@ -22,7 +22,7 @@ else
             <div class="custom-file mb-3">
                 <EditForm Model="_download" Context="formContext">
                     <InputFile id="FileUpload" class="custom-file-input" OnChange="UploadFile" />
-                    <label class="custom-file-label" for="FileUpload"><i class="fas fa-upload"></i> Upload file</label>
+                    <label class="custom-file-label" for="FileUpload"><i class="fas fa-upload"></i> Upload file (200MB)</label>
                 </EditForm>
             </div>
 
@@ -67,8 +67,9 @@ else
 
     async Task UploadFile(IFileListEntry[] files)
     {
+        const int maxSize = 209715200; // 200MB
         var file = files.FirstOrDefault();
-        byte[] contents = (await file.ReadAllAsync()).ToArray();
+        byte[] contents = (await file.ReadAllAsync(maxSize)).ToArray();
         await downloadProcessor.CreateFile(new DataAccessLibrary.Models.DownloadFileModel { DownloadId = _download.Id, Filename = file.Name }, contents);
 
         _download.Files.Add(file.Name);
