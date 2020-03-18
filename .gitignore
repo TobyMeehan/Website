@@ -354,3 +354,6 @@ connectionStrings.config
 connectionStrings.json
 secrets.config
 secrets.json
+
+# Location for uploaded files
+DownloadHost/Files/
