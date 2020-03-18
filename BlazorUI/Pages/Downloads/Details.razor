@@ -1,0 +1,67 @@
+﻿@using AutoMapper
+@using BlazorUI.Extensions
+@using DataAccessLibrary.Data
+
+@page "/downloads/{Id}"
+
+@inject IDownloadProcessor downloadProcessor
+@inject IMapper mapper
+@inject AuthenticationStateProvider authenticationStateProvider
+@inject NavigationManager navigationManager
+
+@if (_download == null)
+{
+    <div class="d-flex justify-content-center">
+        <strong>Loading...</strong>
+        <div class="spinner-border ml-auto" role="status"></div>
+    </div>
+}
+else
+{
+    <h1>@_download.Title</h1>
+
+    @((MarkupString)_download.LongDescription)
+
+    @if (_download.Updated != null)
+    {
+<p class="text-muted font-weight-light">Last updated @_download.Updated.Value.Day @_download.Updated.Value.ToString("MMMM") @_download.Updated.Value.Year</p>
+    }
+
+    <button type="button" class="btn btn-primary my-2" data-toggle="modal" data-target="#FilesModal">Download</button>
+
+    <div class="modal fade" id="FilesModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Download @_download.Title</h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+
+                <div class="modal-body">
+                    <ul>
+                        @foreach (var item in _download.Files)
+                        {
+                            <!--TODO: File type icons-->
+                            <li><a href="https://downloads.tobymeehan.com/@_download.Id/@item">@item</a></li>
+                        }
+                    </ul>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public string Id { get; set; }
+
+    private Models.Download _download;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _download = await Task.Run(async () => mapper.Map<Models.Download>(await downloadProcessor.GetDownloadById(Id)));
+    }
+}

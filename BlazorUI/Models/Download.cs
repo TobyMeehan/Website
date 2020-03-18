@@ -16,7 +16,7 @@ namespace BlazorUI.Models
         public string LongDescription { get; set; }
         public List<string> Files { get; set; }
         public string Version { get; set; }
-        public DateTime Updated { get; set; }
+        public DateTime? Updated { get; set; }
         public List<User> Authors { get; set; }
         public DownloadVerification Verified { get; set; }
     }
