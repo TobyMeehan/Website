@@ -21,9 +21,9 @@ else
         <Authorized>
             <div class="custom-file mb-3">
                 <EditForm Model="_download" Context="formContext">
-                    <InputFile class="custom-file-input" OnChange="UploadFile" />
+                    <InputFile id="FileUpload" class="custom-file-input" OnChange="UploadFile" />
+                    <label class="custom-file-label" for="FileUpload"><i class="fas fa-upload"></i> Upload file</label>
                 </EditForm>
-                <label class="custom-file-label" for="FileInput">Upload file</label>
             </div>
 
             <table class="table table-hover table-sm">
@@ -31,7 +31,12 @@ else
                     @foreach (string file in _download.Files)
                     {
                         <tr>
-                            <td class="my-auto">@file</td>
+                            <td>
+                                <FileIcon Filename="@file" />
+                            </td>
+                            <td>
+                                <a class="my-auto" href="@($"https://downloads.tobymeehan.com/{Id}/{file}")">@file</a>
+                            </td>
                             <td>
                                 <button class="btn btn-sm btn-outline-danger" @onclick="@(e => DeleteFile(file))">Delete</button>
                             </td>

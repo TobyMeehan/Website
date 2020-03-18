@@ -27,15 +27,16 @@ else
 <p class="text-muted font-weight-light">Last updated @_download.Updated.Value.Day @_download.Updated.Value.ToString("MMMM") @_download.Updated.Value.Year</p>
     }
 
-    <button type="button" class="btn btn-primary my-2" data-toggle="modal" data-target="#FilesModal">Download</button>
+    <button type="button" class="btn btn-primary my-2" data-toggle="modal" data-target="#FilesModal"><i class="fas fa-download"></i> Download</button>
 
     <p>
-        <a href="/downloads">Back to List</a>
+        <a href="/downloads"><i class="fas fa-angle-left"></i> Back to List</a>
 
         <AuthorizeView Resource="_download" Policy="EditDownloadPolicy">
-            <a href="/downloads/@Id/edit">Edit</a>
-            <a href="/downloads/@Id/files">File Manager</a>
-            <a href="/downloads/@Id/delete">Delete</a>
+            <DownloadLink Id="@_download.Id" Action="DownloadLink.ActionType.Edit"><i class="fas fa-edit"></i> Edit</DownloadLink>
+            <DownloadLink Id="@_download.Id" Action="DownloadLink.ActionType.Files"><i class="far fa-folder-open"></i> File Manager</DownloadLink>
+            <DownloadLink Id="@_download.Id" Action="DownloadLink.ActionType.Authors"><i class="fas fa-users-cog"></i> Authors</DownloadLink>
+            <DownloadLink Id="@_download.Id" Action="DownloadLink.ActionType.Delete"><i class="fas fa-trash"></i> Delete</DownloadLink>
         </AuthorizeView>
     </p>
 
@@ -51,8 +52,9 @@ else
                     <ul>
                         @foreach (var item in _download.Files)
                         {
-                            <!--TODO: File type icons-->
-                            <li><a href="https://downloads.tobymeehan.com/@_download.Id/@item">@item</a></li>
+                            <li>
+                                <a href="@($"https://downloads.tobymeehan.com/{Id}/{item}")">@item <FileIcon Filename="@item" /></a>
+                            </li>
                         }
                     </ul>
                 </div>

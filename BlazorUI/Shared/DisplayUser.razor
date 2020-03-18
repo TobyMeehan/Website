@@ -1,8 +1,26 @@
-﻿@using DataAccessLibrary.Data;
+﻿@using AutoMapper
+@using DataAccessLibrary.Data
 
 @inject IUserProcessor userProcessor
+@inject IMapper mapper
 
 <span>
+    @if (_roles != null)
+    {
+        @if (_roles.Any(role => role.Name == "Admin"))
+        {
+            <i class="fas fa-user-shield"></i>
+        }
+        else if (_roles.Any(role => role.Name == "Verified"))
+        {
+            <i class="fas fa-user-check"></i>
+        }
+        else
+        {
+            <i class="fas fa-user"></i>
+        }
+    }
+
     @Username
 </span>
 
@@ -13,8 +31,11 @@
     [Parameter]
     public string Id { get; set; }
 
+    private List<Models.Role> _roles;
+
     protected override async Task OnInitializedAsync()
     {
         Username = (!string.IsNullOrEmpty(Username)) ? Username : (await userProcessor.GetUserById(Id)).Username;
+        _roles = await Task.Run(async () => mapper.Map<List<Models.Role>>((await userProcessor.GetUserByUsername(Username)).Roles));
     }
 }
