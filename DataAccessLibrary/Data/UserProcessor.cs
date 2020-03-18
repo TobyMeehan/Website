@@ -22,6 +22,26 @@ namespace DataAccessLibrary.Data
             _userRoleTable = userRoleTable;
         }
 
+        private async Task<User> PopulateRoles(User user)
+        {
+            user.Roles = new List<Role>();
+
+            List<UserRoleModel> userRoles = await _userRoleTable.SelectByUser(user.Id);
+
+            foreach (UserRoleModel userRole in userRoles)
+            {
+                if (ValidateQuery(await _roleTable.SelectById(userRole.RoleId), out Role role))
+                {
+                    user.Roles.Add(role);
+                }
+            }
+
+            return user;
+
+            // TODO: repeat for alerts and anything else which needs to be added.
+            // TODO: Replace any manual population with this method.
+        }
+
         public async Task<User> GetUserById(string userid)
         {
             if (ValidateQuery(await _userTable.SelectById(userid), out User user)) // Get user with specified id, check if user exists
@@ -70,6 +90,18 @@ namespace DataAccessLibrary.Data
             throw new ArgumentException("Provided username could not be found.");
         }
 
+        public async Task<List<User>> GetUsers()
+        {
+            List<User> users = await _userTable.Select();
+
+            foreach (User user in users)
+            {
+                await PopulateRoles(user);
+            }
+
+            return users;
+        }
+
         public async Task<List<User>> GetUsersByRole(string rolename)
         {
             if (ValidateQuery(await _roleTable.SelectByName(rolename), out Role role))
@@ -81,7 +113,7 @@ namespace DataAccessLibrary.Data
                 {
                     if (ValidateQuery(await _userTable.SelectById(item.UserId), out User user))
                     {
-                        users.Add(user);
+                        users.Add(await PopulateRoles(user));
                     }
                 }
 

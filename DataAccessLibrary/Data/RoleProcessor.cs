@@ -41,11 +41,16 @@ namespace DataAccessLibrary.Data
             }
         }
 
-        public async Task CreateRole(Role role)
+        public async Task<List<Role>> GetRoles()
         {
-            if (!(await _roleTable.SelectByName(role.Name)).Any()) // Check if role name already exists
+            return await _roleTable.Select();
+        }
+
+        public async Task CreateRole(string name)
+        {
+            if (!(await _roleTable.SelectByName(name)).Any()) // Check if role name already exists
             {
-                await _roleTable.Insert(role.Name);
+                await _roleTable.Insert(name);
             }
             else
             {

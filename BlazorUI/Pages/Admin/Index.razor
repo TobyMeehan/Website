@@ -1,0 +1,88 @@
+﻿@using AutoMapper
+@using DataAccessLibrary.Data
+
+@page "/admin"
+@attribute [Authorize(Policy = Authorization.Policies.IsAdmin)]
+
+@inject IUserProcessor userProcessor
+@inject IRoleProcessor roleProcessor
+@inject IMapper mapper
+
+<h1>Admin Actions</h1>
+
+<div class="card my-3">
+    <div class="card-body">
+        <h2>Roles</h2>
+
+        @if (_roles == null)
+        {
+            <LoadingMessage Text="false" />
+        }
+        else
+        {
+            <ul class="list-group list-group-flush">
+                @foreach (var item in _roles)
+                {
+                    <li class="list-group-item d-flex justify-content-between">
+                        <span>@item.Name</span>
+                        <button class="btn btn-outline-danger btn-sm" @onclick="() => DeleteRole(item)"><i class="fas fa-trash"></i> Delete</button>
+                    </li>
+                }
+            </ul>
+
+            <EditForm Model="_roleForm" OnSubmit="AddRole">
+                <div class="input-group my-3">
+                    <InputText class="form-control" placeholder="Create role" @bind-Value="_roleForm.Value" />
+                    <div class="input-group-append">
+                        <button class="btn btn-outline-primary" type="submit">Add</button>
+                    </div>
+                </div>
+            </EditForm>
+        }
+    </div>
+</div>
+
+<div class="card my-3">
+    <div class="card-body">
+        <h2>Users</h2>
+
+        @if (_users == null)
+        {
+            <LoadingMessage Text="false" />
+        }
+        else
+        {
+            <ul class="list-group list-group-flush">
+                @foreach (var item in _users)
+                {
+                    <li class="list-group-item"><DisplayUser Username="@item.Username" /></li>
+                }
+            </ul>
+        }
+    </div>
+</div>
+
+@code {
+    private List<Models.Role> _roles;
+    private List<Models.User> _users;
+
+    private Models.SingleTextFormModel _roleForm = new Models.SingleTextFormModel();
+
+    protected override async Task OnInitializedAsync()
+    {
+        _users = await Task.Run(async () => mapper.Map<List<Models.User>>(await userProcessor.GetUsers()));
+        _roles = await Task.Run(async () => mapper.Map<List<Models.Role>>(await roleProcessor.GetRoles()));
+    }
+
+    async Task AddRole()
+    {
+        await roleProcessor.CreateRole(_roleForm.Value);
+        _roles.Add(mapper.Map<Models.Role>(await roleProcessor.GetRoleByName(_roleForm.Value)));
+    }
+
+    async Task DeleteRole(Models.Role role)
+    {
+        await roleProcessor.DeleteRole(mapper.Map<DataAccessLibrary.Models.Role>(role));
+        _roles.Remove(role);
+    }
+}

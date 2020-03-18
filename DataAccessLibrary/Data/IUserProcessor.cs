@@ -13,6 +13,7 @@ namespace DataAccessLibrary.Data
         Task UpdatePassword(string userid, string newPassword);
         Task<User> GetUserById(string userid);
         Task<User> GetUserByUsername(string username);
+        Task<List<User>> GetUsers();
         Task<List<User>> GetUsersByRole(string rolename);
         Task<bool> UserExists(string username);
         Task DeleteUser(string userid);

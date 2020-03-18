@@ -15,6 +15,11 @@
             <li class="nav-item">
                 <NavLink class="nav-link" href="https://api.tobymeehan.com">API</NavLink>
             </li>
+            <AuthorizeView Policy="@Authorization.Policies.IsAdmin">
+                <li class="nav-item">
+                    <NavLink class="nav-link" href="/admin" Match="NavLinkMatch.All">Admin</NavLink>
+                </li>
+            </AuthorizeView>
         </ul>
         <div class="navbar-nav ml-auto">
             <LoginButton />
