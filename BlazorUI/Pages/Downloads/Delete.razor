@@ -19,7 +19,7 @@
 }
 else
 {
-    <AuthorizeView Resource="_download" Policy="EditDownloadPolicy">
+    <AuthorizeView Resource="_download" Policy="@Authorization.Policies.EditDownload">
         <Authorized>
             <p>Are you sure you want to delete this?</p>
 

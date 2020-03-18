@@ -20,7 +20,7 @@
 }
 else
 {
-    <AuthorizeView Resource="_download" Policy="EditDownloadPolicy">
+    <AuthorizeView Resource="_download" Policy="@Authorization.Policies.EditDownload">
         <Authorized>
             <EditForm Model="_form" Context="formContext" OnValidSubmit="Submit">
                 <DataAnnotationsValidator />

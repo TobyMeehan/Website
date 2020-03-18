@@ -51,10 +51,9 @@ namespace BlazorUI
 
             services.AddAuthorization(options =>
             {
-                options.AddPolicy("EditDownloadPolicy", policy =>
-                    policy.Requirements.Add(new DownloadAuthorRequirement()));
-
                 options.AddPolicy(Policies.IsVerified, Policies.IsVerifiedPolicy());
+                options.AddPolicy(Policies.IsAdmin, Policies.IsAdminPolicy());
+                options.AddPolicy(Policies.EditDownload, Policies.EditDownloadPolicy());
             });
 
             services.AddSingleton<IAuthorizationHandler, EditDownloadAuthorizationHandler>();

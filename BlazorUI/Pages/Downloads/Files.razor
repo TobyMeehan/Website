@@ -17,7 +17,7 @@
 }
 else
 {
-    <AuthorizeView Resource="_download" Policy="EditDownloadPolicy">
+    <AuthorizeView Resource="_download" Policy="@Authorization.Policies.EditDownload">
         <Authorized>
             <div class="custom-file mb-3">
                 <EditForm Model="_download" Context="formContext">

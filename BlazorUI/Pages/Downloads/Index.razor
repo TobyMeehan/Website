@@ -11,7 +11,7 @@
 <h1>Downloads</h1>
 
 <p>Some text...</p> <!--TODO: Some text-->
-<AuthorizeView Policy="IsVerified">
+<AuthorizeView Policy="@Authorization.Policies.IsVerified">
     <p>
         <DownloadLink Action="DownloadLink.ActionType.Add">Add Download</DownloadLink>
     </p>
@@ -40,7 +40,7 @@ else
                     <p class="card-text">@download.ShortDescription</p>
                 </div>
                 <ul class="list-group list-group-flush">
-                    <AuthorizeView Resource="download" Policy="EditDownloadPolicy">
+                    <AuthorizeView Resource="download" Policy="@Authorization.Policies.EditDownload">
                         <li class="list-group-item">
                             <DownloadLink Id="@download.Id" Action="DownloadLink.ActionType.Edit" class="card-link">Edit</DownloadLink>
                             <DownloadLink Id="@download.Id" Action="DownloadLink.ActionType.Delete" class="card-link">Delete</DownloadLink>

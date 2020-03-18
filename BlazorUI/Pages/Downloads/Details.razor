@@ -32,7 +32,7 @@ else
     <p>
         <a href="/downloads"><i class="fas fa-angle-left"></i> Back to List</a>
 
-        <AuthorizeView Resource="_download" Policy="EditDownloadPolicy">
+        <AuthorizeView Resource="_download" Policy="@Authorization.Policies.EditDownload">
             <DownloadLink Id="@_download.Id" Action="DownloadLink.ActionType.Edit"><i class="fas fa-edit"></i> Edit</DownloadLink>
             <DownloadLink Id="@_download.Id" Action="DownloadLink.ActionType.Files"><i class="far fa-folder-open"></i> File Manager</DownloadLink>
             <DownloadLink Id="@_download.Id" Action="DownloadLink.ActionType.Authors"><i class="fas fa-users-cog"></i> Authors</DownloadLink>
