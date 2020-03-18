@@ -56,6 +56,12 @@ else
                     <button type="submit" class="btn btn-dark">Save</button>
                 </div>
             </EditForm>
+
+            <p>
+                <a href="/downloads">Back to List</a>
+                <a href="/downloads/@Id/files">File Manager</a>
+                <a href="/downloads/@Id/delete">Delete</a>
+            </p>
         </Authorized>
         <NotAuthorized>
             <Redirect Path="/downloads" />

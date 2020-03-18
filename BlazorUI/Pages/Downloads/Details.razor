@@ -29,6 +29,16 @@ else
 
     <button type="button" class="btn btn-primary my-2" data-toggle="modal" data-target="#FilesModal">Download</button>
 
+    <p>
+        <a href="/downloads">Back to List</a>
+
+        <AuthorizeView Resource="_download" Policy="EditDownloadPolicy">
+            <a href="/downloads/@Id/edit">Edit</a>
+            <a href="/downloads/@Id/files">File Manager</a>
+            <a href="/downloads/@Id/delete">Delete</a>
+        </AuthorizeView>
+    </p>
+
     <div class="modal fade" id="FilesModal">
         <div class="modal-dialog">
             <div class="modal-content">

@@ -6,31 +6,56 @@
 @inject IMapper mapper
 @inject IDownloadProcessor downloadProcessor
 
-<h1>
-    File Manager
-    <small class="text-muted">@_download.Title</small>
-</h1>
+@if (_download == null)
+{
+    <div class="d-flex justify-content-center">
+        <strong>Loading...</strong>
+        <div class="spinner-border ml-auto" role="status"></div>
+    </div>
+}
+else
+{
+    <AuthorizeView Resource="_download" Policy="EditDownloadPolicy">
+        <Authorized>
+            <h1>
+                File Manager
+                <small class="text-muted">@_download.Title</small>
+            </h1>
 
-<div class="custom-file mb-3">
-    <EditForm Model="_download">
-        <InputFile class="custom-file-input" OnChange="UploadFile" />
-    </EditForm>
-    <label class="custom-file-label" for="FileInput">Upload file</label>
-</div>
+            <div class="custom-file mb-3">
+                <EditForm Model="_download" Context="formContext">
+                    <InputFile class="custom-file-input" OnChange="UploadFile" />
+                </EditForm>
+                <label class="custom-file-label" for="FileInput">Upload file</label>
+            </div>
 
-<table class="table table-hover table-sm">
-    <tbody>
-        @foreach (string file in _download.Files)
-        {
-            <tr>
-                <td class="my-auto">@file</td>
-                <td>
-                    <button class="btn btn-sm btn-outline-danger" @onclick="@(e => DeleteFile(file))">Delete</button>
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
+            <table class="table table-hover table-sm">
+                <tbody>
+                    @foreach (string file in _download.Files)
+                    {
+                        <tr>
+                            <td class="my-auto">@file</td>
+                            <td>
+                                <button class="btn btn-sm btn-outline-danger" @onclick="@(e => DeleteFile(file))">Delete</button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+
+            <p>
+                <a href="/downloads">Back to List</a>
+                |
+                <a href="/downloads/@Id/edit">Edit</a>
+                |
+                <a href="/downloads/@Id/delete">Delete</a>
+            </p>
+        </Authorized>
+        <NotAuthorized>
+            <Redirect Path="/downloads" />
+        </NotAuthorized>
+    </AuthorizeView>
+}
 
 @code {
     [Parameter]
