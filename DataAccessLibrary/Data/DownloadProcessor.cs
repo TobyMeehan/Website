@@ -170,6 +170,38 @@ namespace DataAccessLibrary.Data
             await _downloadTable.Update(download);
         }
 
+        public async Task AddAuthor(string downloadid, string userid)
+        {
+            if ((await _downloadTable.SelectById(downloadid)).Any())
+            {
+                if ((await _userTable.SelectById(userid)).Any())
+                {
+                    DownloadAuthorModel author = new DownloadAuthorModel { DownloadId = downloadid, UserId = userid };
+                    await _downloadAuthorTable.Insert(author);
+                }
+                else
+                {
+                    throw new ArgumentException("No user with the provided ID could be found.");
+                }
+            }
+        }
+
+        public async Task RemoveAuthor(string downloadid, string userid)
+        {
+            if ((await _downloadTable.SelectById(downloadid)).Any())
+            {
+                if ((await _userTable.SelectById(userid)).Any())
+                {
+                    DownloadAuthorModel author = new DownloadAuthorModel { DownloadId = downloadid, UserId = userid };
+                    await _downloadAuthorTable.Delete(author);
+                }
+                else
+                {
+                    throw new ArgumentException("No user with the provided ID could be found.");
+                }
+            }
+        }
+
         public async Task DeleteDownload(string downloadid)
         {
             await _downloadTable.Delete(downloadid);

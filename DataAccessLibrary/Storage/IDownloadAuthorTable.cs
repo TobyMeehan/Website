@@ -6,6 +6,7 @@ namespace DataAccessLibrary.Storage
 {
     public interface IDownloadAuthorTable
     {
+        Task Delete(DownloadAuthorModel author);
         Task DeleteByDownload(string downloadid);
         Task DeleteByUser(string userid);
         Task Insert(DownloadAuthorModel author);

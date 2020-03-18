@@ -47,6 +47,13 @@ namespace DataAccessLibrary.Storage
             await _sqlDataAccess.SaveData(sql, author);
         }
 
+        public async Task Delete(DownloadAuthorModel author)
+        {
+            string sql = "DELETE FROM `downloadauthors` WHERE `DownloadId` = @DownloadId AND `UserId` = @UserId";
+
+            await _sqlDataAccess.SaveData(sql, author);
+        }
+
         public async Task DeleteByDownload(string downloadid)
         {
             string sql = "DELETE FROM `downloadauthors` WHERE `DownloadId` = @downloadid";

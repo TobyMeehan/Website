@@ -15,6 +15,8 @@ namespace DataAccessLibrary.Data
         Task<List<Download>> GetDownloadsByAuthor(string userid);
         Task<List<Download>> GetDownloadsByCreator(string userid);
         Task<List<Download>> SearchDownloads(string query);
+        Task AddAuthor(string downloadid, string userid);
+        Task RemoveAuthor(string downloadid, string userid);
         Task UpdateDownload(Download download);
     }
 }

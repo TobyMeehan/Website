@@ -70,6 +70,29 @@ namespace DataAccessLibrary.Data
             throw new ArgumentException("Provided username could not be found.");
         }
 
+        public async Task<List<User>> GetUsersByRole(string rolename)
+        {
+            if (ValidateQuery(await _roleTable.SelectByName(rolename), out Role role))
+            {
+                List<UserRoleModel> userRoles = await _userRoleTable.SelectByRole(role.Id);
+                List<User> users = new List<User>();
+
+                foreach (UserRoleModel item in userRoles)
+                {
+                    if (ValidateQuery(await _userTable.SelectById(item.UserId), out User user))
+                    {
+                        users.Add(user);
+                    }
+                }
+
+                return users;
+            }
+            else
+            {
+                throw new ArgumentException("No role found with specified name.");
+            }
+        }
+
         public async Task<bool> Authenticate(string username, string password)
         {
             if (ValidateQuery(await _userTable.SelectPassword(username), out PasswordModel item))
