@@ -1,0 +1,19 @@
+﻿@if (Text)
+{
+    <div class="d-flex justify-content-center">
+        <strong>Loading...</strong>
+        <div class="spinner-border ml-auto" role="status"></div>
+    </div>
+}
+else
+{
+    <div class="d-flex justify-content-center">
+        <div class="spinner-border" role="status">
+            <span class="sr-only">Loading...</span>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public bool Text { get; set; }
+}

@@ -11,10 +11,7 @@
 
 @if (_download == null)
 {
-    <div class="d-flex justify-content-center">
-        <strong>Loading...</strong>
-        <div class="spinner-border ml-auto" role="status"></div>
-    </div>
+    <LoadingMessage Text="true" />
 }
 else
 {
