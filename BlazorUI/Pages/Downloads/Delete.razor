@@ -1,0 +1,68 @@
+﻿@using AutoMapper
+@using BlazorUI.Extensions
+@using DataAccessLibrary.Data
+
+@page "/downloads/{Id}/delete"
+
+@inject IDownloadProcessor downloadProcessor
+@inject IMapper mapper
+@inject AuthenticationStateProvider authenticationStateProvider
+@inject NavigationManager navigationManager
+
+@if (_download == null)
+{
+    <div class="d-flex justify-content-center">
+        <strong>Loading...</strong>
+        <div class="spinner-border ml-auto" role="status"></div>
+    </div>
+}
+else
+{
+    <AuthorizeView Resource="_download" Policy="EditDownloadPolicy">
+        <Authorized>
+            <h1>
+                Delete
+                <small class="text-muted">@_download.Title</small>
+            </h1>
+
+            <p>Are you sure you want to delete this?</p>
+
+            <div class="card my-3">
+                <div class="card-body">
+                    <h2>@_download.Title</h2>
+                    <p class="lead">@_download.ShortDescription</p>
+                    <hr />
+                    <p>@((MarkupString)_download.LongDescription)</p>
+                </div>
+            </div>
+
+            <p>Deleted downloads and their files are not retrievable. Deleting this download will be a permanent action.</p>
+
+            <button class="btn btn-danger" @onclick="Confirm">Confirm</button>
+        </Authorized>
+        <NotAuthorized>
+            <Redirect Path="/downloads" />
+        </NotAuthorized>
+    </AuthorizeView>
+}
+
+@code {
+    [Parameter] public string Id { get; set; }
+
+    private Models.Download _download;
+
+    private AuthenticationState _context;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _context = await authenticationStateProvider.GetAuthenticationStateAsync();
+        _download = await Task.Run(async () => mapper.Map<Models.Download>(await downloadProcessor.GetDownloadById(Id)));
+    }
+
+    async Task Confirm()
+    {
+        await downloadProcessor.DeleteDownload(Id);
+
+        navigationManager.NavigateTo("/downloads");
+    }
+}
