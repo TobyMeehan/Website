@@ -42,16 +42,16 @@ else
                 <ul class="list-group list-group-flush">
                     <AuthorizeView Resource="download" Policy="EditDownloadPolicy">
                         <li class="list-group-item">
-                            <DownloadLink Id="@(download.Id)" Action="DownloadLink.ActionType.Edit" CssClass="card-link">Edit</DownloadLink>
-                            <DownloadLink Id="@(download.Id)" Action="DownloadLink.ActionType.Delete" CssClass="card-link">Delete</DownloadLink>
+                            <DownloadLink Id="@download.Id" Action="DownloadLink.ActionType.Edit" class="card-link">Edit</DownloadLink>
+                            <DownloadLink Id="@download.Id" Action="DownloadLink.ActionType.Delete" class="card-link">Delete</DownloadLink>
                         </li>
                     </AuthorizeView>
                     <li class="list-group-item">
-                        <DownloadLink Id="@(download.Id)" Action="DownloadLink.ActionType.View" CssClass="btn btn-outline-primary btn-block">View Page</DownloadLink>
+                        <DownloadLink Id="@download.Id" Action="DownloadLink.ActionType.View" class="btn btn-outline-primary btn-block">View Page</DownloadLink>
                     </li>
                 </ul>
                 <div class="card-footer">
-                    <p class="text-muted mb-0">Created by <DisplayUser Id="@(download.CreatorId)" /></p>
+                    <p class="text-muted mb-0">Created by <DisplayUser Id="@download.CreatorId" /></p>
                 </div>
             </div>
         }

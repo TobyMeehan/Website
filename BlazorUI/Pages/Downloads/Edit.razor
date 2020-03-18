@@ -3,11 +3,13 @@
 @using DataAccessLibrary.Data
 
 @page "/downloads/{Id}/edit"
+@layout EditLayout
 
 @inject IDownloadProcessor downloadProcessor
 @inject IMapper mapper
 @inject AuthenticationStateProvider authenticationStateProvider
 @inject NavigationManager navigationManager
+@inject EditDownloadState state
 
 @if (_download == null)
 {
@@ -20,11 +22,6 @@ else
 {
     <AuthorizeView Resource="_download" Policy="EditDownloadPolicy">
         <Authorized>
-            <h1>
-                Edit
-                <small class="text-muted">@_download.Title</small>
-            </h1>
-
             <EditForm Model="_form" Context="formContext" OnValidSubmit="Submit">
                 <DataAnnotationsValidator />
 
@@ -56,12 +53,6 @@ else
                     <button type="submit" class="btn btn-dark">Save</button>
                 </div>
             </EditForm>
-
-            <p>
-                <a href="/downloads">Back to List</a>
-                <a href="/downloads/@Id/files">File Manager</a>
-                <a href="/downloads/@Id/delete">Delete</a>
-            </p>
         </Authorized>
         <NotAuthorized>
             <Redirect Path="/downloads" />
@@ -83,6 +74,9 @@ else
         _context = await authenticationStateProvider.GetAuthenticationStateAsync();
         _download = await Task.Run(async () => mapper.Map<Models.Download>(await downloadProcessor.GetDownloadById(Id)));
         _form = await Task.Run(() => mapper.Map<Models.DownloadFormModel>(_download));
+
+        state.Title = _download.Title;
+        state.Id = _download.Id;
     }
 
     async Task Submit()

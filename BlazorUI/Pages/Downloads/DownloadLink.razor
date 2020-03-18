@@ -1,6 +1,6 @@
-﻿@inherits ComponentBase
+﻿@inherits NavLink
 
-<a href="@_action" class="@CssClass">@ChildContent</a>
+<NavLink class="@CssClass" href="@_action">@ChildContent</NavLink>
 
 @code {
     [Parameter]
@@ -9,12 +9,6 @@
     [Parameter]
     public ActionType Action { get; set; }
 
-    [Parameter]
-    public RenderFragment ChildContent { get; set; }
-
-    [Parameter]
-    public string CssClass { get; set; }
-
     private string _action;
 
     public enum ActionType
@@ -22,7 +16,9 @@
         View,
         Edit,
         Delete,
-        Add
+        Add,
+        Files,
+        Authors
     }
 
     protected override void OnInitialized()
@@ -41,6 +37,12 @@
                 break;
             case ActionType.Add:
                 _action += "/add";
+                break;
+            case ActionType.Files:
+                _action += $"/{Id}/files";
+                break;
+            case ActionType.Authors:
+                _action += $"/{Id}/authors";
                 break;
             default:
                 _action += "";

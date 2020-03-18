@@ -89,6 +89,8 @@ namespace BlazorUI
             services.AddTransient<IApplicationProcessor, ApplicationProcessor>();
             services.AddTransient<IConnectionProcessor, ConnectionProcessor>();
             services.AddTransient<IDownloadProcessor, DownloadProcessor>();
+
+            services.AddScoped<Pages.Downloads.EditDownloadState>();
         }
 
         private IMapper ConfigureMapper()

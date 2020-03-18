@@ -1,0 +1,33 @@
+﻿@inherits LayoutComponentBase
+@layout MainLayout
+
+@inject EditDownloadState state
+
+<h1>
+    Edit
+    <small class="text-muted">@state.Title</small>
+</h1>
+
+<ul class="nav nav-tabs mb-3">
+    <li class="nav-item">
+        <NavLink class="nav-link" href="@($"/downloads/{state.Id}/edit")">Edit</NavLink>
+    </li>
+    <li class="nav-item">
+        <NavLink class="nav-link" href="@($"/downloads/{state.Id}/files")">File Manager</NavLink>
+    </li>
+    <li class="nav-item">
+        <NavLink class="nav-link" href="@($"/downloads/{state.Id}/authors")">Authors</NavLink>
+    </li>
+    <li class="nav-item">
+        <NavLink class="nav-link" href="@($"/downloads/{state.Id}/delete")">Delete</NavLink>
+    </li>
+</ul>
+
+@Body
+
+@code { 
+    protected override void OnInitialized()
+    {
+        state.OnChange += StateHasChanged;
+    }
+}

@@ -2,9 +2,11 @@
 @using DataAccessLibrary.Data;
 
 @page "/downloads/{Id}/files"
+@layout EditLayout
 
 @inject IMapper mapper
 @inject IDownloadProcessor downloadProcessor
+@inject EditDownloadState state
 
 @if (_download == null)
 {
@@ -17,11 +19,6 @@ else
 {
     <AuthorizeView Resource="_download" Policy="EditDownloadPolicy">
         <Authorized>
-            <h1>
-                File Manager
-                <small class="text-muted">@_download.Title</small>
-            </h1>
-
             <div class="custom-file mb-3">
                 <EditForm Model="_download" Context="formContext">
                     <InputFile class="custom-file-input" OnChange="UploadFile" />
@@ -42,14 +39,6 @@ else
                     }
                 </tbody>
             </table>
-
-            <p>
-                <a href="/downloads">Back to List</a>
-                |
-                <a href="/downloads/@Id/edit">Edit</a>
-                |
-                <a href="/downloads/@Id/delete">Delete</a>
-            </p>
         </Authorized>
         <NotAuthorized>
             <Redirect Path="/downloads" />
@@ -65,7 +54,10 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        _download = mapper.Map<Models.Download>(await downloadProcessor.GetDownloadById(Id));
+        _download = await Task.Run(async () => mapper.Map<Models.Download>(await downloadProcessor.GetDownloadById(Id)));
+
+        state.Title = _download.Title;
+        state.Id = _download.Id;
     }
 
     async Task UploadFile(IFileListEntry[] files)
