@@ -1,0 +1,61 @@
+﻿@using AutoMapper
+@using DataAccessLibrary.Data;
+@using BlazorUI.Extensions;
+
+@page "/me/downloads"
+@layout SettingsLayout
+@attribute [Authorize]
+
+@inject IUserProcessor userProcessor
+@inject IDownloadProcessor downloadProcessor
+@inject IMapper mapper
+@inject AuthenticationStateProvider authenticationStateProvider
+@inject NavigationManager navigationManager
+
+<AuthorizeView Policy="@Authorization.Policies.IsVerified">
+    <Authorized>
+        @if (_downloads == null)
+        {
+            <LoadingMessage Text="true" />
+        }
+        else
+        {
+            <div class="card my-3">
+                <div class="card-body">
+                    <h1>Downloads</h1>
+                    @if (!_downloads.Any())
+                    {
+                        <p>You haven't created any downloads.</p>
+                    }
+                </div>
+            </div>
+
+            <div class="card my-3">
+                <div class="card-body">
+                    <a href="/downloads/add">Add Download</a>
+                    @foreach (var download in _downloads)
+                    {
+                        <DownloadCard Download="download" />
+                    }
+                </div>
+            </div>
+        }
+    </Authorized>
+    <NotAuthorized>
+        <Redirect Path="/me" />
+    </NotAuthorized>
+</AuthorizeView>
+
+
+
+@code {
+    private List<Models.Download> _downloads;
+
+    private AuthenticationState _context;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _context = await authenticationStateProvider.GetAuthenticationStateAsync();
+        _downloads = await Task.Run(async () => mapper.Map<List<Models.Download>>(await downloadProcessor.GetDownloadsByAuthor(_context.User.GetUserId())));
+    }
+}
