@@ -3,6 +3,15 @@
 
 @inject EditDownloadState state
 
+@if (string.IsNullOrEmpty(state.Title))
+{
+    <Title Value="@($"Edit Download")"></Title>
+}
+else
+{
+    <Title Value="@($"Edit {state.Title}")"></Title>
+}
+
 <h1>
     Edit
     <small class="text-muted">@state.Title</small>
@@ -31,7 +40,7 @@
     <a href="@($"/downloads/{state.Id}")">View Page</a>
 </p>
 
-@code { 
+@code {
     protected override void OnInitialized()
     {
         state.OnChange += StateHasChanged;

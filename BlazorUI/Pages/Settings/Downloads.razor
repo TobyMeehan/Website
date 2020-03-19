@@ -12,6 +12,8 @@
 @inject AuthenticationStateProvider authenticationStateProvider
 @inject NavigationManager navigationManager
 
+<Title Value="My Downloads"></Title>
+
 <AuthorizeView Policy="@Authorization.Policies.IsVerified">
     <Authorized>
         @if (_downloads == null)
