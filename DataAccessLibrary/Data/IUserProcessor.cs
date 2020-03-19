@@ -8,6 +8,7 @@ namespace DataAccessLibrary.Data
     {
         Task<bool> Authenticate(string username, string password);
         Task AddRole(string userid, Role role);
+        Task RemoveRole(string userid, Role role);
         Task<User> CreateUser(User user, string password);
         Task UpdateUsername(string userid, string username);
         Task UpdatePassword(string userid, string newPassword);

@@ -36,6 +36,8 @@ namespace DataAccessLibrary.Data
                 }
             }
 
+            user.Roles.Sort(RoleProcessor.CompareRoles);
+
             return user;
 
             // TODO: repeat for alerts and anything else which needs to be added.
@@ -218,6 +220,15 @@ namespace DataAccessLibrary.Data
             foreach (Role role in roles)
             {
                 await AddRole(userid, role);
+            }
+        }
+
+        public async Task RemoveRole(string userid, Role role)
+        {
+            if ((await _userTable.SelectById(userid)).Any())
+            {
+                UserRoleModel userRole = new UserRoleModel { UserId = userid, RoleId = role.Id };
+                await _userRoleTable.Delete(userRole);
             }
         }
 

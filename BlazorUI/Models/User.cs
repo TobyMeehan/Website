@@ -12,5 +12,6 @@ namespace BlazorUI.Models
         public string Email { get; set; }
         public List<Role> Roles { get; set; }
 
+        public bool IsVerified => Roles.Any(role => role.Name == "Verified");
     }
 }

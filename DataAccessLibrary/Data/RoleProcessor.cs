@@ -17,6 +17,47 @@ namespace DataAccessLibrary.Data
             _roleTable = roleTable;
         }
 
+        /// <summary>
+        /// Compares roles in order to rank the most significant. Allows the highest ranked role to be first in list.
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <returns></returns>
+        public static int CompareRoles(Role x, Role y)
+        {
+            if (x == null) // If x is null
+            {
+                if (y == null) // and y is null
+                {
+                    return 0; // they're equal
+                }
+                else // and y is not null
+                {
+                    return -1; // y is greater
+                }
+            }
+            else // If x is not null
+            {
+                if (y == null) // and y is null
+                {
+                    return 1; // x is greater
+                }
+                else // Compare names
+                {
+                    if (x.Name == y.Name) return 0; // Make sure there are no issues from duplicate names
+
+                    // Sort roles in order of rank
+                    if (x.Name == UserRoles.Admin) return 1; // y cannot be admin as the two names are not equal
+                    if (y.Name == UserRoles.Admin) return -1; // As above, for x
+
+                    if (x.Name == UserRoles.Verified) return 1; // y is neither verified nor admin as we checked against both above
+                    if (y.Name == UserRoles.Verified) return -1; // As above, for x
+
+                    return x.Name.CompareTo(y.Name); // We have checked all our special cases so we can simply use default comparison
+                }
+            }
+        }
+
         public async Task<Role> GetRoleById(string roleid)
         {
             if (ValidateQuery(await _roleTable.SelectById(roleid), out Role role))

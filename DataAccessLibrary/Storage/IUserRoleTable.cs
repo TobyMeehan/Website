@@ -6,6 +6,7 @@ namespace DataAccessLibrary.Storage
 {
     public interface IUserRoleTable
     {
+        Task Delete(UserRoleModel value);
         Task DeleteByRole(string roleid);
         Task DeleteByUser(string userid);
         Task Insert(UserRoleModel value);

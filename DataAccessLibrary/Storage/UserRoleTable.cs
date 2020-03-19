@@ -62,6 +62,13 @@ namespace DataAccessLibrary.Storage
             await _sqlDataAccess.SaveData(sql, value);
         }
 
+        public async Task Delete(UserRoleModel value)
+        {
+            string sql = "DELETE FROM `userroles` WHERE `UserId` = @UserId AND `RoleId` = @RoleId";
+
+            await _sqlDataAccess.SaveData(sql, value);
+        }
+
         /// <summary>
         /// Deletes all user roles with the role
         /// </summary>
