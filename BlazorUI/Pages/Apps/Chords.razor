@@ -1,0 +1,63 @@
+﻿@page "/apps/chords"
+
+@inject IJSRuntime jsRuntime
+
+<Title Value="Chord Creator"></Title>
+
+<h1>Piano Chord Creator</h1>
+
+<p>Add notes to your chord using the buttons below, then click play. Note sounds come from <a href="https://freesound.org/people/pinkyfinger/">Pinkyfinger</a>'s <a href="https://freesound.org/people/pinkyfinger/packs/4409/">Piano Notes Pack</a> on <a href="https://www.freesound.org">freesound.org</a>.</p>
+<div class="pnotes">
+    <h3>Choose Notes</h3>
+    <div class="btn-group-vertical">
+        <button type="button" class="btn btn-outline-secondary" id="As" onclick="NoteClick('As')">A#</button>
+        <button type="button" class="btn btn-outline-secondary" id="An" onclick="NoteClick('An')">A</button>
+        <button type="button" class="btn btn-outline-secondary" id="Ab" onclick="NoteClick('Ab')">Ab</button>
+    </div>
+    <div class="btn-group-vertical">
+        <button type="button" class="btn btn-outline-secondary" id="Bs" onclick="NoteClick('Bs')">B#</button>
+        <button type="button" class="btn btn-outline-secondary" id="Bn" onclick="NoteClick('Bn')">B</button>
+        <button type="button" class="btn btn-outline-secondary" id="Bb" onclick="NoteClick('Bb')">Bb</button>
+    </div>
+    <div class="btn-group-vertical">
+        <button type="button" class="btn btn-outline-secondary" id="Cs" onclick="NoteClick('Cs')">C#</button>
+        <button type="button" class="btn btn-outline-secondary" id="Cn" onclick="NoteClick('Cn')">C</button>
+        <button type="button" class="btn btn-outline-secondary" id="Cb" onclick="NoteClick('Cb')">Cb</button>
+    </div>
+    <div class="btn-group-vertical">
+        <button type="button" class="btn btn-outline-secondary" id="Ds" onclick="NoteClick('Ds')">D#</button>
+        <button type="button" class="btn btn-outline-secondary" id="Dn" onclick="NoteClick('Dn')">D</button>
+        <button type="button" class="btn btn-outline-secondary" id="Db" onclick="NoteClick('Db')">Db</button>
+    </div>
+    <div class="btn-group-vertical">
+        <button type="button" class="btn btn-outline-secondary" id="Es" onclick="NoteClick('Es')">E#</button>
+        <button type="button" class="btn btn-outline-secondary" id="En" onclick="NoteClick('En')">E</button>
+        <button type="button" class="btn btn-outline-secondary" id="Eb" onclick="NoteClick('Eb')">Eb</button>
+    </div>
+    <div class="btn-group-vertical">
+        <button type="button" class="btn btn-outline-secondary" id="Fs" onclick="NoteClick('Fs')">F#</button>
+        <button type="button" class="btn btn-outline-secondary" id="Fn" onclick="NoteClick('Fn')">F</button>
+        <button type="button" class="btn btn-outline-secondary" id="Fb" onclick="NoteClick('Fb')">Fb</button>
+    </div>
+    <div class="btn-group-vertical">
+        <button type="button" class="btn btn-outline-secondary" id="Gs" onclick="NoteClick('Gs')">G#</button>
+        <button type="button" class="btn btn-outline-secondary" id="Gn" onclick="NoteClick('Gn')">G</button>
+        <button type="button" class="btn btn-outline-secondary" id="Gb" onclick="NoteClick('Gb')">Gb</button>
+    </div>
+    <div class="btn-group btn-group-lg">
+        <button type="button" class="btn btn-primary" onclick="ClearAll()">Clear</button>
+        <button type="button" class="btn btn-primary" onclick="HearChord()">Play</button>
+    </div>
+    <h3>Selected:</h3>
+    <p id="selnotes">No notes selected yet.</p>
+</div>
+<h3>Troubleshooting</h3>
+<p>Depending on your device/internet speed, the chord may sound more like an <a href="https://en.wikipedia.org/wiki/Arpeggio">arpeggio</a>. This is because technically, the notes play one after the other, rather than at the same time. If your device is slower, the gap between the notes becomes more obvious. There is no real way round this except me reprogramming it, and I don't want to do that.</p>
+<p>Also, some browsers may not support .wav files, which are used by this app. If you are using Internet Explorer, why?</p>
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        await jsRuntime.InvokeVoidAsync("activateChords");
+    }
+}
