@@ -2,7 +2,7 @@
     <div class="card-header">
         <div class="d-flex justify-content-between">
             <h5 class="my-auto">
-                <a href="@($"/downloads/{Download.Id}")" class="text-dark text-decoration-none">@Download.Title</a>
+                <DownloadTitle Id="@Download.Id" Title="@Download.Title" Link="true" />
             </h5>
 
             <AuthorizeView Resource="Download" Policy="@Authorization.Policies.EditDownload">

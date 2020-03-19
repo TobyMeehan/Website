@@ -78,6 +78,19 @@ namespace DataAccessLibrary.Storage
             await _sqlDataAccess.SaveData(sql, download);
         }
 
+        public async Task UpdateVerified(string downloadid, DownloadVerification verified)
+        {
+            string sql = "UPDATE `downloads` SET `Verified` = @verified WHERE `Id` = @downloadid";
+
+            object parameters = new
+            {
+                downloadid,
+                verified
+            };
+
+            await _sqlDataAccess.SaveData(sql, parameters);
+        }
+
         public async Task Delete(string downloadid)
         {
             string sql = "DELETE FROM `downloads` WHERE `Id` = @downloadid";

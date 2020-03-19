@@ -13,5 +13,6 @@ namespace DataAccessLibrary.Storage
         Task<List<Download>> SelectById(string downloadid);
         Task<List<Download>> SelectByUser(string userid);
         Task Update(Download download);
+        Task UpdateVerified(string downloadid, DownloadVerification verified);
     }
 }

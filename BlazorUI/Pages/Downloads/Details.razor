@@ -1,5 +1,6 @@
 ﻿@using AutoMapper
 @using BlazorUI.Extensions
+@using DataAccessLibrary.Models
 @using DataAccessLibrary.Data
 
 @page "/downloads/{Id}"
@@ -19,9 +20,51 @@ else
 
     @((MarkupString)_download.LongDescription)
 
+    <AuthorizeView Policy="@Authorization.Policies.IsAdmin">
+        <Authorized>
+            <div class="card border-dark mb-2">
+                <div class="card-body">
+                    <EditForm Model="_download" OnSubmit="Verify" Context="formContext" class="form-inline">
+                        <label class="my-1 mr-sm-2"><i class="fas fa-user-shield mr-1"></i> Set verification:</label>
+                        <InputSelect @bind-Value="@_download.Verified" class="custom-select my-1 mr-sm-2">
+                            <option value="@(DownloadVerification.None)">None</option>
+                            <option value="@(DownloadVerification.Verified)">Verified</option>
+                            <option value="@(DownloadVerification.Dangerous)">Dangerous</option>
+                        </InputSelect>
+                        <button type="submit" class="btn btn-dark">Submit</button>
+                    </EditForm>
+                </div>
+            </div>
+        </Authorized>
+        <NotAuthorized>
+            @switch (_download.Verified)
+            {
+                case DataAccessLibrary.Models.DownloadVerification.Dangerous:
+                    <div class="card border-danger mb-2">
+                        <div class="card-body text-danger">
+                            <i class="fas fa-exclamation"></i>
+                            This download has been marked as dangerous and could potentially cause damage to your computer.
+                        </div>
+                    </div>
+                    break;
+                case DataAccessLibrary.Models.DownloadVerification.Verified:
+                    <div class="card border-success mb-2">
+                        <div class="card-body text-success">
+                            <i class="fas fa-check"></i>
+                            This download is verified and safe to use on your computer.
+                        </div>
+                    </div>
+                    break;
+                default:
+                    break;
+            }
+
+        </NotAuthorized>
+    </AuthorizeView>
+
     @if (_download.Updated != null)
     {
-<p class="text-muted font-weight-light">Last updated @_download.Updated.Value.Day @_download.Updated.Value.ToString("MMMM") @_download.Updated.Value.Year</p>
+        <p class="text-muted font-weight-light">Last updated @_download.Updated.Value.Day @_download.Updated.Value.ToString("MMMM") @_download.Updated.Value.Year</p>
     }
 
     <button type="button" class="btn btn-primary my-2" data-toggle="modal" data-target="#FilesModal"><i class="fas fa-download"></i> Download</button>
@@ -72,5 +115,10 @@ else
     protected override async Task OnInitializedAsync()
     {
         _download = await Task.Run(async () => mapper.Map<Models.Download>(await downloadProcessor.GetDownloadById(Id)));
+    }
+
+    async Task Verify()
+    {
+        await downloadProcessor.VerifyDownload(_download.Id, _download.Verified);
     }
 }

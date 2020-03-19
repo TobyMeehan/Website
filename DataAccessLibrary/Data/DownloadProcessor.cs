@@ -170,6 +170,11 @@ namespace DataAccessLibrary.Data
             await _downloadTable.Update(download);
         }
 
+        public async Task VerifyDownload(string downloadid, DownloadVerification verified)
+        {
+            await _downloadTable.UpdateVerified(downloadid, verified);
+        }
+
         public async Task AddAuthor(string downloadid, string userid)
         {
             if ((await _downloadTable.SelectById(downloadid)).Any())

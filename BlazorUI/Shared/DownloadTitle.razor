@@ -1,0 +1,65 @@
+﻿@using AutoMapper
+@using DataAccessLibrary.Data
+@using DataAccessLibrary.Models
+
+@inject IDownloadProcessor downloadProcessor
+@inject IMapper mapper
+
+@if (Link)
+{
+    <a class="text-secondary text-decoration-none" href="@($"/downloads/{Id}")">
+        @Title
+
+        @switch (_verified)
+        {
+            case DownloadVerification.Dangerous:
+                <i class="fas fa-exclamation-circle"></i>
+                break;
+            case DownloadVerification.None:
+                break;
+            case DownloadVerification.Verified:
+                <i class="fas fa-check-circle"></i>
+                break;
+            default:
+                break;
+        }
+    </a>
+}
+else
+{
+    <span>
+        @Title
+
+        @switch (_verified)
+        {
+            case DownloadVerification.Dangerous:
+                break;
+            case DownloadVerification.None:
+                <i class="fas fa-exclamation-circle"></i>
+                break;
+            case DownloadVerification.Verified:
+                <i class="fas fa-check-circle"></i>
+                break;
+            default:
+                break;
+        }
+    </span>
+}
+
+@code {
+    [Parameter] public string Id { get; set; }
+
+    [Parameter] public string Title { get; set; }
+
+    [Parameter] public bool Link { get; set; } = true;
+
+    DownloadVerification _verified;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        var download = await downloadProcessor.GetDownloadById(Id);
+        Title = (!string.IsNullOrEmpty(Title)) ? Title : download.Title;
+        _verified = download.Verified;
+    }
+}

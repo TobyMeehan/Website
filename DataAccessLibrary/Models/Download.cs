@@ -32,8 +32,8 @@ namespace DataAccessLibrary.Models
 
     public enum DownloadVerification
     {
-        Dangerous,
-        None,
-        Verified
+        Dangerous = -1,
+        None = 0,
+        Verified = 1
     }
 }
