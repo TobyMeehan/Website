@@ -9,6 +9,7 @@
 @inject IDownloadProcessor downloadProcessor
 @inject IRoleProcessor roleProcessor
 @inject AuthenticationStateProvider authenticationStateProvider
+@inject AlertState alertState
 
 @if (_user == null)
 {
@@ -164,7 +165,14 @@ else
             if (await userProcessor.Authenticate(_context.User.GetUsername(), _adminPasswordForm.CurrentPassword))
             {
                 await userProcessor.UpdatePassword(_user.Id, _adminPasswordForm.NewPassword);
-                // TODO: Success message
+
+                alertState.Queue.Add(new Models.Alert
+                {
+                    Title = null,
+                    Body = $"Successfully changed password of {_user.Username}.",
+                    Context = AlertContext.Success
+                });
+
                 _adminPasswordForm = new Models.ChangePasswordFormModel();
             }
             else

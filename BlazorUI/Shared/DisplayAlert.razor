@@ -1,0 +1,10 @@
+﻿@using BlazorUI.Models
+
+<div class="@($"alert alert-{Alert.Context.ToString().ToLower()}")" role="alert">
+    <h4 class="alert-heading">@Alert.Title</h4>
+    @((MarkupString)Alert.Body)
+</div>
+
+@code {
+    [Parameter] public Alert Alert { get; set; }
+}

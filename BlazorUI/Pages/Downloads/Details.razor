@@ -9,6 +9,7 @@
 @inject IMapper mapper
 @inject AuthenticationStateProvider authenticationStateProvider
 @inject NavigationManager navigationManager
+@inject AlertState alertState
 
 @if (_download == null)
 {
@@ -123,5 +124,11 @@ else
     async Task Verify()
     {
         await downloadProcessor.VerifyDownload(_download.Id, _download.Verified);
+        alertState.Queue.Add(new Models.Alert
+        {
+            Title = null,
+            Body = $"Successfully changed verification to {_download.Verified}.",
+            Context = AlertContext.Success
+        });
     }
 }
