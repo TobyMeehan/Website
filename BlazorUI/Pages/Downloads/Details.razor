@@ -96,7 +96,8 @@ else
                         @foreach (var item in _download.Files)
                         {
                             <li>
-                                <a href="@($"https://downloads.tobymeehan.com/{Id}/{item}")">@item <FileIcon Filename="@item" /></a>
+                                <a href="@($"https://downloads.tobymeehan.com/{Id}/{item}")">@item</a>
+                                <FileIcon Filename="@item" />
                             </li>
                         }
                     </ul>
