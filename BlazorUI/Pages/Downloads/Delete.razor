@@ -9,6 +9,7 @@
 @inject AuthenticationStateProvider authenticationStateProvider
 @inject NavigationManager navigationManager
 @inject EditDownloadState state
+@inject AlertState alertState
 
 @if (_download == null)
 {
@@ -61,6 +62,13 @@ else
     async Task Confirm()
     {
         await downloadProcessor.DeleteDownload(Id);
+
+        alertState.Queue.Add(new Models.Alert
+        {
+            Title = null,
+            Body = $"{_download.Title} has been successfully deleted.",
+            Context = AlertContext.Success
+        });
 
         navigationManager.NavigateTo("/downloads");
     }

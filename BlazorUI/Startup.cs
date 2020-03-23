@@ -90,6 +90,7 @@ namespace BlazorUI
             services.AddTransient<IDownloadProcessor, DownloadProcessor>();
 
             services.AddScoped<Pages.Downloads.EditDownloadState>();
+            services.AddScoped<AlertState>();
         }
 
         private IMapper ConfigureMapper()
@@ -98,6 +99,7 @@ namespace BlazorUI
             {
                 cfg.CreateMap<DataAccessLibrary.Models.User, User>().ReverseMap();
                 cfg.CreateMap<DataAccessLibrary.Models.Role, Role>().ReverseMap();
+                cfg.CreateMap<DataAccessLibrary.Models.Alert, Alert>().ReverseMap();
 
                 cfg.CreateMap<DataAccessLibrary.Models.Download, Download>().ReverseMap();
                 cfg.CreateMap<DataAccessLibrary.Models.Download, DownloadFormModel>().ReverseMap();
