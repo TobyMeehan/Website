@@ -85,7 +85,10 @@ else
             </div>
         </Authorized>
         <NotAuthorized>
-            <Redirect Path="/downloads" />
+            <Redirect Path="@($"/downloads/{Id}")" />
+            <div class="alert alert-danger">
+                You do not have edit access for this download.
+            </div>
         </NotAuthorized>
     </AuthorizeView>
 }

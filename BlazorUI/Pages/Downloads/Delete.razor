@@ -34,7 +34,10 @@ else
             <button class="btn btn-danger" @onclick="Confirm">Confirm</button>
         </Authorized>
         <NotAuthorized>
-            <Redirect Path="/downloads" />
+            <Redirect Path="@($"/downloads/{Id}")" />
+            <div class="alert alert-danger">
+                You do not have edit access for this download.
+            </div>
         </NotAuthorized>
     </AuthorizeView>
 }
