@@ -1,15 +1,5 @@
-﻿@using AutoMapper
-@using DataAccessLibrary.Data
-
-@page "/downloads/{Id}/delete"
+﻿@page "/downloads/{Id}/delete"
 @layout EditLayout
-
-@inject IDownloadProcessor downloadProcessor
-@inject IMapper mapper
-@inject AuthenticationStateProvider authenticationStateProvider
-@inject NavigationManager navigationManager
-@inject EditDownloadState state
-@inject AlertState alertState
 
 @if (_download == null)
 {
@@ -32,44 +22,11 @@ else
 
             <p>Deleted downloads and their files are not retrievable. Deleting this download will be a permanent action.</p>
 
-            <button class="btn btn-danger" @onclick="Confirm">Confirm</button>
+            <ProcessButton class="btn btn-danger" @ref="_confirmButton" @onclick="ConfirmButton_Click">Confirm</ProcessButton>
         </Authorized>
         <NotAuthorized>
+            <DisplayAlert Alert="_accessDeniedAlert" />
             <Redirect Path="@($"/downloads/{Id}")" />
-            <div class="alert alert-danger">
-                You do not have edit access for this download.
-            </div>
         </NotAuthorized>
     </AuthorizeView>
-}
-
-@code {
-    [Parameter] public string Id { get; set; }
-
-    private Models.Download _download;
-
-    private AuthenticationState _context;
-
-    protected override async Task OnInitializedAsync()
-    {
-        _context = await authenticationStateProvider.GetAuthenticationStateAsync();
-        _download = await Task.Run(async () => mapper.Map<Models.Download>(await downloadProcessor.GetDownloadById(Id)));
-
-        state.Title = _download.Title;
-        state.Id = _download.Id;
-    }
-
-    async Task Confirm()
-    {
-        await downloadProcessor.DeleteDownload(Id);
-
-        alertState.Queue.Add(new Models.Alert
-        {
-            Title = null,
-            Body = $"{_download.Title} has been successfully deleted.",
-            Context = AlertContext.Success
-        });
-
-        navigationManager.NavigateTo("/downloads");
-    }
 }

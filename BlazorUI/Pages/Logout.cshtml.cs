@@ -13,7 +13,7 @@ namespace BlazorUI
         public async Task<IActionResult> OnGet()
         {
             await HttpContext.SignOutAsync();
-            return LocalRedirect("/");
+            return Redirect("/");
         }
     }
 }

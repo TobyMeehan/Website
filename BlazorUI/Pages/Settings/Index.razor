@@ -1,13 +1,7 @@
-﻿@using DataAccessLibrary.Data;
-@using BlazorUI.Extensions;
+﻿@using BlazorUI.Extensions;
 
 @page "/me"
 @layout SettingsLayout
-@attribute [Authorize]
-
-@inject IUserProcessor userProcessor
-@inject AuthenticationStateProvider AuthenticationStateProvider
-@inject NavigationManager NavigationManager
 
 <Title Value="Account"></Title>
 
@@ -15,7 +9,7 @@
     <div class="card my-3">
         <div class="card-body">
             <div class="d-flex flex-row">
-                <h3 class="p-2">@(context.User.GetUsername())</h3>
+                <h3 class="p-2">@context.User.GetUsername()</h3>
                 <a href="#" class="p-2 my-1" title="Change Username" role="button" data-toggle="modal" data-target="#InformationModal" onclick="Settings_Index_ShowUsernameTab()">Change</a>
             </div>
         </div>
@@ -35,6 +29,7 @@
                     </div>
                 </div>
             </div>
+
             <div class="form-group">
                 <button class="btn btn-danger btn-lg" data-toggle="modal" data-target="#InformationModal" onclick="Settings_Index_ShowAccountTab()">Delete Account</button>
             </div>
@@ -50,6 +45,7 @@
                 </div>
 
                 <div class="modal-body">
+
                     <ul class="nav nav-tabs" id="InformationTabs">
                         <li class="nav-item">
                             <a class="nav-link active" id="UsernameTab" data-toggle="tab" href="#UsernameContent" role="tab" aria-controls="username" aria-selected="true">Username</a>
@@ -61,19 +57,20 @@
                             <a class="nav-link" id="AccountTab" data-toggle="tab" href="#AccountContent" role="tab" aria-controls="account" aria-selected="false">Account</a>
                         </li>
                     </ul>
+
                     <div class="tab-content" id="InformationContent">
                         <div class="tab-pane fade show active" id="UsernameContent" role="tabpanel" aria-labelledby="UsernameTab">
                             <h5>Change Username</h5>
 
-                            <EditForm Model="_usernameModel" Context="usernameFormContext" OnValidSubmit="ChangeUsername">
+                            <EditForm Model="_usernameForm" Context="formContext" OnValidSubmit="UsernameForm_Submit">
                                 <DataAnnotationsValidator />
-                                <ServerSideValidator @ref="usernameValidator" />
+                                <ServerSideValidator @ref="_usernameValidator" />
 
                                 <div class="form-group">
                                     <label for="Username" class="col-md-2">Username</label>
                                     <div class="col-md-10">
-                                        <InputText id="Username" @bind-Value="_usernameModel.Username" class="form-control" />
-                                        <ValidationMessage For="@(() => _usernameModel.Username)" />
+                                        <InputText id="Username" @bind-Value="_usernameForm.Username" class="form-control" />
+                                        <ValidationMessage For="@(() => _usernameForm.Username)" />
                                     </div>
                                 </div>
 
@@ -86,29 +83,29 @@
                         </div>
                         <div class="tab-pane fade" id="PasswordContent" role="tabpanel" aria-labelledby="PasswordTab">
                             <h5>Change Password</h5>
-                            <EditForm Model="_changePasswordModel" Context="changePasswordFormContext" OnValidSubmit="ChangePassword">
+                            <EditForm Model="_changePasswordForm" Context="formContext" OnValidSubmit="ChangePasswordForm_Submit">
                                 <DataAnnotationsValidator />
-                                <ServerSideValidator @ref="changePasswordValidator" />
+                                <ServerSideValidator @ref="_changePasswordValidator" />
                                 <div class="form-group">
                                     <label for="CurrentPassword" class="col-md-10">Current Password</label>
                                     <div class="col-md-10">
-                                        <InputText id="CurrentPassword" @bind-Value="_changePasswordModel.CurrentPassword" class="form-control" />
-                                        <ValidationMessage For="@(() => _changePasswordModel.CurrentPassword)" />
+                                        <InputText id="CurrentPassword" type="password" @bind-Value="_changePasswordForm.CurrentPassword" class="form-control" />
+                                        <ValidationMessage For="@(() => _changePasswordForm.CurrentPassword)" />
 
                                     </div>
                                 </div>
                                 <div class="form-group">
                                     <label for="NewPassword" class="col-md-10">New Password</label>
                                     <div class="col-md-10">
-                                        <InputText id="NewPassword" @bind-Value="_changePasswordModel.NewPassword" class="form-control" />
-                                        <ValidationMessage For="@(() => _changePasswordModel.NewPassword)" class="text-danger" />
+                                        <InputText id="NewPassword" type="password" @bind-Value="_changePasswordForm.NewPassword" class="form-control" />
+                                        <ValidationMessage For="@(() => _changePasswordForm.NewPassword)" class="text-danger" />
                                     </div>
                                 </div>
                                 <div class="form-group">
                                     <label for="ConfirmNewPassword" class="col-md-10">Confirm New Password</label>
                                     <div class="col-md-10">
-                                        <InputText id="ConfirmNewPassword" @bind-Value="_changePasswordModel.ConfirmNewPassword" class="form-control" />
-                                        <ValidationMessage For="@(() => _changePasswordModel.ConfirmNewPassword)" class="text-danger" />
+                                        <InputText id="ConfirmNewPassword" type="password" @bind-Value="_changePasswordForm.ConfirmNewPassword" class="form-control" />
+                                        <ValidationMessage For="@(() => _changePasswordForm.ConfirmNewPassword)" class="text-danger" />
                                     </div>
                                 </div>
                                 <div class="form-group">
@@ -125,14 +122,14 @@
                                     <p class="text-danger">Admin accounts cannot be deleted automatically.</p>
                                 </Authorized>
                                 <NotAuthorized>
-                                    <EditForm Model="_passwordModel" Context="passwordFormContext" OnValidSubmit="DeleteAccount">
+                                    <EditForm Model="_deleteAccountForm" Context="passwordFormContext" OnValidSubmit="DeleteAccountForm_Submit">
                                         <DataAnnotationsValidator />
-                                        <ServerSideValidator @ref="deleteValidator" />
+                                        <ServerSideValidator @ref="_deleteValidator" />
                                         <div class="form-group">
                                             <label for="Password" class="col-md-10">Password</label>
                                             <div class="col-md-10">
-                                                <InputText id="Password" @bind-Value="_passwordModel.Password" class="form-control" />
-                                                <ValidationMessage For="@(() => _passwordModel.Password)" class="text-danger" />
+                                                <InputText id="Password" type="password" @bind-Value="_deleteAccountForm.Password" class="form-control" />
+                                                <ValidationMessage For="@(() => _deleteAccountForm.Password)" class="text-danger" />
                                             </div>
                                         </div>
                                         <div class="form-group">
@@ -154,81 +151,3 @@
         </div>
     </div>
 </AuthorizeView>
-
-@code {
-    private Models.UsernameFormModel _usernameModel = new Models.UsernameFormModel();
-    private Models.ChangePasswordFormModel _changePasswordModel = new Models.ChangePasswordFormModel();
-    private Models.PasswordFormModel _passwordModel = new Models.PasswordFormModel();
-    private AuthenticationState context;
-
-    ServerSideValidator usernameValidator;
-    ServerSideValidator changePasswordValidator;
-    ServerSideValidator deleteValidator;
-
-    protected override async Task OnInitializedAsync()
-    {
-        context = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-    }
-
-    async Task ChangeUsername(EditContext editContext)
-    {
-        if (await userProcessor.UserExists(_usernameModel.Username) && _usernameModel.Username != context.User.GetUsername())
-        {
-            Dictionary<string, List<string>> errors = new Dictionary<string, List<string>>();
-            errors.Add("Username", new List<string> { "That username is already in use." });
-            usernameValidator.DisplayErrors(errors);
-        }
-        else
-        {
-            await userProcessor.UpdateUsername(context.User.GetUserId(), _usernameModel.Username);
-            NavigationManager.NavigateTo("/me");
-        }
-    }
-
-    async Task ChangePassword(EditContext editContext)
-    {
-        Dictionary<string, List<string>> errors = new Dictionary<string, List<string>>();
-        if (_changePasswordModel.NewPassword == _changePasswordModel.ConfirmNewPassword) // this is checked by the validator but has caused some issues in some versions of blazor
-        {
-            if (await userProcessor.Authenticate(context.User.GetUsername(), _changePasswordModel.CurrentPassword))
-            {
-                await userProcessor.UpdatePassword(context.User.GetUserId(), _changePasswordModel.NewPassword);
-                NavigationManager.NavigateTo("/me");
-            }
-            else
-            {
-                errors.Add("CurrentPassword", new List<string> { "Incorrect current password." });
-            }
-        }
-        else
-        {
-            List<string> message = new List<string> { "Passwords do not match." };
-            errors.Add("NewPassword", message);
-            errors.Add("ConfirmNewPassword", message);
-        }
-
-        if (errors.Any())
-        {
-            changePasswordValidator.DisplayErrors(errors);
-        }
-        else
-        {
-
-        }
-    }
-
-    async Task DeleteAccount(EditContext editContext)
-    {
-        if (await userProcessor.Authenticate(context.User.GetUsername(), _passwordModel.Password))
-        {
-            await userProcessor.DeleteUser(context.User.GetUserId());
-            NavigationManager.NavigateTo("/logout", true);
-        }
-        else
-        {
-            Dictionary<string, List<string>> errors = new Dictionary<string, List<string>>();
-            errors.Add("Password", new List<string> { "Incorrect password." });
-            deleteValidator.DisplayErrors(errors);
-        }
-    }
-}

@@ -1,0 +1,25 @@
+﻿<button @attributes="InputAttributes" disabled="@InProgress">
+    @if (InProgress)
+    {
+        <span class="spinner-border spinner-border-sm" role="status"></span>
+        <span class="sr-only">Loading...</span>
+    }
+
+    @ChildContent
+</button>
+
+@code {
+    [Parameter] public RenderFragment ChildContent { get; set; }
+
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object> InputAttributes { get; set; }
+
+    [Parameter] public bool InProgress { get; set; }
+
+    public void SetProgress(bool inProgress)
+    {
+        InProgress = inProgress;
+        StateHasChanged();
+    }
+
+}

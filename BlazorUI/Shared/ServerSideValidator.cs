@@ -12,8 +12,6 @@ namespace BlazorUI.Shared
         private ValidationMessageStore _messageStore;
 
         [CascadingParameter] EditContext CurrentEditContext { get; set; }
-
-        /// <inheritdoc />
         protected override void OnInitialized()
         {
             if (CurrentEditContext == null)

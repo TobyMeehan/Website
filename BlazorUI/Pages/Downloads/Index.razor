@@ -1,12 +1,4 @@
-﻿@using BlazorUI.Models;
-@using DataAccessLibrary.Data;
-@using AutoMapper;
-
-@page "/downloads"
-
-@inject IDownloadProcessor downloadProcessor
-@inject IMapper mapper
-@inject IAuthorizationService authorizationService
+﻿@page "/downloads"
 
 <Title Value="Downloads"></Title>
 
@@ -21,14 +13,14 @@
 
 <hr />
 
-@if (Downloads == null)
+@if (_downloads == null)
 {
     <LoadingMessage Text="false" />
 }
 else
 {
     <div class="card-deck card-deck-responsive">
-        @foreach (Download download in Downloads)
+        @foreach (var download in _downloads)
         {
             <div class="card my-3">
                 <div class="card-body">
@@ -54,15 +46,4 @@ else
             </div>
         }
     </div>
-}
-
-
-
-@code {
-    protected List<Download> Downloads { get; set; }
-
-    protected override async Task OnInitializedAsync()
-    {
-        Downloads = await Task.Run(async () => mapper.Map<List<Download>>(await downloadProcessor.GetDownloads()));
-    }
 }

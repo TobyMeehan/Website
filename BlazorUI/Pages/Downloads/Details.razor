@@ -1,15 +1,6 @@
-﻿@using AutoMapper
-@using BlazorUI.Extensions
-@using DataAccessLibrary.Models
-@using DataAccessLibrary.Data
+﻿@using DataAccessLibrary.Models
 
 @page "/downloads/{Id}"
-
-@inject IDownloadProcessor downloadProcessor
-@inject IMapper mapper
-@inject AuthenticationStateProvider authenticationStateProvider
-@inject NavigationManager navigationManager
-@inject AlertState alertState
 
 @if (_download == null)
 {
@@ -28,7 +19,7 @@ else
         <Authorized>
             <div class="card border-dark mb-2">
                 <div class="card-body">
-                    <EditForm Model="_download" OnSubmit="Verify" Context="formContext" class="form-inline">
+                    <EditForm Model="_download" OnSubmit="VerifyForm_Submit" Context="formContext" class="form-inline">
                         <label class="my-1 mr-sm-2"><i class="fas fa-user-shield mr-1"></i> Set verification:</label>
                         <InputSelect @bind-Value="@_download.Verified" class="custom-select my-1 mr-sm-2">
                             <option value="@(DownloadVerification.None)">None</option>
@@ -43,7 +34,7 @@ else
         <NotAuthorized>
             @switch (_download.Verified)
             {
-                case DataAccessLibrary.Models.DownloadVerification.Dangerous:
+                case DownloadVerification.Dangerous:
                     <div class="card border-danger mb-2">
                         <div class="card-body text-danger">
                             <i class="fas fa-exclamation"></i>
@@ -51,7 +42,7 @@ else
                         </div>
                     </div>
                     break;
-                case DataAccessLibrary.Models.DownloadVerification.Verified:
+                case DownloadVerification.Verified:
                     <div class="card border-success mb-2">
                         <div class="card-body text-success">
                             <i class="fas fa-check"></i>
@@ -110,26 +101,4 @@ else
             </div>
         </div>
     </div>
-}
-
-@code {
-    [Parameter] public string Id { get; set; }
-
-    private Models.Download _download;
-
-    protected override async Task OnInitializedAsync()
-    {
-        _download = await Task.Run(async () => mapper.Map<Models.Download>(await downloadProcessor.GetDownloadById(Id)));
-    }
-
-    async Task Verify()
-    {
-        await downloadProcessor.VerifyDownload(_download.Id, _download.Verified);
-        alertState.Queue.Add(new Models.Alert
-        {
-            Title = null,
-            Body = $"Successfully changed verification to {_download.Verified}.",
-            Context = AlertContext.Success
-        });
-    }
 }

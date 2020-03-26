@@ -1,15 +1,4 @@
-﻿@using AutoMapper
-@using BlazorUI.Extensions
-@using DataAccessLibrary.Data
-
-@page "/users/{Username}"
-
-@inject IMapper mapper
-@inject IUserProcessor userProcessor
-@inject IDownloadProcessor downloadProcessor
-@inject IRoleProcessor roleProcessor
-@inject AuthenticationStateProvider authenticationStateProvider
-@inject AlertState alertState
+﻿@page "/users/{Username}"
 
 @if (_user == null)
 {
@@ -56,14 +45,14 @@ else
                 <h3>Admin Actions</h3>
                 <hr />
                 <h4>Reset Password</h4>
-                <EditForm Model="_adminPasswordForm" Context="formContext" OnValidSubmit="ResetPassword">
+                <EditForm Model="_adminPasswordForm" Context="formContext" OnValidSubmit="AdminPasswordForm_Submit">
                     <DataAnnotationsValidator />
                     <ServerSideValidator @ref="_adminPasswordValidator" />
 
                     <div class="form-group row">
                         <label for="NewPassword" class="col-md-2 col-form-label">New Password</label>
                         <div class="col-md-10">
-                            <InputText id="NewPassword" @bind-Value="_adminPasswordForm.NewPassword" class="form-control" />
+                            <InputText id="NewPassword" type="password" @bind-Value="_adminPasswordForm.NewPassword" class="form-control" />
                             <ValidationMessage For="() => _adminPasswordForm.NewPassword" class="text-danger" />
                         </div>
                     </div>
@@ -71,7 +60,7 @@ else
                     <div class="form-group row">
                         <label for="ConfirmNewPassword" class="col-md-2 col-form-label">Confirm New Password</label>
                         <div class="col-md-10">
-                            <InputText id="ConfirmNewPassword" @bind-Value="_adminPasswordForm.ConfirmNewPassword" class="form-control" />
+                            <InputText id="ConfirmNewPassword" type="password" @bind-Value="_adminPasswordForm.ConfirmNewPassword" class="form-control" />
                             <ValidationMessage For="() => _adminPasswordForm.ConfirmNewPassword" class="text-danger" />
                         </div>
                     </div>
@@ -79,7 +68,7 @@ else
                     <div class="form-group row">
                         <label for="AdminPassword" class="col-md-2 col-form-label">Admin Password</label>
                         <div class="col-md-10">
-                            <InputText id="AdminPassword" @bind-Value="_adminPasswordForm.CurrentPassword" class="form-control" />
+                            <InputText id="AdminPassword" type="password" @bind-Value="_adminPasswordForm.CurrentPassword" class="form-control" />
                             <ValidationMessage For="() => _adminPasswordForm.CurrentPassword" />
                         </div>
                     </div>
@@ -101,7 +90,7 @@ else
                                     @foreach (var role in _roles)
                                     {
                                         <li class="list-group-item">
-                                            <button class="btn btn-outline-primary btn-block" @onclick="() => AddRole(role)">
+                                            <button class="btn btn-outline-primary btn-block" @onclick="() => AddRole_Click(role)">
                                                 <i class="fas fa-plus-circle"></i>
                                                 @role.Name
                                             </button>
@@ -120,7 +109,7 @@ else
                                     @foreach (var role in _user.Roles)
                                     {
                                         <li class="list-group-item">
-                                            <button class="btn btn-outline-danger btn-block" @onclick="() => RemoveRole(role)">
+                                            <button class="btn btn-outline-danger btn-block" @onclick="() => RemoveRole_Click(role)">
                                                 <i class="fas fa-minus-circle"></i>
                                                 @role.Name
                                             </button>
@@ -134,76 +123,4 @@ else
             </div>
         </div>
     </AuthorizeView>
-}
-
-@code {
-    [Parameter] public string Username { get; set; }
-
-    private Models.User _user;
-    private List<Models.Role> _roles;
-    private List<Models.Download> _downloads;
-
-    private AuthenticationState _context;
-
-    private Models.ChangePasswordFormModel _adminPasswordForm = new Models.ChangePasswordFormModel();
-    ServerSideValidator _adminPasswordValidator;
-
-    protected override async Task OnInitializedAsync()
-    {
-        _context = await authenticationStateProvider.GetAuthenticationStateAsync();
-        _user = await Task.Run(async () => mapper.Map<Models.User>(await userProcessor.GetUserByUsername(Username)));
-        _roles = await Task.Run(async () => mapper.Map<List<Models.Role>>(await roleProcessor.GetRoles()));
-        _roles = await Task.Run(() => _roles.Where(filter => !(_user.Roles.Any(role => role.Id == filter.Id))).ToList());
-        _downloads = await Task.Run(async () => mapper.Map<List<Models.Download>>(await downloadProcessor.GetDownloadsByAuthor(_user.Id)));
-    }
-
-    async Task ResetPassword()
-    {
-        Dictionary<string, List<string>> errors = new Dictionary<string, List<string>>();
-        if (_adminPasswordForm.NewPassword == _adminPasswordForm.ConfirmNewPassword) // see /Settings/Index.razor #189
-        {
-            if (await userProcessor.Authenticate(_context.User.GetUsername(), _adminPasswordForm.CurrentPassword))
-            {
-                await userProcessor.UpdatePassword(_user.Id, _adminPasswordForm.NewPassword);
-
-                alertState.Queue.Add(new Models.Alert
-                {
-                    Title = null,
-                    Body = $"Successfully changed password of {_user.Username}.",
-                    Context = AlertContext.Success
-                });
-
-                _adminPasswordForm = new Models.ChangePasswordFormModel();
-            }
-            else
-            {
-                errors.Add(nameof(_adminPasswordForm.CurrentPassword), new List<string> { "Admin password was incorrect. " });
-            }
-        }
-        else
-        {
-            List<string> message = new List<string> { "Passwords do not match." };
-            errors.Add(nameof(_adminPasswordForm.NewPassword), message);
-            errors.Add(nameof(_adminPasswordForm.ConfirmNewPassword), message);
-        }
-
-        if (errors.Any())
-        {
-            _adminPasswordValidator.DisplayErrors(errors);
-        }
-    }
-
-    async Task AddRole(Models.Role role)
-    {
-        await userProcessor.AddRole(_user.Id, mapper.Map<DataAccessLibrary.Models.Role>(role));
-        _user.Roles.Add(role);
-        _roles.Remove(role);
-    }
-
-    async Task RemoveRole(Models.Role role)
-    {
-        await userProcessor.RemoveRole(_user.Id, mapper.Map<DataAccessLibrary.Models.Role>(role));
-        _user.Roles.Remove(role);
-        _roles.Add(role);
-    }
 }

@@ -33,12 +33,14 @@ namespace BlazorUI
         [BindProperty]
         public LoginFormModel Login { get; set; }
 
-        public async Task<IActionResult> OnPost()
+        public async Task<IActionResult> OnPost(string redirectUri)
         {
             if (!ModelState.IsValid)
             {
                 return Page();
             }
+
+            redirectUri ??= "/";
 
             if (await _userProcessor.Authenticate(Login.Username, Login.Password))
             {
@@ -63,7 +65,7 @@ namespace BlazorUI
                     new ClaimsPrincipal(claimsIdentity),
                     authProperties);
 
-                return LocalRedirect("/");
+                return Redirect(redirectUri);
             }
             else
             {

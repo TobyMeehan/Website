@@ -1,16 +1,7 @@
-﻿@using AutoMapper
-@using BlazorUI.Extensions
-@using DataAccessLibrary.Data
+﻿@using BlazorUI.Extensions
 
 @page "/downloads/{Id}/authors"
 @layout EditLayout
-
-@inject IDownloadProcessor downloadProcessor
-@inject IUserProcessor userProcessor
-@inject IMapper mapper
-@inject NavigationManager navigationManager
-@inject AuthenticationStateProvider authenticationStateProvider
-@inject EditDownloadState state
 
 @if (_download == null)
 {
@@ -26,23 +17,11 @@ else
                         <div class="card-body">
                             <h2>Add Authors</h2>
 
-                            <EditForm Model="_username" OnSubmit="AddUser" Context="formContext">
-                                <div class="input-group mb-3">
-                                    <InputText id="UserSearch" class="form-control" @bind-Value="_username.Username" @onkeypress="SelectUser" />
-                                    <div class="input-group-append">
-                                        <button type="submit" class="btn btn-outline-primary">
-                                            <i class="fas fa-user-plus"></i>
-                                            Invite
-                                        </button>
-                                    </div>
-                                </div>
-                            </EditForm>
-
                             <ul class="list-group list-group-flush">
-                                @foreach (Models.User user in _usersFilter)
+                                @foreach (var user in _users)
                                 {
                                     <li class="list-group-item">
-                                        <a href="" role="button" @onclick="() => SelectUser(user)" @onclick:preventDefault>@user.Username</a>
+                                        <a href="" role="button" @onclick="() => AddUser_Click(user)" @onclick:preventDefault>@user.Username</a>
                                     </li>
                                 }
                             </ul>
@@ -54,7 +33,7 @@ else
                         <div class="card-body">
                             <h2>Manage Authors</h2>
                             <ul class="list-group list-group-flush mb-3">
-                                @foreach (Models.User author in _download.Authors)
+                                @foreach (var author in _download.Authors)
                                 {
                                     if (author.Id == _download.CreatorId)
                                     {
@@ -67,14 +46,14 @@ else
                                     {
                                         <li class="list-group-item list-group-item-secondary d-flex justify-content-between">
                                             <span class="my-auto"><DisplayUser Username="@author.Username" /></span>
-                                            <button class="btn btn-secondary" @onclick="() => RemoveUser(author)"><i class="fas fa-user-slash"></i> Leave</button>
+                                            <button class="btn btn-secondary" @onclick="() => RemoveUser_Click(author)"><i class="fas fa-user-slash"></i> Leave</button>
                                         </li>
                                     }
                                     else
                                     {
                                         <li class="list-group-item d-flex justify-content-between">
                                             <span class="my-auto"><DisplayUser Username="@author.Username" /></span>
-                                            <button class="btn btn-danger" @onclick="() => RemoveUser(author)"><i class="fas fa-user-minus"></i> Remove</button>
+                                            <button class="btn btn-danger" @onclick="() => RemoveUser_Click(author)"><i class="fas fa-user-minus"></i> Remove</button>
                                         </li>
                                     }
                                 }
@@ -85,93 +64,8 @@ else
             </div>
         </Authorized>
         <NotAuthorized>
+            <DisplayAlert Alert="_accessDeniedAlert" />
             <Redirect Path="@($"/downloads/{Id}")" />
-            <div class="alert alert-danger">
-                You do not have edit access for this download.
-            </div>
         </NotAuthorized>
     </AuthorizeView>
-}
-
-@code {
-    [Parameter] public string Id { get; set; }
-
-    private Models.UsernameFormModel _username = new Models.UsernameFormModel();
-
-    private Models.Download _download;
-    private List<Models.User> _users;
-    private List<Models.User> _usersFilter;
-    private Models.User _selectedUser;
-
-    private AuthenticationState _context;
-
-    protected override async Task OnInitializedAsync()
-    {
-        _context = await authenticationStateProvider.GetAuthenticationStateAsync();
-        _download = await Task.Run(async () => mapper.Map<Models.Download>(await downloadProcessor.GetDownloadById(Id)));
-        _users = await Task.Run(async () => mapper.Map<List<Models.User>>(await userProcessor.GetUsersByRole("Verified")));
-        _users = await Task.Run(() => _users.Where(filter => !(_download.Authors.Any(user => user.Id == filter.Id))).ToList());
-        _usersFilter = _users;
-
-        state.Title = _download.Title;
-        state.Id = _download.Id;
-    }
-
-    void SelectUser(Models.User user)
-    {
-        _selectedUser = user;
-        _username.Username = user.Username;
-    }
-
-    void SelectUser(string username)
-    {
-        SearchUser(username);
-
-        if (_users.Any(filter => filter.Username == username))
-        {
-            _selectedUser = _users.First(filter => filter.Username == username);
-        }
-    }
-
-    void SelectUser()
-    {
-        SelectUser(_username.Username);
-    }
-
-    void SearchUser()
-    {
-        SearchUser(_username.Username);
-    }
-
-    void SearchUser(string query)
-    {
-        if (string.IsNullOrWhiteSpace(query))
-        {
-            _usersFilter = _users;
-        }
-        else
-        {
-            _usersFilter = _users.Where(filter => filter.Username.Contains(query)).ToList();
-        }
-    }
-
-    async Task AddUser()
-    {
-        if (_selectedUser != null)
-        {
-            if (_users.Any(filter => filter.Id == _selectedUser.Id))
-            {
-                await downloadProcessor.AddAuthor(_download.Id, _selectedUser.Id);
-                _download.Authors.Add(_selectedUser);
-                _users.Remove(_selectedUser);
-            }
-        }
-    }
-
-    async Task RemoveUser(Models.User user)
-    {
-        await downloadProcessor.RemoveAuthor(_download.Id, user.Id);
-        _download.Authors.Remove(user);
-        _users.Add(user);
-    }
 }
