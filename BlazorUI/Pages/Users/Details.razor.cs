@@ -40,7 +40,7 @@ namespace BlazorUI.Pages.Users
             _roles = await Task.Run(async () =>
             {
                 return mapper.Map<List<Role>>(await roleProcessor.GetRoles())
-                        .Where(filter => _user.Roles.Any(role => role.Id != filter.Id))
+                        .Where(filter => !_user.Roles.Any(role => role.Id == filter.Id))
                         .ToList();
             });
             _downloads = await Task.Run(async () => mapper.Map<List<Download>>(await downloadProcessor.GetDownloadsByAuthor(_user.Id)));
