@@ -63,7 +63,7 @@ namespace DataAccessLibrary.Storage
                 downloadid
             };
 
-            await _sqlDataAccess.SaveData(sql, downloadid);
+            await _sqlDataAccess.SaveData(sql, parameters);
         }
 
         public async Task DeleteByUser(string userid)
@@ -75,7 +75,7 @@ namespace DataAccessLibrary.Storage
                 userid
             };
 
-            await _sqlDataAccess.SaveData(sql, userid);
+            await _sqlDataAccess.SaveData(sql, parameters);
         }
     }
 }

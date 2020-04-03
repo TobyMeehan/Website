@@ -14,7 +14,7 @@ using System.Timers;
 
 namespace BlazorUI.Shared
 {
-    public class AuthStateValidator : ComponentBase
+    public class AuthStateValidator : ComponentBase, IDisposable
     {
         [Inject] private AuthenticationStateProvider authenticationStateProvider { get; set; }
         [Inject] private IUserProcessor userProcessor { get; set; }
@@ -22,31 +22,35 @@ namespace BlazorUI.Shared
         [Inject] private IMapper mapper { get; set; }
         [Inject] private NavigationManager navigationManager { get; set; }
 
-        private AuthenticationState _context;
+        [CascadingParameter] private Task<AuthenticationState> authenticationStateTask { get; set; }
+
+        private Timer _timer;
 
         protected override async Task OnInitializedAsync()
         {
-            _context = await authenticationStateProvider.GetAuthenticationStateAsync();
+            
         }
 
         protected override async Task OnAfterRenderAsync(bool firstRender)
         {
             await Task.Run(() =>
             {
-                var timer = new Timer(5000);
-                timer.Elapsed += async (source, e) =>
+                _timer = new Timer(5000);
+                _timer.Elapsed += async (source, e) =>
                 {
-                    if (_context.User.Identity.IsAuthenticated)
+                    var authState = await authenticationStateTask;
+
+                    if (authState.User.Identity.IsAuthenticated)
                     {
-                        User user = mapper.Map<User>(await userProcessor.GetUserById(_context.User.GetUserId()));
-                        if (!await StateIsValid(_context.User, user))
+                        User user = mapper.Map<User>(await userProcessor.GetUserById(authState.User.GetUserId()));
+                        if (!await StateIsValid(authState.User, user))
                         {
                             navigationManager.NavigateTo($"/login?redirectUri={navigationManager.Uri}", true);
                         }
                     }
                 };
-                timer.AutoReset = true;
-                timer.Enabled = true;
+                _timer.AutoReset = true;
+                _timer.Enabled = true;
             });
         }
 
@@ -77,6 +81,12 @@ namespace BlazorUI.Shared
             }
 
             return valid;
+        }
+
+        public void Dispose()
+        {
+            _timer?.Stop();
+            _timer?.Dispose();
         }
     }
 }
