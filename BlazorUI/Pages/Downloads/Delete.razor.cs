@@ -49,7 +49,7 @@ namespace BlazorUI.Pages.Downloads
         {
             _confirmButton.SetProgress(true);
 
-            if ((await authorizationService.AuthorizeAsync(_context.User, Authorization.Policies.EditDownload)).Succeeded)
+            if ((await authorizationService.AuthorizeAsync(_context.User, _download, Authorization.Policies.EditDownload)).Succeeded)
             {
                 await downloadProcessor.DeleteDownload(Id);
 
