@@ -32,6 +32,14 @@ html, body {
     padding: 0;
 }
 
+@media (min-width: 768px) {
+    .navbar-centre {
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+    }
+}
+
 /* Responsive Card Decks */
 @media (min-width: 0) {
     .card-deck-responsive .card {
