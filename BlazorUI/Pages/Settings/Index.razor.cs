@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Forms;
+using Microsoft.JSInterop;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,6 +25,7 @@ namespace BlazorUI.Pages.Settings
         private ChangePasswordFormModel _changePasswordForm = new ChangePasswordFormModel();
         private PasswordFormModel _deleteAccountForm = new PasswordFormModel();
         private AuthenticationState _context;
+        private bool _passwordSuccess;
 
         private ServerSideValidator _usernameValidator;
         private ServerSideValidator _changePasswordValidator;
@@ -48,7 +50,7 @@ namespace BlazorUI.Pages.Settings
             {
                 await userProcessor.UpdateUsername(_context.User.GetUserId(), _usernameForm.Username);
 
-                navigationManager.NavigateTo($"/login?redirectUri={navigationManager.Uri}");
+                navigationManager.NavigateTo($"/login?redirectUri={navigationManager.Uri}", true);
             }
         }
 
@@ -60,7 +62,6 @@ namespace BlazorUI.Pages.Settings
                 if (await userProcessor.Authenticate(_context.User.GetUsername(), _changePasswordForm.CurrentPassword))
                 {
                     await userProcessor.UpdatePassword(_context.User.GetUserId(), _changePasswordForm.NewPassword);
-                    navigationManager.NavigateTo("/me");
                 }
                 else
                 {
@@ -80,7 +81,8 @@ namespace BlazorUI.Pages.Settings
             }
             else
             {
-
+                _changePasswordForm = new ChangePasswordFormModel();
+                _passwordSuccess = true;
             }
         }
 

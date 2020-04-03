@@ -82,6 +82,12 @@
                             </EditForm>
                         </div>
                         <div class="tab-pane fade" id="PasswordContent" role="tabpanel" aria-labelledby="PasswordTab">
+
+                            @if (_passwordSuccess)
+                            {
+                                <p class="text-success my-2">Your password has been changed.</p>
+                            }
+
                             <h5>Change Password</h5>
                             <EditForm Model="_changePasswordForm" Context="formContext" OnValidSubmit="ChangePasswordForm_Submit">
                                 <DataAnnotationsValidator />
