@@ -47,7 +47,8 @@ namespace BlazorUI.Pages.Settings
             else
             {
                 await userProcessor.UpdateUsername(_context.User.GetUserId(), _usernameForm.Username);
-                navigationManager.NavigateTo("/me");
+
+                navigationManager.NavigateTo($"/login?redirectUri={navigationManager.Uri}");
             }
         }
 
