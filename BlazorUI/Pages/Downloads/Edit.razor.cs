@@ -60,6 +60,8 @@ namespace BlazorUI.Pages.Downloads
                 };
 
                 await downloadProcessor.UpdateDownload(mapper.Map<DataAccessLibrary.Models.Download>(download));
+                _editForm = await Task.Run(async () => mapper.Map<DownloadFormModel>(await downloadProcessor.GetDownloadById(download.Id)));
+                editDownloadState.Title = download.Title;
             }
             else
             {
