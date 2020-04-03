@@ -31,6 +31,7 @@ else
                         <DownloadTitle Id="@download.Id" Title="@download.Title" Link="false" />
                     </h5>
                     <p class="card-text">@download.ShortDescription</p>
+                    <p class="card-text"><small class="text-muted">Last updated @download.UpdatedString</small></p>
                 </div>
                 <ul class="list-group list-group-flush">
                     <AuthorizeView Resource="download" Policy="@Authorization.Policies.EditDownload">
@@ -44,7 +45,13 @@ else
                     </li>
                 </ul>
                 <div class="card-footer">
-                    <p class="text-muted mb-0">Created by <DisplayUser Id="@download.CreatorId" /></p>
+                    <p class="text-muted mb-0">
+                        Created by <DisplayUser Id="@download.CreatorId" />
+                        @if (download.Authors.Count > 1)
+                        {
+                            @:&amp; @(download.Authors.Count - 1) others
+                        }
+                    </p>
                 </div>
             </div>
         }

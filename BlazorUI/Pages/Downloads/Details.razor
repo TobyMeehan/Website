@@ -11,7 +11,24 @@ else
 {
     <Title Value="@_download.Title"></Title>
 
-    <h1>@_download.Title</h1>
+    <div class="d-md-flex justify-content-between text-center text-md-left">
+        <h1>@_download.Title</h1>
+        <br />
+        @if (_download.Authors.Count == 1)
+        {
+            <h1><small class="text-muted"><DisplayUser Id="@_download.Creator.Id" /></small></h1>
+        }
+        else
+        {
+            <ul>
+                <li class="h5"><DisplayUser Id="@_download.Creator.Id" /></li>
+                @foreach (var author in _download.Authors.Except(new[] { _download.Creator }))
+                {
+                    <li class="h5 font-weight-light"><DisplayUser Id="@author.Id" /></li>
+                }
+            </ul>
+        }
+    </div>
 
     @((MarkupString)_download.LongDescription)
 
@@ -59,7 +76,7 @@ else
 
     @if (_download.Updated != null)
     {
-        <p class="text-muted font-weight-light">Last updated @_download.Updated.Value.Day @_download.Updated.Value.ToString("MMMM") @_download.Updated.Value.Year</p>
+        <p class="text-muted font-weight-light">Last updated @_download.UpdatedString</p>
     }
 
     <button type="button" class="btn btn-primary my-2" data-toggle="modal" data-target="#FilesModal"><i class="fas fa-download"></i> Download</button>
