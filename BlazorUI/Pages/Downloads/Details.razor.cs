@@ -4,6 +4,7 @@ using DataAccessLibrary.Data;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,6 +14,7 @@ namespace BlazorUI.Pages.Downloads
 {
     public partial class Details : ComponentBase
     {
+        [Inject] public IConfiguration configuration { get; set; }
         [Inject] private IDownloadProcessor downloadProcessor { get; set; }
         [Inject] private IMapper mapper { get; set; }
         [Inject] private AuthenticationStateProvider authenticationStateProvider { get; set; }
@@ -22,12 +24,14 @@ namespace BlazorUI.Pages.Downloads
         [Parameter] public string Id { get; set; }
 
         private Download _download;
+        private string _downloadHost;
         private AuthenticationState _context;
 
         protected override async Task OnInitializedAsync()
         {
             _context = await authenticationStateProvider.GetAuthenticationStateAsync();
             _download = await Task.Run(async () => mapper.Map<Download>(await downloadProcessor.GetDownloadById(Id)));
+            _downloadHost = configuration.GetSection("DownloadHost").Value;
         }
 
         private async Task VerifyForm_Submit()

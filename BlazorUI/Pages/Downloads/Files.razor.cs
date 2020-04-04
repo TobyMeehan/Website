@@ -5,6 +5,7 @@ using DataAccessLibrary.Data;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,6 +15,7 @@ namespace BlazorUI.Pages.Downloads
 {
     public partial class Files : ComponentBase
     {
+        [Inject] private IConfiguration configuration { get; set; }
         [Inject] private IDownloadProcessor downloadProcessor { get; set; }
         [Inject] private IMapper mapper { get; set; }
         [Inject] private AuthenticationStateProvider authenticationStateProvider { get; set; }
@@ -25,6 +27,7 @@ namespace BlazorUI.Pages.Downloads
         [Parameter] public string Id { get; set; }
 
         private Download _download;
+        private string _downloadHost;
         private AuthenticationState _context;
 
         private Alert _accessDeniedAlert = new Alert
@@ -38,6 +41,7 @@ namespace BlazorUI.Pages.Downloads
         {
             _context = await authenticationStateProvider.GetAuthenticationStateAsync();
             _download = await Task.Run(async () => mapper.Map<Models.Download>(await downloadProcessor.GetDownloadById(Id)));
+            _downloadHost = configuration.GetSection("DownloadHost").Value;
 
             editDownloadState.Title = _download.Title;
             editDownloadState.Id = _download.Id;
