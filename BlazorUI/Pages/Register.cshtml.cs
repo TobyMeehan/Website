@@ -66,7 +66,8 @@ namespace BlazorUI
 
             var authProperties = new AuthenticationProperties
             {
-                ExpiresUtc = DateTimeOffset.UtcNow.AddMonths(6)
+                ExpiresUtc = DateTimeOffset.UtcNow.AddMonths(6),
+                IsPersistent = true
             };
 
             await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme,
