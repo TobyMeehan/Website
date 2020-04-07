@@ -16,6 +16,12 @@ namespace BlazorUI
 
         public List<string> Files { get; set; } = new List<string>();
 
+        public List<string> FailedUploads { get; set; } = new List<string>();
+        public void DismissFailedUpload(string filename)
+        {
+            FailedUploads.Remove(filename);
+        }
+
         public async Task UploadFile(string filename, Task<bool> uploadTask)
         {
             Files.Add(filename);
@@ -31,6 +37,7 @@ namespace BlazorUI
             else
             {
                 Files.Remove(filename);
+                FailedUploads.Add(filename);
                 NotifyUploadFailed(filename);
             }
         }

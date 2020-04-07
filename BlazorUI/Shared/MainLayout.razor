@@ -31,30 +31,35 @@
         </div>
 
         <div class="col-sm-2">
-            @if (uploadState.Files.Any())
+            @if (uploadState.Files.Any() || uploadState.FailedUploads.Any())
             {
-                <div class="card">
-                    <div class="card-header">
-                        Uploading Files
+                    <div class="card mt-sm-5">
+                        <div class="card-header">
+                            Uploading Files
+                        </div>
+                        <ul class="list-group list-group-flush text-left">
+                            @foreach (var fail in uploadState.FailedUploads)
+                            {
+                                <li class="list-group-item list-group-item-danger">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        @fail
+                                        <button type="button" class="close ml-auto" aria-label="Close" @onclick="() => uploadState.DismissFailedUpload(fail)">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <small>Upload Failed</small>
+                                </li>
+                            }
+                            @foreach (var file in uploadState.Files)
+                            {
+                                <li class="list-group-item">
+                                    <span class="spinner-border spinner-border-sm" role="status"></span>
+                                    @file
+                                </li>
+                            }
+                        </ul>
                     </div>
-                    <ul class="list-group list-group-flush">
-                        @foreach (var file in uploadState.Files)
-                        {
-                            <li class="list-group-item">
-                                <div class="spinner-border" role="status"></div>
-                                @file
-                            </li>
-                        }
-                    </ul>
-                    <ul class="list-group list-group-flush">
-                        @foreach (var fail in _failedUploads)
-                        {
-                            <li class="list-group-item">
-                                @fail - Upload Failed
-                            </li>
-                        }
-                    </ul>
-                </div>
+
             }
         </div>
     </div>
@@ -70,17 +75,11 @@
 </footer>
 
 @code {
-    private List<string> _failedUploads = new List<string>();
-
     protected override void OnInitialized()
     {
         alertState.OnChange += StateHasChanged;
         uploadState.OnUploadStart += async () => await InvokeAsync(() => StateHasChanged());
         uploadState.OnUploadComplete += async (filename) => await InvokeAsync(() => StateHasChanged());
-        uploadState.OnUploadFailed += async (filename) => await InvokeAsync(() =>
-        {
-            _failedUploads.Add(filename);
-            StateHasChanged();
-        });
+        uploadState.OnUploadFailed += async (filename) => await InvokeAsync(() => StateHasChanged());
     }
 }
