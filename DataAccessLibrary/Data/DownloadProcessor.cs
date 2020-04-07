@@ -158,7 +158,7 @@ namespace DataAccessLibrary.Data
 
         public async Task<bool> TryAddFile(DownloadFileModel file, MemoryStream stream)
         {
-            if ((await _downloadTable.SelectById(file.DownloadId)).Any())
+            if (ValidateQuery(await _downloadTable.SelectById(file.DownloadId), out Download download))
             {
                 try // try
                 {
@@ -176,14 +176,17 @@ namespace DataAccessLibrary.Data
                     }
                 }
 
-                await _downloadFileTable.Insert(file);
+                if (!download.Files.Contains(file.Filename))
+                {
+                    await _downloadFileTable.Insert(file);
+                }
+
+                await UpdateDownload(download); // set Updated to current datetime
 
                 return true;
             }
-            else
-            {
-                return false;
-            }
+
+            return false;
         }
 
         public async Task UpdateDownload(Download download)

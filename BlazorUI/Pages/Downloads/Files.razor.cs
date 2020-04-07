@@ -49,9 +49,12 @@ namespace BlazorUI.Pages.Downloads
             editDownloadState.Title = _download.Title;
             editDownloadState.Id = _download.Id;
 
-            uploadState.OnUploadComplete += async (filename) => await InvokeAsync(async () =>
+            uploadState.OnUploadComplete += async (filename) => await InvokeAsync(() =>
             {
-                _download.Files.Add(filename);
+                if (!_download.Files.Contains(filename))
+                {
+                    _download.Files.Add(filename);
+                }
             });
         }
 
