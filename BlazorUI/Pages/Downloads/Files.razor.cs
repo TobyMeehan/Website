@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using BlazorInputFile;
+using Blazor.FileReader;
 using BlazorUI.Models;
 using DataAccessLibrary.Data;
 using Microsoft.AspNetCore.Authorization;
@@ -55,13 +55,14 @@ namespace BlazorUI.Pages.Downloads
             });
         }
 
-        private async Task FileUpload_Change(IFileListEntry[] files)
+        private async Task FileUpload_Change(IFileReference[] files)
         {
             if ((await authorizationService.AuthorizeAsync(_context.User, _download, Authorization.Policies.EditDownload)).Succeeded)
             {
                 var file = files.FirstOrDefault();
+                var fileInfo = await file.ReadFileInfoAsync();
 
-                await uploadState.UploadFile(file.Name, UploadFile(file));
+                await uploadState.UploadFile(fileInfo.Name, UploadFile(file, fileInfo));
             }
             else
             {
@@ -71,20 +72,18 @@ namespace BlazorUI.Pages.Downloads
             }
         }
 
-        private async Task<bool> UploadFile(IFileListEntry file)
+        private async Task<bool> UploadFile(IFileReference file, IFileInfo info)
         {
-            const int maxSize = 209715200; // 200MB
+            const int maxSize = 200 * 1024 * 1024; // 200MB
+            if (info.Size > maxSize)
+                return false;
 
-            var ms = new MemoryStream();
-            await file.Data.CopyToAsync(ms);
-
-            //if (ms.Length > maxSize)
-            //    return false;
+            var ms = await file.CreateMemoryStreamAsync(7 * 1024 * 1024);
 
             bool result = await downloadProcessor.TryAddFile(new DataAccessLibrary.Models.DownloadFileModel
             {
                 DownloadId = _download.Id,
-                Filename = file.Name
+                Filename = info.Name
             }, ms);
 
             return result;
