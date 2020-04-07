@@ -2,6 +2,7 @@
 using DataAccessLibrary.Storage;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -155,12 +156,33 @@ namespace DataAccessLibrary.Data
             return await GetDownloadById(download.Id);
         }
 
-        public async Task CreateFile(DownloadFileModel file, byte[] contents)
+        public async Task<bool> TryAddFile(DownloadFileModel file, MemoryStream stream)
         {
             if ((await _downloadTable.SelectById(file.DownloadId)).Any())
             {
+                try // try
+                {
+                    await _downloadFileApi.Post(file, stream);
+                }
+                catch (Exception e)
+                {
+                    try // try a second time
+                    {
+                        await _downloadFileApi.Post(file, stream);
+                    }
+                    catch (Exception ex) // fail after 2 attempts
+                    {
+                        return false;
+                    }
+                }
+
                 await _downloadFileTable.Insert(file);
-                await _downloadFileApi.Post(file, contents);
+
+                return true;
+            }
+            else
+            {
+                return false;
             }
         }
 

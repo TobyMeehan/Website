@@ -8,7 +8,9 @@ using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace BlazorUI.Pages.Downloads
@@ -22,6 +24,7 @@ namespace BlazorUI.Pages.Downloads
         [Inject] private IAuthorizationService authorizationService { get; set; }
         [Inject] private NavigationManager navigationManager { get; set; }
         [Inject] private EditDownloadState editDownloadState { get; set; }
+        [Inject] private FileUploadState uploadState { get; set; }
         [Inject] private AlertState alertState { get; set; }
 
         [Parameter] public string Id { get; set; }
@@ -40,23 +43,25 @@ namespace BlazorUI.Pages.Downloads
         protected override async Task OnInitializedAsync()
         {
             _context = await authenticationStateProvider.GetAuthenticationStateAsync();
-            _download = await Task.Run(async () => mapper.Map<Models.Download>(await downloadProcessor.GetDownloadById(Id)));
+            _download = await Task.Run(async () => mapper.Map<Download>(await downloadProcessor.GetDownloadById(Id)));
             _downloadHost = configuration.GetSection("DownloadHost").Value;
 
             editDownloadState.Title = _download.Title;
             editDownloadState.Id = _download.Id;
+
+            uploadState.OnUploadComplete += async (filename) => await InvokeAsync(async () =>
+            {
+                _download.Files.Add(filename);
+            });
         }
 
         private async Task FileUpload_Change(IFileListEntry[] files)
         {
             if ((await authorizationService.AuthorizeAsync(_context.User, _download, Authorization.Policies.EditDownload)).Succeeded)
             {
-                const int maxSize = 209715200; // 200MB
                 var file = files.FirstOrDefault();
-                byte[] contents = (await file.ReadAllAsync(maxSize)).ToArray();
-                await downloadProcessor.CreateFile(new DataAccessLibrary.Models.DownloadFileModel { DownloadId = _download.Id, Filename = file.Name }, contents);
 
-                _download.Files.Add(file.Name);
+                await uploadState.UploadFile(file.Name, UploadFile(file));
             }
             else
             {
@@ -64,6 +69,25 @@ namespace BlazorUI.Pages.Downloads
 
                 navigationManager.NavigateTo($"/downloads/{Id}");
             }
+        }
+
+        private async Task<bool> UploadFile(IFileListEntry file)
+        {
+            const int maxSize = 209715200; // 200MB
+
+            var ms = new MemoryStream();
+            await file.Data.CopyToAsync(ms);
+
+            //if (ms.Length > maxSize)
+            //    return false;
+
+            bool result = await downloadProcessor.TryAddFile(new DataAccessLibrary.Models.DownloadFileModel
+            {
+                DownloadId = _download.Id,
+                Filename = file.Name
+            }, ms);
+
+            return result;
         }
 
         private async Task DeleteFile_Click(string filename)

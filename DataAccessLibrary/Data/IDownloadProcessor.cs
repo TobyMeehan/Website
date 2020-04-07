@@ -1,5 +1,6 @@
 ﻿using DataAccessLibrary.Models;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
 
 namespace DataAccessLibrary.Data
@@ -7,7 +8,7 @@ namespace DataAccessLibrary.Data
     public interface IDownloadProcessor
     {
         Task<Download> CreateDownload(Download download);
-        Task CreateFile(DownloadFileModel file, byte[] contents);
+        Task<bool> TryAddFile(DownloadFileModel file, MemoryStream stream);
         Task DeleteDownload(string downloadid);
         Task DeleteFile(DownloadFileModel file);
         Task<Download> GetDownloadById(string downloadid);

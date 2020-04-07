@@ -3,6 +3,7 @@ using DataAccessLibrary.Models;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
@@ -21,11 +22,17 @@ namespace DataAccessLibrary.Storage
             _httpDataAccess = httpDataAccess;
         }
 
-        public async Task Post(DownloadFileModel file, byte[] contents)
+        public async Task Post(DownloadFileModel file, MemoryStream stream)
         {
             string downloadHost = _configuration.GetSection("DownloadHost").Value;
-            string uri = $"{downloadHost}/upload/{file.DownloadId}/{file.Filename}";
-            await _httpDataAccess.Post(uri, Convert.ToBase64String(contents));
+            string uri = $"{downloadHost}/upload/{file.DownloadId}";
+
+            MultipartFormDataContent content = new MultipartFormDataContent
+            {
+                { new ByteArrayContent(stream.GetBuffer()), "\"file\"", file.Filename }
+            };
+
+            await _httpDataAccess.PostHttpContent(uri, content);
         }
 
         public async Task Delete(string downloadid, string filename)
