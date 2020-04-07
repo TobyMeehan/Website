@@ -95,7 +95,7 @@ namespace DataAccessLibrary.Data
                 await Populate(download);
             }
 
-            return downloads.OrderBy(download => download.Updated).ThenBy(download => download.Title).ToList();
+            return downloads.OrderByDescending(download => download.Updated).ThenBy(download => download.Title).ToList();
         }
 
 
