@@ -357,3 +357,6 @@ secrets.json
 
 # Location for uploaded files
 DownloadHost/Files/
+/WebApi/.config/dotnet-tools.json
+/DownloadHost/.config/dotnet-tools.json
+/BlazorUI/.config/dotnet-tools.json
