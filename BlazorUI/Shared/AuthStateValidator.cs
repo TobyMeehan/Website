@@ -25,33 +25,31 @@ namespace BlazorUI.Shared
         [CascadingParameter] private Task<AuthenticationState> authenticationStateTask { get; set; }
 
         private Timer _timer;
+        private bool _active = true;
 
-        protected override async Task OnInitializedAsync()
+        protected override void OnInitialized()
         {
-            
-        }
-
-        protected override async Task OnAfterRenderAsync(bool firstRender)
-        {
-            await Task.Run(() =>
+            if (_active)
             {
                 _timer = new Timer(5000);
-                _timer.Elapsed += async (source, e) =>
-                {
-                    var authState = await authenticationStateTask;
-
-                    if (authState.User.Identity.IsAuthenticated)
-                    {
-                        User user = mapper.Map<User>(await userProcessor.GetUserById(authState.User.GetUserId()));
-                        if (!await StateIsValid(authState.User, user))
-                        {
-                            navigationManager.NavigateTo($"/login?redirectUri={navigationManager.Uri}", true);
-                        }
-                    }
-                };
+                _timer.Elapsed += async (sender, e) => await ValidateState(sender, e);
                 _timer.AutoReset = true;
                 _timer.Enabled = true;
-            });
+            }
+        }
+
+        private async Task ValidateState(object sender, EventArgs e)
+        {
+            var authState = await authenticationStateTask;
+
+            if (authState.User.Identity.IsAuthenticated)
+            {
+                User user = mapper.Map<User>(await userProcessor.GetUserById(authState.User.GetUserId()));
+                if (!await StateIsValid(authState.User, user))
+                {
+                    navigationManager.NavigateTo($"/login?redirectUri={navigationManager.Uri}", true);
+                }
+            }
         }
 
         private async Task<bool> StateIsValid(ClaimsPrincipal authenticatedUser, User user)
