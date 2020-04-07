@@ -45,7 +45,11 @@ namespace BlazorUI
 
             services.AddAuthentication(
                 CookieAuthenticationDefaults.AuthenticationScheme)
-                .AddCookie();
+                .AddCookie(options =>
+                {
+                    options.LoginPath = "/login";
+                    options.ExpireTimeSpan = DateTimeOffset.UtcNow.AddMonths(6).Subtract(DateTimeOffset.UtcNow);
+                });
 
             services.AddRazorPages();
             services.AddServerSideBlazor().AddHubOptions(options =>
