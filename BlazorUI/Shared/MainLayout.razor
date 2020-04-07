@@ -14,7 +14,7 @@
         <div class="col-sm-8 text-left">
             @foreach (var alert in alertState.Queue)
             {
-                <div class="@($"alert alert-{alert.Context.ToString().ToLower()}")" role="alert">
+                <div class="@($"alert alert-{alert.Context.ToString().ToLower()} alert-dismissible fade show")" role="alert">
                     @if (alert.Title != null)
                     {
                         <h4 class="alert-heading">@alert.Title</h4>
