@@ -176,7 +176,7 @@ namespace DataAccessLibrary.Data
                     }
                 }
 
-                if (!download.Files.Contains(file.Filename))
+                if (!(await _downloadFileTable.Select(file.DownloadId)).Any(f => f.Filename == file.Filename))
                 {
                     await _downloadFileTable.Insert(file);
                 }
