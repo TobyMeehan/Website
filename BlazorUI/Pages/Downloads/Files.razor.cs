@@ -77,17 +77,20 @@ namespace BlazorUI.Pages.Downloads
 
         private async Task<bool> UploadFile(IFileReference file, IFileInfo info)
         {
-            const int maxSize = 200 * 1024 * 1024; // 200MB
+            const int maxSize = 100 * 1024 * 1024; // 100MB
             if (info.Size > maxSize)
                 return false;
 
-            var ms = await file.CreateMemoryStreamAsync(7 * 1024 * 1024);
+            bool result;
 
-            bool result = await downloadProcessor.TryAddFile(new DataAccessLibrary.Models.DownloadFileModel
+            using (var ms = await file.CreateMemoryStreamAsync())
             {
-                DownloadId = _download.Id,
-                Filename = info.Name
-            }, ms);
+                result = await downloadProcessor.TryAddFile(new DataAccessLibrary.Models.DownloadFileModel
+                {
+                    DownloadId = _download.Id,
+                    Filename = info.Name
+                }, ms);
+            }
 
             return result;
         }

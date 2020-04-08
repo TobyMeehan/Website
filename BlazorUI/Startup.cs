@@ -54,7 +54,7 @@ namespace BlazorUI
             services.AddRazorPages();
             services.AddServerSideBlazor().AddHubOptions(options =>
             {
-                options.MaximumReceiveMessageSize = 10 * 1024 * 1024;
+                options.MaximumReceiveMessageSize = 130 * 1024 * 1024;
             });
 
             services.AddAuthorization(options =>
