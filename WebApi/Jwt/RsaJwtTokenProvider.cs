@@ -36,7 +36,8 @@ namespace WebApi.Jwt
 
             List<Claim> claims = new List<Claim>
             {
-               new Claim(ClaimTypes.Name, connection.User.Id),
+               new Claim(ClaimTypes.Name, connection.User.Username),
+               new Claim(ClaimTypes.NameIdentifier, connection.User.Id),
                new Claim(ClaimTypes.Role, connection.Application.Role)
             };
 

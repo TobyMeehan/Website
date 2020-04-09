@@ -39,13 +39,14 @@ namespace WebApi.Controllers
             client_secret=CLIENT_SECRET*/
         public async Task<IActionResult> Post(AuthCodeTokenRequest request)
         {
-            if (await _connectionProcessor.ValidateAuthCode(request.code))
-            {
-                Connection connection = _mapper.Map<Connection>(await _connectionProcessor.GetConnectionByAuthCode(request.code));
+            AuthorizationCode authCode = _mapper.Map<AuthorizationCode>(await _connectionProcessor.GetAuthorizationCode(request.code));
 
-                if (connection.Application.Id == request.client_id && connection.Application.Secret == request.client_secret)
+            if (authCode?.IsValid ?? false)
+            {
+                if (await _applicationProcessor.ValidateApplication(request.client_id, request.client_secret, request.redirect_uri)
+                    && request.client_id == authCode.Connection.Application.Id)
                 {
-                    return Token(connection);
+                    return Token(authCode.Connection);
                 }
             }
 
@@ -61,25 +62,18 @@ namespace WebApi.Controllers
         {
             Application app = _mapper.Map<Application>(await _applicationProcessor.GetApplicationById(request.client_id));
 
-            if (app != null)
+            if (app?.Role == ApplicationRoles.FirstParty)
             {
-                if (app.Role == ApplicationRoles.FirstParty)
+                if (await _userProcessor.Authenticate(request.username, request.password))
                 {
-                    if (await _userProcessor.UserExists(request.username))
+                    Connection connection = new Connection
                     {
-                        if (await _userProcessor.Authenticate(request.username, request.password))
-                        {
-                            Connection connection = new Connection
-                            {
-                                User = _mapper.Map<User>(await _userProcessor.GetUserByUsername(request.username)),
-                                Application = app
-                            };
+                        User = _mapper.Map<User>(await _userProcessor.GetUserByUsername(request.username)),
+                        Application = app
+                    };
 
-                            connection = _mapper.Map<Connection>(await _connectionProcessor.CreateConnection(_mapper.Map<DataAccessLibrary.Models.Connection>(connection)));
 
-                            return Token(connection);
-                        }
-                    }
+                    return Token(connection);
                 }
             }
 
@@ -115,5 +109,4 @@ namespace WebApi.Controllers
         }
     }
 }
- 
- 
+

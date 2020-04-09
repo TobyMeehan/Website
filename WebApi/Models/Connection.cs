@@ -7,9 +7,8 @@ namespace WebApi.Models
 {
     public class Connection
     {
+        public string Id { get; set; }
         public Application Application { get; set; }
         public User User { get; set; }
-        public string Token { get; set; }
-        public string AuthorizationCode { get; set; }
     }
 }
