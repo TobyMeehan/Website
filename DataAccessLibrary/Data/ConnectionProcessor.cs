@@ -14,106 +14,76 @@ namespace DataAccessLibrary.Data
         private readonly IConnectionTable _connectionTable;
         private readonly IUserTable _userTable;
         private readonly IApplicationTable _applicationTable;
+        private readonly IAuthorizationCodeTable _authorizationCodeTable;
 
-        public ConnectionProcessor(IConnectionTable connectionTable, IUserTable userTable, IApplicationTable applicationTable)
+        public ConnectionProcessor(IConnectionTable connectionTable, IUserTable userTable, IApplicationTable applicationTable, IAuthorizationCodeTable authorizationCodeTable)
         {
             _connectionTable = connectionTable;
             _userTable = userTable;
             _applicationTable = applicationTable;
+            _authorizationCodeTable = authorizationCodeTable;
         }
 
-        public string GenerateAuthCode(int length = 32)
+        private DateTime DefaultExpiry => DateTime.Now.AddMinutes(30);
+
+        private AuthorizationCode GenerateAuthCode(Connection connection, DateTime expiry, int length = 32)
         {
-            return $"{RandomString.GenerateCrypto(length)}{DateTime.Now.ToBinary()}";
+            return new AuthorizationCode
+            {
+                ConnectionId = connection.Id,
+                Expiry = expiry,
+                Code = RandomString.GenerateCrypto(length)
+            };
         }
 
-        public async Task<Connection> CreateConnection(Connection connection)
+        public async Task<Connection> GetConnectionById(string connectionid)
         {
-            if ((await _userTable.SelectById(connection.User.Id)).Any()) // Check that provided user exists
+            if (ValidateQuery(await _connectionTable.SelectById(connectionid), out Connection connection))
             {
-                if ((await _applicationTable.SelectById(connection.Application.Id)).Any()) // Check that provided application exists
-                {
-                    connection.UserId = connection.User.Id;
-                    connection.AppId = connection.Application.Id;
+                connection.Application = (await _applicationTable.SelectById(connection.AppId)).SingleOrDefault();
+                connection.User = (await _userTable.SelectById(connection.UserId)).SingleOrDefault();
 
-                    connection.AuthorizationCode = GenerateAuthCode();
-
-                    if ((await _connectionTable.SelectByUserAndApplication(connection.User.Id, connection.Application.Id)).Any()) // If a connection between the provided user and application already exists
-                    {
-                        await _connectionTable.Update(connection);
-                    }
-                    else
-                    {
-                        await _connectionTable.Insert(connection);
-                    }
-
-                    if (ValidateQuery(await _connectionTable.SelectByUserAndApplication(connection.UserId, connection.AppId), out Connection output))
-                    {
-                        return output;
-                    }
-                    else
-                    {
-                        throw new Exception("Error occurred getting new connection.");
-                    }
-                }
-                else
-                {
-                    throw new ArgumentException("Provided application ID could not be found.");
-                }
+                return connection;
             }
-            else
-            {
-                throw new ArgumentException("Provided user ID could not be found.");
-            }
+
+            return null;
         }
 
-        public async Task<Connection> GetConnectionByAuthCode(string authorizationCode)
+        public async Task<AuthorizationCode> GetAuthorizationCode(string code)
         {
-            if (ValidateQuery(await _connectionTable.SelectByAuthCode(authorizationCode), out Connection connection))
+            if (ValidateQuery(await _authorizationCodeTable.SelectByCode(code), out AuthorizationCode authCode))
             {
-                if (ValidateQuery(await _userTable.SelectById(connection.UserId), out User user))
+                if (authCode.Expiry >= DateTime.Now)
                 {
-                    if (ValidateQuery(await _applicationTable.SelectById(connection.AppId), out Application app))
+                    if (ValidateQuery(await _connectionTable.SelectById(authCode.ConnectionId), out Connection connection))
                     {
-                        connection.User = user;
-                        connection.Application = app;
+                        authCode.Connection = connection;
+                        return authCode;
+                    }
+                }
+            }
 
-                        return connection;
-                    }
-                    else
-                    {
-                        throw new ArgumentException("Provided application ID could not be found.");
-                    }
-                }
-                else
-                {
-                    throw new ArgumentException("Provided user ID could not be found.");
-                }
-            }
-            else
-            {
-                return null;
-            }
+            return null;
         }
 
-        public async Task<bool> ValidateAuthCode(string authorizationCode)
+        public async Task<AuthorizationCode> CreateAuthorizationCode(string userid, string appid)
         {
-            string date = authorizationCode.Remove(0, 32);
-            
-            if (long.TryParse(date, out long binDate))
+            // If there isn't already a connection, create one
+            if (!ValidateQuery(await _connectionTable.SelectByUserAndApplication(userid, appid), out Connection connection))
             {
-                DateTime validDate = DateTime.FromBinary(binDate).AddHours(2);
-
-                if (DateTime.Now < validDate)
-                {
-                    if ((await _connectionTable.SelectByAuthCode(authorizationCode)).Any())
-                    {
-                        return true;
-                    }
-                }
+                await _connectionTable.Insert(new Connection { UserId = userid, AppId = appid });
+                connection = (await _connectionTable.SelectByUserAndApplication(userid, appid)).Single();
             }
 
-            return false;
+            AuthorizationCode authCode = GenerateAuthCode(connection, DefaultExpiry);
+            await _authorizationCodeTable.Insert(authCode);
+
+            return await GetAuthorizationCode(authCode.Code);
+        }
+
+        public async Task DeleteConnection(string connectionid)
+        {
+            await _connectionTable.Delete(connectionid);
         }
     }
 }

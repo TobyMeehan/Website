@@ -5,8 +5,8 @@ namespace DataAccessLibrary.Data
 {
     public interface IConnectionProcessor
     {
-        Task<Connection> CreateConnection(Connection connection);
-        Task<Connection> GetConnectionByAuthCode(string authorizationCode);
-        Task<bool> ValidateAuthCode(string authorizationCode);
+        Task<AuthorizationCode> CreateAuthorizationCode(string userid, string appid);
+        Task DeleteConnection(string connectionid);
+        Task<AuthorizationCode> GetAuthorizationCode(string code);
     }
 }

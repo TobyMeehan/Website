@@ -179,5 +179,20 @@ namespace DataAccessLibrary.Data
             await _applicationTable.Delete(appid);
             // TODO: Could add additional validation, I don't think it's necessary
         }
+
+        public async Task<bool> ValidateApplication(string clientId, string clientSecret, string redirectUri)
+        {
+            Application app = await GetApplicationById(clientId);
+
+            if (app == null)
+                return false;
+
+            bool valid = true;
+
+            valid = app.Secret == clientSecret && valid;
+            valid = app.RedirectUri == redirectUri && valid;
+
+            return valid;
+        }
     }
 }

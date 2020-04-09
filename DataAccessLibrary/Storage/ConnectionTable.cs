@@ -23,13 +23,13 @@ namespace DataAccessLibrary.Storage
             await _sqlDataAccess.SaveData(sql, connection);
         }
 
-        public async Task<List<Connection>> SelectByAuthCode(string authorizationCode)
+        public async Task<List<Connection>> SelectById(string connectionid)
         {
-            string sql = "SELECT * FROM `connections` WHERE `AuthorizationCode` = @authorizationCode";
+            string sql = "SELECT * FROM `connections` WHERE `Id` = @connectionid";
 
             object parameters = new
             {
-                authorizationCode
+                connectionid
             };
 
             return await _sqlDataAccess.LoadData<Connection>(sql, parameters);
@@ -48,21 +48,13 @@ namespace DataAccessLibrary.Storage
             return await _sqlDataAccess.LoadData<Connection>(sql, parameters);
         }
 
-        public async Task Update(Connection connection)
+        public async Task Delete(string connectionid)
         {
-            string sql = "UPDATE `connections` SET `AuthorizationCode` = @AuthorizationCode WHERE `UserId` = @UserId AND `AppId` = @AppId";
-
-            await _sqlDataAccess.SaveData(sql, connection);
-        }
-
-        public async Task Delete(string userid, string appid)
-        {
-            string sql = "UPDATE `connections` SET `AuthorizationCode` = NULL WHERE `UserId` = @userid AND `AppId` = @appid";
+            string sql = "DELETE FROM `connections` WHERE `Id` = @connectionid";
 
             object parameters = new
             {
-                userid,
-                appid
+                connectionid
             };
 
             await _sqlDataAccess.SaveData(sql, parameters);
