@@ -36,14 +36,29 @@ namespace DataAccessLibrary.Data
             };
         }
 
+        private async Task<Connection> Populate(Connection connection)
+        {
+            connection.Application = (await _applicationTable.SelectById(connection.AppId)).SingleOrDefault();
+            connection.User = (await _userTable.SelectById(connection.UserId)).SingleOrDefault();
+
+            return connection;
+        }
+
         public async Task<Connection> GetConnectionById(string connectionid)
         {
             if (ValidateQuery(await _connectionTable.SelectById(connectionid), out Connection connection))
             {
-                connection.Application = (await _applicationTable.SelectById(connection.AppId)).SingleOrDefault();
-                connection.User = (await _userTable.SelectById(connection.UserId)).SingleOrDefault();
+                return await Populate(connection);
+            }
 
-                return connection;
+            return null;
+        }
+
+        public async Task<Connection> GetConnectionByUserAndApplication(string userid, string appid)
+        {
+            if (ValidateQuery(await _connectionTable.SelectByUserAndApplication(userid, appid), out Connection connection))
+            {
+                return await Populate(connection);
             }
 
             return null;

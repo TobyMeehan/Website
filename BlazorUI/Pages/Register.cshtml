@@ -2,49 +2,30 @@
 @model BlazorUI.RegisterModel
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 @{
-    Layout = null;
+    Layout = "_AuthLayout";
 }
 
-<!DOCTYPE html>
+<h1>Register</h1>
+<p>Create a new account.</p>
 
-<html class="h-100">
-<head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width" />
-    <title>Register - TobyMeehan</title>
-    <link rel="stylesheet" href="~/css/bootstrap/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/css/site.css" />
-</head>
-<body class="h-100">
-    <div class="banner d-flex h-100">
-        <div class="card mx-auto align-self-center w-25 bg-dark text-light">
-            <div class="card-body">
-                <h1>Register</h1>
-                <p>Create a new account.</p>
-
-                <form method="post" asp-antiforgery="true">
-                    <div class="form-group">
-                        <label asp-for="Register.Username"></label>
-                        <input asp-for="Register.Username" class="form-control" />
-                        <span asp-validation-for="Register.Username" class="text-danger"></span>
-                    </div>
-                    <div class="form-group">
-                        <label asp-for="Register.Password"></label>
-                        <input asp-for="Register.Password" class="form-control" />
-                        <span asp-validation-for="Register.Password" class="text-danger"></span>
-                    </div>
-                    <div class="form-group">
-                        <label asp-for="Register.ConfirmPassword"></label>
-                        <input asp-for="Register.ConfirmPassword" class="form-control" />
-                        <span asp-validation-for="Register.ConfirmPassword" class="text-danger"></span>
-                    </div>
-                    <div class="form-group">
-                        <button type="submit" class="btn btn-light">Register</button>
-                    </div>
-                </form>
-                <p>Already have an account? <a href="/login" class="text-darklink">Login</a></p>
-            </div>
-        </div>
+<form method="post" asp-antiforgery="true">
+    <div class="form-group">
+        <label asp-for="Register.Username"></label>
+        <input asp-for="Register.Username" class="form-control" />
+        <span asp-validation-for="Register.Username" class="text-danger"></span>
     </div>
-</body>
-</html>
+    <div class="form-group">
+        <label asp-for="Register.Password"></label>
+        <input asp-for="Register.Password" class="form-control" />
+        <span asp-validation-for="Register.Password" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Register.ConfirmPassword"></label>
+        <input asp-for="Register.ConfirmPassword" class="form-control" />
+        <span asp-validation-for="Register.ConfirmPassword" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <button type="submit" class="btn btn-light">Register</button>
+    </div>
+</form>
+<p>Already have an account? <a href="/login" class="text-darklink">Login</a></p>
