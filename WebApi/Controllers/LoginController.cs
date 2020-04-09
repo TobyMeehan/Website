@@ -14,13 +14,13 @@ using WebApi.Models;
 namespace WebApi.Controllers
 {
     [Authorize(AuthenticationSchemes = CookieAuthenticationDefaults.AuthenticationScheme)]
-    public class AuthController : Controller
+    public class LoginController : Controller
     {
         private readonly IMapper _mapper;
         private readonly IUserProcessor _userProcessor;
         private readonly IRoleProcessor _roleProcessor;
 
-        public AuthController(IMapper mapper, IUserProcessor userProcessor, IRoleProcessor roleProcessor)
+        public LoginController(IMapper mapper, IUserProcessor userProcessor, IRoleProcessor roleProcessor)
         {
             _mapper = mapper;
             _userProcessor = userProcessor;
@@ -33,7 +33,8 @@ namespace WebApi.Controllers
 
             var claims = new List<Claim>
             {
-                new Claim(ClaimTypes.Name, user.Id)
+                new Claim(ClaimTypes.Name, user.Username),
+                new Claim(ClaimTypes.NameIdentifier, user.Id)
             };
 
             user.Roles.ForEach(role => claims.Add(new Claim(ClaimTypes.Role, role.Name)));
@@ -67,7 +68,7 @@ namespace WebApi.Controllers
 
         [Route("/login")]
         [AllowAnonymous]
-        public IActionResult Login()
+        public IActionResult Login([FromQuery] string ReturnUrl)
         {
             return View();
         }
@@ -76,13 +77,15 @@ namespace WebApi.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [AllowAnonymous]
-        public async Task<IActionResult> Login(LoginFormModel login)
+        public async Task<IActionResult> Login(LoginFormModel login,[FromQuery] string ReturnUrl)
         {
+            ReturnUrl = (!string.IsNullOrWhiteSpace(ReturnUrl)) ? ReturnUrl : "/";
+
             if (ModelState.IsValid)
             {
                 if (await Authenticate(login.Username, login.Password))
                 {
-                    return RedirectToAction("Index", "Home");
+                    return LocalRedirect(ReturnUrl);
                 }
                 else
                 {
