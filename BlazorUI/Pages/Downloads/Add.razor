@@ -1,87 +1,40 @@
-﻿@using AutoMapper;
-@using BlazorUI.Extensions;
-@using DataAccessLibrary.Data;
-
-@page "/downloads/add"
-
-@inject IMapper mapper
-@inject IDownloadProcessor downloadProcessor
-@inject AuthenticationStateProvider authenticationStateProvider
-@inject NavigationManager navigationManager
+﻿@page "/downloads/add"
 
 <Title Value="Add Download"></Title>
+<h1>Add Download</h1>
 
-<AuthorizeView Policy="@Authorization.Policies.IsVerified">
-    <Authorized>
-        <h1>Add Download</h1>
+<EditForm Model="_downloadForm" Context="formContext" OnValidSubmit="DownloadForm_Submit">
+    <DataAnnotationsValidator />
 
-        <EditForm Model="_model" Context="formContext" OnValidSubmit="Submit">
-            <DataAnnotationsValidator />
-            <ServerSideValidator @ref="_serverSideValidator" />
+    <div class="form-group">
+        <label for="Title">Title</label>
+        <div class="col-md-10">
+            <InputText id="Title" @bind-Value="_downloadForm.Title" class="form-control" />
+            <ValidationMessage For="() => _downloadForm.Title" />
+        </div>
+    </div>
 
-            <div class="form-group">
-                <label for="Title">Title</label>
-                <div class="col-md-10">
-                    <InputText id="Title" @bind-Value="_model.Title" class="form-control" />
-                    <ValidationMessage For="@(() => _model.Title)" />
-                </div>
-            </div>
+    <div class="form-group">
+        <label for="ShortDescription">Short Description</label>
+        <div class="col-md-10">
+            <InputText id="ShortDescription" @bind-Value="_downloadForm.ShortDescription" class="form-control" />
+            <ValidationMessage For="() => _downloadForm.ShortDescription" />
+        </div>
+    </div>
 
-            <div class="form-group">
-                <label for="ShortDescription">Short Description</label>
-                <div class="col-md-10">
-                    <InputText id="ShortDescription" @bind-Value="_model.ShortDescription" class="form-control" />
-                    <ValidationMessage For="@(() => _model.ShortDescription)" />
-                </div>
-            </div>
+    <div class="form-group">
+        <label for="LongDescription">Long Description</label>
+        <div class="col-md-10">
+            <InputRichText Id="LongDescription" @bind-Value="_downloadForm.LongDescription" />
+            <ValidationMessage For="() => _downloadForm.LongDescription" />
+        </div>
+    </div>
 
-            <div class="form-group">
-                <label for="LongDescription">Long Description</label>
-                <div class="col-md-10">
-                    <InputRichText Id="LongDescription" @bind-Value="_model.LongDescription" />
-                    <ValidationMessage For="@(() => _model.LongDescription)" />
-                </div>
-            </div>
+    <div class="form-group">
+        <ProcessButton type="submit" class="btn btn-dark" @ref="_submitButton">Continue</ProcessButton>
+    </div>
+</EditForm>
 
-            <div class="form-group">
-                <button type="submit" class="btn btn-dark">Continue</button>
-            </div>
-        </EditForm>
-
-        <p>
-            <a href="/downloads">Back to List</a>
-        </p>
-    </Authorized>
-    <NotAuthorized>
-        <Redirect Path="/downloads" />
-    </NotAuthorized>
-</AuthorizeView>
-
-@code {
-    private Models.DownloadFormModel _model = new Models.DownloadFormModel();
-    private AuthenticationState _context;
-
-    ServerSideValidator _serverSideValidator;
-
-    protected override async Task OnInitializedAsync()
-    {
-        _context = await authenticationStateProvider.GetAuthenticationStateAsync();
-    }
-
-    async Task Submit()
-    {
-        var download = new Models.Download
-        {
-            Title = _model.Title,
-            ShortDescription = _model.ShortDescription,
-            LongDescription = _model.LongDescription,
-            Verified = DataAccessLibrary.Models.DownloadVerification.None,
-            Version = "", // TODO: version
-            CreatorId = _context.User.GetUserId()
-        };
-
-        string id = (await downloadProcessor.CreateDownload(mapper.Map<DataAccessLibrary.Models.Download>(download))).Id;
-
-        navigationManager.NavigateTo($"/downloads/{id}/files");
-    }
-}
+<p>
+    <a href="/downloads">Back to List</a>
+</p>

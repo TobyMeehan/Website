@@ -18,7 +18,7 @@ namespace BlazorUI.Models
 
         [Required(ErrorMessage = "Please confirm your password.")]
         [Display(Name = "Confirm Password")]
-        [Compare("Password", ErrorMessage = "Passwords must match.")]
+        [Compare(nameof(Password), ErrorMessage = "Passwords must match.")]
         [DataType(DataType.Password)]
         public string ConfirmPassword { get; set; }
 

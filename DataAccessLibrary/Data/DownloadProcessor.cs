@@ -2,6 +2,7 @@
 using DataAccessLibrary.Storage;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -94,7 +95,7 @@ namespace DataAccessLibrary.Data
                 await Populate(download);
             }
 
-            return downloads;
+            return downloads.OrderByDescending(download => download.Updated).ThenBy(download => download.Title).ToList();
         }
 
 
@@ -155,13 +156,37 @@ namespace DataAccessLibrary.Data
             return await GetDownloadById(download.Id);
         }
 
-        public async Task CreateFile(DownloadFileModel file, byte[] contents)
+        public async Task<bool> TryAddFile(DownloadFileModel file, MemoryStream stream)
         {
-            if ((await _downloadTable.SelectById(file.DownloadId)).Any())
+            if (ValidateQuery(await _downloadTable.SelectById(file.DownloadId), out Download download))
             {
-                await _downloadFileTable.Insert(file);
-                await _downloadFileApi.Post(file, contents);
+                try // try
+                {
+                    await _downloadFileApi.Post(file, stream);
+                }
+                catch (Exception e)
+                {
+                    try // try a second time
+                    {
+                        await _downloadFileApi.Post(file, stream);
+                    }
+                    catch (Exception ex) // fail after 2 attempts
+                    {
+                        return false;
+                    }
+                }
+
+                if (!(await _downloadFileTable.Select(file.DownloadId)).Any(f => f.Filename == file.Filename))
+                {
+                    await _downloadFileTable.Insert(file);
+                }
+
+                await UpdateDownload(download); // set Updated to current datetime
+
+                return true;
             }
+
+            return false;
         }
 
         public async Task UpdateDownload(Download download)

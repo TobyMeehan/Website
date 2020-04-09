@@ -102,5 +102,17 @@ namespace DataAccessLibrary.Storage
 
             await _sqlDataAccess.SaveData(sql, parameters);
         }
+
+        public async Task DeleteByUser(string userid)
+        {
+            string sql = "DELETE FROM `downloads` WHERE `CreatorId` = @userid";
+
+            object parameters = new
+            {
+                userid
+            };
+
+            await _sqlDataAccess.SaveData(sql, parameters);
+        }
     }
 }

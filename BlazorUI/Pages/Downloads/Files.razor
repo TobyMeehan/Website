@@ -1,12 +1,5 @@
-﻿@using AutoMapper;
-@using DataAccessLibrary.Data;
-
-@page "/downloads/{Id}/files"
+﻿@page "/downloads/{Id}/files"
 @layout EditLayout
-
-@inject IMapper mapper
-@inject IDownloadProcessor downloadProcessor
-@inject EditDownloadState state
 
 @if (_download == null)
 {
@@ -18,8 +11,8 @@ else
         <Authorized>
             <div class="custom-file mb-3">
                 <EditForm Model="_download" Context="formContext">
-                    <InputFile id="FileUpload" class="custom-file-input" OnChange="UploadFile" />
-                    <label class="custom-file-label" for="FileUpload"><i class="fas fa-upload"></i> Upload file (200MB)</label>
+                    <InputFile id="FileUpload" class="custom-file-input" OnChange="FileUpload_Change" />
+                    <label class="custom-file-label" for="FileUpload"><i class="fas fa-upload"></i> Upload file (100MB)</label>
                 </EditForm>
             </div>
 
@@ -32,10 +25,10 @@ else
                                 <FileIcon Filename="@file" />
                             </td>
                             <td>
-                                <a class="my-auto" href="@($"https://downloads.tobymeehan.com/{Id}/{file}")">@file</a>
+                                <a class="my-auto" href="@($"{_downloadHost}/{Id}/{file}")">@file</a>
                             </td>
                             <td>
-                                <button class="btn btn-sm btn-outline-danger" @onclick="@(e => DeleteFile(file))">Delete</button>
+                                <button class="btn btn-sm btn-outline-danger" @onclick="() => DeleteFile_Click(file)">Delete</button>
                             </td>
                         </tr>
                     }
@@ -43,38 +36,8 @@ else
             </table>
         </Authorized>
         <NotAuthorized>
+            <DisplayAlert Alert="_accessDeniedAlert" />
             <Redirect Path="/downloads" />
         </NotAuthorized>
     </AuthorizeView>
-}
-
-@code {
-    [Parameter]
-    public string Id { get; set; }
-
-    private Models.Download _download;
-
-    protected override async Task OnInitializedAsync()
-    {
-        _download = await Task.Run(async () => mapper.Map<Models.Download>(await downloadProcessor.GetDownloadById(Id)));
-
-        state.Title = _download.Title;
-        state.Id = _download.Id;
-    }
-
-    async Task UploadFile(IFileListEntry[] files)
-    {
-        const int maxSize = 209715200; // 200MB
-        var file = files.FirstOrDefault();
-        byte[] contents = (await file.ReadAllAsync(maxSize)).ToArray();
-        await downloadProcessor.CreateFile(new DataAccessLibrary.Models.DownloadFileModel { DownloadId = _download.Id, Filename = file.Name }, contents);
-
-        _download.Files.Add(file.Name);
-    }
-
-    async Task DeleteFile(string filename)
-    {
-        await downloadProcessor.DeleteFile(new DataAccessLibrary.Models.DownloadFileModel { DownloadId = _download.Id, Filename = filename });
-        _download.Files.Remove(filename);
-    }
 }

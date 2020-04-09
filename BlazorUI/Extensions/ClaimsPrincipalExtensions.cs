@@ -27,7 +27,7 @@ namespace BlazorUI.Extensions
 
         public static string GetUsername(this ClaimsPrincipal user)
         {
-            return user.Claims.Where(claim => claim.Type == "Username").ToList().Single().Value;
+            return user.Claims.Single(claim => claim.Type == "Username").Value;
         }
     }
 }

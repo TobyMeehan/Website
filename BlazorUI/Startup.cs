@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using AutoMapper;
+using Blazor.FileReader;
 using BlazorUI.Authorization;
 using BlazorUI.Models;
 using DataAccessLibrary.Data;
@@ -44,10 +45,17 @@ namespace BlazorUI
 
             services.AddAuthentication(
                 CookieAuthenticationDefaults.AuthenticationScheme)
-                .AddCookie();
+                .AddCookie(options =>
+                {
+                    options.LoginPath = "/login";
+                    options.ExpireTimeSpan = DateTimeOffset.UtcNow.AddMonths(6).Subtract(DateTimeOffset.UtcNow);
+                });
 
             services.AddRazorPages();
-            services.AddServerSideBlazor();
+            services.AddServerSideBlazor().AddHubOptions(options =>
+            {
+                options.MaximumReceiveMessageSize = 130 * 1024 * 1024;
+            });
 
             services.AddAuthorization(options =>
             {
@@ -56,14 +64,16 @@ namespace BlazorUI
                 options.AddPolicy(Policies.EditDownload, Policies.EditDownloadPolicy());
             });
 
+            services.AddFileReaderService();
+
             services.AddSingleton<IAuthorizationHandler, EditDownloadAuthorizationHandler>();
 
             services.AddHttpContextAccessor();
 
             HttpClient client = new HttpClient();
-            client.DefaultRequestHeaders.Accept.Clear();
-            client.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
-            client.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/octet-stream"));
+            //client.DefaultRequestHeaders.Accept.Clear();
+            //client.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
+            //client.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/octet-stream"));
 
             services.AddSingleton(client);
 
@@ -91,6 +101,7 @@ namespace BlazorUI
 
             services.AddScoped<Pages.Downloads.EditDownloadState>();
             services.AddScoped<AlertState>();
+            services.AddScoped<FileUploadState>();
         }
 
         private IMapper ConfigureMapper()

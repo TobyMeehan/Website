@@ -1,15 +1,5 @@
-﻿@using AutoMapper
-@using BlazorUI.Extensions
-@using DataAccessLibrary.Data
-
-@page "/downloads/{Id}/edit"
+﻿@page "/downloads/{Id}/edit"
 @layout EditLayout
-
-@inject IDownloadProcessor downloadProcessor
-@inject IMapper mapper
-@inject AuthenticationStateProvider authenticationStateProvider
-@inject NavigationManager navigationManager
-@inject EditDownloadState state
 
 @if (_download == null)
 {
@@ -19,30 +9,30 @@ else
 {
     <AuthorizeView Resource="_download" Policy="@Authorization.Policies.EditDownload">
         <Authorized>
-            <EditForm Model="_form" Context="formContext" OnValidSubmit="Submit">
+            <EditForm Model="_editForm" Context="formContext" OnValidSubmit="EditForm_Submit">
                 <DataAnnotationsValidator />
 
                 <div class="form-group">
                     <label for="Title">Title</label>
                     <div class="col-md-10">
-                        <InputText id="Title" @bind-Value="_form.Title" class="form-control" />
-                        <ValidationMessage For="@(() => _form.Title)" />
+                        <InputText id="Title" @bind-Value="_editForm.Title" class="form-control" />
+                        <ValidationMessage For="() => _editForm.Title" />
                     </div>
                 </div>
 
                 <div class="form-group">
                     <label for="ShortDescription">Short Description</label>
                     <div class="col-md-10">
-                        <InputText id="ShortDescription" @bind-Value="_form.ShortDescription" class="form-control" />
-                        <ValidationMessage For="@(() => _form.ShortDescription)" />
+                        <InputText id="ShortDescription" @bind-Value="_editForm.ShortDescription" class="form-control" />
+                        <ValidationMessage For="() => _editForm.ShortDescription" />
                     </div>
                 </div>
 
                 <div class="form-group">
                     <label for="LongDescription">Long Description</label>
                     <div class="col-md-10">
-                        <InputRichText Id="LongDescription" @bind-Value="_form.LongDescription" />
-                        <ValidationMessage For="@(() => _form.LongDescription)" />
+                        <InputRichText Id="LongDescription" @bind-Value="_editForm.LongDescription" />
+                        <ValidationMessage For="() => _editForm.LongDescription" />
                     </div>
                 </div>
 
@@ -52,43 +42,8 @@ else
             </EditForm>
         </Authorized>
         <NotAuthorized>
-            <Redirect Path="/downloads" />
+            <DisplayAlert Alert="_accessDeniedAlert" />
+            <Redirect Path="@($"/downloads/{Id}")" />
         </NotAuthorized>
     </AuthorizeView>
-}
-
-@code {
-    [Parameter] public string Id { get; set; }
-
-    private Models.Download _download;
-
-    private Models.DownloadFormModel _form = new Models.DownloadFormModel();
-
-    private AuthenticationState _context;
-
-    protected override async Task OnInitializedAsync()
-    {
-        _context = await authenticationStateProvider.GetAuthenticationStateAsync();
-        _download = await Task.Run(async () => mapper.Map<Models.Download>(await downloadProcessor.GetDownloadById(Id)));
-        _form = await Task.Run(() => mapper.Map<Models.DownloadFormModel>(_download));
-
-        state.Title = _download.Title;
-        state.Id = _download.Id;
-    }
-
-    async Task Submit()
-    {
-        var download = new Models.Download
-        {
-            Id = _download.Id,
-            Title = _form.Title,
-            ShortDescription = _form.ShortDescription,
-            LongDescription = _form.LongDescription,
-            CreatorId = _context.User.GetUserId()
-        };
-
-        await downloadProcessor.UpdateDownload(mapper.Map<DataAccessLibrary.Models.Download>(download));
-
-        navigationManager.NavigateTo($"/downloads/{download.Id}");
-    }
 }

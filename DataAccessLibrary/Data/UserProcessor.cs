@@ -14,12 +14,16 @@ namespace DataAccessLibrary.Data
         private readonly IUserTable _userTable;
         private readonly IRoleTable _roleTable;
         private readonly IUserRoleTable _userRoleTable;
+        private readonly IDownloadTable _downloadTable;
+        private readonly IDownloadAuthorTable _downloadAuthorTable;
 
-        public UserProcessor(IUserTable userTable, IRoleTable roleTable, IUserRoleTable userRoleTable)
+        public UserProcessor(IUserTable userTable, IRoleTable roleTable, IUserRoleTable userRoleTable, IDownloadTable downloadTable, IDownloadAuthorTable downloadAuthorTable)
         {
             _userTable = userTable;
             _roleTable = roleTable;
             _userRoleTable = userRoleTable;
+            _downloadTable = downloadTable;
+            _downloadAuthorTable = downloadAuthorTable;
         }
 
         private async Task<User> PopulateRoles(User user)
@@ -239,6 +243,9 @@ namespace DataAccessLibrary.Data
 
         public async Task DeleteUser(string userid)
         {
+            await _downloadTable.DeleteByUser(userid);
+            await _downloadAuthorTable.DeleteByUser(userid);
+            await _userRoleTable.DeleteByUser(userid);
             await _userTable.Delete(userid);
         }
 

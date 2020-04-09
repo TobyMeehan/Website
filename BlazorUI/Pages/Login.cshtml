@@ -21,18 +21,16 @@
         <div class="card mx-auto align-self-center w-25 bg-dark text-light">
             <div class="card-body">
                 <h1>Login</h1>
-                <p>Some text... <!--TODO: some text--></p>
-
                 <form method="post" asp-antiforgery="true">
                     <div class="form-group">
-                        <label asp-for="Login.Username"></label>
-                        <input asp-for="Login.Username" class="form-control" />
-                        <span asp-validation-for="Login.Username" class="text-danger"></span>
+                        <label asp-for="LoginForm.Username"></label>
+                        <input asp-for="LoginForm.Username" class="form-control" />
+                        <span asp-validation-for="LoginForm.Username" class="text-danger"></span>
                     </div>
                     <div class="form-group">
-                        <label asp-for="Login.Password"></label>
-                        <input asp-for="Login.Password" class="form-control" />
-                        <span asp-validation-for="Login.Password" class="text-danger"></span>
+                        <label asp-for="LoginForm.Password"></label>
+                        <input asp-for="LoginForm.Password" class="form-control" />
+                        <span asp-validation-for="LoginForm.Password" class="text-danger"></span>
                     </div>
                     <div class="form-group">
                         <button type="submit" class="btn btn-light">Log In</button>

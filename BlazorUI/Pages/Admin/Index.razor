@@ -1,12 +1,5 @@
-﻿@using AutoMapper
-@using DataAccessLibrary.Data
-
-@page "/admin"
+﻿@page "/admin"
 @attribute [Authorize(Policy = Authorization.Policies.IsAdmin)]
-
-@inject IUserProcessor userProcessor
-@inject IRoleProcessor roleProcessor
-@inject IMapper mapper
 
 <Title Value="Admin"></Title>
 
@@ -27,12 +20,12 @@
                 {
                     <li class="list-group-item d-flex justify-content-between">
                         <span>@item.Name</span>
-                        <button class="btn btn-outline-danger btn-sm" @onclick="() => DeleteRole(item)"><i class="fas fa-trash"></i> Delete</button>
+                        <button class="btn btn-outline-danger btn-sm" @onclick="() => RoleButton_Click(item)"><i class="fas fa-trash"></i> Delete</button>
                     </li>
                 }
             </ul>
 
-            <EditForm Model="_roleForm" OnSubmit="AddRole">
+            <EditForm Model="_roleForm" OnSubmit="RoleForm_Submit">
                 <div class="input-group my-3">
                     <InputText class="form-control" placeholder="Create role" @bind-Value="_roleForm.Value" />
                     <div class="input-group-append">
@@ -63,28 +56,3 @@
         }
     </div>
 </div>
-
-@code {
-    private List<Models.Role> _roles;
-    private List<Models.User> _users;
-
-    private Models.SingleTextFormModel _roleForm = new Models.SingleTextFormModel();
-
-    protected override async Task OnInitializedAsync()
-    {
-        _users = await Task.Run(async () => mapper.Map<List<Models.User>>(await userProcessor.GetUsers()));
-        _roles = await Task.Run(async () => mapper.Map<List<Models.Role>>(await roleProcessor.GetRoles()));
-    }
-
-    async Task AddRole()
-    {
-        await roleProcessor.CreateRole(_roleForm.Value);
-        _roles.Add(mapper.Map<Models.Role>(await roleProcessor.GetRoleByName(_roleForm.Value)));
-    }
-
-    async Task DeleteRole(Models.Role role)
-    {
-        await roleProcessor.DeleteRole(mapper.Map<DataAccessLibrary.Models.Role>(role));
-        _roles.Remove(role);
-    }
-}

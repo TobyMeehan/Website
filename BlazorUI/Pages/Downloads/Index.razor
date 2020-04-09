@@ -1,18 +1,13 @@
-﻿@using BlazorUI.Models;
-@using DataAccessLibrary.Data;
-@using AutoMapper;
-
-@page "/downloads"
-
-@inject IDownloadProcessor downloadProcessor
-@inject IMapper mapper
-@inject IAuthorizationService authorizationService
+﻿@page "/downloads"
 
 <Title Value="Downloads"></Title>
 
 <h1>Downloads</h1>
 
-<p>Some text...</p> <!--TODO: Some text-->
+<p>Downloads are a way to share collections of files under one page. The whole system is fairly limited currently, but I do plan to add more features, including versioning and a desktop application for automatic installation of applications, which most downloads currently are.</p>
+
+<p>There is a verification system for downloads, which is mainly in place for executable files. Verified <i class="fas fa-check-circle"></i> downloads I have checked and are safe to install and run. Dangerous <i class="fas fa-exclamation-circle"></i> downloads are not safe to run, or are easy to use in a damaging way. Downloads with neither of these have either not been checked or do not quite qualify for being verified. Given the relatively low traffic I can check downloads fairly rapidly so it's probably safe to assume unmarked downloads are safe.</p>
+
 <AuthorizeView Policy="@Authorization.Policies.IsVerified">
     <p>
         <DownloadLink Action="DownloadLink.ActionType.Add">Add Download</DownloadLink>
@@ -21,14 +16,14 @@
 
 <hr />
 
-@if (Downloads == null)
+@if (_downloads == null)
 {
     <LoadingMessage Text="false" />
 }
 else
 {
     <div class="card-deck card-deck-responsive">
-        @foreach (Download download in Downloads)
+        @foreach (var download in _downloads)
         {
             <div class="card my-3">
                 <div class="card-body">
@@ -36,6 +31,12 @@ else
                         <DownloadTitle Id="@download.Id" Title="@download.Title" Link="false" />
                     </h5>
                     <p class="card-text">@download.ShortDescription</p>
+
+                    @if (download.Updated != null)
+                    {
+                        <p class="card-text"><small class="text-muted">Last updated @download.UpdatedString</small></p>
+                    }
+
                 </div>
                 <ul class="list-group list-group-flush">
                     <AuthorizeView Resource="download" Policy="@Authorization.Policies.EditDownload">
@@ -49,20 +50,15 @@ else
                     </li>
                 </ul>
                 <div class="card-footer">
-                    <p class="text-muted mb-0">Created by <DisplayUser Id="@download.CreatorId" /></p>
+                    <p class="text-muted mb-0">
+                        Created by <DisplayUser Id="@download.CreatorId" />
+                        @if (download.Authors.Count > 1)
+                        {
+                            @:&amp; @(download.Authors.Count - 1) others
+                        }
+                    </p>
                 </div>
             </div>
         }
     </div>
-}
-
-
-
-@code {
-    protected List<Download> Downloads { get; set; }
-
-    protected override async Task OnInitializedAsync()
-    {
-        Downloads = await Task.Run(async () => mapper.Map<List<Download>>(await downloadProcessor.GetDownloads()));
-    }
 }

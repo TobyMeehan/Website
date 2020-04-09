@@ -17,6 +17,7 @@ namespace BlazorUI.Models
         public List<string> Files { get; set; }
         public string Version { get; set; }
         public DateTime? Updated { get; set; }
+        public string UpdatedString => $"{Updated.Value.Day} {Updated.Value.ToString("MMMM")} {Updated.Value.Year}";
         public List<User> Authors { get; set; }
         public DownloadVerification Verified { get; set; }
     }

@@ -1,4 +1,5 @@
 ﻿using DataAccessLibrary.Models;
+using System.IO;
 using System.Threading.Tasks;
 
 namespace DataAccessLibrary.Storage
@@ -6,6 +7,6 @@ namespace DataAccessLibrary.Storage
     public interface IDownloadFileApi
     {
         Task Delete(string downloadid, string filename);
-        Task Post(DownloadFileModel file, byte[] contents);
+        Task Post(DownloadFileModel file, MemoryStream stream);
     }
 }

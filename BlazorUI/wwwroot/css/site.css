@@ -11,12 +11,6 @@ html, body {
     color: #6c757d;
 }
 
-.btn-primary {
-    color: #fff;
-    background-color: #1b6ec2;
-    border-color: #1861ac;
-}
-
 .banner {
     margin-bottom: 0;
     border-radius: 0;
@@ -36,6 +30,14 @@ html, body {
     background-position: center;
     background-size: cover;
     padding: 0;
+}
+
+@media (min-width: 992px) {
+    .navbar-centre {
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+    }
 }
 
 /* Responsive Card Decks */
@@ -73,16 +75,19 @@ html, body {
     background-color: rgba(255, 255, 255, 0.1);
 }
 
-.valid.modified:not([type=checkbox]) {
-    outline: 1px solid #26b050;
+.form-control.valid {
+    border-color: #28a745;
 }
 
-.invalid {
-    outline: 1px solid red;
+.form-control.invalid {
+    border-color: #dc3545;
 }
 
 .validation-message {
-    color: red;
+    width: 100%;
+    margin-top: .25rem;
+    font-size: 80%;
+    color: #dc3545;
 }
 
 #blazor-error-ui {

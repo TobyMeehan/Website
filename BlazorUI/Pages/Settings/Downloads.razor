@@ -1,16 +1,5 @@
-﻿@using AutoMapper
-@using DataAccessLibrary.Data;
-@using BlazorUI.Extensions;
-
-@page "/me/downloads"
+﻿@page "/me/downloads"
 @layout SettingsLayout
-@attribute [Authorize]
-
-@inject IUserProcessor userProcessor
-@inject IDownloadProcessor downloadProcessor
-@inject IMapper mapper
-@inject AuthenticationStateProvider authenticationStateProvider
-@inject NavigationManager navigationManager
 
 <Title Value="My Downloads"></Title>
 
@@ -47,17 +36,3 @@
         <Redirect Path="/me" />
     </NotAuthorized>
 </AuthorizeView>
-
-
-
-@code {
-    private List<Models.Download> _downloads;
-
-    private AuthenticationState _context;
-
-    protected override async Task OnInitializedAsync()
-    {
-        _context = await authenticationStateProvider.GetAuthenticationStateAsync();
-        _downloads = await Task.Run(async () => mapper.Map<List<Models.Download>>(await downloadProcessor.GetDownloadsByAuthor(_context.User.GetUserId())));
-    }
-}

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using AutoMapper;
+using BlazorUI.Extensions;
 using BlazorUI.Models;
 using DataAccessLibrary.Data;
 using Microsoft.AspNetCore.Authentication;
@@ -25,53 +26,78 @@ namespace BlazorUI
             _userProcessor = userProcessor;
         }
 
-        public IActionResult OnGet()
+        public async Task<IActionResult> OnGet(string redirectUri)
         {
-            return Page();
+            if (HttpContext.User.Identity.IsAuthenticated)
+            {
+                // Allows this endpoint to be used to refresh the user's login credentials if they have expired. A component checks for this and redirects if necessary
+                await HttpContext.SignOutAsync();
+
+                redirectUri ??= "/";
+                string userid = HttpContext.User.GetUserId();
+                User user = _mapper.Map<User>(await _userProcessor.GetUserById(userid));
+
+                await Login(user);
+
+                return Redirect(redirectUri);
+            }
+            else
+            {
+                return Page();
+            }
         }
 
         [BindProperty]
-        public LoginFormModel Login { get; set; }
+        public LoginFormModel LoginForm { get; set; }
 
-        public async Task<IActionResult> OnPost()
+        public async Task<IActionResult> OnPost(string redirectUri)
         {
             if (!ModelState.IsValid)
             {
                 return Page();
             }
 
-            if (await _userProcessor.Authenticate(Login.Username, Login.Password))
+            redirectUri ??= "/";
+
+            if (await _userProcessor.Authenticate(LoginForm.Username, LoginForm.Password))
             {
-                User user = _mapper.Map<User>(await _userProcessor.GetUserByUsername(Login.Username));
+                User user = _mapper.Map<User>(await _userProcessor.GetUserByUsername(LoginForm.Username));
 
-                var claims = new List<Claim>
-                {
-                    new Claim(ClaimTypes.Name, user.Id),
-                    new Claim("Username", user.Username)
-                };
+                await Login(user);
 
-                user.Roles.ForEach(role => claims.Add(new Claim(ClaimTypes.Role, role.Name)));
-
-                var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-
-                var authProperties = new AuthenticationProperties
-                {
-                    ExpiresUtc = DateTimeOffset.UtcNow.AddMonths(6)
-                };
-
-                await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme,
-                    new ClaimsPrincipal(claimsIdentity),
-                    authProperties);
-
-                return LocalRedirect("/");
+                return Redirect(redirectUri);
             }
             else
             {
-                ModelState.AddModelError("Login.Username", "Invalid username and password combination.");
-                ModelState.AddModelError("Login.Password", "Invalid username and password combination.");
+                ModelState.AddModelError("LoginForm.Username", "Invalid username and password combination.");
+                ModelState.AddModelError("LoginForm.Password", "Invalid username and password combination.");
 
                 return Page();
             }
+        }
+
+        private async Task Login(User user)
+        {
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.Name, user.Id),
+                new Claim("Username", user.Username)
+            };
+
+            foreach (Role role in user.Roles)
+            {
+                claims.Add(new Claim(ClaimTypes.Role, role.Name));
+            }
+
+            var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+
+            var authProperties = new AuthenticationProperties
+            {
+                ExpiresUtc = DateTimeOffset.UtcNow.AddMonths(6),
+                IsPersistent = true
+            };
+
+            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(identity), authProperties);
         }
     }
 }

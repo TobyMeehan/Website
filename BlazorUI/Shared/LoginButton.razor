@@ -3,18 +3,21 @@
 
 <AuthorizeView>
     <Authorized>
-        <div class="btn-group">
-            <a class="btn btn-outline-light my-2 my-sm-0" href="/me"><DisplayUser Username="@(context.User.GetUsername())" Link="false" /></a>
-
+        <div class="form-inline">
             <div class="btn-group">
-                <button id="BtnAccountsDropdown" type="button" class="btn btn-outline-light dropdown-toggle" data-toggle="dropdown"></button>
-                <div class="dropdown-menu dropdown-menu-right" aria-labelledby="BtnAccountsDropdown">
+                <a class="btn btn-outline-light" href="/me"><DisplayUser Username="@(context.User.GetUsername())" Link="false" /></a>
+                <button type="button" class="btn btn-outline-light dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <span class="sr-only">Toggle Dropdown</span>
+                </button>
+                <div class="dropdown-menu">
                     <a class="dropdown-item" href="/logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
                 </div>
             </div>
         </div>
     </Authorized>
     <NotAuthorized>
-        <a class="btn btn-outline-light my-2 my-sm-0" href="/login"><i class="fas fa-sign-in-alt"></i> Login</a>
+        <div class="form-inline">
+            <a class="btn btn-outline-light" href="/login"><i class="fas fa-sign-in-alt"></i> Login</a>
+        </div>
     </NotAuthorized>
 </AuthorizeView>

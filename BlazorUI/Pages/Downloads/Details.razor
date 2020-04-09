@@ -1,15 +1,6 @@
-﻿@using AutoMapper
-@using BlazorUI.Extensions
-@using DataAccessLibrary.Models
-@using DataAccessLibrary.Data
+﻿@using DataAccessLibrary.Models
 
 @page "/downloads/{Id}"
-
-@inject IDownloadProcessor downloadProcessor
-@inject IMapper mapper
-@inject AuthenticationStateProvider authenticationStateProvider
-@inject NavigationManager navigationManager
-@inject AlertState alertState
 
 @if (_download == null)
 {
@@ -20,7 +11,24 @@ else
 {
     <Title Value="@_download.Title"></Title>
 
-    <h1>@_download.Title</h1>
+    <div class="d-md-flex justify-content-between text-center text-md-left">
+        <h1>@_download.Title</h1>
+        <br />
+        @if (_download.Authors.Count == 1)
+        {
+            <h1><small class="text-muted"><DisplayUser Id="@_download.Creator.Id" /></small></h1>
+        }
+        else
+        {
+            <ul>
+                <li class="h5"><DisplayUser Id="@_download.Creator.Id" /></li>
+                @foreach (var author in _download.Authors.Except(new[] { _download.Creator }))
+                {
+                    <li class="h5 font-weight-light"><DisplayUser Id="@author.Id" /></li>
+                }
+            </ul>
+        }
+    </div>
 
     @((MarkupString)_download.LongDescription)
 
@@ -28,7 +36,7 @@ else
         <Authorized>
             <div class="card border-dark mb-2">
                 <div class="card-body">
-                    <EditForm Model="_download" OnSubmit="Verify" Context="formContext" class="form-inline">
+                    <EditForm Model="_download" OnSubmit="VerifyForm_Submit" Context="formContext" class="form-inline">
                         <label class="my-1 mr-sm-2"><i class="fas fa-user-shield mr-1"></i> Set verification:</label>
                         <InputSelect @bind-Value="@_download.Verified" class="custom-select my-1 mr-sm-2">
                             <option value="@(DownloadVerification.None)">None</option>
@@ -43,7 +51,7 @@ else
         <NotAuthorized>
             @switch (_download.Verified)
             {
-                case DataAccessLibrary.Models.DownloadVerification.Dangerous:
+                case DownloadVerification.Dangerous:
                     <div class="card border-danger mb-2">
                         <div class="card-body text-danger">
                             <i class="fas fa-exclamation"></i>
@@ -51,7 +59,7 @@ else
                         </div>
                     </div>
                     break;
-                case DataAccessLibrary.Models.DownloadVerification.Verified:
+                case DownloadVerification.Verified:
                     <div class="card border-success mb-2">
                         <div class="card-body text-success">
                             <i class="fas fa-check"></i>
@@ -68,7 +76,7 @@ else
 
     @if (_download.Updated != null)
     {
-        <p class="text-muted font-weight-light">Last updated @_download.Updated.Value.Day @_download.Updated.Value.ToString("MMMM") @_download.Updated.Value.Year</p>
+        <p class="text-muted font-weight-light">Last updated @_download.UpdatedString</p>
     }
 
     <button type="button" class="btn btn-primary my-2" data-toggle="modal" data-target="#FilesModal"><i class="fas fa-download"></i> Download</button>
@@ -77,9 +85,13 @@ else
         <a href="/downloads"><i class="fas fa-angle-left"></i> Back to List</a>
 
         <AuthorizeView Resource="_download" Policy="@Authorization.Policies.EditDownload">
+            |
             <DownloadLink Id="@_download.Id" Action="DownloadLink.ActionType.Edit"><i class="fas fa-edit"></i> Edit</DownloadLink>
+            |
             <DownloadLink Id="@_download.Id" Action="DownloadLink.ActionType.Files"><i class="far fa-folder-open"></i> File Manager</DownloadLink>
+            |
             <DownloadLink Id="@_download.Id" Action="DownloadLink.ActionType.Authors"><i class="fas fa-users-cog"></i> Authors</DownloadLink>
+            |
             <DownloadLink Id="@_download.Id" Action="DownloadLink.ActionType.Delete"><i class="fas fa-trash"></i> Delete</DownloadLink>
         </AuthorizeView>
     </p>
@@ -97,7 +109,8 @@ else
                         @foreach (var item in _download.Files)
                         {
                             <li>
-                                <a href="@($"https://downloads.tobymeehan.com/{Id}/{item}")">@item <FileIcon Filename="@item" /></a>
+                                <a href="@($"{_downloadHost}/{Id}/{item}")">@item</a>
+                                <FileIcon Filename="@item" />
                             </li>
                         }
                     </ul>
@@ -109,26 +122,4 @@ else
             </div>
         </div>
     </div>
-}
-
-@code {
-    [Parameter] public string Id { get; set; }
-
-    private Models.Download _download;
-
-    protected override async Task OnInitializedAsync()
-    {
-        _download = await Task.Run(async () => mapper.Map<Models.Download>(await downloadProcessor.GetDownloadById(Id)));
-    }
-
-    async Task Verify()
-    {
-        await downloadProcessor.VerifyDownload(_download.Id, _download.Verified);
-        alertState.Queue.Add(new Models.Alert
-        {
-            Title = null,
-            Body = $"Successfully changed verification to {_download.Verified}.",
-            Context = AlertContext.Success
-        });
-    }
 }
