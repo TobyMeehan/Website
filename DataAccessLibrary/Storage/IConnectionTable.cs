@@ -10,5 +10,6 @@ namespace DataAccessLibrary.Storage
         Task Insert(Connection connection);
         Task<List<Connection>> SelectById(string connectionid);
         Task<List<Connection>> SelectByUserAndApplication(string userid, string appid);
+        Task<List<Connection>> SelectByUser(string userid);
     }
 }

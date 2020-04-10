@@ -1,4 +1,5 @@
 ﻿using DataAccessLibrary.Models;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace DataAccessLibrary.Data
@@ -9,5 +10,6 @@ namespace DataAccessLibrary.Data
         Task DeleteConnection(string connectionid);
         Task<AuthorizationCode> GetAuthorizationCode(string code);
         Task<Connection> GetConnectionByUserAndApplication(string userid, string appid);
+        Task<List<Connection>> GetConnectionsByUser(string userid);
     }
 }

@@ -1,0 +1,78 @@
+﻿@page "/me/connections"
+@layout SettingsLayout
+
+<Title Value="Connections"></Title>
+
+<div class="card my-3">
+    <div class="card-body">
+        <h1>Connections</h1>
+
+    </div>
+</div>
+
+<div class="card my-3">
+    <div class="card-body">
+    <h2>Authorised Apps</h2>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">Name</th>
+                    <th scope="col">Author</th>
+                    <th scope="col"></th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (_connections == null)
+                {
+                    <LoadingMessage Text="false" />
+                }
+                else
+                {
+                    @foreach (var conn in _connections)
+                    {
+                        <tr>
+                            <td>@conn.Application.Name</td>
+                            <td><DisplayUser Id="@conn.User.Id" /></td>
+                            <td>Revoke Access</td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="card my-3">
+    <div class="card-body">
+        <h2>My Applications</h2>
+        <a href="https://api.tobymeehan.com/developer/create">Create new Application</a>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">Name</th>
+                    <th scope="col">Client ID</th>
+                    <th scope="col">Redirect URL</th>
+                    <th scope="col"></th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (_applications == null)
+                {
+                    <LoadingMessage Text="false" />
+                }
+                else
+                {
+                    @foreach (var app in _applications)
+                    {
+                        <tr>
+                            <th scope="row">@app.Name</th>
+                            <td>@app.Id</td>
+                            <td>@app.RedirectUri</td>
+                            <td>Edit | Delete</td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

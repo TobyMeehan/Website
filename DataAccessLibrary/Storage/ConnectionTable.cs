@@ -48,6 +48,18 @@ namespace DataAccessLibrary.Storage
             return await _sqlDataAccess.LoadData<Connection>(sql, parameters);
         }
 
+        public async Task<List<Connection>> SelectByUser(string userid)
+        {
+            string sql = "SELECT * FROM `connections` WHERE `UserId` = @userid";
+
+            object parameters = new
+            {
+                userid
+            };
+
+            return await _sqlDataAccess.LoadData<Connection>(sql, parameters);
+        }
+
         public async Task Delete(string connectionid)
         {
             string sql = "DELETE FROM `connections` WHERE `Id` = @connectionid";

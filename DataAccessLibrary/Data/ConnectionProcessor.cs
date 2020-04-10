@@ -64,6 +64,18 @@ namespace DataAccessLibrary.Data
             return null;
         }
 
+        public async Task<List<Connection>> GetConnectionsByUser(string userid)
+        {
+            List<Connection> connections = await _connectionTable.SelectByUser(userid) ?? new List<Connection>();
+
+            foreach (Connection connection in connections)
+            {
+                await Populate(connection);
+            }
+
+            return connections;
+        }
+
         public async Task<AuthorizationCode> GetAuthorizationCode(string code)
         {
             if (ValidateQuery(await _authorizationCodeTable.SelectByCode(code), out AuthorizationCode authCode))
