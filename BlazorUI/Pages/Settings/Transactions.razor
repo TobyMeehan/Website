@@ -1,0 +1,43 @@
+﻿@page "/me/transactions"
+@layout SettingsLayout
+
+<div class="card my-3">
+    <div class="card-body">
+        <h1>Transactions</h1>
+    </div>
+</div>
+
+<div class="card my-3">
+    <div class="card-body">
+        @if  (_user != null)
+        {
+            <p>Balance: @_user.Balance</p>
+        }
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">Sender</th>
+                    <th scope="col">Description</th>
+                    <th scope="col">Amount</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (_user != null)
+                {
+                    foreach (var transaction in _user.Transactions)
+                    {
+                        <tr>
+                            <td>@transaction.Sender</td>
+                            <td>@transaction.Description</td>
+                            <td>@transaction.Amount</td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+        @if  (_user == null)
+        {
+            <LoadingMessage Text="false" />
+        }
+    </div>
+</div>

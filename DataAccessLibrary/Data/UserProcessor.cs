@@ -16,17 +16,19 @@ namespace DataAccessLibrary.Data
         private readonly IUserRoleTable _userRoleTable;
         private readonly IDownloadTable _downloadTable;
         private readonly IDownloadAuthorTable _downloadAuthorTable;
+        private readonly ITransactionTable _transactionTable;
 
-        public UserProcessor(IUserTable userTable, IRoleTable roleTable, IUserRoleTable userRoleTable, IDownloadTable downloadTable, IDownloadAuthorTable downloadAuthorTable)
+        public UserProcessor(IUserTable userTable, IRoleTable roleTable, IUserRoleTable userRoleTable, IDownloadTable downloadTable, IDownloadAuthorTable downloadAuthorTable, ITransactionTable transactionTable)
         {
             _userTable = userTable;
             _roleTable = roleTable;
             _userRoleTable = userRoleTable;
             _downloadTable = downloadTable;
             _downloadAuthorTable = downloadAuthorTable;
+            _transactionTable = transactionTable;
         }
 
-        private async Task<User> PopulateRoles(User user)
+        private async Task<User> Populate(User user)
         {
             user.Roles = new List<Role>();
 
@@ -42,6 +44,8 @@ namespace DataAccessLibrary.Data
 
             user.Roles.Sort(RoleProcessor.CompareRoles);
 
+            user.Transactions = await _transactionTable.SelectByUser(user.Id) ?? new List<Transaction>();
+
             return user;
 
             // TODO: repeat for alerts and anything else which needs to be added.
@@ -52,21 +56,7 @@ namespace DataAccessLibrary.Data
         {
             if (ValidateQuery(await _userTable.SelectById(userid), out User user)) // Get user with specified id, check if user exists
             {
-                user.Roles = new List<Role>();
-
-                List<UserRoleModel> userRoles = await _userRoleTable.SelectByUser(userid); // Get user role relations for the user
-
-                foreach (UserRoleModel userRole in userRoles)
-                {
-                    if (ValidateQuery(await _roleTable.SelectById(userRole.RoleId), out Role role)) // Get role associated with role id
-                    {
-                        user.Roles.Add(role); // Add role to user's list of roles
-                    }
-                }
-
-                // TODO: repeat for alerts and anything else which needs to be added.
-
-                return user;
+                return await Populate(user);
             }
             else
             {
@@ -78,19 +68,7 @@ namespace DataAccessLibrary.Data
         {
             if (ValidateQuery(await _userTable.SelectByUsername(username), out User user)) // Get user with specified username, check if user exists
             {
-                user.Roles = new List<Role>();
-
-                List<UserRoleModel> userRoles = await _userRoleTable.SelectByUser(user.Id); // Get user role relations for the user
-
-                foreach (UserRoleModel userRole in userRoles)
-                {
-                    if (ValidateQuery(await _roleTable.SelectById(userRole.RoleId), out Role role)) // Get role associated with role id
-                    {
-                        user.Roles.Add(role); // Add role to user's list of roles
-                    }
-                }
-
-                return user;
+                return await Populate(user);
             }
 
             throw new ArgumentException("Provided username could not be found.");
@@ -102,7 +80,7 @@ namespace DataAccessLibrary.Data
 
             foreach (User user in users)
             {
-                await PopulateRoles(user);
+                await Populate(user);
             }
 
             return users;
@@ -119,7 +97,7 @@ namespace DataAccessLibrary.Data
                 {
                     if (ValidateQuery(await _userTable.SelectById(item.UserId), out User user))
                     {
-                        users.Add(await PopulateRoles(user));
+                        users.Add(await Populate(user));
                     }
                 }
 
@@ -246,6 +224,7 @@ namespace DataAccessLibrary.Data
             await _downloadTable.DeleteByUser(userid);
             await _downloadAuthorTable.DeleteByUser(userid);
             await _userRoleTable.DeleteByUser(userid);
+            await _transactionTable.DeleteByUser(userid);
             await _userTable.Delete(userid);
         }
 

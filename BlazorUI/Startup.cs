@@ -84,6 +84,7 @@ namespace BlazorUI
 
             services.AddTransient<IUserTable, UserTable>();
             services.AddTransient<IRoleTable, RoleTable>();
+            services.AddTransient<ITransactionTable, TransactionTable>();
             services.AddTransient<IApplicationTable, ApplicationTable>();
             services.AddTransient<IUserRoleTable, UserRoleTable>();
             services.AddTransient<IConnectionTable, ConnectionTable>();
@@ -111,6 +112,7 @@ namespace BlazorUI
             {
                 cfg.CreateMap<DataAccessLibrary.Models.User, User>().ReverseMap();
                 cfg.CreateMap<DataAccessLibrary.Models.Role, Role>().ReverseMap();
+                cfg.CreateMap<DataAccessLibrary.Models.Transaction, Transaction>().ReverseMap();
                 cfg.CreateMap<DataAccessLibrary.Models.Alert, Alert>().ReverseMap();
                 cfg.CreateMap<DataAccessLibrary.Models.Application, Application>().ReverseMap();
 

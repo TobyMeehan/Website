@@ -12,6 +12,7 @@ namespace WebApi.Models
         public string Username { get; set; }
         public string Email { get; set; }
         public List<Role> Roles { get; set; }
-
+        public List<Transaction> Transactions { get; set; }
+        public int Balance { get; set; }
     }
 }

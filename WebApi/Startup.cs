@@ -78,6 +78,7 @@ namespace WebApi
 
             services.AddTransient<IUserTable, UserTable>();
             services.AddTransient<IRoleTable, RoleTable>();
+            services.AddTransient<ITransactionTable, TransactionTable>();
             services.AddTransient<IApplicationTable, ApplicationTable>();
             services.AddTransient<IUserRoleTable, UserRoleTable>();
             services.AddTransient<IConnectionTable, ConnectionTable>();
@@ -95,6 +96,7 @@ namespace WebApi
             {
                 cfg.CreateMap<DataAccessLibrary.Models.User, User>().ReverseMap();
                 cfg.CreateMap<DataAccessLibrary.Models.Role, Role>().ReverseMap();
+                cfg.CreateMap<DataAccessLibrary.Models.Transaction, Transaction>().ReverseMap();
                 cfg.CreateMap<DataAccessLibrary.Models.Application, Application>().ReverseMap();
                 cfg.CreateMap<DataAccessLibrary.Models.Connection, Connection>().ReverseMap();
                 cfg.CreateMap<DataAccessLibrary.Models.AuthorizationCode, AuthorizationCode>().ReverseMap();
