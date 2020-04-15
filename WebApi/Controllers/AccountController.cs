@@ -32,6 +32,7 @@ namespace WebApi.Controllers
             _connectionProcessor = connectionProcessor;
         }
 
+        [HttpGet]
         public async Task<ActionResult<User>> Get()
         {
             User user = _mapper.Map<User>(await _userProcessor.GetUserById(UserId));

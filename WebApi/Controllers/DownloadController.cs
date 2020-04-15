@@ -28,7 +28,7 @@ namespace WebApi.Controllers
             _mapper = mapper;
         }
 
-        [Route("/{id}")]
+        [HttpGet("{id}")]
         public async Task<ActionResult<Download>> Get(string id)
         {
             Download download = _mapper.Map<Download>(await _downloadProcessor.GetDownloadById(id));
@@ -46,6 +46,7 @@ namespace WebApi.Controllers
             return download;
         }
 
+        [HttpPost]
         public async Task<ActionResult<Download>> Post(Download download)
         {
             download.Authors.Clear();
@@ -55,6 +56,7 @@ namespace WebApi.Controllers
             return _mapper.Map<Download>(await _downloadProcessor.CreateDownload(_mapper.Map<DataAccessLibrary.Models.Download>(download)));
         }
 
+        [HttpPut]
         public async Task<IActionResult> Put(Download download)
         {
             if (!await _downloadProcessor.IsAuthor(download.Id, UserId))
@@ -67,7 +69,7 @@ namespace WebApi.Controllers
             return Ok();
         }
 
-        [Route("/{id}")]
+        [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(string id)
         {
             if (!await _downloadProcessor.IsAuthor(id, UserId))

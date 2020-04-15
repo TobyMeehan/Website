@@ -21,12 +21,12 @@ namespace WebApi.Controllers
             _mapper = mapper;
         }
 
-        public string UserId => User.Claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value;
+        protected string UserId => User.Claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value;
 
-        public string Username => User.Identity.Name;
+        protected string Username => User.Identity.Name;
 
-        public string AppId => User.Claims.First(c => c.Type == ClaimTypes.Actor).Value;
+        protected string AppId => User.Claims.First(c => c.Type == ClaimTypes.Actor).Value;
 
-        public async Task<User> GetUser() => _mapper.Map<User>(await _userProcessor.GetUserById(UserId));
+        protected async Task<User> GetUser() => _mapper.Map<User>(await _userProcessor.GetUserById(UserId));
     }
 }

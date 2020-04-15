@@ -28,6 +28,7 @@ namespace WebApi.Controllers
             _mapper = mapper;
         }
 
+        [HttpPost]
         public async Task<IActionResult> Post(Transaction transaction)
         {
             transaction.UserId = UserId;
