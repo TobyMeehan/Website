@@ -25,6 +25,8 @@ namespace WebApi.Controllers
 
         public string Username => User.Identity.Name;
 
+        public string AppId => User.Claims.First(c => c.Type == ClaimTypes.Actor).Value;
+
         public async Task<User> GetUser() => _mapper.Map<User>(await _userProcessor.GetUserById(UserId));
     }
 }

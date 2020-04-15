@@ -214,6 +214,24 @@ namespace DataAccessLibrary.Data
             }
         }
 
+        public async Task<bool> TrySendTransaction(Transaction transaction)
+        {
+            if (!ValidateQuery(await _userTable.SelectById(transaction.UserId), out User user))
+            {
+                return false;
+            }
+
+            if (user.Balance - transaction.Amount < 0)
+            {
+                return false;
+            }
+
+            await _userTable.UpdateBalance(transaction.UserId, transaction.Amount);
+            await _transactionTable.Insert(transaction);
+
+            return true;
+        }
+
         public async Task<bool> UserExists(string username)
         {
             return (await _userTable.SelectByUsername(username)).Any();

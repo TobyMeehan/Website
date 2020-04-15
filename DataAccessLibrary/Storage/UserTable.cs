@@ -151,6 +151,19 @@ namespace DataAccessLibrary.Storage
             await _sqlDataAccess.SaveData(sql, parameters);
         }
 
+        public async Task UpdateBalance(string userid, int amount)
+        {
+            string sql = "UPDATE `users` SET `Balance` = `Balance` + @amount WHERE `UserId` = @userid";
+
+            object parameters = new
+            {
+                userid,
+                amount
+            };
+
+            await _sqlDataAccess.SaveData(sql, parameters);
+        }
+
         /// <summary>
         /// Removes the user
         /// </summary>

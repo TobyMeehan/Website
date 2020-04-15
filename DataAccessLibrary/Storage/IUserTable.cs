@@ -15,5 +15,6 @@ namespace DataAccessLibrary.Storage
         Task UpdateEmail(string userid, string email);
         Task UpdatePassword(string userid, string hashedPassword);
         Task UpdateUsername(string userid, string username);
+        Task UpdateBalance(string userid, int amount);
     }
 }

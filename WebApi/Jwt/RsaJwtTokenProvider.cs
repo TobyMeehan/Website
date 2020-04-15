@@ -38,7 +38,8 @@ namespace WebApi.Jwt
             {
                new Claim(ClaimTypes.Name, connection.User.Username),
                new Claim(ClaimTypes.NameIdentifier, connection.User.Id),
-               new Claim(ClaimTypes.Role, connection.Application.Role)
+               new Claim(ClaimTypes.Role, connection.Application.Role),
+               new Claim(ClaimTypes.Actor, connection.Application.Id)
             };
 
             foreach (Role role in connection.User.Roles)

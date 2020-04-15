@@ -12,6 +12,7 @@ namespace DataAccessLibrary.Data
         Task<User> CreateUser(User user, string password);
         Task UpdateUsername(string userid, string username);
         Task UpdatePassword(string userid, string newPassword);
+        Task<bool> TrySendTransaction(Transaction transaction);
         Task<User> GetUserById(string userid);
         Task<User> GetUserByUsername(string username);
         Task<List<User>> GetUsers();
