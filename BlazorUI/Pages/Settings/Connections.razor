@@ -22,11 +22,7 @@
                 </tr>
             </thead>
             <tbody>
-                @if (_connections == null)
-                {
-                    <LoadingMessage Text="false" />
-                }
-                else
+                @if (_connections != null)
                 {
                     @foreach (var conn in _connections)
                     {
@@ -39,6 +35,11 @@
                 }
             </tbody>
         </table>
+
+        @if(_connections == null)
+        {
+            <LoadingMessage Text="false" />
+        }
     </div>
 </div>
 
@@ -56,11 +57,7 @@
                 </tr>
             </thead>
             <tbody>
-                @if (_applications == null)
-                {
-                    <LoadingMessage Text="false" />
-                }
-                else
+                @if (_applications != null)
                 {
                     @foreach (var app in _applications)
                     {
@@ -74,5 +71,9 @@
                 }
             </tbody>
         </table>
+        @if (_applications == null)
+        {
+            <LoadingMessage Text="false" />
+        }
     </div>
 </div>
