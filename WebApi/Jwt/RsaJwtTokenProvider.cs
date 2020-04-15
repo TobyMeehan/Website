@@ -1,4 +1,5 @@
-﻿using Microsoft.IdentityModel.Tokens;
+﻿using DataAccessLibrary;
+using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
@@ -38,7 +39,7 @@ namespace WebApi.Jwt
             {
                new Claim(ClaimTypes.Name, connection.User.Username),
                new Claim(ClaimTypes.NameIdentifier, connection.User.Id),
-               new Claim(ClaimTypes.Role, connection.Application.Role),
+               new Claim(ClaimTypes.Role, connection.Application.Role ?? ApplicationRoles.ThirdParty),
                new Claim(ClaimTypes.Actor, connection.Application.Id)
             };
 
