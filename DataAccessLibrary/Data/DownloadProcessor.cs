@@ -248,5 +248,10 @@ namespace DataAccessLibrary.Data
                 }
             }
         }
+
+        public async Task<bool> IsAuthor(string downloadid, string userid)
+        {
+            return (await _downloadAuthorTable.SelectByDownload(downloadid)).Any(da => da.UserId == userid);
+        }
     }
 }

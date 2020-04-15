@@ -20,5 +20,6 @@ namespace DataAccessLibrary.Data
         Task RemoveAuthor(string downloadid, string userid);
         Task UpdateDownload(Download download);
         Task VerifyDownload(string downloadid, DownloadVerification verified);
+        Task<bool> IsAuthor(string downloadid, string userid);
     }
 }
