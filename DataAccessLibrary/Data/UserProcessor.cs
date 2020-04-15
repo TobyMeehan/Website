@@ -221,7 +221,7 @@ namespace DataAccessLibrary.Data
                 return false;
             }
 
-            if (user.Balance - transaction.Amount < 0)
+            if (user.Balance + transaction.Amount < 0)
             {
                 return false;
             }
