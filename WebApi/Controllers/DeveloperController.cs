@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using AutoMapper;
 using DataAccessLibrary.Data;
@@ -27,9 +28,11 @@ namespace WebApi.Controllers
             _applicationProcessor = applicationProcessor;
         }
 
+        public string UserId => User.Claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value;
+
         public async Task<IActionResult> Index()
         {
-            List<Application> apps = _mapper.Map<List<Application>>(await _applicationProcessor.GetApplicationsByUser(User.Identity.Name));
+            List<Application> apps = _mapper.Map<List<Application>>(await _applicationProcessor.GetApplicationsByUser(UserId));
 
             return View(apps);
         }
@@ -45,7 +48,7 @@ namespace WebApi.Controllers
         {
             if (ModelState.IsValid)
             {
-                if (await _applicationProcessor.GetApplicationByUserAndName(User.Identity.Name, appForm.Name) == null) // Check if application already exists
+                if (await _applicationProcessor.GetApplicationByUserAndName(UserId, appForm.Name) == null) // Check if application already exists
                 {
                     bool secret = appForm.Type == ApplicationFormModel.ApplicationType.WebServer; // Only generate secret for webserver applications
 
@@ -56,7 +59,7 @@ namespace WebApi.Controllers
 
                     var app = new Application
                     {
-                        Author = _mapper.Map<User>(await _userProcessor.GetUserById(User.Identity.Name)),
+                        Author = _mapper.Map<User>(await _userProcessor.GetUserById(UserId)),
                         Name = appForm.Name,
                         RedirectUri = appForm.RedirectUri
                     };
@@ -121,7 +124,7 @@ namespace WebApi.Controllers
                 {
                     if ((await _authorizationService.AuthorizeAsync(User, app, "ApplicationPolicy")).Succeeded)
                     {
-                        if (await _applicationProcessor.GetApplicationByUserAndName(User.Identity.Name, appForm.Name) == null)
+                        if (await _applicationProcessor.GetApplicationByUserAndName(UserId, appForm.Name) == null)
                         {
                             if (string.IsNullOrWhiteSpace(appForm.RedirectUri))
                             {
@@ -131,7 +134,7 @@ namespace WebApi.Controllers
                             app = new Application
                             {
                                 Id = appid,
-                                Author = _mapper.Map<User>(await _userProcessor.GetUserById(User.Identity.Name)),
+                                Author = _mapper.Map<User>(await _userProcessor.GetUserById(UserId)),
                                 Name = appForm.Name,
                                 RedirectUri = appForm.RedirectUri
                             };

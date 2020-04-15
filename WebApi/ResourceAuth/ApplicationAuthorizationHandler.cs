@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using WebApi.Models;
 
@@ -11,7 +12,7 @@ namespace WebApi.ResourceAuth
     {
         protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, ApplicationAuthorRequirement requirement, Application resource)
         {
-            if (context.User.Identity.Name == resource.Author.Id)
+            if (context.User.Claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value == resource.Author.Id)
             {
                 context.Succeed(requirement);
             }
