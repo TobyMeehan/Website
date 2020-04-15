@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
 using AutoMapper;
 using DataAccessLibrary.Data;
@@ -33,13 +34,9 @@ namespace WebApi
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllersWithViews();
-
-            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(options =>
+            services.AddControllersWithViews(options =>
             {
-                options.LoginPath = "/login";
-                options.AccessDeniedPath = "/login";
-                options.Validate();
+                options.InputFormatters.Add(new FormDataInputFormatter());
             });
 
 
@@ -50,6 +47,13 @@ namespace WebApi
             {
                 options.RequireHttpsMetadata = false;
                 options.TokenValidationParameters = tokenProvider.GetValidationParameters();
+            });
+
+            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(options =>
+            {
+                options.LoginPath = "/login";
+                options.AccessDeniedPath = "/login";
+                options.Validate();
             });
 
             services.AddAuthorization(auth =>
@@ -66,28 +70,37 @@ namespace WebApi
 
                 auth.AddPolicy("ApplicationPolicy", policy =>
                     policy.Requirements.Add(new ApplicationAuthorRequirement()));
-
-                auth.DefaultPolicy = auth.GetPolicy("Cookies");
             });
 
             services.AddSingleton<IAuthorizationHandler, ApplicationAuthorizationHandler>();
 
             services.AddSingleton(ConfigureMapper());
 
+            services.AddSingleton<HttpClient>();
+
             services.AddTransient<ISqlDataAccess, SqlDataAccess>();
+            services.AddTransient<IHttpDataAccess, HttpDataAccess>();
 
             services.AddTransient<IUserTable, UserTable>();
             services.AddTransient<IRoleTable, RoleTable>();
             services.AddTransient<ITransactionTable, TransactionTable>();
-            services.AddTransient<IApplicationTable, ApplicationTable>();
             services.AddTransient<IUserRoleTable, UserRoleTable>();
+
+            services.AddTransient<IApplicationTable, ApplicationTable>();
             services.AddTransient<IConnectionTable, ConnectionTable>();
             services.AddTransient<IAuthorizationCodeTable, AuthorizationCodeTable>();
+            services.AddTransient<IPkceTable, PkceTable>();
+
+            services.AddTransient<IDownloadTable, DownloadTable>();
+            services.AddTransient<IDownloadFileTable, DownloadFileTable>();
+            services.AddTransient<IDownloadAuthorTable, DownloadAuthorTable>();
+            services.AddTransient<IDownloadFileApi, DownloadFileApi>();
 
             services.AddTransient<IUserProcessor, UserProcessor>();
             services.AddTransient<IRoleProcessor, RoleProcessor>();
             services.AddTransient<IApplicationProcessor, ApplicationProcessor>();
             services.AddTransient<IConnectionProcessor, ConnectionProcessor>();
+            services.AddTransient<IDownloadProcessor, DownloadProcessor>();
         }
 
         private IMapper ConfigureMapper()
@@ -100,6 +113,7 @@ namespace WebApi
                 cfg.CreateMap<DataAccessLibrary.Models.Application, Application>().ReverseMap();
                 cfg.CreateMap<DataAccessLibrary.Models.Connection, Connection>().ReverseMap();
                 cfg.CreateMap<DataAccessLibrary.Models.AuthorizationCode, AuthorizationCode>().ReverseMap();
+                cfg.CreateMap<DataAccessLibrary.Models.Download, Download>().ReverseMap();
             });
 
             var mapper = mapperConfig.CreateMapper();

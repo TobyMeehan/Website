@@ -29,14 +29,19 @@ namespace BlazorUI
 
         public Application Application { get; set; }
 
-        private async Task<IActionResult> Authorize(string clientId, string redirectUri, string state)
+        private async Task<IActionResult> Authorize(string clientId, string redirectUri, string state, string codeChallenge)
         {
             string code = (await _connectionProcessor.CreateAuthorizationCode(User.GetUserId(), clientId)).Code;
+
+            if (codeChallenge != null)
+            {
+                await _connectionProcessor.CreatePkce(new DataAccessLibrary.Models.Pkce { ClientId = clientId, CodeChallenge = codeChallenge });
+            }
 
             return Redirect($"{redirectUri}?code={code}&state={state}");
         }
 
-        public async Task<IActionResult> OnGet(string client_id, string redirect_uri, string state)
+        public async Task<IActionResult> OnGet(string client_id, string redirect_uri, string state, string code_challenge)
         {
             Application = _mapper.Map<Application>(await _applicationProcessor.GetApplicationById(client_id));
 
@@ -66,18 +71,18 @@ namespace BlazorUI
             {
                 if ((await _connectionProcessor.GetConnectionByUserAndApplication(User.GetUserId(), client_id)) != null) // if there is already a connection, the user has already authorised the application
                 {
-                    return await Authorize(client_id, redirect_uri, state);
+                    return await Authorize(client_id, redirect_uri, state, code_challenge);
                 }
 
                 return Page();
             }
 
-            return LocalRedirect("/login?redirectUri=/auth");
+            return LocalRedirect($"/login?redirectUri=/auth?client_id={client_id}&redirect_uri={redirect_uri}&state={state}{(code_challenge != null ? $"&code_challenge={code_challenge}" : "")}");
         }
 
-        public async Task<IActionResult> OnPost(string client_id, string redirect_uri, string state)
+        public async Task<IActionResult> OnPost(string client_id, string redirect_uri, string state, string code_challenge)
         {
-            return await Authorize(client_id, redirect_uri, state);
+            return await Authorize(client_id, redirect_uri, state, code_challenge);
         }
     }
 }

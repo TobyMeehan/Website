@@ -4,6 +4,7 @@ using DataAccessLibrary.Storage;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -15,13 +16,15 @@ namespace DataAccessLibrary.Data
         private readonly IUserTable _userTable;
         private readonly IApplicationTable _applicationTable;
         private readonly IAuthorizationCodeTable _authorizationCodeTable;
+        private readonly IPkceTable _pkceTable;
 
-        public ConnectionProcessor(IConnectionTable connectionTable, IUserTable userTable, IApplicationTable applicationTable, IAuthorizationCodeTable authorizationCodeTable)
+        public ConnectionProcessor(IConnectionTable connectionTable, IUserTable userTable, IApplicationTable applicationTable, IAuthorizationCodeTable authorizationCodeTable, IPkceTable pkceTable)
         {
             _connectionTable = connectionTable;
             _userTable = userTable;
             _applicationTable = applicationTable;
             _authorizationCodeTable = authorizationCodeTable;
+            _pkceTable = pkceTable;
         }
 
         private DateTime DefaultExpiry => DateTime.Now.AddMinutes(30);
@@ -84,13 +87,25 @@ namespace DataAccessLibrary.Data
                 {
                     if (ValidateQuery(await _connectionTable.SelectById(authCode.ConnectionId), out Connection connection))
                     {
-                        authCode.Connection = connection;
+                        authCode.Connection = await Populate(connection);
                         return authCode;
                     }
                 }
             }
 
             return null;
+        }
+
+        public async Task<Pkce> GetPkce(string clientid)
+        {
+            if (ValidateQuery(await _pkceTable.Select(clientid), out Pkce pkce))
+            {
+                return pkce;
+            }
+            else
+            {
+                return null;
+            }
         }
 
         public async Task<AuthorizationCode> CreateAuthorizationCode(string userid, string appid)
@@ -106,6 +121,19 @@ namespace DataAccessLibrary.Data
             await _authorizationCodeTable.Insert(authCode);
 
             return await GetAuthorizationCode(authCode.Code);
+        }
+
+        public async Task CreatePkce(Pkce pkce)
+        {
+            await _pkceTable.Insert(pkce);
+        }
+
+        public async Task<bool> ValidatePkce(Pkce pkce)
+        {
+            pkce.CodeChallenge = Convert.ToBase64String(new SHA256Managed().ComputeHash(Encoding.UTF8.GetBytes(pkce.CodeVerifier)));
+
+            List<Pkce> codes = await _pkceTable.Select(pkce.ClientId);
+            return codes.Any(c => c.CodeChallenge == pkce.CodeChallenge);
         }
 
         public async Task DeleteConnection(string connectionid)

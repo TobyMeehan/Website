@@ -11,5 +11,8 @@ namespace DataAccessLibrary.Data
         Task<AuthorizationCode> GetAuthorizationCode(string code);
         Task<Connection> GetConnectionByUserAndApplication(string userid, string appid);
         Task<List<Connection>> GetConnectionsByUser(string userid);
+        Task<Pkce> GetPkce(string clientid);
+        Task CreatePkce(Pkce pkce);
+        Task<bool> ValidatePkce(Pkce pkce);
     }
 }

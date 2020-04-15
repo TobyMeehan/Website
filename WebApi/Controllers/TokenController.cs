@@ -31,26 +31,37 @@ namespace WebApi.Controllers
             _applicationProcessor = applicationProcessor;
         }
 
-        /* POST https://api.authorization-server.com/token
-            grant_type=authorization_code&
-            code=AUTH_CODE_HERE&
-            redirect_uri=REDIRECT_URI&
-            client_id=CLIENT_ID&
-            client_secret=CLIENT_SECRET*/
-        public async Task<IActionResult> Post(AuthCodeTokenRequest request)
+        [HttpPost]
+        public async Task<ActionResult<JsonWebToken>> Post([FromBody] AuthCodeTokenRequest bodyRequest, [FromForm] AuthCodeTokenRequest formRequest)
         {
+            AuthCodeTokenRequest request = bodyRequest ?? formRequest;
+
             AuthorizationCode authCode = _mapper.Map<AuthorizationCode>(await _connectionProcessor.GetAuthorizationCode(request.code));
+
+            bool ignoreSecret = false;
+
+            if (request.code_verifier != null)
+            {
+                if (await _connectionProcessor.ValidatePkce(new DataAccessLibrary.Models.Pkce
+                {
+                    ClientId = request.client_id,
+                    CodeVerifier = request.code_verifier
+                }))
+                {
+                    ignoreSecret = true;
+                }
+            }
 
             if (authCode?.IsValid ?? false)
             {
-                if (await _applicationProcessor.ValidateApplication(request.client_id, request.client_secret, request.redirect_uri)
+                if (await _applicationProcessor.ValidateApplication(request.client_id, request.client_secret, request.redirect_uri, ignoreSecret)
                     && request.client_id == authCode.Connection.Application.Id)
                 {
                     return Token(authCode.Connection);
                 }
             }
 
-            return Forbid();
+            return Unauthorized();
         }
 
         /* POST https://api.authorization-server.com/token
@@ -58,7 +69,7 @@ namespace WebApi.Controllers
             username=USERNAME&
             password=PASSWORD&
             client_id=CLIENT_ID */
-        public async Task<IActionResult> Post(PasswordTokenRequest request)
+        public async Task<ActionResult<JsonWebToken>> Post(PasswordTokenRequest request)
         {
             Application app = _mapper.Map<Application>(await _applicationProcessor.GetApplicationById(request.client_id));
 
@@ -77,7 +88,7 @@ namespace WebApi.Controllers
                 }
             }
 
-            return Forbid();
+            return Unauthorized();
         }
 
         // TODO: Consider whether client credentials is necessary
@@ -93,7 +104,7 @@ namespace WebApi.Controllers
         //    return Token(connection);
         //}
 
-        public JsonResult Token(Connection connection)
+        private ActionResult<JsonWebToken> Token(Connection connection)
         {
             DateTime expiry = DateTime.UtcNow.AddDays(7);
 
@@ -105,7 +116,7 @@ namespace WebApi.Controllers
 
             };
 
-            return new JsonResult(token);
+            return token;
         }
     }
 }

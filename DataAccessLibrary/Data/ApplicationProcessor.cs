@@ -180,7 +180,7 @@ namespace DataAccessLibrary.Data
             // TODO: Could add additional validation, I don't think it's necessary
         }
 
-        public async Task<bool> ValidateApplication(string clientId, string clientSecret, string redirectUri)
+        public async Task<bool> ValidateApplication(string clientId, string clientSecret, string redirectUri, bool ignoreSecret)
         {
             Application app = await GetApplicationById(clientId);
 
@@ -189,7 +189,9 @@ namespace DataAccessLibrary.Data
 
             bool valid = true;
 
-            valid = app.Secret == clientSecret && valid;
+            valid = (clientSecret != null || ignoreSecret) && valid;
+            valid = (app.Secret == clientSecret || ignoreSecret) && valid;
+
             valid = app.RedirectUri == redirectUri && valid;
 
             return valid;

@@ -1,5 +1,7 @@
 ﻿@page
 @model BlazorUI.AuthModel
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
 @{
     ViewData["Title"] = "Auth";
     Layout = "~/Pages/Shared/_AuthLayout.cshtml";
@@ -17,6 +19,6 @@
 
 <p>To accept and give access to this application, press authorise below. You can revoke access at any time by using the 'connections' tab in your account settings.</p>
 
-<form method="post">
+<form method="post" asp-antiforgery="true">
     <button type="submit" class="btn btn-light">Authorise</button>
 </form>

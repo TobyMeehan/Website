@@ -13,6 +13,6 @@ namespace DataAccessLibrary.Data
         Task<List<Application>> GetApplicationsByName(string name);
         Task<List<Application>> GetApplicationsByUser(string userid);
         Task UpdateApplication(Application app);
-        Task<bool> ValidateApplication(string clientId, string clientSecret, string redirectUri);
+        Task<bool> ValidateApplication(string clientId, string clientSecret, string redirectUri, bool ignoreSecret);
     }
 }

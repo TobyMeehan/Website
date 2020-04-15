@@ -85,14 +85,16 @@ namespace BlazorUI
             services.AddTransient<IUserTable, UserTable>();
             services.AddTransient<IRoleTable, RoleTable>();
             services.AddTransient<ITransactionTable, TransactionTable>();
-            services.AddTransient<IApplicationTable, ApplicationTable>();
             services.AddTransient<IUserRoleTable, UserRoleTable>();
+
+            services.AddTransient<IApplicationTable, ApplicationTable>();
             services.AddTransient<IConnectionTable, ConnectionTable>();
             services.AddTransient<IAuthorizationCodeTable, AuthorizationCodeTable>();
+            services.AddTransient<IPkceTable, PkceTable>();
+
             services.AddTransient<IDownloadTable, DownloadTable>();
             services.AddTransient<IDownloadAuthorTable, DownloadAuthorTable>();
             services.AddTransient<IDownloadFileTable, DownloadFileTable>();
-
             services.AddTransient<IDownloadFileApi, DownloadFileApi>();
 
             services.AddTransient<IUserProcessor, UserProcessor>();
