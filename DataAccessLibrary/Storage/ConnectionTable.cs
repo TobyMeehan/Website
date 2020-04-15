@@ -18,7 +18,7 @@ namespace DataAccessLibrary.Storage
 
         public async Task Insert(Connection connection)
         {
-            string sql = "INSERT INTO `connections` (AppId, UserId, AuthorizationCode) VALUES (@AppId, @UserId, @AuthorizationCode)";
+            string sql = "INSERT INTO `connections` (AppId, UserId) VALUES (@AppId, @UserId)";
 
             await _sqlDataAccess.SaveData(sql, connection);
         }
