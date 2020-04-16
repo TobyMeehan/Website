@@ -49,9 +49,13 @@ namespace WebApi.Controllers
         [HttpPost]
         public async Task<ActionResult<Download>> Post(Download download)
         {
-            download.Authors.Clear();
-            download.Authors.Add(await GetUser());
+            download.Authors = new List<User>
+            {
+                await GetUser()
+            };
+
             download.Updated = DateTime.Now;
+            download.CreatorId = UserId;
 
             return _mapper.Map<Download>(await _downloadProcessor.CreateDownload(_mapper.Map<DataAccessLibrary.Models.Download>(download)));
         }
