@@ -82,6 +82,7 @@ namespace BlazorUI
             services.AddTransient<ISqlDataAccess, SqlDataAccess>();
             services.AddTransient<IHttpDataAccess, HttpDataAccess>();
 
+
             services.AddTransient<IUserTable, UserTable>();
             services.AddTransient<IRoleTable, RoleTable>();
             services.AddTransient<ITransactionTable, TransactionTable>();
@@ -91,16 +92,22 @@ namespace BlazorUI
             services.AddTransient<IConnectionTable, ConnectionTable>();
             services.AddTransient<IAuthorizationCodeTable, AuthorizationCodeTable>();
             services.AddTransient<IPkceTable, PkceTable>();
+            services.AddTransient<IObjectiveTable, ObjectiveTable>();
+            services.AddTransient<IScoreboardTable, ScoreboardTable>();
 
             services.AddTransient<IDownloadTable, DownloadTable>();
-            services.AddTransient<IDownloadAuthorTable, DownloadAuthorTable>();
             services.AddTransient<IDownloadFileTable, DownloadFileTable>();
+            services.AddTransient<IDownloadAuthorTable, DownloadAuthorTable>();
             services.AddTransient<IDownloadFileApi, DownloadFileApi>();
+
 
             services.AddTransient<IUserProcessor, UserProcessor>();
             services.AddTransient<IRoleProcessor, RoleProcessor>();
+
             services.AddTransient<IApplicationProcessor, ApplicationProcessor>();
             services.AddTransient<IConnectionProcessor, ConnectionProcessor>();
+            services.AddTransient<IScoreboardProcessor, ScoreboardProcessor>();
+
             services.AddTransient<IDownloadProcessor, DownloadProcessor>();
 
             services.AddScoped<Pages.Downloads.EditDownloadState>();
@@ -148,6 +155,8 @@ namespace BlazorUI
             app.UseAuthentication();
 
             app.UseRouting();
+
+            app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {

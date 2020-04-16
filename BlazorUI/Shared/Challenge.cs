@@ -21,7 +21,7 @@ namespace BlazorUI.Shared
 
             if (!_context.User.Identity.IsAuthenticated)
             {
-                string uri = $"/login?redirectUri={System.Net.WebUtility.UrlEncode(navigationManager.Uri)}";
+                string uri = $"/login?ReturnUrl={System.Net.WebUtility.UrlEncode(navigationManager.ToBaseRelativePath(navigationManager.BaseUri))}";
                 navigationManager.NavigateTo(uri, true);
             }
             else

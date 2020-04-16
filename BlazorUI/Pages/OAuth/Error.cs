@@ -1,0 +1,6 @@
+﻿enum Error
+{
+    NotFound,
+    InvalidCredentials
+
+}

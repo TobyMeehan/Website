@@ -47,7 +47,7 @@ namespace BlazorUI.Shared
                 User user = mapper.Map<User>(await userProcessor.GetUserById(authState.User.GetUserId()));
                 if (!await StateIsValid(authState.User, user))
                 {
-                    navigationManager.NavigateTo($"/login?redirectUri={navigationManager.Uri}", true);
+                    navigationManager.NavigateTo($"/login?ReturnUrl={System.Net.WebUtility.UrlEncode(navigationManager.ToBaseRelativePath(navigationManager.BaseUri))}", true);
                 }
             }
         }

@@ -50,7 +50,7 @@ namespace BlazorUI.Pages.Settings
             {
                 await userProcessor.UpdateUsername(_context.User.GetUserId(), _usernameForm.Username);
 
-                navigationManager.NavigateTo($"/login?redirectUri={navigationManager.Uri}", true);
+                navigationManager.NavigateTo($"/login?ReturnUrl={System.Net.WebUtility.UrlEncode(navigationManager.ToBaseRelativePath(navigationManager.BaseUri))}", true);
             }
         }
 

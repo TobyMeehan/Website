@@ -26,20 +26,20 @@ namespace BlazorUI
             _userProcessor = userProcessor;
         }
 
-        public async Task<IActionResult> OnGet(string redirectUri)
+        public async Task<IActionResult> OnGet(string ReturnUrl)
         {
             if (HttpContext.User.Identity.IsAuthenticated)
             {
                 // Allows this endpoint to be used to refresh the user's login credentials if they have expired. A component checks for this and redirects if necessary
                 await HttpContext.SignOutAsync();
 
-                redirectUri ??= "/";
+                ReturnUrl ??= "/";
                 string userid = HttpContext.User.GetUserId();
                 User user = _mapper.Map<User>(await _userProcessor.GetUserById(userid));
 
                 await Login(user);
 
-                return Redirect(redirectUri);
+                return LocalRedirect(ReturnUrl);
             }
             else
             {
@@ -50,14 +50,14 @@ namespace BlazorUI
         [BindProperty]
         public LoginFormModel LoginForm { get; set; }
 
-        public async Task<IActionResult> OnPost(string redirectUri)
+        public async Task<IActionResult> OnPost(string ReturnUrl)
         {
             if (!ModelState.IsValid)
             {
                 return Page();
             }
 
-            redirectUri ??= "/";
+            ReturnUrl ??= "/";
 
             if (await _userProcessor.Authenticate(LoginForm.Username, LoginForm.Password))
             {
@@ -65,7 +65,7 @@ namespace BlazorUI
 
                 await Login(user);
 
-                return Redirect(redirectUri);
+                return LocalRedirect(ReturnUrl);
             }
             else
             {
