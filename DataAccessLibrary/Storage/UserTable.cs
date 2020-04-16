@@ -153,7 +153,7 @@ namespace DataAccessLibrary.Storage
 
         public async Task UpdateBalance(string userid, int amount)
         {
-            string sql = "UPDATE `users` SET `Balance` = `Balance` + @amount WHERE `UserId` = @userid";
+            string sql = "UPDATE `users` SET `Balance` = `Balance` + @amount WHERE `Id` = @userid";
 
             object parameters = new
             {
