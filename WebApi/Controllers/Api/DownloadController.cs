@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using WebApi.Models;
 
-namespace WebApi.Controllers
+namespace WebApi.Controllers.Api
 {
     [Route("api/[controller]")]
     [ApiController]
