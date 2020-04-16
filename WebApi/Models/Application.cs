@@ -17,6 +17,7 @@ namespace WebApi.Models
         [Display(Name = "Client Secret")]
         public string Secret { get; set; }
         public string Role { get; set; }
+        public Scoreboard Scoreboard { get; set; }
 
     }
 }

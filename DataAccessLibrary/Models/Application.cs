@@ -13,6 +13,7 @@ namespace DataAccessLibrary.Models
         public string RedirectUri { get; set; }
         public string Secret { get; set; }
         public string Role { get; set; }
+        public Scoreboard Scoreboard { get; set; }
 
     }
 }

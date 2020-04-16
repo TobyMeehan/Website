@@ -78,8 +78,10 @@ namespace WebApi
 
             services.AddSingleton<HttpClient>();
 
+
             services.AddTransient<ISqlDataAccess, SqlDataAccess>();
             services.AddTransient<IHttpDataAccess, HttpDataAccess>();
+
 
             services.AddTransient<IUserTable, UserTable>();
             services.AddTransient<IRoleTable, RoleTable>();
@@ -90,16 +92,22 @@ namespace WebApi
             services.AddTransient<IConnectionTable, ConnectionTable>();
             services.AddTransient<IAuthorizationCodeTable, AuthorizationCodeTable>();
             services.AddTransient<IPkceTable, PkceTable>();
+            services.AddTransient<IObjectiveTable, ObjectiveTable>();
+            services.AddTransient<IScoreboardTable, ScoreboardTable>();
 
             services.AddTransient<IDownloadTable, DownloadTable>();
             services.AddTransient<IDownloadFileTable, DownloadFileTable>();
             services.AddTransient<IDownloadAuthorTable, DownloadAuthorTable>();
             services.AddTransient<IDownloadFileApi, DownloadFileApi>();
 
+
             services.AddTransient<IUserProcessor, UserProcessor>();
             services.AddTransient<IRoleProcessor, RoleProcessor>();
+
             services.AddTransient<IApplicationProcessor, ApplicationProcessor>();
             services.AddTransient<IConnectionProcessor, ConnectionProcessor>();
+            services.AddTransient<IScoreboardProcessor, ScoreboardProcessor>();
+
             services.AddTransient<IDownloadProcessor, DownloadProcessor>();
         }
 
@@ -110,9 +118,14 @@ namespace WebApi
                 cfg.CreateMap<DataAccessLibrary.Models.User, User>().ReverseMap();
                 cfg.CreateMap<DataAccessLibrary.Models.Role, Role>().ReverseMap();
                 cfg.CreateMap<DataAccessLibrary.Models.Transaction, Transaction>().ReverseMap();
+
                 cfg.CreateMap<DataAccessLibrary.Models.Application, Application>().ReverseMap();
                 cfg.CreateMap<DataAccessLibrary.Models.Connection, Connection>().ReverseMap();
                 cfg.CreateMap<DataAccessLibrary.Models.AuthorizationCode, AuthorizationCode>().ReverseMap();
+                cfg.CreateMap<DataAccessLibrary.Models.Objective, Objective>().ReverseMap();
+                cfg.CreateMap<DataAccessLibrary.Models.Score, Score>().ReverseMap();
+                cfg.CreateMap<DataAccessLibrary.Models.Scoreboard, Scoreboard>().ReverseMap();
+
                 cfg.CreateMap<DataAccessLibrary.Models.Download, Download>().ReverseMap();
             });
 

@@ -14,112 +14,83 @@ namespace DataAccessLibrary.Data
         private readonly IApplicationTable _applicationTable;
         private readonly IUserTable _userTable;
         private readonly IUserProcessor _userProcessor;
+        private readonly IScoreboardProcessor _scoreboardProcessor;
 
-        public ApplicationProcessor(IApplicationTable applicationTable, IUserTable userTable, IUserProcessor userProcessor)
+        public ApplicationProcessor(IApplicationTable applicationTable, IUserTable userTable, IUserProcessor userProcessor, IScoreboardProcessor scoreboardProcessor)
         {
             _applicationTable = applicationTable;
             _userTable = userTable;
             _userProcessor = userProcessor;
+            _scoreboardProcessor = scoreboardProcessor;
+        }
+
+        private async Task<Application> Populate(Application application)
+        {
+            if (!(await _userTable.SelectById(application.UserId)).Any())
+            {
+                throw new Exception("Author of provided application could not be found.");
+            }
+
+            application.Author = await _userProcessor.GetUserById(application.UserId);
+            application.Scoreboard = await _scoreboardProcessor.GetScoreboardByApplication(application.Id);
+
+            return application;
         }
 
         public async Task<Application> GetApplicationById(string appid)
         {
-            if (ValidateQuery(await _applicationTable.SelectById(appid), out Application app)) // If the application exists
-            {
-                if (ValidateQuery(await _userTable.SelectById(app.UserId), out User author)) // If the application's author exists
-                {
-                    app.Author = author;
-
-                    return app;
-                }
-                else
-                {
-                    throw new Exception("Author of provided application could not be found.");
-                }
-            }
-            else
+            if (!ValidateQuery(await _applicationTable.SelectById(appid), out Application app)) // If the application exists
             {
                 return null;
             }
+
+            return await Populate(app);
         }
 
         public async Task<Application> GetApplicationByUserAndName(string userid, string name)
         {
-            if (ValidateQuery(await _userTable.SelectById(userid), out User author)) // Check user exists
+            if (!ValidateQuery(await _applicationTable.SelectByUserAndName(userid, name), out Application app))
             {
-                if (ValidateQuery(await _applicationTable.SelectByUserAndName(userid, name), out Application app))
-                {
-                    app.Author = author;
-
-                    return app;
-                }
-                else
-                {
-                    return null;
-                }
-            }
-            else
-            {
-                throw new ArgumentException("Provided user ID could not be found.");
+                return null;
             }
 
+            return await Populate(app);
         }
 
         public async Task<List<Application>> GetApplicationsByName(string name)
         {
             var apps = await _applicationTable.SelectByName(name);
 
-            if (apps.Any()) // Check at least one application has provided name
+            if (!apps.Any())
             {
-                foreach (Application app in apps)
-                {
-                    if (ValidateQuery(await _userTable.SelectById(app.UserId), out User author)) // Check author of each application with provided name
-                    {
-                        app.Author = author;
-                    }
-                    else
-                    {
-                        throw new Exception("Author of provided application could not be found.");
-                    }
-                }
+                return new List<Application>();
+            }
 
-                return apps;
-            }
-            else
+            foreach (Application app in apps)
             {
-                return null;
+                await Populate(app);
             }
+
+            return apps;
         }
 
         public async Task<List<Application>> GetApplicationsByUser(string userid)
         {
-            if (ValidateQuery(await _userTable.SelectById(userid), out User user)) // Check user id exists and get user it represents
-            {
-                var apps = await _applicationTable.SelectByUser(userid);
+            var apps = await _applicationTable.SelectByUser(userid);
 
-                if (apps.Any()) // If user has created at least one application
-                {
-                    apps.ForEach(app => app.Author = user);
-
-                    return apps;
-                }
-                else
-                {
-                    return new List<Application>(); // Return empty list
-                }
-            }
-            else
+            if (!apps.Any())
             {
                 return new List<Application>();
             }
+
+            foreach (Application app in apps)
+            {
+                await Populate(app);
+            }
+
+            return apps;
         }
 
-        /// <summary>
-        /// Adds a new application to the database, and generates a client secret, if required.
-        /// </summary>
-        /// <param name="app">Application model to add.</param>
-        /// <param name="secret">Whether to generate a client secret.</param>
-        /// <returns></returns>
         public async Task<Application> CreateApplication(Application app, bool secret)
         {
             if ((await _userTable.SelectById(app.Author.Id)).Any()) // If provided app author exists
@@ -177,7 +148,6 @@ namespace DataAccessLibrary.Data
         public async Task DeleteApplication(string appid)
         {
             await _applicationTable.Delete(appid);
-            // TODO: Could add additional validation, I don't think it's necessary
         }
 
         public async Task<bool> ValidateApplication(string clientId, string clientSecret, string redirectUri, bool ignoreSecret)
