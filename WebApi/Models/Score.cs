@@ -9,7 +9,7 @@ namespace WebApi.Models
     {
         public string Id { get; set; }
         public Objective Objective { get; set; }
-        public User User { get; set; }
+        public SimplifiedUser User { get; set; }
         public int Value { get; set; }
     }
 }

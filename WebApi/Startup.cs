@@ -116,6 +116,8 @@ namespace WebApi
             var mapperConfig = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<DataAccessLibrary.Models.User, User>().ReverseMap();
+                cfg.CreateMap<DataAccessLibrary.Models.User, SimplifiedUser>().ReverseMap();
+                cfg.CreateMap<SimplifiedUser, User>().ReverseMap();
                 cfg.CreateMap<DataAccessLibrary.Models.Role, Role>().ReverseMap();
                 cfg.CreateMap<DataAccessLibrary.Models.Transaction, Transaction>().ReverseMap();
 

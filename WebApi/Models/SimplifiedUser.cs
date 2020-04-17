@@ -5,12 +5,10 @@ using System.Threading.Tasks;
 
 namespace WebApi.Models
 {
-    public class Transaction
+    public class SimplifiedUser
     {
         public string Id { get; set; }
-        public string Sender { get; set; }
-        public string Description { get; set; }
-        public int Amount { get; set; }
+        public string Username { get; set; }
 
     }
 }

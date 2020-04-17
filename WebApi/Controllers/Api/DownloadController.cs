@@ -49,9 +49,9 @@ namespace WebApi.Controllers.Api
         [HttpPost]
         public async Task<ActionResult<Download>> Post(Download download)
         {
-            download.Authors = new List<User>
+            download.Authors = new List<SimplifiedUser>
             {
-                await GetUser()
+                _mapper.Map<SimplifiedUser>(await GetUser())
             };
 
             download.Updated = DateTime.Now;

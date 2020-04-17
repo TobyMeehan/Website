@@ -21,7 +21,7 @@ namespace WebApi.Controllers.Api
         private readonly IApplicationProcessor _applicationProcessor;
         private readonly IMapper _mapper;
 
-        public TransactionController(IUserProcessor userProcessor, IApplicationProcessor applicationProcessor, IMapper mapper) : base (userProcessor, mapper)
+        public TransactionController(IUserProcessor userProcessor, IApplicationProcessor applicationProcessor, IMapper mapper) : base(userProcessor, mapper)
         {
             _userProcessor = userProcessor;
             _applicationProcessor = applicationProcessor;
@@ -31,10 +31,13 @@ namespace WebApi.Controllers.Api
         [HttpPost]
         public async Task<IActionResult> Post(Transaction transaction)
         {
-            transaction.UserId = UserId;
-            transaction.Sender = (await _applicationProcessor.GetApplicationById(AppId)).Name;
-
-            if (await _userProcessor.TrySendTransaction(_mapper.Map<DataAccessLibrary.Models.Transaction>(transaction)))
+            if (await _userProcessor.TrySendTransaction(new DataAccessLibrary.Models.Transaction
+            {
+                UserId = UserId,
+                Sender = (await _applicationProcessor.GetApplicationById(AppId)).Name,
+                Description = transaction.Description,
+                Amount = transaction.Amount
+            }))
             {
                 return Ok();
             }

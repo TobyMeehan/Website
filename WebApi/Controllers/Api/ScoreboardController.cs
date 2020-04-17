@@ -38,7 +38,7 @@ namespace WebApi.Controllers.Api
         }
 
         [HttpPost("objective")]
-        public async Task<IActionResult> Post([FromBody] string name)
+        public async Task<ActionResult<Objective>> Post([FromBody] string name)
         {
             await _scoreboardProcessor.CreateObjective(new DataAccessLibrary.Models.Objective
             {
