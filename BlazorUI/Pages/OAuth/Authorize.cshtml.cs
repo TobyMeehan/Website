@@ -59,12 +59,7 @@ namespace BlazorUI
 
         private async Task<IActionResult> AuthorizationCode(string clientId, string redirectUri, string state, string codeChallenge)
         {
-            string code = (await _connectionProcessor.CreateAuthorizationCode(User.GetUserId(), clientId)).Code;
-
-            if (codeChallenge != null)
-            {
-                await _connectionProcessor.CreatePkce(new DataAccessLibrary.Models.Pkce { ClientId = clientId, CodeChallenge = codeChallenge });
-            }
+            string code = (await _connectionProcessor.CreateAuthorizationCode(User.GetUserId(), clientId, codeChallenge)).Code;
 
             return Redirect($"{redirectUri}?code={code}&state={state}");
         }

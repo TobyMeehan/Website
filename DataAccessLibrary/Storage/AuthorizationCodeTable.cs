@@ -30,7 +30,7 @@ namespace DataAccessLibrary.Storage
 
         public async Task Insert(AuthorizationCode value)
         {
-            string sql = "INSERT INTO `authorizationcodes` (Id, ConnectionId, Code, Expiry) VALUES (UUID(), @ConnectionId, @Code, @Expiry)";
+            string sql = "INSERT INTO `authorizationcodes` (Id, ConnectionId, Code, Expiry, CodeChallenge) VALUES (UUID(), @ConnectionId, @Code, @Expiry, @CodeChallenge)";
 
             await _sqlDataAccess.SaveData(sql, value);
         }

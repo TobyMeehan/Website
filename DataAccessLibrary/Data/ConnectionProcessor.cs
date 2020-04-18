@@ -4,6 +4,7 @@ using DataAccessLibrary.Storage;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
@@ -16,15 +17,13 @@ namespace DataAccessLibrary.Data
         private readonly IUserTable _userTable;
         private readonly IApplicationTable _applicationTable;
         private readonly IAuthorizationCodeTable _authorizationCodeTable;
-        private readonly IPkceTable _pkceTable;
 
-        public ConnectionProcessor(IConnectionTable connectionTable, IUserTable userTable, IApplicationTable applicationTable, IAuthorizationCodeTable authorizationCodeTable, IPkceTable pkceTable)
+        public ConnectionProcessor(IConnectionTable connectionTable, IUserTable userTable, IApplicationTable applicationTable, IAuthorizationCodeTable authorizationCodeTable)
         {
             _connectionTable = connectionTable;
             _userTable = userTable;
             _applicationTable = applicationTable;
             _authorizationCodeTable = authorizationCodeTable;
-            _pkceTable = pkceTable;
         }
 
         private DateTime DefaultExpiry => DateTime.Now.AddMinutes(30);
@@ -81,34 +80,28 @@ namespace DataAccessLibrary.Data
 
         public async Task<AuthorizationCode> GetAuthorizationCode(string code)
         {
-            if (ValidateQuery(await _authorizationCodeTable.SelectByCode(code), out AuthorizationCode authCode))
-            {
-                if (authCode.Expiry >= DateTime.Now)
-                {
-                    if (ValidateQuery(await _connectionTable.SelectById(authCode.ConnectionId), out Connection connection))
-                    {
-                        authCode.Connection = await Populate(connection);
-                        return authCode;
-                    }
-                }
-            }
-
-            return null;
-        }
-
-        public async Task<Pkce> GetPkce(string clientid)
-        {
-            if (ValidateQuery(await _pkceTable.Select(clientid), out Pkce pkce))
-            {
-                return pkce;
-            }
-            else
+            if (!ValidateQuery(await _authorizationCodeTable.SelectByCode(code), out AuthorizationCode authCode))
             {
                 return null;
             }
+
+            if (authCode.Expiry < DateTime.Now)
+            {
+                await _authorizationCodeTable.DeleteById(authCode.Id);
+                return null;
+            }
+
+            if (!ValidateQuery(await _connectionTable.SelectById(authCode.ConnectionId), out Connection connection))
+            {
+                await _authorizationCodeTable.DeleteByConnection(authCode.ConnectionId);
+                return null;
+            }
+
+            authCode.Connection = await Populate(connection);
+            return authCode;
         }
 
-        public async Task<AuthorizationCode> CreateAuthorizationCode(string userid, string appid)
+        public async Task<AuthorizationCode> CreateAuthorizationCode(string userid, string appid, string codeChallenge = null)
         {
             // If there isn't already a connection, create one
             if (!ValidateQuery(await _connectionTable.SelectByUserAndApplication(userid, appid), out Connection connection))
@@ -118,22 +111,24 @@ namespace DataAccessLibrary.Data
             }
 
             AuthorizationCode authCode = GenerateAuthCode(connection, DefaultExpiry);
+
+            authCode.CodeChallenge = codeChallenge;
+
             await _authorizationCodeTable.Insert(authCode);
 
             return await GetAuthorizationCode(authCode.Code);
         }
 
-        public async Task CreatePkce(Pkce pkce)
+        public bool CheckPkce(string codeChallenge, string codeVerifier)
         {
-            await _pkceTable.Insert(pkce);
-        }
+            if (codeChallenge == null && codeVerifier == null)
+            {
+                return true;
+            }
 
-        public async Task<bool> ValidatePkce(Pkce pkce)
-        {
-            pkce.CodeChallenge = Convert.ToBase64String(new SHA256Managed().ComputeHash(Encoding.UTF8.GetBytes(pkce.CodeVerifier)));
+            string hash = Pkce.ChallengeFromVerifier(codeVerifier);
 
-            List<Pkce> codes = await _pkceTable.Select(pkce.ClientId);
-            return codes.Any(c => c.CodeChallenge == pkce.CodeChallenge);
+            return codeChallenge == hash || codeChallenge == WebUtility.UrlEncode(hash); // also accept url encoded version as this is allowed
         }
 
         public async Task DeleteConnection(string connectionid)

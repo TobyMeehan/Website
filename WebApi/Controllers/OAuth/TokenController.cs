@@ -38,27 +38,17 @@ namespace WebApi.Controllers.OAuth
 
             AuthorizationCode authCode = _mapper.Map<AuthorizationCode>(await _connectionProcessor.GetAuthorizationCode(request.code));
 
-            bool ignoreSecret = false;
-
-            if (request.code_verifier != null)
+            if (authCode == null)
             {
-                if (await _connectionProcessor.ValidatePkce(new DataAccessLibrary.Models.Pkce
-                {
-                    ClientId = request.client_id,
-                    CodeVerifier = request.code_verifier
-                }))
-                {
-                    ignoreSecret = true;
-                }
+                return Unauthorized();
             }
 
-            if (authCode?.IsValid ?? false)
+            bool ignoreSecret = _connectionProcessor.CheckPkce(authCode.CodeChallenge, request.code_verifier);
+
+            if (await _applicationProcessor.ValidateApplication(request.client_id, request.client_secret, request.redirect_uri, ignoreSecret)
+                && request.client_id == authCode.Connection.Application.Id)
             {
-                if (await _applicationProcessor.ValidateApplication(request.client_id, request.client_secret, request.redirect_uri, ignoreSecret)
-                    && request.client_id == authCode.Connection.Application.Id)
-                {
-                    return Token(authCode.Connection);
-                }
+                return Token(authCode.Connection);
             }
 
             return Unauthorized();

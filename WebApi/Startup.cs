@@ -91,7 +91,6 @@ namespace WebApi
             services.AddTransient<IApplicationTable, ApplicationTable>();
             services.AddTransient<IConnectionTable, ConnectionTable>();
             services.AddTransient<IAuthorizationCodeTable, AuthorizationCodeTable>();
-            services.AddTransient<IPkceTable, PkceTable>();
             services.AddTransient<IObjectiveTable, ObjectiveTable>();
             services.AddTransient<IScoreboardTable, ScoreboardTable>();
 

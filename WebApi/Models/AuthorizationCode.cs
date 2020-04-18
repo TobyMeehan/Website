@@ -11,6 +11,7 @@ namespace WebApi.Models
         public Connection Connection { get; set; }
         public string Code { get; set; }
         public DateTime Expiry { get; set; }
+        public string CodeChallenge { get; set; }
         public bool IsValid => Expiry >= DateTime.Now;
     }
 }
