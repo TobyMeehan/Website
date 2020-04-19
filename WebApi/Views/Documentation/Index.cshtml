@@ -1,0 +1,69 @@
+﻿@{
+    ViewData["Title"] = "Documentation";
+}
+
+<div class="alert alert-danger">
+    The documentation in its current state is horribly incomplete, however I suspect most use of the API will be through the .NET connector, so I am not prioritising its completion. If this is an issue, please contact me on <a class="alert-link" href="https://github.com/TobyMeehan/Website">GitHub</a> or otherwise, and I will strive to help out.
+</div>
+
+<div class="row h-100">
+    <div class="col-4">
+        <nav id="DocsNavbar" class="navbar navbar-light flex-column bg-light">
+            <a class="navbar-brand" href="#">Documentation</a>
+            <nav class="nav nav-pills flex-column">
+                <a class="nav-link" href="#Applications">Applications</a>
+                <a class="nav-link" href="#OAuth">OAuth 2</a>
+            </nav>
+        </nav>
+    </div>
+    <div class="col-8 overflow-auto">
+        <div data-spy="scroll" data-target="#DocsNavbar" data-offset="0">
+            <h3 id="Applications">Applications</h3>
+
+            <p>Applications are the medium of communication between the API and your code. This is further explained in the OAuth section, but simply, to access the API your application must be authorised by a registered user account. At this point you can begin calling the API, as a connection; a link between an application and its user.</p>
+
+            <h4>Creating an Application</h4>
+            <p>To register an application, you need to be signed in on the API website. This will enable the developer area, from which you can create and manage applications. Begin by selecting 'Create new Application', and this will open a page with a set of options for your new app.</p>
+            <h5>Redirect URI</h5>
+            <p>When users authorise your application, they are taken to a dedicated page on the website. Once they accept, they are redirected to a URI specified by your application, with authorisation information in the querystring. This must be registered by your application at the creation stage. Currently only a single redirect URI is supported for each application.</p>
+            <h5>Application Type</h5>
+            <p>Different types of application use different flows to get authorisation. The most important distinction is between server apps, which use a client secret, and other types, which do not.</p>
+
+            <p>Once you have created an application, you will be given a client ID, and potentially a client secret. If you do not have a secret, this is not an issue, it just means your application was not registered as a server app. If you do have a client secret, it must be kept secret. This information will be used when authorising with the OAuth flow.</p>
+
+            <h3 id="OAuth">OAuth 2</h3>
+
+            <p>OAuth is an authorisation standard for web APIs, which gives applications access to limited parts of users' data, without requiring direct authentication from within the application. The API implements OAuth 2 to grant applications access to user data while keeping control of that data with the user. Critically, it prevents third party applications accessing authentication data, i.e passwords.</p>
+
+            <h4>Getting Authorisation</h4>
+            <p>Obtaining authorisation for your application follows the standard set in <a href="https://tools.ietf.org/html/rfc6749">RFC6749</a>. The URLs for authorising with users and getting an access token are below.</p>
+
+            <h5>OAuth URLs</h5>
+            <table class="table table-sm">
+                <tbody>
+                    <tr>
+                        <th scope="row">Authorisation</th>
+                        <td><a href="https://tobymeehan.com/oauth/authorize">https://tobymeehan.com/oauth/authorize</a></td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Access Token</th>
+                        <td><a href="https://api.tobymeehan.com/oauth/token">https://api.tobymeehan.com/oauth/token</a></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h4>PKCE</h4>
+            <p>If your application is not server-side, and therefore cannot accept a client secret, the API does <strong>not</strong> support the implicit grant type, instead the PKCE extension is supported and should be used. While you can specify which hash algorithm you used to produce the code challenge, the API does not check this and only supports SHA256.</p>
+
+            <p>If you are implementing PKCE to connect to the API, be aware of issues that can occur when dealing with the code challenge hash. When getting an access token, the API will SHA256 hash the code verifier, then replace '+' with '-', '/' with '_' and trim any trailing '='. This same process should be applied when you produce your code challenge.</p>
+
+            <h4>OAuth Scopes</h4>
+            <p>At this stage, scopes have not been implemented and if a user authorises an application, it is given access to all areas of the API. Be aware that this may change in the future, time allowing.</p>
+
+            <h4>Client Credentials Grant Type</h4>
+            <p>The client credentials grant allows applications to access their data without the scope of a user. Currently this is not supported due to the limited extent of application data. As above this may be implemented in the future.</p>
+
+            <p>More information about OAuth flows, and the OAuth 2 spec can be found in Aaron Parecki's post <a href="https://aaronparecki.com/oauth-2-simplified/">OAuth 2 Simplified</a>.</p>
+        </div>
+    </div>
+</div>
