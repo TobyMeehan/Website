@@ -17,8 +17,9 @@ namespace DataAccessLibrary.Data
         private readonly IDownloadTable _downloadTable;
         private readonly IDownloadAuthorTable _downloadAuthorTable;
         private readonly ITransactionTable _transactionTable;
+        private readonly IScoreboardTable _scoreboardTable;
 
-        public UserProcessor(IUserTable userTable, IRoleTable roleTable, IUserRoleTable userRoleTable, IDownloadTable downloadTable, IDownloadAuthorTable downloadAuthorTable, ITransactionTable transactionTable)
+        public UserProcessor(IUserTable userTable, IRoleTable roleTable, IUserRoleTable userRoleTable, IDownloadTable downloadTable, IDownloadAuthorTable downloadAuthorTable, ITransactionTable transactionTable, IScoreboardTable scoreboardTable)
         {
             _userTable = userTable;
             _roleTable = roleTable;
@@ -26,6 +27,7 @@ namespace DataAccessLibrary.Data
             _downloadTable = downloadTable;
             _downloadAuthorTable = downloadAuthorTable;
             _transactionTable = transactionTable;
+            _scoreboardTable = scoreboardTable;
         }
 
         private async Task<User> Populate(User user)
@@ -243,6 +245,7 @@ namespace DataAccessLibrary.Data
             await _downloadAuthorTable.DeleteByUser(userid);
             await _userRoleTable.DeleteByUser(userid);
             await _transactionTable.DeleteByUser(userid);
+            await _scoreboardTable.DeleteByUser(userid);
             await _userTable.Delete(userid);
         }
 
