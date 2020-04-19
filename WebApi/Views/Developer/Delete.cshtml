@@ -23,7 +23,7 @@
         </dd>
     </dl>
 
-    <form asp-action="ConfirmDelete">
+    <form asp-action="ConfirmDelete" asp-route-appid="@Model.Id">
         @Html.AntiForgeryToken()
         <input type="submit" value="Delete" class="btn btn-danger" /> |
         <a asp-action="Index">Back to List</a>
