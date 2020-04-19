@@ -81,6 +81,24 @@ namespace WebApi.Controllers
             }
         }
 
+        [Route("/Developer/{appid}")]
+        public async Task<IActionResult> Details(string appid)
+        {
+            Application app = _mapper.Map<Application>(await _applicationProcessor.GetApplicationById(appid));
+
+            if (app == null)
+            {
+                return RedirectToAction("Index");
+            }
+
+            if (!(await _authorizationService.AuthorizeAsync(User, app, "ApplicationPolicy")).Succeeded)
+            {
+                return RedirectToAction("Index");
+            }
+
+            return View(app);
+        }
+
         [Route("/Developer/Edit/{appid}")]
         public async Task<IActionResult> Edit(string appid)
         {
@@ -189,7 +207,7 @@ namespace WebApi.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Route("/Delete/{appid}")]
+        [Route("/Developer/Delete/{appid}")]
         public async Task<IActionResult> ConfirmDelete(string appid)
         {
             await _applicationProcessor.DeleteApplication(appid);

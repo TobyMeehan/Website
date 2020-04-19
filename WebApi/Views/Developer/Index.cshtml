@@ -9,16 +9,10 @@
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.Id)
+                Name
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Name)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.RedirectUri)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Secret)
+                Client ID
             </th>
             <th></th>
         </tr>
@@ -28,20 +22,14 @@
         {
             <tr>
                 <td>
-                    @Html.DisplayFor(modelItem => item.Id)
+                    <a asp-action="Details" asp-route-appid="@item.Id">@item.Name</a>
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.Name)
+                    @item.Id
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.RedirectUri)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Secret)
-                </td>
-                <td>
-                    @Html.ActionLink("Edit", "Edit", new { appid = item.Id }) |
-                    @Html.ActionLink("Delete", "Delete", new { appid = item.Id })
+                    <a asp-action="Edit" asp-route-appid="@item.Id">Edit</a> |
+                    <a asp-action="Delete" asp-route-appid="@item.Id">Delete</a>
                 </td>
             </tr>
         }
