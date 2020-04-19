@@ -1,12 +1,9 @@
-﻿@using Microsoft.AspNetCore.Authorization
-@inject IAuthorizationService AuthorizationService
-
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - WebApi</title>
+    <title>@ViewData["Title"] - TobyMeehan API</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" />
 </head>
@@ -24,7 +21,7 @@
                 </button>
                 <div class="navbar-collapse collapse d-sm-inline-flex flex-sm-row-reverse">
                     <ul class="nav navbar-nav ml-auto">
-                        @if ((await AuthorizationService.AuthorizeAsync(User, "Cookies")).Succeeded)
+                        @if (User.Identity.IsAuthenticated)
                         {
                             <li class="nav-item">
                                 <span class="navbar-text">Logged in as @User.Identity.Name</span>
@@ -44,7 +41,7 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                         </li>
-                        @if ((await AuthorizationService.AuthorizeAsync(User, "Cookies")).Succeeded)
+                        @if (User.Identity.IsAuthenticated)
                         {
                             <li class="nav-item">
                                 <a class="nav-link text-dark" asp-area="" asp-controller="Developer" asp-action="Index">Developer</a>
@@ -65,9 +62,9 @@
         </main>
     </div>
 
-    <footer class="border-top footer text-muted bg-light">
+    <footer class="border-top footer text-muted text-center bg-light">
         <div class="container">
-            &copy; 2020 - WebApi - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+            Copyright &copy; @DateTime.Now.Year Toby Meehan
         </div>
     </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
