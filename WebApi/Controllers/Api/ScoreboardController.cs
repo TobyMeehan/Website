@@ -54,12 +54,20 @@ namespace WebApi.Controllers.Api
         {
             Application application = _mapper.Map<Application>(await _applicationProcessor.GetApplicationById(AppId));
 
-            if (!application.Scoreboard.Objectives.Any(o => o.Id == request.ObjectiveId))
+            if (!application.Scoreboard.Objectives.Any(o => o.Id == request.Objective))
             {
                 return NotFound();
             }
 
-            await _scoreboardProcessor.SetScore(UserId, request.ObjectiveId, request.Score);
+            await _scoreboardProcessor.SetScore(UserId, request.Objective, request.Score);
+
+            return Ok();
+        }
+
+        [HttpDelete("objective")]
+        public async Task<IActionResult> Delete([FromBody] string objective)
+        {
+            await _scoreboardProcessor.DeleteObjective(objective);
 
             return Ok();
         }

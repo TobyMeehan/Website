@@ -7,7 +7,7 @@ namespace WebApi.Models.Api
 {
     public class ScoreRequest
     {
-        public string ObjectiveId { get; set; }
+        public string Objective { get; set; }
         public int Score { get; set; }
     }
 }
