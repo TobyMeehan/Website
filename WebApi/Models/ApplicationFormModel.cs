@@ -8,6 +8,8 @@ namespace WebApi.Models
 {
     public class ApplicationFormModel
     {
+        public string Id { get; set; }
+
         [Required(ErrorMessage = "Enter a name for your application.")]
         [Display(Name = "Application Name")]
         public string Name { get; set; }

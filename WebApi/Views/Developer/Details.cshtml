@@ -38,7 +38,8 @@
     </dl>
 </div>
 <div>
-    @Html.ActionLink("Edit", "Edit", new { appid = Model.Id }) |
+    <a asp-action="Edit" asp-route-appid="@Model.Id">Edit</a> |
+    <a asp-action="Scoreboard" asp-route-appid="@Model.Id">Scoreboard</a> |
     <a asp-action="Index">Back to List</a>
 </div>
 

@@ -19,13 +19,15 @@ namespace WebApi.Controllers
         private readonly IAuthorizationService _authorizationService;
         private readonly IUserProcessor _userProcessor;
         private readonly IApplicationProcessor _applicationProcessor;
+        private readonly IScoreboardProcessor _scoreboardProcessor;
 
-        public DeveloperController(IMapper mapper, IAuthorizationService authorizationService, IUserProcessor userProcessor, IApplicationProcessor applicationProcessor)
+        public DeveloperController(IMapper mapper, IAuthorizationService authorizationService, IUserProcessor userProcessor, IApplicationProcessor applicationProcessor, IScoreboardProcessor scoreboardProcessor)
         {
             _mapper = mapper;
             _authorizationService = authorizationService;
             _userProcessor = userProcessor;
             _applicationProcessor = applicationProcessor;
+            _scoreboardProcessor = scoreboardProcessor;
         }
 
         public string UserId => User.Claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value;
@@ -116,6 +118,7 @@ namespace WebApi.Controllers
                 {
                     ApplicationFormModel viewModel = new ApplicationFormModel
                     {
+                        Id = appid,
                         Name = app.Name,
                         RedirectUri = app.RedirectUri
                     };
@@ -188,6 +191,66 @@ namespace WebApi.Controllers
             {
                 return View(appForm);
             }
+        }
+
+        [Route("/Developer/Scoreboard/{appid}")]
+        public async Task<IActionResult> Scoreboard(string appid)
+        {
+            Application app = _mapper.Map<Application>(await _applicationProcessor.GetApplicationById(appid));
+
+            if (app == null)
+            {
+                return RedirectToAction("Index");
+            }
+
+            if (!(await _authorizationService.AuthorizeAsync(User, app, "ApplicationPolicy")).Succeeded)
+            {
+                return RedirectToAction("Index");
+            }
+
+            return View(app);
+        }
+
+        [HttpPost]
+        [Route("/Developer/Objective/{appid}")]
+        public async Task<IActionResult> AddObjective(string appid, [FromForm] string name)
+        {
+            Application app = _mapper.Map<Application>(await _applicationProcessor.GetApplicationById(appid));
+
+            if (app == null)
+            {
+                return RedirectToAction("Index");
+            }
+
+            if (!(await _authorizationService.AuthorizeAsync(User, app, "ApplicationPolicy")).Succeeded)
+            {
+                return RedirectToAction("Index");
+            }
+
+            await _scoreboardProcessor.CreateObjective(new DataAccessLibrary.Models.Objective { AppId = app.Id, Name = name });
+
+            return RedirectToAction("Scoreboard", new { appid });
+        }
+
+        [HttpGet]
+        [Route("/Developer/Objective/{appid}/{objective}")]
+        public async Task<IActionResult> DeleteObjective(string appid, string objective)
+        {
+            Application app = _mapper.Map<Application>(await _applicationProcessor.GetApplicationById(appid));
+
+            if (app == null)
+            {
+                return RedirectToAction("Index");
+            }
+
+            if (!(await _authorizationService.AuthorizeAsync(User, app, "ApplicationPolicy")).Succeeded)
+            {
+                return RedirectToAction("Index");
+            }
+
+            await _scoreboardProcessor.DeleteObjective(objective);
+
+            return RedirectToAction("Scoreboard", new { appid });
         }
 
         [Route("/Developer/Delete/{appid}")]
