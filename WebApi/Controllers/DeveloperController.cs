@@ -137,60 +137,47 @@ namespace WebApi.Controllers
         [Route("/Developer/Edit/{appid}")]
         public async Task<IActionResult> Edit(string appid, ApplicationFormModel appForm)
         {
-            if (ModelState.IsValid)
-            {
-                Application app = _mapper.Map<Application>(_applicationProcessor.GetApplicationById(appid));
-
-                if (app != null)
-                {
-                    if ((await _authorizationService.AuthorizeAsync(User, app, "ApplicationPolicy")).Succeeded)
-                    {
-                        if (await _applicationProcessor.GetApplicationByUserAndName(UserId, appForm.Name) == null)
-                        {
-                            if (string.IsNullOrWhiteSpace(appForm.RedirectUri))
-                            {
-                                appForm.RedirectUri = "localhost:6969";
-                            }
-
-                            app = new Application
-                            {
-                                Id = appid,
-                                Author = _mapper.Map<User>(await _userProcessor.GetUserById(UserId)),
-                                Name = appForm.Name,
-                                RedirectUri = appForm.RedirectUri
-                            };
-
-                            await _applicationProcessor.UpdateApplication(_mapper.Map<DataAccessLibrary.Models.Application>(app));
-
-                            return RedirectToAction("Index");
-
-                            // TODO: Add alert with success message
-                        }
-                        else
-                        {
-                            ModelState.AddModelError("Name", "You have already created an application with this name.");
-
-                            return View(appForm);
-                        }
-                    }
-                    else
-                    {
-                        return RedirectToAction("Index");
-
-                        // TODO: Add alert with unauthorized error
-                    }
-                }
-                else
-                {
-                    throw new ArgumentException("Application does not exist.");
-
-                    // TODO: Add alert with error
-                }
-            }
-            else
+            if (!ModelState.IsValid)
             {
                 return View(appForm);
             }
+
+            Application app = _mapper.Map<Application>(await _applicationProcessor.GetApplicationById(appid));
+
+            if (app == null)
+            {
+                return RedirectToAction("Index");
+            }
+
+            if (!(await _authorizationService.AuthorizeAsync(User, app, "ApplicationPolicy")).Succeeded)
+            {
+                return RedirectToAction("Index");
+            }
+
+            app = _mapper.Map<Application>(await _applicationProcessor.GetApplicationByUserAndName(UserId, appForm.Name));
+
+            if (app != null && appid != app?.Id)
+            {
+                ModelState.AddModelError("Name", "You have already created an application with this name.");
+                return View(appForm);
+            }
+
+            if (string.IsNullOrWhiteSpace(appForm.RedirectUri))
+            {
+                appForm.RedirectUri = "localhost:6969";
+            }
+
+            app = new Application
+            {
+                Id = appid,
+                Author = _mapper.Map<User>(await _userProcessor.GetUserById(UserId)),
+                Name = appForm.Name,
+                RedirectUri = appForm.RedirectUri
+            };
+
+            await _applicationProcessor.UpdateApplication(_mapper.Map<DataAccessLibrary.Models.Application>(app));
+
+            return RedirectToAction("Details", new { appid });
         }
 
         [Route("/Developer/Scoreboard/{appid}")]

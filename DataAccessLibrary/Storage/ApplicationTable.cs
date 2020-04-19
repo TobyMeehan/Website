@@ -86,7 +86,7 @@ namespace DataAccessLibrary.Storage
 
         public async Task Update(Application app)
         {
-            string sql = "UPDATE `applications` SET `Name` = @Name, `RedirectUri` = @RedirectUri WHERE `Id` = @AppId";
+            string sql = "UPDATE `applications` SET `Name` = @Name, `RedirectUri` = @RedirectUri WHERE `Id` = @Id";
 
             await _sqlDataAccess.SaveData(sql, app);
         }

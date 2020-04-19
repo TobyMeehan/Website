@@ -121,28 +121,22 @@ namespace DataAccessLibrary.Data
 
         public async Task UpdateApplication(Application app)
         {
-            if ((await _userTable.SelectById(app.Author.Id)).Any()) // If provided app author exists
-            {
-                if ((await _applicationTable.SelectById(app.Id)).Any()) // If provided app ID exists
-                {
-                    if (ValidateQuery(await _applicationTable.SelectByUserAndName(app.UserId, app.Name), out Application match) && match.Id == app.Id) // Check if an application with the same name has already been created. Check that the ID of the two applications match
-                    {
-                        await _applicationTable.Update(app);
-                    }
-                    else
-                    {
-                        throw new ArgumentException("Application with the same name has already been created by the user.");
-                    }
-                }
-                else
-                {
-                    throw new ArgumentException("Provided application ID could not be found.");
-                }
-            }
-            else
+            if (!(await _userTable.SelectById(app.Author.Id)).Any())
             {
                 throw new ArgumentException("Provided user could not be found.");
             }
+
+            if (!(await _applicationTable.SelectById(app.Id)).Any())
+            {
+                return;
+            }
+
+            if (ValidateQuery(await _applicationTable.SelectByUserAndName(app.Author.Id, app.Name), out Application match) && app.Id != match.Id)
+            {
+                throw new ArgumentException("Application with the same name has already been created by the user.");
+            }
+
+            await _applicationTable.Update(app);
         }
 
         public async Task DeleteApplication(string appid)
