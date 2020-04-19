@@ -13,9 +13,9 @@ namespace BlazorUI.Pages.Settings
 {
     public partial class Connections : ComponentBase
     {
-        [Inject] public IApplicationProcessor applicationProcessor { get; set; }
-        [Inject] public IConnectionProcessor connectionProcessor { get; set; }
-        [Inject] public IMapper mapper { get; set; }
+        [Inject] private IApplicationProcessor applicationProcessor { get; set; }
+        [Inject] private IConnectionProcessor connectionProcessor { get; set; }
+        [Inject] private IMapper mapper { get; set; }
 
         private List<Connection> _connections;
         private List<Application> _applications;
@@ -28,6 +28,12 @@ namespace BlazorUI.Pages.Settings
             _context = await AuthenticationStateTask;
             _connections = await Task.Run(async () => mapper.Map<List<Connection>>(await connectionProcessor.GetConnectionsByUser(_context.User.GetUserId())));
             _applications = await Task.Run(async () => mapper.Map<List<Application>>(await applicationProcessor.GetApplicationsByUser(_context.User.GetUserId())));
+        }
+
+        private async Task RevokeConnection_Click(Connection connection)
+        {
+            await connectionProcessor.DeleteConnection(connection.Id);
+            _connections.Remove(connection);
         }
     }
 }

@@ -122,7 +122,9 @@ namespace BlazorUI
                 cfg.CreateMap<DataAccessLibrary.Models.Role, Role>().ReverseMap();
                 cfg.CreateMap<DataAccessLibrary.Models.Transaction, Transaction>().ReverseMap();
                 cfg.CreateMap<DataAccessLibrary.Models.Alert, Alert>().ReverseMap();
+
                 cfg.CreateMap<DataAccessLibrary.Models.Application, Application>().ReverseMap();
+                cfg.CreateMap<DataAccessLibrary.Models.Connection, Connection>().ReverseMap();
 
                 cfg.CreateMap<DataAccessLibrary.Models.Download, Download>().ReverseMap();
                 cfg.CreateMap<DataAccessLibrary.Models.Download, DownloadFormModel>().ReverseMap();

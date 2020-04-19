@@ -12,7 +12,7 @@
 
 <div class="card my-3">
     <div class="card-body">
-    <h2>Authorised Apps</h2>
+        <h2>Authorised Apps</h2>
         <table class="table">
             <thead>
                 <tr>
@@ -29,14 +29,19 @@
                         <tr>
                             <td>@conn.Application.Name</td>
                             <td><DisplayUser Id="@conn.User.Id" /></td>
-                            <td>Revoke Access</td>
+                            <td>
+                                <button class="btn btn-link text-danger p-0" @onclick="() => RevokeConnection_Click(conn)">
+                                    <i class="fas fa-minus-circle"></i>
+                                    Revoke
+                                </button>
+                            </td>
                         </tr>
                     }
                 }
             </tbody>
         </table>
 
-        @if(_connections == null)
+        @if (_connections == null)
         {
             <LoadingMessage Text="false" />
         }
@@ -46,7 +51,7 @@
 <div class="card my-3">
     <div class="card-body">
         <h2>My Applications</h2>
-        <a href="https://api.tobymeehan.com/developer/create">Create new Application</a>
+        <p><a href="https://api.tobymeehan.com/developer/create">Create new Application</a></p>
         <table class="table">
             <thead>
                 <tr>
@@ -65,7 +70,10 @@
                             <th scope="row">@app.Name</th>
                             <td>@app.Id</td>
                             <td>@app.RedirectUri</td>
-                            <td>Edit | Delete</td>
+                            <td>
+                                <a href="@($"https://api.tobymeehan.com/developer/edit/{app.Id}")">Edit</a> |
+                                <a href="@($"https://api.tobymeehan.com/developer/delete/{app.Id}")">Delete</a>
+                            </td>
                         </tr>
                     }
                 }
