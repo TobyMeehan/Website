@@ -28,6 +28,12 @@ namespace WebApi.Controllers.Api
             _mapper = mapper;
         }
 
+        [HttpGet]
+        public async Task<ActionResult<List<Download>>> Get()
+        {
+            return _mapper.Map<List<Download>>(await _downloadProcessor.GetDownloadsByAuthor(UserId));
+        }
+
         [HttpGet("{id}")]
         public async Task<ActionResult<Download>> Get(string id)
         {

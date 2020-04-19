@@ -28,6 +28,12 @@ namespace WebApi.Controllers.Api
             _mapper = mapper;
         }
 
+        [HttpGet]
+        public async Task<ActionResult<List<Transaction>>> Get()
+        {
+            return _mapper.Map<List<Transaction>>((await _userProcessor.GetUserById(UserId)).Transactions);
+        }
+
         [HttpPost]
         public async Task<IActionResult> Post(Transaction transaction)
         {

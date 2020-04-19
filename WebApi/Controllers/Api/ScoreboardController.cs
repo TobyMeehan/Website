@@ -65,7 +65,7 @@ namespace WebApi.Controllers.Api
         }
 
         [HttpDelete("objective")]
-        public async Task<IActionResult> Delete([FromBody] string objective)
+        public async Task<IActionResult> Delete(string objective)
         {
             await _scoreboardProcessor.DeleteObjective(objective);
 
