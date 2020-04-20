@@ -56,7 +56,7 @@ namespace WebApi.Controllers.Api
 
             if (!application.Scoreboard.Objectives.Any(o => o.Id == request.Objective))
             {
-                return NotFound();
+                return NotFound(new ErrorResponse { Error = "The specified objective could not be found." });
             }
 
             await _scoreboardProcessor.SetScore(UserId, request.Objective, request.Score);

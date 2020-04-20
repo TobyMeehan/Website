@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using WebApi.Models;
+using WebApi.Models.Api;
 
 namespace WebApi.Controllers.Api
 {
@@ -49,7 +50,7 @@ namespace WebApi.Controllers.Api
             }
             else
             {
-                return StatusCode(402);
+                return StatusCode(402, new ErrorResponse { Error = "Transaction failed." });
             }
         }
     }

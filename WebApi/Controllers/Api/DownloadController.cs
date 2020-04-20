@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using WebApi.Models;
+using WebApi.Models.Api;
 
 namespace WebApi.Controllers.Api
 {
@@ -41,7 +42,7 @@ namespace WebApi.Controllers.Api
 
             if (download == null)
             {
-                return NotFound();
+                return NotFound(new ErrorResponse { Error = "The specified download could not be found." });
             }
             
             if (!download.Authors.Any(u => u.Id == UserId))
