@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using AutoMapper;
 using BlazorUI.Extensions;
@@ -60,6 +61,8 @@ namespace BlazorUI
         private async Task<IActionResult> AuthorizationCode(string clientId, string redirectUri, string state, string codeChallenge)
         {
             string code = (await _connectionProcessor.CreateAuthorizationCode(User.GetUserId(), clientId, codeChallenge)).Code;
+            code = WebUtility.UrlEncode(code);
+            state = WebUtility.UrlEncode(state);
 
             return Redirect($"{redirectUri}?code={code}&state={state}");
         }
