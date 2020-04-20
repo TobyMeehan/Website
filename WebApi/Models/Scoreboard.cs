@@ -7,7 +7,6 @@ namespace WebApi.Models
 {
     public class Scoreboard
     {
-        public string AppId { get; set; }
         public List<Objective> Objectives { get; set; }
         public List<Score> Scores { get; set; }
     }

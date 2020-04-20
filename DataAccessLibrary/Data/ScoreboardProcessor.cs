@@ -67,7 +67,7 @@ namespace DataAccessLibrary.Data
             }
             else
             {
-                await _scoreboardTable.Insert(new Score { ObjectiveId = objectiveid, UserId = userid });
+                await _scoreboardTable.Insert(new Score { ObjectiveId = objectiveid, UserId = userid, Value = value });
             }
         }
 
