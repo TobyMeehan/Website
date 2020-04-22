@@ -135,5 +135,16 @@ namespace DataAccessLibrary.Data
         {
             await _connectionTable.Delete(connectionid);
         }
+
+        public async Task DeleteInvalidAuthCodes()
+        {
+            foreach (var authCode in await _authorizationCodeTable.Select())
+            {
+                if (authCode.Expiry < DateTime.Now)
+                {
+                    await _authorizationCodeTable.DeleteById(authCode.Id);
+                }
+            }
+        }
     }
 }

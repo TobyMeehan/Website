@@ -74,6 +74,8 @@ namespace WebApi
 
             services.AddSingleton<IAuthorizationHandler, ApplicationAuthorizationHandler>();
 
+            services.AddHostedService<AuthCodeHostedService>();
+
             services.AddSingleton(ConfigureMapper());
 
             services.AddSingleton<HttpClient>();
