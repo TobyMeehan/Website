@@ -235,6 +235,9 @@ namespace DataAccessLibrary.Data
         public async Task DeleteDownload(string downloadid)
         {
             await _downloadTable.Delete(downloadid);
+            await _downloadFileTable.DeleteByDownload(downloadid);
+            // TODO: when changing download host, add generic download delete.
+            await _downloadAuthorTable.DeleteByDownload(downloadid);
         }
 
         public async Task DeleteFile(DownloadFileModel file)
