@@ -156,7 +156,7 @@ namespace DataAccessLibrary.Data
             return await GetDownloadById(download.Id);
         }
 
-        public async Task<bool> TryAddFile(DownloadFileModel file, MemoryStream stream)
+        public async Task<bool> TryAddFile(DownloadFileModel file, Stream stream)
         {
             if (ValidateQuery(await _downloadTable.SelectById(file.DownloadId), out Download download))
             {

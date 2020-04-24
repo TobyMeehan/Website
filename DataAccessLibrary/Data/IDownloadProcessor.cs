@@ -8,7 +8,7 @@ namespace DataAccessLibrary.Data
     public interface IDownloadProcessor
     {
         Task<Download> CreateDownload(Download download);
-        Task<bool> TryAddFile(DownloadFileModel file, MemoryStream stream);
+        Task<bool> TryAddFile(DownloadFileModel file, Stream stream);
         Task DeleteDownload(string downloadid);
         Task DeleteFile(DownloadFileModel file);
         Task<Download> GetDownloadById(string downloadid);

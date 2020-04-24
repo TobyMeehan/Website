@@ -7,6 +7,6 @@ namespace DataAccessLibrary.Storage
     public interface IDownloadFileApi
     {
         Task Delete(string downloadid, string filename);
-        Task Post(DownloadFileModel file, MemoryStream stream);
+        Task Post(DownloadFileModel file, Stream stream);
     }
 }

@@ -22,14 +22,14 @@ namespace DataAccessLibrary.Storage
             _httpDataAccess = httpDataAccess;
         }
 
-        public async Task Post(DownloadFileModel file, MemoryStream stream)
+        public async Task Post(DownloadFileModel file, Stream stream)
         {
             string downloadHost = _configuration.GetSection("DownloadHost").Value;
             string uri = $"{downloadHost}/upload/{file.DownloadId}";
 
             MultipartFormDataContent content = new MultipartFormDataContent
             {
-                { new ByteArrayContent(stream.GetBuffer()), "\"file\"", file.Filename }
+                { new StreamContent(stream), "\"file\"", file.Filename }
             };
 
             await _httpDataAccess.PostHttpContent(uri, content);

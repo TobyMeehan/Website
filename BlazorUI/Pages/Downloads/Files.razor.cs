@@ -83,13 +83,15 @@ namespace BlazorUI.Pages.Downloads
 
             bool result;
 
-            using (var ms = await file.CreateMemoryStreamAsync())
+            await using (var stream = await file.OpenReadAsync())
             {
                 result = await downloadProcessor.TryAddFile(new DataAccessLibrary.Models.DownloadFileModel
                 {
                     DownloadId = _download.Id,
                     Filename = info.Name
-                }, ms);
+                }, stream);
+
+                stream.Close();
             }
 
             return result;

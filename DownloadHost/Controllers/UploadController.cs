@@ -23,6 +23,7 @@ namespace DownloadHost.Controllers
             using (var stream = System.IO.File.Create(path))
             {
                 await file.CopyToAsync(stream);
+                stream.Close();
             }
 
             return Created($"/{download}/{file.FileName}", file.FileName);
