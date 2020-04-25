@@ -70,14 +70,13 @@ namespace BlazorUI.Pages.Downloads
         {
             if ((await authorizationService.AuthorizeAsync(_context.User, _download, Authorization.Policies.EditDownload)).Succeeded)
             {
-                var file = files.FirstOrDefault();
-                var fileInfo = await file.ReadFileInfoAsync();
-
-                Progress<int> progress = new Progress<int>();
-                CancellationTokenSource cts = new CancellationTokenSource();
-
-                await Task.Run(async () =>
+                Parallel.ForEach(files, async (file) =>
                 {
+                    var fileInfo = await file.ReadFileInfoAsync();
+
+                    Progress<int> progress = new Progress<int>();
+                    CancellationTokenSource cts = new CancellationTokenSource();
+
                     var upload = new FileUpload(fileInfo.Name, _download.Id, UploadFile(file, fileInfo, progress, cts.Token), progress, cts);
                     await uploadState.UploadFile(upload);
                 });
