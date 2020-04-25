@@ -50,15 +50,19 @@ namespace BlazorUI.Pages.Downloads
             editDownloadState.Title = _download.Title;
             editDownloadState.Id = _download.Id;
 
-            //uploadState.OnUploadComplete += async (filename, download) => await InvokeAsync(StateHasChanged);
-
-            uploadState.OnUploadComplete += async (filename, download) =>
+            uploadState.OnStateChanged += async () =>
             {
-                if (download == _download.Id && !_download.Files.Contains(filename))
-                {
-                    _download.Files.Add(filename);
-                    await InvokeAsync(StateHasChanged);
-                }
+                List<string> files = uploadState.Uploads
+                    .Where(x =>
+                        x.Status == UploadFileResult.Success &&
+                        x.Download == _download.Id &&
+                        !_download.Files.Contains(x.Filename))
+                    .Select(x => x.Filename)
+                    .ToList();
+
+                _download.Files.AddRange(files);
+
+                await InvokeAsync(StateHasChanged);
             };
         }
 
@@ -70,10 +74,11 @@ namespace BlazorUI.Pages.Downloads
                 var fileInfo = await file.ReadFileInfoAsync();
 
                 Progress<int> progress = new Progress<int>();
+                CancellationTokenSource cts = new CancellationTokenSource();
 
                 await Task.Run(async () =>
                 {
-                    var upload = new FileUpload(fileInfo.Name, _download.Id, UploadFile(file, fileInfo, progress), progress);
+                    var upload = new FileUpload(fileInfo.Name, _download.Id, UploadFile(file, fileInfo, progress, cts.Token), progress, cts);
                     await uploadState.UploadFile(upload);
                 });
             }
@@ -85,15 +90,15 @@ namespace BlazorUI.Pages.Downloads
             }
         }
 
-        private async Task<bool> UploadFile(IFileReference file, IFileInfo info, IProgress<int> progress)
+        private async Task<UploadFileResult> UploadFile(IFileReference file, IFileInfo info, IProgress<int> progress, CancellationToken cancellationToken)
         {
             const int maxSize = 100 * 1024 * 1024; // 100MB
             const int bufferSize = 512 * 1024; // 500KB
 
             if (info.Size > maxSize)
-                return false;
+                return UploadFileResult.Failed; // TODO: more interactive logic
 
-            bool result;
+            UploadFileResult result;
 
             await using (var stream = await file.OpenReadAsync())
             {
@@ -101,7 +106,7 @@ namespace BlazorUI.Pages.Downloads
                 {
                     DownloadId = _download.Id,
                     Filename = info.Name
-                }, stream, bufferSize, progress);
+                }, stream, bufferSize, progress, cancellationToken);
             }
 
             GC.Collect(); // TODO: remove asap

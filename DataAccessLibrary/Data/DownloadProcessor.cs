@@ -1,11 +1,11 @@
-﻿using DataAccessLibrary.Extensions;
-using DataAccessLibrary.Models;
+﻿using DataAccessLibrary.Models;
 using DataAccessLibrary.Storage;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace DataAccessLibrary.Data
@@ -157,20 +157,29 @@ namespace DataAccessLibrary.Data
             return await GetDownloadById(download.Id);
         }
 
-        public async Task<bool> TryAddFile(DownloadFileModel file, Stream stream, int bufferSize, IProgress<int> progress)
+        public async Task<UploadFileResult> TryAddFile(DownloadFileModel file, Stream stream, int bufferSize, IProgress<int> progress, CancellationToken cancellationToken)
         {
             if (ValidateQuery(await _downloadTable.SelectById(file.DownloadId), out Download download))
             {
+                UploadFileResult result = UploadFileResult.Success;
+
                 try
                 {
-                    await _downloadFileApi.Post(file, stream, bufferSize, progress);
+                    if (!await _downloadFileApi.Post(file, stream, bufferSize, progress, cancellationToken))
+                    {
+                        result = UploadFileResult.Failed;
+                    }
                 }
-                catch (TaskCanceledException)
+                catch (OperationCanceledException)
                 {
-                    return false;
+                    result = UploadFileResult.Cancelled;
                 }
 
-                // TODO: cancel file upload
+                if (cancellationToken.IsCancellationRequested || result != UploadFileResult.Success)
+                {
+                    await DeleteFile(file);
+                    return result;
+                }
 
                 if (!(await _downloadFileTable.Select(file.DownloadId)).Any(f => f.Filename == file.Filename))
                 {
@@ -179,10 +188,10 @@ namespace DataAccessLibrary.Data
 
                 await UpdateDownload(download); // set Updated to current datetime
 
-                return true;
+                return UploadFileResult.Success;
             }
 
-            return false;
+            return UploadFileResult.Failed;
         }
 
         public async Task UpdateDownload(Download download)
@@ -240,11 +249,8 @@ namespace DataAccessLibrary.Data
         {
             if ((await _downloadTable.SelectById(file.DownloadId)).Any())
             {
-                if ((await _downloadFileTable.Select(file.DownloadId)).Where(f => f.Filename == file.Filename).Any())
-                {
-                    await _downloadFileTable.DeleteByFile(file);
-                    await _downloadFileApi.Delete(file.DownloadId, file.Filename);
-                }
+                await _downloadFileTable.DeleteByFile(file);
+                await _downloadFileApi.Delete(file.DownloadId, file.Filename);
             }
         }
 

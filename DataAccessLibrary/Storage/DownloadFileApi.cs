@@ -1,5 +1,4 @@
 ﻿using DataAccessLibrary.DataAccess;
-using DataAccessLibrary.Extensions;
 using DataAccessLibrary.Models;
 using Microsoft.Extensions.Configuration;
 using System;
@@ -27,7 +26,7 @@ namespace DataAccessLibrary.Storage
             _client = client;
         }
 
-        public async Task Post(DownloadFileModel file, Stream stream, int bufferSize, IProgress<int> progress) // TODO: cancel file upload
+        public async Task<bool> Post(DownloadFileModel file, Stream stream, int bufferSize, IProgress<int> progress, CancellationToken cancellationToken)
         {
             string downloadHost = _configuration.GetSection("DownloadHost").Value;
             string uri = $"{downloadHost}/upload/{file.DownloadId}";
@@ -38,6 +37,8 @@ namespace DataAccessLibrary.Storage
             
             while (stream.Position < stream.Length)
             {
+                cancellationToken.ThrowIfCancellationRequested();
+
                 int length = Math.Min(bufferSize, (int)(stream.Length - stream.Position));
 
                 await stream.ReadAsync(buffer, 0, length);
@@ -57,7 +58,7 @@ namespace DataAccessLibrary.Storage
                         }
                         else
                         {
-                            // TODO: cancel if failed
+                            return false;
                         }
                     }
                 }
@@ -68,6 +69,8 @@ namespace DataAccessLibrary.Storage
 
                 Thread.Sleep(10);
             }
+
+            return true;
         }
 
         public async Task Delete(string downloadid, string filename)

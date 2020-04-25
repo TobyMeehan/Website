@@ -31,38 +31,76 @@
         </div>
 
         <div class="col-sm-2">
-            @if (uploadState.Uploads.Any() || uploadState.FailedUploads.Any())
+            @if (uploadState.Uploads.Any())
             {
                 <div class="card mt-sm-5">
                     <div class="card-header">
                         Uploading Files
                     </div>
                     <ul class="list-group list-group-flush text-left">
-                        @foreach (var fail in uploadState.FailedUploads)
-                        {
-                            <li class="list-group-item list-group-item-danger">
-                                <div class="d-flex w-100 justify-content-between">
-                                    @fail
-                                    <button type="button" class="close ml-auto" aria-label="Close" @onclick="() => uploadState.DismissFailedUpload(fail)">
-                                        <span aria-hidden="true">&times;</span>
-                                    </button>
-                                </div>
-                                <small>Upload Failed</small>
-                            </li>
-                        }
                         @foreach (var upload in uploadState.Uploads)
                         {
-                            <li class="list-group-item">
-                                <span class="spinner-border spinner-border-sm" role="status"></span>
-                                @upload.Filename
-                                <div class="progress mt-1">
-                                    <div class="progress-bar bg-dark" role="progressbar"
-                                         style="@($"width: {upload.PercentageProgress}%")"
-                                         aria-valuemin="0" aria-valuenow="@upload.PercentageProgress" aria-valuemax="100">
-                                        @($"{upload.PercentageProgress}%")
-                                    </div>
-                                </div>
-                            </li>
+                            switch (upload.Status)
+                            {
+                                case UploadFileResult.Success:
+                                    <li class="list-group-item list-group-item-success">
+                                        <div class="d-flex w-100 justify-content-between">
+                                            @upload.Filename
+                                            <button type="button" class="close ml-auto" aria-label="Close" @onclick="() => uploadState.DismissUpload(upload)">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                        <small>Upload Complete</small>
+                                    </li>
+                                    break;
+                                case UploadFileResult.Cancelled:
+                                    <li class="list-group-item list-group-item-warning">
+                                        <div class="d-flex w-100 justify-content-between">
+                                            @upload.Filename
+                                            <button type="button" class="close ml-auto" aria-label="Close"
+                                                    @onclick="() => uploadState.DismissUpload(upload)">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                        <small>Upload Cancelled</small>
+                                    </li>
+                                    break;
+                                case UploadFileResult.Failed:
+                                    <li class="list-group-item list-group-item-danger">
+                                        <div class="d-flex w-100 justify-content-between">
+                                            @upload.Filename
+                                            <button type="button" class="close ml-auto" aria-label="Close"
+                                                    @onclick="() => uploadState.DismissUpload(upload)">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                        <small>Upload Failed</small>
+                                    </li>
+                                    break;
+                                case UploadFileResult.InProgress:
+                                    <li class="list-group-item">
+                                        <div class="d-flex w-100 justify-content-between">
+                                            <span>
+                                                <span class="spinner-border spinner-border-sm" role="status"></span>
+                                                @upload.Filename
+                                            </span>
+                                            <button type="button" class="btn btn-link btn-sm p-0 text-muted"
+                                                    @onclick="upload.CancellationTokenSource.Cancel">
+                                                Cancel
+                                            </button>
+                                        </div>
+                                        
+                                        <div class="progress mt-1">
+                                            <div class="progress-bar bg-dark" role="progressbar"
+                                                 style="@($"width: {upload.PercentageProgress}%")"
+                                                 aria-valuemin="0" aria-valuenow="@upload.PercentageProgress" aria-valuemax="100">
+                                                @($"{upload.PercentageProgress}%")
+                                            </div>
+                                        </div>
+                                    </li>
+                                    break;
+                            }
+
                         }
                     </ul>
                 </div>
@@ -84,9 +122,6 @@
     protected override void OnInitialized()
     {
         alertState.OnChange += StateHasChanged;
-        uploadState.OnUploadStart += async () => await InvokeAsync(() => StateHasChanged());
-        uploadState.OnUploadComplete += async (filename, download) => await InvokeAsync(() => StateHasChanged());
-        uploadState.OnUploadFailed += async () => await InvokeAsync(() => StateHasChanged());
-        uploadState.OnUploadProgress += async () => await InvokeAsync(() => StateHasChanged());
+        uploadState.OnStateChanged += async () => await InvokeAsync(StateHasChanged);
     }
 }
