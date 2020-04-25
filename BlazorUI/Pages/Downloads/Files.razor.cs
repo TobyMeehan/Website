@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace BlazorUI.Pages.Downloads
@@ -49,13 +50,16 @@ namespace BlazorUI.Pages.Downloads
             editDownloadState.Title = _download.Title;
             editDownloadState.Id = _download.Id;
 
-            uploadState.OnUploadComplete += async (filename) => await InvokeAsync(() =>
+            //uploadState.OnUploadComplete += async (filename, download) => await InvokeAsync(StateHasChanged);
+
+            uploadState.OnUploadComplete += async (filename, download) =>
             {
-                if (!_download.Files.Contains(filename))
+                if (download == _download.Id && !_download.Files.Contains(filename))
                 {
                     _download.Files.Add(filename);
+                    await InvokeAsync(StateHasChanged);
                 }
-            });
+            };
         }
 
         private async Task FileUpload_Change(IFileReference[] files)
@@ -65,7 +69,13 @@ namespace BlazorUI.Pages.Downloads
                 var file = files.FirstOrDefault();
                 var fileInfo = await file.ReadFileInfoAsync();
 
-                await uploadState.UploadFile(fileInfo.Name, UploadFile(file, fileInfo));
+                Progress<int> progress = new Progress<int>();
+
+                await Task.Run(async () =>
+                {
+                    var upload = new FileUpload(fileInfo.Name, _download.Id, UploadFile(file, fileInfo, progress), progress);
+                    await uploadState.UploadFile(upload);
+                });
             }
             else
             {
@@ -75,9 +85,11 @@ namespace BlazorUI.Pages.Downloads
             }
         }
 
-        private async Task<bool> UploadFile(IFileReference file, IFileInfo info)
+        private async Task<bool> UploadFile(IFileReference file, IFileInfo info, IProgress<int> progress)
         {
             const int maxSize = 100 * 1024 * 1024; // 100MB
+            const int bufferSize = 512 * 1024; // 500KB
+
             if (info.Size > maxSize)
                 return false;
 
@@ -89,10 +101,10 @@ namespace BlazorUI.Pages.Downloads
                 {
                     DownloadId = _download.Id,
                     Filename = info.Name
-                }, stream);
-
-                stream.Close();
+                }, stream, bufferSize, progress);
             }
+
+            GC.Collect(); // TODO: remove asap
 
             return result;
         }

@@ -1,4 +1,5 @@
-﻿using DataAccessLibrary.Models;
+﻿using DataAccessLibrary.Extensions;
+using DataAccessLibrary.Models;
 using DataAccessLibrary.Storage;
 using System;
 using System.Collections.Generic;
@@ -156,25 +157,20 @@ namespace DataAccessLibrary.Data
             return await GetDownloadById(download.Id);
         }
 
-        public async Task<bool> TryAddFile(DownloadFileModel file, Stream stream)
+        public async Task<bool> TryAddFile(DownloadFileModel file, Stream stream, int bufferSize, IProgress<int> progress)
         {
             if (ValidateQuery(await _downloadTable.SelectById(file.DownloadId), out Download download))
             {
-                try // try
+                try
                 {
-                    await _downloadFileApi.Post(file, stream);
+                    await _downloadFileApi.Post(file, stream, bufferSize, progress);
                 }
-                catch (Exception e)
+                catch (TaskCanceledException)
                 {
-                    try // try a second time
-                    {
-                        await _downloadFileApi.Post(file, stream);
-                    }
-                    catch (Exception ex) // fail after 2 attempts
-                    {
-                        return false;
-                    }
+                    return false;
                 }
+
+                // TODO: cancel file upload
 
                 if (!(await _downloadFileTable.Select(file.DownloadId)).Any(f => f.Filename == file.Filename))
                 {

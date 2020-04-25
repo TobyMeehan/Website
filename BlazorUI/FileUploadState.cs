@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BlazorUI.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -9,12 +10,12 @@ namespace BlazorUI
     {
         private void NotifyUploadStart() => OnUploadStart?.Invoke();
         public event Action OnUploadStart;
-        private void NotifyUploadComplete(string filename) => OnUploadComplete?.Invoke(filename);
-        public event Action<string> OnUploadComplete;
-        private void NotifyUploadFailed(string filename) => OnUploadFailed?.Invoke(filename);
-        public event Action<string> OnUploadFailed;
-
-        public List<string> Files { get; set; } = new List<string>();
+        private void NotifyUploadComplete(string filename, string download) => OnUploadComplete?.Invoke(filename, download);
+        public event Action<string, string> OnUploadComplete;
+        private void NotifyUploadFailed() => OnUploadFailed?.Invoke();
+        public event Action OnUploadFailed;
+        private void NotifyUploadProgress() => OnUploadProgress?.Invoke();
+        public event Action OnUploadProgress;
 
         public List<string> FailedUploads { get; set; } = new List<string>();
         public void DismissFailedUpload(string filename)
@@ -22,23 +23,27 @@ namespace BlazorUI
             FailedUploads.Remove(filename);
         }
 
-        public async Task UploadFile(string filename, Task<bool> uploadTask)
+        public List<FileUpload> Uploads { get; set; } = new List<FileUpload>();
+
+        public async Task UploadFile(FileUpload fileUpload)
         {
-            Files.Add(filename);
+            Uploads.Add(fileUpload);
             NotifyUploadStart();
 
-            bool success = await uploadTask;
+            fileUpload.OnProgressChanged += NotifyUploadProgress;
+
+            bool success = await fileUpload.Task;
 
             if (success)
             {
-                Files.Remove(filename);
-                NotifyUploadComplete(filename);
+                Uploads.Remove(fileUpload);
+                NotifyUploadComplete(fileUpload.Filename, fileUpload.Download);
             }
             else
             {
-                Files.Remove(filename);
-                FailedUploads.Add(filename);
-                NotifyUploadFailed(filename);
+                Uploads.Remove(fileUpload);
+                FailedUploads.Add(fileUpload.Filename);
+                NotifyUploadFailed();
             }
         }
     }

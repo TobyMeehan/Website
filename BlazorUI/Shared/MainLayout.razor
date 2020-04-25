@@ -31,35 +31,41 @@
         </div>
 
         <div class="col-sm-2">
-            @if (uploadState.Files.Any() || uploadState.FailedUploads.Any())
+            @if (uploadState.Uploads.Any() || uploadState.FailedUploads.Any())
             {
-                    <div class="card mt-sm-5">
-                        <div class="card-header">
-                            Uploading Files
-                        </div>
-                        <ul class="list-group list-group-flush text-left">
-                            @foreach (var fail in uploadState.FailedUploads)
-                            {
-                                <li class="list-group-item list-group-item-danger">
-                                    <div class="d-flex w-100 justify-content-between">
-                                        @fail
-                                        <button type="button" class="close ml-auto" aria-label="Close" @onclick="() => uploadState.DismissFailedUpload(fail)">
-                                            <span aria-hidden="true">&times;</span>
-                                        </button>
-                                    </div>
-                                    <small>Upload Failed</small>
-                                </li>
-                            }
-                            @foreach (var file in uploadState.Files)
-                            {
-                                <li class="list-group-item">
-                                    <span class="spinner-border spinner-border-sm" role="status"></span>
-                                    @file
-                                </li>
-                            }
-                        </ul>
+                <div class="card mt-sm-5">
+                    <div class="card-header">
+                        Uploading Files
                     </div>
-
+                    <ul class="list-group list-group-flush text-left">
+                        @foreach (var fail in uploadState.FailedUploads)
+                        {
+                            <li class="list-group-item list-group-item-danger">
+                                <div class="d-flex w-100 justify-content-between">
+                                    @fail
+                                    <button type="button" class="close ml-auto" aria-label="Close" @onclick="() => uploadState.DismissFailedUpload(fail)">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <small>Upload Failed</small>
+                            </li>
+                        }
+                        @foreach (var upload in uploadState.Uploads)
+                        {
+                            <li class="list-group-item">
+                                <span class="spinner-border spinner-border-sm" role="status"></span>
+                                @upload.Filename
+                                <div class="progress mt-1">
+                                    <div class="progress-bar bg-dark" role="progressbar"
+                                         style="@($"width: {upload.PercentageProgress}%")"
+                                         aria-valuemin="0" aria-valuenow="@upload.PercentageProgress" aria-valuemax="100">
+                                        @($"{upload.PercentageProgress}%")
+                                    </div>
+                                </div>
+                            </li>
+                        }
+                    </ul>
+                </div>
             }
         </div>
     </div>
@@ -79,7 +85,8 @@
     {
         alertState.OnChange += StateHasChanged;
         uploadState.OnUploadStart += async () => await InvokeAsync(() => StateHasChanged());
-        uploadState.OnUploadComplete += async (filename) => await InvokeAsync(() => StateHasChanged());
-        uploadState.OnUploadFailed += async (filename) => await InvokeAsync(() => StateHasChanged());
+        uploadState.OnUploadComplete += async (filename, download) => await InvokeAsync(() => StateHasChanged());
+        uploadState.OnUploadFailed += async () => await InvokeAsync(() => StateHasChanged());
+        uploadState.OnUploadProgress += async () => await InvokeAsync(() => StateHasChanged());
     }
 }
