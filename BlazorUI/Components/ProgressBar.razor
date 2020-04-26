@@ -1,12 +1,11 @@
-﻿<div @attributes="AdditionalAttributes">
-    <div class="progress">
-        <div class="@($"progress-bar bg-{Context.ToString().ToLower()}")" role="progressbar"
-             style="@($"width: {PercentageProgress}%")"
-             aria-valuemin="0" aria-valuenow="@PercentageProgress" aria-valuemax="100">
+﻿
+<div class="@($"progress {_cssClass}")" @attributes="@AdditionalAttributes.Where(x => x.Key != "class")">
+    <div class="@($"progress-bar bg-{Context.ToString().ToLower()}")" role="progressbar"
+         style="@($"width: {PercentageProgress}%")"
+         aria-valuemin="0" aria-valuenow="@PercentageProgress" aria-valuemax="100">
 
-            @ChildContent
+        @ChildContent
 
-        </div>
     </div>
 </div>
 
@@ -19,4 +18,13 @@
 
     [Parameter] public BootstrapContext Context { get; set; }
 
+    private string _cssClass = "";
+
+    protected override void OnInitialized()
+    {
+        if (AdditionalAttributes.TryGetValue("class", out object cssClass))
+        {
+            _cssClass = cssClass.ToString();
+        }
+    }
 }

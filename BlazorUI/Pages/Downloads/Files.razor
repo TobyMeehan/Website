@@ -32,6 +32,33 @@ else
                             </td>
                         </tr>
                     }
+
+                    @foreach (var upload in uploadState.Uploads.Where(x => x.Download == _download.Id && !x.IsComplete))
+                    {
+                        <tr>
+                            <td>
+                                <i class="fas fa-file-upload"></i>
+                            </td>
+                            <td>
+                                @upload.Filename
+                            </td>
+                            <td>
+                                @switch (upload.Status)
+                                {
+                                    case UploadFileResult.InProgress:
+                                        <ProgressBar style="height: 20px;" Context="BootstrapContext.Primary" PercentageProgress="@upload.PercentageProgress">
+                                            Uploading @upload.PercentageProgress%
+                                        </ProgressBar>
+                                        break;
+                                    case UploadFileResult.Queued:
+                                        <ProgressBar style="height: 20px;" Context="BootstrapContext.Info" PercentageProgress="100">
+                                            Queued
+                                        </ProgressBar>
+                                        break;
+                                }
+                            </td>
+                        </tr>
+                    }
                 </tbody>
             </table>
         </Authorized>
