@@ -41,6 +41,9 @@ namespace BlazorUI.Pages.Downloads
             Context = AlertContext.Danger
         };
 
+        private const int _maxSize = 100 * 1024 * 1024; // 100MB
+        const int _bufferSize = 512 * 1024; // 500KB
+
         protected override async Task OnInitializedAsync()
         {
             _context = await authenticationStateProvider.GetAuthenticationStateAsync();
@@ -50,19 +53,14 @@ namespace BlazorUI.Pages.Downloads
             editDownloadState.Title = _download.Title;
             editDownloadState.Id = _download.Id;
 
-            uploadState.OnStateChanged += async () =>
+            uploadState.OnStateChanged += async () => await InvokeAsync(StateHasChanged);
+            uploadState.OnUploadComplete += async (fileUpload) =>
             {
-                List<string> files = uploadState.Uploads
-                    .Where(x =>
-                        x.Status == UploadFileResult.Success &&
-                        x.Download == _download.Id &&
-                        !_download.Files.Contains(x.Filename))
-                    .Select(x => x.Filename)
-                    .ToList();
-
-                _download.Files.AddRange(files);
-
-                await InvokeAsync(StateHasChanged);
+                if (fileUpload.Download == _download.Id == !_download.Files.Contains(fileUpload.Filename))
+                {
+                    _download.Files.Add(fileUpload.Filename);
+                    await InvokeAsync(StateHasChanged);
+                }
             };
         }
 
@@ -70,16 +68,24 @@ namespace BlazorUI.Pages.Downloads
         {
             if ((await authorizationService.AuthorizeAsync(_context.User, _download, Authorization.Policies.EditDownload)).Succeeded)
             {
-                Parallel.ForEach(files, async (file) =>
+                foreach (var file in files)
                 {
                     var fileInfo = await file.ReadFileInfoAsync();
+
+                    if (fileInfo.Size > _maxSize)
+                    {
+                        return;
+                    }
 
                     Progress<int> progress = new Progress<int>();
                     CancellationTokenSource cts = new CancellationTokenSource();
 
-                    var upload = new FileUpload(fileInfo.Name, _download.Id, UploadFile(file, fileInfo, progress, cts.Token), progress, cts);
-                    await uploadState.UploadFile(upload);
-                });
+                    var uploadTask = GetUploadTask(fileInfo.Name, progress, cts.Token);
+
+                    var upload = new FileUpload(fileInfo.Name, _download.Id, uploadTask, await file.OpenReadAsync(), progress, cts);
+
+                    uploadState.Enqueue(upload);
+                }
             }
             else
             {
@@ -89,28 +95,13 @@ namespace BlazorUI.Pages.Downloads
             }
         }
 
-        private async Task<UploadFileResult> UploadFile(IFileReference file, IFileInfo info, IProgress<int> progress, CancellationToken cancellationToken)
+        private Func<Stream, Task<UploadFileResult>> GetUploadTask(string filename, IProgress<int> progress, CancellationToken cancellationToken) 
         {
-            const int maxSize = 100 * 1024 * 1024; // 100MB
-            const int bufferSize = 512 * 1024; // 500KB
-
-            if (info.Size > maxSize)
-                return UploadFileResult.Failed; // TODO: more interactive logic
-
-            UploadFileResult result;
-
-            await using (var stream = await file.OpenReadAsync())
+            return (stream) => downloadProcessor.TryAddFile(new DataAccessLibrary.Models.DownloadFileModel
             {
-                result = await downloadProcessor.TryAddFile(new DataAccessLibrary.Models.DownloadFileModel
-                {
-                    DownloadId = _download.Id,
-                    Filename = info.Name
-                }, stream, bufferSize, progress, cancellationToken);
-            }
-
-            GC.Collect(); // TODO: remove asap
-
-            return result;
+                Filename = filename,
+                DownloadId = _download.Id
+            }, stream, _bufferSize, progress, cancellationToken);
         }
 
         private async Task DeleteFile_Click(string filename)

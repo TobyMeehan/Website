@@ -15,5 +15,6 @@ public enum UploadFileResult
     Success,
     Cancelled,
     Failed,
-    InProgress
+    InProgress,
+    Queued
 }

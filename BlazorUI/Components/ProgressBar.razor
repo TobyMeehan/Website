@@ -1,0 +1,22 @@
+﻿<div @attributes="AdditionalAttributes">
+    <div class="progress">
+        <div class="@($"progress-bar bg-{Context.ToString().ToLower()}")" role="progressbar"
+             style="@($"width: {PercentageProgress}%")"
+             aria-valuemin="0" aria-valuenow="@PercentageProgress" aria-valuemax="100">
+
+            @ChildContent
+
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter(CaptureUnmatchedValues = true)] public Dictionary<string, object> AdditionalAttributes { get; set; }
+
+    [Parameter] public RenderFragment ChildContent { get; set; }
+
+    [Parameter] public int PercentageProgress { get; set; }
+
+    [Parameter] public BootstrapContext Context { get; set; }
+
+}

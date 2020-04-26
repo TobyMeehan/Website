@@ -2195,7 +2195,7 @@
     searchPseudoElements: false,
     observeMutations: true,
     mutateApproach: 'async',
-    keepOriginalSource: true,
+    keepOriginalSource: false,
     measurePerformance: false,
     showMissingIcons: true
   };

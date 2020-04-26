@@ -1,0 +1,56 @@
+﻿@using BlazorUI.Components.Uploads
+
+<ul class="list-group list-group-flush text-left">
+    @foreach (var upload in Uploads)
+    {
+        <UploadListItem Upload="upload">
+            <Content>
+                @switch (upload.Status)
+                {
+                    case UploadFileResult.Success:
+                        <small>Upload Complete</small>
+                        break;
+                    case UploadFileResult.Cancelled:
+                        <small>Upload Cancelled</small>
+                        break;
+                    case UploadFileResult.Failed:
+                        <small>Upload Failed</small>
+                        break;
+                    case UploadFileResult.InProgress:
+                        <ProgressBar PercentageProgress="upload.PercentageProgress" Context="BootstrapContext.Dark" class="mt-2">
+                            @upload.PercentageProgress%
+                        </ProgressBar>
+                        break;
+                    case UploadFileResult.Queued:
+                        <small>Queued</small>
+                        break;
+                }
+            </Content>
+            <CloseButton>
+                @if (upload.IsComplete)
+                {
+                    <button type="button" class="close ml-auto" aria-label="Close" @onclick="() => DismissUpload(upload)">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                }
+                else
+                {
+                    <button type="button" class="btn btn-link btn-sm p-0 text-muted" @onclick="() => DismissUpload(upload)">
+                        Cancel
+                    </button>
+                }
+            </CloseButton>
+        </UploadListItem>
+    }
+</ul>
+
+@code {
+    [Parameter] public List<FileUpload> Uploads { get; set; }
+
+    [Parameter] public EventCallback<FileUpload> OnUploadDismiss { get; set; }
+
+    private async Task DismissUpload(FileUpload upload)
+    {
+        await OnUploadDismiss.InvokeAsync(upload);
+    }
+}
