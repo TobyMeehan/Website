@@ -29,14 +29,46 @@ namespace DataAccessLibrary.Storage
         public async Task<bool> Post(DownloadFileModel file, Stream stream, int bufferSize, IProgress<int> progress, CancellationToken cancellationToken)
         {
             string downloadHost = _configuration.GetSection("DownloadHost").Value;
-            string uri = $"{downloadHost}/upload/{file.DownloadId}";
+            string secret = _configuration.GetSection("UploadSecret").Value;
+
+            string uri = $"{downloadHost}/token";
+            bool result = false;
+
+            await _client.Post(uri, new
+            {
+                secret,
+                file.DownloadId,
+                file.Filename
+            })
+                .OnOK<dynamic>((response) =>
+                {
+                    string token = response.token;
+                    _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+                    result = true;
+                })
+                .OnBadRequest(() =>
+                {
+                    result = false;
+                })
+                .SendAsync();
+
+
+            if (!result) return result;
+
+            uri = $"{downloadHost}/upload/{file.DownloadId}";
 
             int totalFiles = (int)Math.Ceiling((decimal)stream.Length / (decimal)bufferSize);
             int processedFiles = 1;
             byte[] buffer = new byte[bufferSize];
-            
+
             while (stream.Position < stream.Length)
             {
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    _client.DefaultRequestHeaders.Clear();
+                    cancellationToken.ThrowIfCancellationRequested();
+                }
+
                 cancellationToken.ThrowIfCancellationRequested();
 
                 int length = Math.Min(bufferSize, (int)(stream.Length - stream.Position));
@@ -49,17 +81,20 @@ namespace DataAccessLibrary.Storage
                     {
                         content.Add(contents, "\"file\"", $"{file.Filename}.part.{processedFiles}");
 
-                        var response = await _client.PostAsync(uri, content);
+                        await _client.PostHttpContent(uri, content)
+                            .OnOK(() =>
+                            {
+                                int percentageProgress = (int)(((decimal)processedFiles / (decimal)totalFiles) * 100m);
+                                progress.Report(percentageProgress);
+                                result = true;
+                            })
+                            .OnBadRequest((statusCode) =>
+                            {
+                                result = false;
+                            })
+                            .SendAsync();
 
-                        if (response.IsSuccessStatusCode)
-                        {
-                            int percentageProgress = (int)(((decimal)processedFiles / (decimal)totalFiles) * 100m);
-                            progress.Report(percentageProgress);
-                        }
-                        else
-                        {
-                            return false;
-                        }
+                        if (!result) return result;
                     }
                 }
 

@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using DataAccessLibrary.Security;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -26,6 +29,25 @@ namespace DownloadHost
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllersWithViews();
+
+            var tokenProvider = new RsaJwtTokenProvider("downloads.tobymeehan.com", "File Upload", "Upload");
+            services.AddSingleton<ITokenProvider>(tokenProvider);
+
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
+            {
+                options.RequireHttpsMetadata = false;
+                options.TokenValidationParameters = tokenProvider.GetValidationParameters();
+            });
+
+            services.AddAuthorization(auth =>
+            {
+                auth.AddPolicy(JwtBearerDefaults.AuthenticationScheme, new AuthorizationPolicyBuilder()
+                    .AddAuthenticationSchemes(JwtBearerDefaults.AuthenticationScheme)
+                    .RequireAuthenticatedUser()
+                    .Build());
+
+                auth.DefaultPolicy = auth.GetPolicy(JwtBearerDefaults.AuthenticationScheme);
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

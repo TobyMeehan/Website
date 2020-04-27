@@ -3,7 +3,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Security.Claims;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -16,13 +19,16 @@ namespace DownloadHost.Controllers
 
         [HttpPost("/upload/{download}")]
         [RequestSizeLimit(MaxFileSize)]
-        public async Task<IActionResult> Upload(string download, IFormFile file)
+        [Authorize]
+        public async Task<IActionResult> Upload(IFormFile file)
         {
-            string path = Path.Combine(Directory.GetCurrentDirectory(), "Files", download);
+            string downloadId = User.Claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value;
+
+            string path = Path.Combine(Directory.GetCurrentDirectory(), "Files", downloadId);
             Directory.CreateDirectory(path);
 
             const int maxPartitions = MaxFileSize / BufferSize;
-            string filename = file.FileName;
+            string filename = User.Identity.Name;
 
             if (!Enumerable.Range(1, maxPartitions).Any(x => filename.EndsWith($".part.{x}")))
             {
@@ -37,7 +43,7 @@ namespace DownloadHost.Controllers
                 stream.Close();
             }
 
-            return Created($"/{download}/{file.FileName}", file.FileName);
+            return Created($"/{downloadId}/{file.FileName}", file.FileName);
         }
     }
 }

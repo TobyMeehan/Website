@@ -23,6 +23,7 @@ namespace BlazorUI
                 .ConfigureAppConfiguration((hostingContext, config) =>
                 {
                     config.AddJsonFile("connectionStrings.config");
+                    config.AddJsonFile("secrets.config");
                 })
                 .ConfigureWebHostDefaults(webBuilder =>
                 {

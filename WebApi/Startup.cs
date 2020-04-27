@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using DataAccessLibrary.Data;
 using DataAccessLibrary.DataAccess;
+using DataAccessLibrary.Security;
 using DataAccessLibrary.Storage;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -16,7 +17,6 @@ using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using WebApi.Jwt;
 using WebApi.Models;
 using WebApi.ResourceAuth;
 
@@ -39,8 +39,7 @@ namespace WebApi
                 options.InputFormatters.Add(new FormDataInputFormatter());
             });
 
-
-            var tokenProvider = new RsaJwtTokenProvider("issuer", "audience", "keyName");
+            var tokenProvider = new RsaJwtTokenProvider("api.tobymeehan.com", "OAuth Application", "OAuth");
             services.AddSingleton<ITokenProvider>(tokenProvider);
 
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
