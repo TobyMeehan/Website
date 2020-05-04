@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using DataAccessLibrary.Security;
+using DownloadHost.Data;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
@@ -48,6 +49,8 @@ namespace DownloadHost
 
                 auth.DefaultPolicy = auth.GetPolicy(JwtBearerDefaults.AuthenticationScheme);
             });
+
+            services.AddTransient<IFileManager, FileManager>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
