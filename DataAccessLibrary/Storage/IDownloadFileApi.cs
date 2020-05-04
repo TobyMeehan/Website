@@ -8,7 +8,9 @@ namespace DataAccessLibrary.Storage
 {
     public interface IDownloadFileApi
     {
+        int GetTotalFiles(int length, int bufferSize);
         Task Delete(string downloadid, string filename);
-        Task<bool> Post(DownloadFileModel file, Stream stream, int bufferSize, IProgress<int> progress, CancellationToken cancellationToken);
+        Task<UploadToken> PostToken(string downloadId, string filename, int partitions);
+        Task<bool> PostFile(UploadToken token, Stream stream, int bufferSize, IProgress<int> progress, CancellationToken cancellationToken);
     }
 }

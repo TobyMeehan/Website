@@ -26,38 +26,44 @@ namespace DataAccessLibrary.Storage
             _client = client;
         }
 
-        public async Task<bool> Post(DownloadFileModel file, Stream stream, int bufferSize, IProgress<int> progress, CancellationToken cancellationToken)
+        public int GetTotalFiles(int length, int bufferSize)
+        {
+            return (int)Math.Ceiling((decimal)length / (decimal)bufferSize);
+        }
+
+        public async Task<UploadToken> PostToken(string downloadId, string filename, int partitions)
         {
             string downloadHost = _configuration.GetSection("DownloadHost").Value;
             string secret = _configuration.GetSection("UploadSecret").Value;
 
             string uri = $"{downloadHost}/token";
-            bool result = false;
+            UploadToken token = null;
 
             await _client.Post(uri, new
             {
                 secret,
-                file.DownloadId,
-                file.Filename
+                downloadId,
+                filename,
+                partitions
             })
-                .OnOK<dynamic>((response) =>
+                .OnOK<UploadToken>((result) =>
                 {
-                    string token = response.token;
-                    _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-                    result = true;
-                })
-                .OnBadRequest(() =>
-                {
-                    result = false;
+                    token = result;
                 })
                 .SendAsync();
 
+            return token;
+        }
 
-            if (!result) return result;
+        public async Task<bool> PostFile(UploadToken token, Stream stream, int bufferSize, IProgress<int> progress, CancellationToken cancellationToken)
+        {
+            string downloadHost = _configuration.GetSection("DownloadHost").Value;
 
-            uri = $"{downloadHost}/upload/{file.DownloadId}";
+            _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token.Token);
 
-            int totalFiles = (int)Math.Ceiling((decimal)stream.Length / (decimal)bufferSize);
+            string uri = $"{downloadHost}/upload";
+
+            int totalFiles = GetTotalFiles((int)stream.Length, bufferSize);
             int processedFiles = 1;
             byte[] buffer = new byte[bufferSize];
 
@@ -79,7 +85,9 @@ namespace DataAccessLibrary.Storage
                 {
                     using (ByteArrayContent contents = new ByteArrayContent(buffer, 0, length))
                     {
-                        content.Add(contents, "\"file\"", $"{file.Filename}.part.{processedFiles}");
+                        content.Add(contents, "\"file\"", $"{token.RandomName}.part.{processedFiles}");
+
+                        bool result = false;
 
                         await _client.PostHttpContent(uri, content)
                             .OnOK(() =>
@@ -88,7 +96,7 @@ namespace DataAccessLibrary.Storage
                                 progress.Report(percentageProgress);
                                 result = true;
                             })
-                            .OnBadRequest((statusCode) =>
+                            .OnBadRequest(() =>
                             {
                                 result = false;
                             })
