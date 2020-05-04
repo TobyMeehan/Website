@@ -13,6 +13,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MvcUI", "MvcUI\MvcUI.csproj
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DownloadHost", "DownloadHost\DownloadHost.csproj", "{21E76ABC-94A9-4E7E-8358-1B15C327C725}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Data", "Data", "{C1466C44-1F52-4F63-9826-D97441EF5EDA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Database", "Data\Database\Database.csproj", "{C63E7247-2434-45E4-83BA-2DF4BCDFCD86}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,9 +43,16 @@ Global
 		{21E76ABC-94A9-4E7E-8358-1B15C327C725}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{21E76ABC-94A9-4E7E-8358-1B15C327C725}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{21E76ABC-94A9-4E7E-8358-1B15C327C725}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C63E7247-2434-45E4-83BA-2DF4BCDFCD86}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C63E7247-2434-45E4-83BA-2DF4BCDFCD86}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C63E7247-2434-45E4-83BA-2DF4BCDFCD86}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C63E7247-2434-45E4-83BA-2DF4BCDFCD86}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{C63E7247-2434-45E4-83BA-2DF4BCDFCD86} = {C1466C44-1F52-4F63-9826-D97441EF5EDA}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {2A768BA2-E72D-4194-82DF-4CFAE99941E6}
