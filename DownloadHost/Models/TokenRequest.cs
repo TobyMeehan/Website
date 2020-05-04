@@ -10,6 +10,7 @@ namespace DownloadHost.Models
         public string Secret { get; set; }
         public string DownloadId { get; set; }
         public string Filename { get; set; }
+        public int Partitions { get; set; }
 
     }
 }
