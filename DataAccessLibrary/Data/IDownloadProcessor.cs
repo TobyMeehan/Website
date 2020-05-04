@@ -10,9 +10,9 @@ namespace DataAccessLibrary.Data
     public interface IDownloadProcessor
     {
         Task<Download> CreateDownload(Download download);
-        Task<UploadFileResult> TryAddFile(DownloadFileModel file, Stream stream, int bufferSize, IProgress<int> progress, CancellationToken cancellationToken);
+        Task<UploadFileResult> TryAddFile(string downloadId, string filename, Stream stream, int bufferSize, IProgress<int> progress, CancellationToken cancellationToken);
         Task DeleteDownload(string downloadid);
-        Task DeleteFile(DownloadFileModel file);
+        Task DeleteFile(string downloadId, string id);
         Task<Download> GetDownloadById(string downloadid);
         Task<List<Download>> GetDownloads();
         Task<List<Download>> GetDownloadsByAuthor(string userid);
