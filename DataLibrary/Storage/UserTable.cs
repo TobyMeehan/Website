@@ -1,8 +1,12 @@
 ﻿using Dapper;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
+using System.Linq;
 using System.Linq.Expressions;
+using System.Net.NetworkInformation;
 using System.Text;
 using System.Threading.Tasks;
 using TobyMeehan.Com.Data.Models;
@@ -19,7 +23,7 @@ namespace TobyMeehan.Com.Data.Storage
             _connection = connection;
         }
 
-        private string SelectWithJoin()
+        private string GetSelectQuery()
         {
             return $"SELECT u.*, r.Name, t.Sender, t.Description, t.Amount " +
                 $"FROM `users` u " +
@@ -31,14 +35,45 @@ namespace TobyMeehan.Com.Data.Storage
                     $"ON t.`UserId` = u.`Id`";
         }
 
-        private string SelectWithJoin(Expression<Predicate<User>> expression, out object parameters)
+        private string GetSelectQuery(Expression<Predicate<User>> expression, out object parameters)
         {
-            return $"{SelectWithJoin()}{new SqlQuery("users").Where(expression).AsSql(out parameters)}";
+            return $"{GetSelectQuery()}{new SqlQuery("users").Where(expression).AsSql(out parameters)}";
+        }
+
+        private User Map(User user, Role role, Transaction transaction)
+        {
+            user.Roles = user.Roles ?? new List<Role>();
+            user.Transactions = user.Transactions ?? new List<Transaction>();
+
+            user.Roles.Add(role);
+            user.Transactions.Add(transaction);
+
+            return user;
+        }
+
+        private IEnumerable<User> Query()
+        {
+            return _connection.Query<User, Role, Transaction, User>(GetSelectQuery(), Map);
+        }
+
+        private Task<IEnumerable<User>> QueryAsync()
+        {
+            return _connection.QueryAsync<User, Role, Transaction, User>(GetSelectQuery(), Map);
+        }
+
+        private IEnumerable<User> Query(Expression<Predicate<User>> expression)
+        {
+            return _connection.Query<User, Role, Transaction, User>(GetSelectQuery(expression, out object parameters), Map, parameters);
+        }
+
+        private Task<IEnumerable<User>> QueryAsync(Expression<Predicate<User>> expression)
+        {
+            return _connection.QueryAsync<User, Role, Transaction, User>(GetSelectQuery(expression, out object parameters), Map, parameters);
         }
 
         public override IEnumerable<User> Select()
         {
-            return _connection.Query<User>(SelectWithJoin());
+            return Query();
         }
         public override IEnumerable<User> Select(params string[] columns)
         {
@@ -48,7 +83,7 @@ namespace TobyMeehan.Com.Data.Storage
 
         public override Task<IEnumerable<User>> SelectAsync()
         {
-            return _connection.QueryAsync<User>(SelectWithJoin());
+            return QueryAsync();
         }
         public override Task<IEnumerable<User>> SelectAsync(params string[] columns)
         {
@@ -58,7 +93,7 @@ namespace TobyMeehan.Com.Data.Storage
 
         public override IEnumerable<User> SelectBy(Expression<Predicate<User>> expression)
         {
-            return _connection.Query<User>(SelectWithJoin(expression, out object parameters), parameters);
+            return Query(expression);
         }
         public override IEnumerable<User> SelectBy(Expression<Predicate<User>> expression, params string[] columns)
         {
@@ -68,7 +103,7 @@ namespace TobyMeehan.Com.Data.Storage
 
         public override Task<IEnumerable<User>> SelectByAsync(Expression<Predicate<User>> expression)
         {
-            return _connection.QueryAsync<User>(SelectWithJoin(expression, out object parameters), parameters);
+            return QueryAsync(expression);
         }
         public override Task<IEnumerable<User>> SelectByAsync(Expression<Predicate<User>> expression, params string[] columns)
         {
