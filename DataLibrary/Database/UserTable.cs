@@ -13,20 +13,20 @@ using TobyMeehan.Com.Data.Models;
 using TobyMeehan.Sql;
 using TobyMeehan.Sql.QueryBuilder;
 
-namespace TobyMeehan.Com.Data.Storage
+namespace TobyMeehan.Com.Data.Database
 {
     public class UserTable : SqlTable<User>
     {
         private readonly IDbConnection _connection;
 
-        public UserTable(IDbConnection connection, IDbNameResolver nameResolver) : base(connection, nameResolver) {
+        public UserTable(IDbConnection connection, IDbNameResolver nameResolver) : base(connection, nameResolver)
+        {
             _connection = connection;
         }
 
-        private string GetSelectQuery()
+        internal static string GetJoinQuery()
         {
-            return $"SELECT u.*, r.Name, t.Sender, t.Description, t.Amount " +
-                $"FROM `users` u " +
+            return 
                 $"LEFT JOIN `userroles` ur " +
                     $"ON ur.`UserId` = u.`Id` " +
                 $"LEFT JOIN `roles` r " +
@@ -35,12 +35,20 @@ namespace TobyMeehan.Com.Data.Storage
                     $"ON t.`UserId` = u.`Id`";
         }
 
+        private string GetSelectQuery()
+        {
+            return 
+                $"SELECT u.*, r.Name, t.Sender, t.Description, t.Amount " +
+                $"FROM `users` u " +
+                GetJoinQuery();
+        }
+
         private string GetSelectQuery(Expression<Predicate<User>> expression, out object parameters)
         {
             return $"{GetSelectQuery()}{new SqlQuery("users").Where(expression).AsSql(out parameters)}";
         }
 
-        private User Map(User user, Role role, Transaction transaction)
+        internal static User Map(User user, Role role, Transaction transaction)
         {
             user.Roles = user.Roles ?? new List<Role>();
             user.Transactions = user.Transactions ?? new List<Transaction>();
@@ -70,6 +78,7 @@ namespace TobyMeehan.Com.Data.Storage
         {
             return _connection.QueryAsync<User, Role, Transaction, User>(GetSelectQuery(expression, out object parameters), Map, parameters);
         }
+
 
         public override IEnumerable<User> Select()
         {
