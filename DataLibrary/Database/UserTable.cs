@@ -35,10 +35,16 @@ namespace TobyMeehan.Com.Data.Database
                     $"ON {transaction}.`UserId` = {user}.`Id`";
         }
 
+        internal static string GetColumns(string user, string role, string transaction)
+        {
+            return
+                $"{user}.Username, {user}.Email, {user}.Balance, {role}.Name, {transaction}.Sender, {transaction}.Description, {transaction}.Amount";
+        }
+
         private string GetSelectQuery()
         {
             return 
-                $"SELECT u.*, r.Name, t.Sender, t.Description, t.Amount " +
+                $"SELECT {GetColumns("u", "r", "t")} " +
                 $"FROM `users` u " +
                 GetJoinQuery("u", "r", "t");
         }

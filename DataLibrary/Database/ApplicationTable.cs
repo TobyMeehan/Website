@@ -28,10 +28,16 @@ namespace TobyMeehan.Com.Data.Database
                 UserTable.GetJoinQuery(user, role, transaction);
         }
 
+        internal static string GetColumns(string app)
+        {
+            return
+                $"{app}.Name, {app}.UserId, {app}.RedirectUri, {app}.Secret, {app}.Role";
+        }
+
         private string GetSelectQuery()
         {
             return
-                "SELECT a.*, u.Username, u.Email, u.Balance, r.Name, t.Sender, t.Description, t.Amount " +
+                $"SELECT {GetColumns("a")}, {UserTable.GetColumns("u", "r", "t")} " +
                 "FROM `applications` a " +
                 GetJoinQuery("a", "u", "r", "t");
         }
@@ -41,7 +47,7 @@ namespace TobyMeehan.Com.Data.Database
             return $"{GetSelectQuery()}{new SqlQuery("users").Where(expression).AsSql(out parameters)}";
         }
 
-        private Application Map(Application app, User user, Role role, Transaction transaction)
+        internal static Application Map(Application app, User user, Role role, Transaction transaction)
         {
             app.Author = app.Author ?? user;
 
