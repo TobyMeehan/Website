@@ -24,15 +24,15 @@ namespace TobyMeehan.Com.Data.Database
             _connection = connection;
         }
 
-        internal static string GetJoinQuery()
+        internal static string GetJoinQuery(string user, string role, string transaction)
         {
             return 
-                $"LEFT JOIN `userroles` ur " +
-                    $"ON ur.`UserId` = u.`Id` " +
-                $"LEFT JOIN `roles` r " +
-                    $"ON ur.`RoleId` = r.`Id` " +
-                $"LEFT JOIN `transactions` t" +
-                    $"ON t.`UserId` = u.`Id`";
+                $"LEFT JOIN `userroles` {user}{role} " +
+                    $"ON {user}{role}.`UserId` = {user}.`Id` " +
+                $"LEFT JOIN `roles` {role} " +
+                    $"ON {user}{role}.`RoleId` = {role}.`Id` " +
+                $"LEFT JOIN `transactions` {transaction}" +
+                    $"ON {transaction}.`UserId` = {user}.`Id`";
         }
 
         private string GetSelectQuery()
@@ -40,7 +40,7 @@ namespace TobyMeehan.Com.Data.Database
             return 
                 $"SELECT u.*, r.Name, t.Sender, t.Description, t.Amount " +
                 $"FROM `users` u " +
-                GetJoinQuery();
+                GetJoinQuery("u", "r", "t");
         }
 
         private string GetSelectQuery(Expression<Predicate<User>> expression, out object parameters)

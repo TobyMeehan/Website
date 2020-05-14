@@ -20,14 +20,20 @@ namespace TobyMeehan.Com.Data.Database
             _connection = connection;
         }
 
+        internal static string GetJoinQuery(string app, string user, string role, string transaction)
+        {
+            return
+                $"INNER JOIN `users` {user} " +
+                    $"ON {user}.`Id` = {app}.`UserId`" +
+                UserTable.GetJoinQuery(user, role, transaction);
+        }
+
         private string GetSelectQuery()
         {
-            return 
-                $"SELECT a.*, u.Username, u.Email, u.Balance, r.Name, t.Sender, t.Description, t.Amount " +
-                $"FROM `applications` a " +
-                $"INNER JOIN `users` u " +
-                    $"ON u.`Id` = a.`UserId`" +
-                UserTable.GetJoinQuery();
+            return
+                "SELECT a.*, u.Username, u.Email, u.Balance, r.Name, t.Sender, t.Description, t.Amount " +
+                "FROM `applications` a " +
+                GetJoinQuery("a", "u", "r", "t");
         }
 
         private string GetSelectQuery(Expression<Predicate<Application>> expression, out object parameters)
