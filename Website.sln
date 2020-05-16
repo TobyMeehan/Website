@@ -13,7 +13,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MvcUI", "MvcUI\MvcUI.csproj
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DownloadHost", "DownloadHost\DownloadHost.csproj", "{21E76ABC-94A9-4E7E-8358-1B15C327C725}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataLibrary", "DataLibrary\DataLibrary.csproj", "{DFA446E5-7636-46E3-8A66-CE870104488D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataLibrary", "DataLibrary\DataLibrary.csproj", "{DFA446E5-7636-46E3-8A66-CE870104488D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TobyMeehan.Com", "TobyMeehan.Com\TobyMeehan.Com.csproj", "{C1953EF6-31AD-4D82-B26A-EAB7783E2485}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -45,6 +47,10 @@ Global
 		{DFA446E5-7636-46E3-8A66-CE870104488D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DFA446E5-7636-46E3-8A66-CE870104488D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DFA446E5-7636-46E3-8A66-CE870104488D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C1953EF6-31AD-4D82-B26A-EAB7783E2485}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C1953EF6-31AD-4D82-B26A-EAB7783E2485}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C1953EF6-31AD-4D82-B26A-EAB7783E2485}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C1953EF6-31AD-4D82-B26A-EAB7783E2485}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
