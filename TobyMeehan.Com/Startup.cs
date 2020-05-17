@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using TobyMeehan.Com.Authorization;
 using TobyMeehan.Com.Data;
 using TobyMeehan.Com.Data.Database;
 using TobyMeehan.Com.Data.Models;
@@ -40,6 +41,11 @@ namespace TobyMeehan.Com
             services.AddServerSideBlazor();
 
             services.AddControllersWithViews();
+
+            services.AddAuthorization(options =>
+            {
+                options.AddAuthorizationPolicies();
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
