@@ -8,6 +8,10 @@ using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using TobyMeehan.Com.Data;
+using TobyMeehan.Com.Data.Database;
+using TobyMeehan.Com.Data.Models;
+using TobyMeehan.Sql;
 
 namespace TobyMeehan.Com
 {
@@ -23,6 +27,14 @@ namespace TobyMeehan.Com
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddTransient<ISqlTable<User>, UserTable>();
+            services.AddTransient<ISqlTable<Application>, ApplicationTable>();
+            services.AddTransient<ISqlTable<Connection>, ConnectionTable>();
+            services.AddTransient<ISqlTable<Download>, DownloadTable>();
+            services.AddTransient(typeof(ISqlTable<>), typeof(SqlTable<>));
+
+            services.AddTransient(typeof(IRepository<>), typeof(SqlRepository<>));
+
             services.AddRazorPages();
 
             services.AddServerSideBlazor();
