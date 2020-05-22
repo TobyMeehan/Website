@@ -38,7 +38,7 @@ namespace TobyMeehan.Com.Data.Database
         internal static string GetColumns(string user, string role, string transaction)
         {
             return
-                $"{user}.Username, {user}.Email, {user}.Balance, {role}.Name, {transaction}.Sender, {transaction}.Description, {transaction}.Amount";
+                $"{user}.Username, {user}.Email, {user}.Balance, {user}.HashedPassword {role}.Name, {transaction}.Sender, {transaction}.Description, {transaction}.Amount";
         }
 
         private string GetSelectQuery()

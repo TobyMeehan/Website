@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -10,6 +11,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using TobyMeehan.Com.Authorization;
 using TobyMeehan.Com.Data;
+using TobyMeehan.Com.Data.Authentication;
 using TobyMeehan.Com.Data.Database;
 using TobyMeehan.Com.Data.Models;
 using TobyMeehan.Sql;
@@ -35,12 +37,23 @@ namespace TobyMeehan.Com
             services.AddTransient(typeof(ISqlTable<>), typeof(SqlTable<>));
 
             services.AddTransient(typeof(IRepository<>), typeof(SqlRepository<>));
+            services.AddTransient<IAuthentication<User>, UserAuthentication>();
 
             services.AddRazorPages();
 
             services.AddServerSideBlazor();
 
             services.AddControllersWithViews();
+
+            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+                .AddCookie(options =>
+                {
+                    options.LoginPath = "/login";
+                    options.AccessDeniedPath = ""; // TODO:
+
+                    options.ExpireTimeSpan = DateTimeOffset.UtcNow.AddMonths(6).Subtract(DateTimeOffset.UtcNow);
+                    options.SlidingExpiration = true;
+                });
 
             services.AddAuthorization(options =>
             {
