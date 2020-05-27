@@ -13,14 +13,12 @@ namespace TobyMeehan.Com.Data
 
         Task<IEnumerable<T>> GetByAsync(Expression<Predicate<T>> expression);
 
-        Task<T> GetByIdAsync(string id);
+        Task<T> GetBySingleAsync(Expression<Predicate<T>> expression);
 
         Task AddAsync(object value);
 
-        Task UpdateAsync(T value);
+        Task UpdateByAsync(Expression<Predicate<T>> expression, T value);
 
-        Task RemoveAsync(Expression<Predicate<T>> expression);
-
-        Task RemoveByIdAsync(string id);
+        Task RemoveByAsync(Expression<Predicate<T>> expression);
     }
 }

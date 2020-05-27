@@ -9,7 +9,7 @@ using TobyMeehan.Sql;
 
 namespace TobyMeehan.Com.Data
 {
-    public class SqlRepository<T> : IRepository<T> where T : IEntity
+    public class SqlRepository<T> : IRepository<T>
     {
         private readonly ISqlTable<T> _table;
 
@@ -33,24 +33,19 @@ namespace TobyMeehan.Com.Data
             return _table.SelectByAsync(expression);
         }
 
-        public virtual async Task<T> GetByIdAsync(string id)
+        public async Task<T> GetBySingleAsync(Expression<Predicate<T>> expression)
         {
-            return (await _table.SelectByAsync(x => x.Id == id)).Single();
+            return (await GetByAsync(expression)).Single();
         }
 
-        public virtual Task RemoveAsync(Expression<Predicate<T>> expression)
+        public virtual Task RemoveByAsync(Expression<Predicate<T>> expression)
         {
             return _table.DeleteAsync(expression);
         }
 
-        public virtual Task RemoveByIdAsync(string id)
+        public Task UpdateByAsync(Expression<Predicate<T>> expression, T value)
         {
-            return _table.DeleteAsync(x => x.Id == id);
-        }
-
-        public virtual Task UpdateAsync(T value)
-        {
-            return _table.UpdateAsync(x => x.Id == value.Id, value);
+            return _table.UpdateAsync(expression, value);
         }
     }
 }

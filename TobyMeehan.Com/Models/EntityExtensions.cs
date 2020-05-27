@@ -8,7 +8,7 @@ using TobyMeehan.Com.Data.Models;
 
 namespace TobyMeehan.Com.Models
 {
-    public static class EntityBaseExtensions
+    public static class EntityExtensions
     {
         public static T As<T>(this IEntity entity, IMapper mapper)
         {
