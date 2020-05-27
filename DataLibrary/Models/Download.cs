@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using TobyMeehan.Sql.QueryBuilder;
 
 namespace TobyMeehan.Com.Data.Models
 {
-    public class Download : EntityBase
+    [SqlName("downloads")]
+    public class Download : IEntity
     {
+        public string Id { get; set; }
         public string CreatorId { get; set; }
         public User Creator => Authors.Find(user => user.Id == CreatorId);
         public string Title { get; set; }

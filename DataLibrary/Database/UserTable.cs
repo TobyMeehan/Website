@@ -9,6 +9,7 @@ using System.Linq.Expressions;
 using System.Net.NetworkInformation;
 using System.Text;
 using System.Threading.Tasks;
+using TobyMeehan.Com.Data.Extensions;
 using TobyMeehan.Com.Data.Models;
 using TobyMeehan.Sql;
 using TobyMeehan.Sql.QueryBuilder;
@@ -19,39 +20,22 @@ namespace TobyMeehan.Com.Data.Database
     {
         private readonly IDbConnection _connection;
 
-        public UserTable(IDbConnection connection, IDbNameResolver nameResolver) : base(connection, nameResolver)
+        public UserTable(IDbConnection connection) : base(connection)
         {
             _connection = connection;
         }
 
-        internal static string GetJoinQuery(string user, string role, string transaction)
+        private SqlQuery<User> GetSelectQuery()
         {
-            return 
-                $"LEFT JOIN `userroles` {user}{role} " +
-                    $"ON {user}{role}.`UserId` = {user}.`Id` " +
-                $"LEFT JOIN `roles` {role} " +
-                    $"ON {user}{role}.`RoleId` = {role}.`Id` " +
-                $"LEFT JOIN `transactions` {transaction}" +
-                    $"ON {transaction}.`UserId` = {user}.`Id`";
+            return new SqlQuery<User>()
+                .Select()
+                .JoinUsers();
         }
 
-        internal static string GetColumns(string user, string role, string transaction)
+        private SqlQuery<User> GetSelectQuery(Expression<Predicate<User>> expression)
         {
-            return
-                $"{user}.Username, {user}.Email, {user}.Balance, {user}.HashedPassword {role}.Name, {transaction}.Sender, {transaction}.Description, {transaction}.Amount";
-        }
-
-        private string GetSelectQuery()
-        {
-            return 
-                $"SELECT {GetColumns("u", "r", "t")} " +
-                $"FROM `users` u " +
-                GetJoinQuery("u", "r", "t");
-        }
-
-        private string GetSelectQuery(Expression<Predicate<User>> expression, out object parameters)
-        {
-            return $"{GetSelectQuery()}{new SqlQuery("users").Where(expression).AsSql(out parameters)}";
+            return GetSelectQuery()
+                .Where(expression);
         }
 
         internal static User Map(User user, Role role, Transaction transaction)
@@ -67,22 +51,22 @@ namespace TobyMeehan.Com.Data.Database
 
         private IEnumerable<User> Query()
         {
-            return _connection.Query<User, Role, Transaction, User>(GetSelectQuery(), Map);
+            return _connection.Query<User, Role, Transaction, User>(GetSelectQuery().AsSql(), Map);
         }
 
         private Task<IEnumerable<User>> QueryAsync()
         {
-            return _connection.QueryAsync<User, Role, Transaction, User>(GetSelectQuery(), Map);
+            return _connection.QueryAsync<User, Role, Transaction, User>(GetSelectQuery().AsSql(), Map);
         }
 
         private IEnumerable<User> Query(Expression<Predicate<User>> expression)
         {
-            return _connection.Query<User, Role, Transaction, User>(GetSelectQuery(expression, out object parameters), Map, parameters);
+            return _connection.Query<User, Role, Transaction, User>(GetSelectQuery(expression).AsSql(out object parameters), Map, parameters);
         }
 
         private Task<IEnumerable<User>> QueryAsync(Expression<Predicate<User>> expression)
         {
-            return _connection.QueryAsync<User, Role, Transaction, User>(GetSelectQuery(expression, out object parameters), Map, parameters);
+            return _connection.QueryAsync<User, Role, Transaction, User>(GetSelectQuery(expression).AsSql(out object parameters), Map, parameters);
         }
 
 

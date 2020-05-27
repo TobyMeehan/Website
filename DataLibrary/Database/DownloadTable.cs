@@ -5,6 +5,7 @@ using System.Data;
 using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
+using TobyMeehan.Com.Data.Extensions;
 using TobyMeehan.Com.Data.Models;
 using TobyMeehan.Sql;
 using TobyMeehan.Sql.QueryBuilder;
@@ -15,34 +16,22 @@ namespace TobyMeehan.Com.Data.Database
     {
         private readonly IDbConnection _connection;
 
-        public DownloadTable(IDbConnection connection, IDbNameResolver nameResolver) : base(connection, nameResolver)
+        public DownloadTable(IDbConnection connection) : base(connection)
         {
             _connection = connection;
         }
 
-        internal static string GetJoinQuery(string download, string file, string user, string role, string transaction)
+        private SqlQuery<Download> GetSelectQuery()
         {
-            return
-                $"INNER JOIN `downloadauthors` {download}{user} " +
-                    $"ON {download}{user}.`DownloadId` = {download}.`Id` " +
-                    $"INNER JOIN `users` {user} " +
-                        $"ON {user}.`Id` = {download}{user}.`UserId` " +
-                        UserTable.GetJoinQuery(user, role, transaction) +
-                $"LEFT JOIN `downloadfiles` {file} " +
-                    $"ON {file}.`DownloadId` = {download}.`Id` ";
+            return new SqlQuery<Download>()
+                .Select()
+                .JoinDownloads();
         }
 
-        private string GetSelectQuery()
+        private SqlQuery<Download> GetSelectQuery(Expression<Predicate<Download>> expression)
         {
-            return
-                $"SELECT d.*, {UserTable.GetColumns("u", "r", "t")} " +
-                $"FROM `downloads` d " +
-                GetJoinQuery("d", "f", "u", "r", "t");
-        }
-
-        private string GetSelectQuery(Expression<Predicate<Download>> expression, out object parameters)
-        {
-            return $"{GetSelectQuery()}{new SqlQuery("downloads").Where(expression).AsSql(out parameters)}";
+            return GetSelectQuery()
+                .Where(expression);
         }
 
         private Download Map(Download download, User user, Role role, Transaction transaction, DownloadFile file)
@@ -57,16 +46,16 @@ namespace TobyMeehan.Com.Data.Database
         }
 
         private IEnumerable<Download> Query() =>
-            _connection.Query<Download, User, Role, Transaction, DownloadFile, Download>(GetSelectQuery(), Map);
+            _connection.Query<Download, User, Role, Transaction, DownloadFile, Download>(GetSelectQuery().AsSql(), Map);
 
         private IEnumerable<Download> Query(Expression<Predicate<Download>> expression) =>
-            _connection.Query<Download, User, Role, Transaction, DownloadFile, Download>(GetSelectQuery(expression, out object parameters), Map, parameters);
+            _connection.Query<Download, User, Role, Transaction, DownloadFile, Download>(GetSelectQuery(expression).AsSql(out object parameters), Map, parameters);
 
         private Task<IEnumerable<Download>> QueryAsync() =>
-            _connection.QueryAsync<Download, User, Role, Transaction, DownloadFile, Download>(GetSelectQuery(), Map);
+            _connection.QueryAsync<Download, User, Role, Transaction, DownloadFile, Download>(GetSelectQuery().AsSql(), Map);
 
         private Task<IEnumerable<Download>> QueryAsync(Expression<Predicate<Download>> expression) =>
-            _connection.QueryAsync<Download, User, Role, Transaction, DownloadFile, Download>(GetSelectQuery(expression, out object parameters), Map, parameters);
+            _connection.QueryAsync<Download, User, Role, Transaction, DownloadFile, Download>(GetSelectQuery(expression).AsSql(out object parameters), Map, parameters);
 
         public override IEnumerable<Download> Select()
         {

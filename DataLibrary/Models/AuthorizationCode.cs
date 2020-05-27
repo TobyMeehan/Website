@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using TobyMeehan.Sql.QueryBuilder;
 
 namespace TobyMeehan.Com.Data.Models
 {
-    public class AuthorizationCode : EntityBase
+    [SqlName("authorizationcodes")]
+    public class AuthorizationCode : IEntity
     {
+        public string Id { get; set; }
         public string ConnectionId { get; set; }
         public Connection Connection { get; set; }
         public string Code { get; set; }

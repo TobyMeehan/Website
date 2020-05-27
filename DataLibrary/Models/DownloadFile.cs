@@ -1,7 +1,11 @@
-﻿namespace TobyMeehan.Com.Data.Models
+﻿using TobyMeehan.Sql.QueryBuilder;
+
+namespace TobyMeehan.Com.Data.Models
 {
-    public class DownloadFile : EntityBase
+    [SqlName("downloadfiles")]
+    public class DownloadFile : IEntity
     {
+        public string Id { get; set; }
         public string DownloadId { get; set; }
         public string Filename { get; set; }
         public string RandomName { get; set; }

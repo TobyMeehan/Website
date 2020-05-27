@@ -9,7 +9,7 @@ using TobyMeehan.Sql;
 
 namespace TobyMeehan.Com.Data
 {
-    public class SqlRepository<T> : IRepository<T> where T : EntityBase
+    public class SqlRepository<T> : IRepository<T> where T : IEntity
     {
         private readonly ISqlTable<T> _table;
 

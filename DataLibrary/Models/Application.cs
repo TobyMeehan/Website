@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using TobyMeehan.Sql.QueryBuilder;
 
 namespace TobyMeehan.Com.Data.Models
 {
-    public class Application : EntityBase
+    [SqlName("applications")]
+    public class Application : IEntity
     {
+        public string Id { get; set; }
         public string UserId { get; set; }
         public User Author { get; set; }
         public string Name { get; set; }

@@ -5,8 +5,8 @@ using System.Threading.Tasks;
 
 namespace TobyMeehan.Com.Data.Models
 {
-    public abstract class EntityBase
+    public interface IEntity
     {
-        public string Id { get; set; }
+        string Id { get; set; }
     }
 }
