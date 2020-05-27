@@ -10,12 +10,12 @@ namespace TobyMeehan.Com.Models
 {
     public static class EntityBaseExtensions
     {
-        public static T As<T>(this EntityBase entity, IMapper mapper)
+        public static T As<T>(this IEntity entity, IMapper mapper)
         {
             return mapper.Map<T>(entity);
         }
 
-        public static Task<T> AsAsync<T>(this EntityBase entity, IMapper mapper)
+        public static Task<T> AsAsync<T>(this IEntity entity, IMapper mapper)
         {
             return Task.Run(() => mapper.Map<T>(entity));
         }

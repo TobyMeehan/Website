@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -9,6 +10,7 @@ using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using MySql.Data.MySqlClient;
 using TobyMeehan.Com.Authorization;
 using TobyMeehan.Com.Data;
 using TobyMeehan.Com.Data.Authentication;
@@ -30,6 +32,8 @@ namespace TobyMeehan.Com
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddTransient<IDbConnection>(serviceProvider => new MySqlConnection(Configuration.GetConnectionString("Default")));
+
             services.AddTransient<ISqlTable<User>, UserTable>();
             services.AddTransient<ISqlTable<Application>, ApplicationTable>();
             services.AddTransient<ISqlTable<Connection>, ConnectionTable>();
