@@ -14,7 +14,7 @@ using MySql.Data.MySqlClient;
 using TobyMeehan.Com.Authorization;
 using TobyMeehan.Com.Data;
 using TobyMeehan.Com.Data.Authentication;
-using TobyMeehan.Com.Data.Database;
+using TobyMeehan.Com.Data.Sql;
 using TobyMeehan.Com.Data.Models;
 using TobyMeehan.Sql;
 
