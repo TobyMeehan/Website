@@ -1,0 +1,29 @@
+﻿@inherits AttributableComponentBase
+
+<a href="@_href" class="@CssClass" @attributes="@AdditionalAttributes">
+    @Username
+</a>
+
+<a tabindex="0" class="@CssClass" role="button" data-toggle="popover" data-trigger="focus"
+   title="@Username" data-content="">
+    @Username
+</a>
+
+@code {
+    [Parameter] public User User { get; set; }
+
+    private string _href;
+    private string _roleIcon;
+
+    protected override void OnInitialized()
+    {
+        _href = AdditionalAttributes["href"].ToString() ?? $"/users/{User.Username}";
+    }
+
+    private RenderFragment Content =>
+        @<div>
+            @Username
+    </div>;
+
+    private RenderFragment Username => @<Username User="@User"></Username>;
+}
