@@ -16,22 +16,27 @@ namespace TobyMeehan.Com.Components.Accounts
     {
         [Inject] private IAuthentication<User> authentication { get; set; }
         [Inject] private IRepository<User> users { get; set; }
-        [Inject] private NavigationManager navigation { get; set; }
 
-        [Parameter] public User User { get; set; }
+        [CascadingParameter] public Task<User> UserTask { get; set; }
 
-        private ChangePasswordViewModel _model;
+        private ChangePasswordViewModel _model = new ChangePasswordViewModel();
+        private User _user;
 
         private ServerSideValidator _serverSideValidator;
 
+        protected override async Task OnInitializedAsync()
+        {
+            _user = await UserTask;
+        }
+
         private async Task Form_ValidSubmit()
         {
-            if (!(await authentication.CheckPasswordAsync(User.Username, _model.CurrentPassword)).Success)
+            if (!(await authentication.CheckPasswordAsync(_user.Username, _model.CurrentPassword)).Success)
             {
                 _serverSideValidator.Error(nameof(_model.CurrentPassword), "Incorrect current password.");
             }
 
-            await users.UpdatePasswordAsync(User, _model.NewPassword);
+            await users.UpdatePasswordAsync(_user, _model.NewPassword);
         }
     }
 }

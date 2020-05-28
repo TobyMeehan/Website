@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using TobyMeehan.Com.Data;
 using TobyMeehan.Com.Data.Extensions;
 using TobyMeehan.Com.Data.Models;
+using TobyMeehan.Com.Extensions;
 using TobyMeehan.Com.Models;
 
 namespace TobyMeehan.Com.Components.Accounts
@@ -13,17 +14,19 @@ namespace TobyMeehan.Com.Components.Accounts
     public partial class ChangeUsernameForm : ComponentBase
     {
         [Inject] private IRepository<User> users { get; set; }
+        [Inject] private NavigationManager navigation { get; set; }
 
-        [Parameter] public string Username { get; set; }
-        [Parameter] public EventCallback<string> OnValidSubmit { get; set; }
+        [CascadingParameter] public Task<User> UserTask { get; set; }
 
+        private User _user;
         private UsernameViewModel _model = new UsernameViewModel();
 
         private ServerSideValidator _serverSideValidator;
 
-        protected override void OnInitialized()
+        protected override async Task OnInitializedAsync()
         {
-            _model.Username = Username;
+            _user = await UserTask;
+            _model.Username = _user.Username;
         }
 
         private async Task Form_ValidSubmit()
@@ -35,7 +38,9 @@ namespace TobyMeehan.Com.Components.Accounts
                 return;
             }
 
-            await OnValidSubmit.InvokeAsync(_model.Username);
+            await users.UpdateUsernameAsync(_user, _model.Username);
+
+            navigation.NavigateToRefresh();
         }
     }
 }

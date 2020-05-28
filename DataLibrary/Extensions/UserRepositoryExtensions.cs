@@ -26,5 +26,10 @@ namespace TobyMeehan.Com.Data.Extensions
 
             return users.UpdateByIdAsync(user.Id, user);
         }
+
+        public static Task UpdateUsernameAsync(this IRepository<User> users, User user, string username)
+        {
+            return users.UpdateByIdAsync(user.Id, new { Username = username });
+        }
     }
 }
