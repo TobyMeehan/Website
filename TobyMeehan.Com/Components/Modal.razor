@@ -1,0 +1,20 @@
+﻿@inherits AttributableComponentBase
+
+<div class="modal fade @CssClass" @attributes="AdditionalAttributes">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">@Title</h4>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                @Body
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter] public RenderFragment Title { get; set; }
+    [Parameter] public RenderFragment Body { get; set; }
+}
