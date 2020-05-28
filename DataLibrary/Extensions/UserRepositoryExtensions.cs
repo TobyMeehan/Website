@@ -12,14 +12,19 @@ namespace TobyMeehan.Com.Data.Extensions
     {
         public static Task AddAsync(this IRepository<User> users, string username, string password, int balance = 500)
         {
-            string hashed = BCrypt.HashPassword(password, BCrypt.GenerateSalt());
-
             return users.AddAsync(new
             {
                 Username = username,
-                HashedPassword = hashed,
+                HashedPassword = new Password(password),
                 Balance = balance
             });
+        }
+
+        public static Task UpdatePasswordAsync(this IRepository<User> users, User user, string password)
+        {
+            user.HashedPassword = new Password(password);
+
+            return users.UpdateByAsync(u => u.Id == user.Id, user);
         }
     }
 }
