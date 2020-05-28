@@ -24,7 +24,7 @@ namespace TobyMeehan.Com.Data.Extensions
         {
             user.HashedPassword = new Password(password);
 
-            return users.UpdateByAsync(u => u.Id == user.Id, user);
+            return users.UpdateByIdAsync(user.Id, user);
         }
     }
 }

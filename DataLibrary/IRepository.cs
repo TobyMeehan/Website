@@ -19,8 +19,11 @@ namespace TobyMeehan.Com.Data
 
         Task AddAsync(object value);
 
-        Task UpdateByAsync(Expression<Predicate<T>> expression, T value);
+        Task UpdateByAsync(Expression<Predicate<T>> expression, object value);
+
+        Task UpdateByIdAsync(string id, object value);
 
         Task RemoveByAsync(Expression<Predicate<T>> expression);
+        Task RemoveByIdAsync(string id);
     }
 }

@@ -48,9 +48,19 @@ namespace TobyMeehan.Com.Data
             return _table.DeleteAsync(expression);
         }
 
-        public Task UpdateByAsync(Expression<Predicate<T>> expression, T value)
+        public Task RemoveByIdAsync(string id)
+        {
+            return RemoveByAsync(x => x.Id == id);
+        }
+
+        public Task UpdateByAsync(Expression<Predicate<T>> expression, object value)
         {
             return _table.UpdateAsync(expression, value);
+        }
+
+        public Task UpdateByIdAsync(string id, object value)
+        {
+            return UpdateByAsync(x => x.Id == id, value);
         }
     }
 }
