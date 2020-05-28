@@ -142,5 +142,15 @@ namespace TobyMeehan.Com.Controllers
 
             return LocalRedirect(ReturnUrl);
         }
+
+        [Route("/logout")]
+        public async Task<IActionResult> Logout(string ReturnUrl)
+        {
+            ReturnUrl ??= "/";
+
+            await HttpContext.SignOutAsync();
+
+            return LocalRedirect(ReturnUrl);
+        }
     }
 }
