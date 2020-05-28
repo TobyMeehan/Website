@@ -11,6 +11,7 @@ using TobyMeehan.Com.Data;
 using TobyMeehan.Com.Data.Authentication;
 using TobyMeehan.Com.Data.Extensions;
 using TobyMeehan.Com.Data.Models;
+using TobyMeehan.Com.Extensions;
 using TobyMeehan.Com.Models;
 
 namespace TobyMeehan.Com.Controllers
@@ -149,6 +150,20 @@ namespace TobyMeehan.Com.Controllers
             ReturnUrl ??= "/";
 
             await HttpContext.SignOutAsync();
+
+            return LocalRedirect(ReturnUrl);
+        }
+
+        [Route("/refresh")]
+        public async Task<IActionResult> Refresh(string ReturnUrl)
+        {
+            ReturnUrl ??= "/";
+
+            User user = await _users.GetByIdAsync(User.Id());
+
+            await HttpContext.SignOutAsync();
+
+            await SignIn(user);
 
             return LocalRedirect(ReturnUrl);
         }
