@@ -27,6 +27,48 @@
                 <NavLink class="nav-link" href="https://api.tobymeehan.com">API</NavLink>
             </li>
         </ul>
+
+        <div class="navbar-nav ml-auto">
+            <div class="form-inline">
+                <AuthorizeView>
+                    <Authorized>
+                        <div class="btn-group">
+                            <a class="btn btn-outline-light" href="/me">
+                                <Username User="_user"></Username>
+                            </a>
+                            <button type="button" class="btn btn-outline-light dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <span class="sr-only">Toggle Dropdown</span>
+                            </button>
+                            <div class="dropdown-menu">
+                                <a class="dropdown-item" href="/logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                            </div>
+                        </div>
+                    </Authorized>
+                    <NotAuthorized>
+                        <a class="btn btn-outline-light" href="/login"><i class="fas fa-sign-in-alt"></i> Login</a>
+                    </NotAuthorized>
+                </AuthorizeView>
+            </div>
+        </div>
     </div>
 
 </nav>
+
+@inject IRepository<User> users
+
+@code {
+    [CascadingParameter] public Task<AuthenticationState> AuthenticationStateTask { get; set; }
+
+    private AuthenticationState _context;
+    private User _user;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _context = await AuthenticationStateTask;
+
+        if (_context.User.Identity.IsAuthenticated)
+        {
+            _user = await users.GetByIdAsync(_context.User.Id());
+        }
+    }
+}
