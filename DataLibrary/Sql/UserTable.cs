@@ -51,22 +51,22 @@ namespace TobyMeehan.Com.Data.Sql
 
         private IEnumerable<User> Query()
         {
-            return _connection.Query<User, Role, Transaction, User>(GetSelectQuery().AsSql(), Map);
+            return _connection.Query<User, Role, Transaction, User>(GetSelectQuery().AsSql(), Map).DistinctEntities();
         }
 
-        private Task<IEnumerable<User>> QueryAsync()
+        private async Task<IEnumerable<User>> QueryAsync()
         {
-            return _connection.QueryAsync<User, Role, Transaction, User>(GetSelectQuery().AsSql(), Map);
+            return (await _connection.QueryAsync<User, Role, Transaction, User>(GetSelectQuery().AsSql(), Map)).DistinctEntities();
         }
 
         private IEnumerable<User> Query(Expression<Predicate<User>> expression)
         {
-            return _connection.Query<User, Role, Transaction, User>(GetSelectQuery(expression).AsSql(out object parameters), Map, parameters);
+            return _connection.Query<User, Role, Transaction, User>(GetSelectQuery(expression).AsSql(out object parameters), Map, parameters).DistinctEntities();
         }
 
-        private Task<IEnumerable<User>> QueryAsync(Expression<Predicate<User>> expression)
+        private async Task<IEnumerable<User>> QueryAsync(Expression<Predicate<User>> expression)
         {
-            return _connection.QueryAsync<User, Role, Transaction, User>(GetSelectQuery(expression).AsSql(out object parameters), Map, parameters);
+            return (await _connection.QueryAsync<User, Role, Transaction, User>(GetSelectQuery(expression).AsSql(out object parameters), Map, parameters)).DistinctEntities();
         }
 
 

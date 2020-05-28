@@ -6,9 +6,8 @@ using TobyMeehan.Sql.QueryBuilder;
 namespace TobyMeehan.Com.Data.Models
 {
     [SqlName("downloads")]
-    public class Download : IEntity
+    public class Download : EntityBase
     {
-        public string Id { get; set; }
         public string CreatorId { get; set; }
         public User Creator => Authors.Find(user => user.Id == CreatorId);
         public string Title { get; set; }

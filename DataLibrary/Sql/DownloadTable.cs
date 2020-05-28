@@ -46,16 +46,16 @@ namespace TobyMeehan.Com.Data.Sql
         }
 
         private IEnumerable<Download> Query() =>
-            _connection.Query<Download, User, Role, Transaction, DownloadFile, Download>(GetSelectQuery().AsSql(), Map);
+            _connection.Query<Download, User, Role, Transaction, DownloadFile, Download>(GetSelectQuery().AsSql(), Map).DistinctEntities();
 
         private IEnumerable<Download> Query(Expression<Predicate<Download>> expression) =>
-            _connection.Query<Download, User, Role, Transaction, DownloadFile, Download>(GetSelectQuery(expression).AsSql(out object parameters), Map, parameters);
+            _connection.Query<Download, User, Role, Transaction, DownloadFile, Download>(GetSelectQuery(expression).AsSql(out object parameters), Map, parameters).DistinctEntities();
 
-        private Task<IEnumerable<Download>> QueryAsync() =>
-            _connection.QueryAsync<Download, User, Role, Transaction, DownloadFile, Download>(GetSelectQuery().AsSql(), Map);
+        private async Task<IEnumerable<Download>> QueryAsync() =>
+            (await _connection.QueryAsync<Download, User, Role, Transaction, DownloadFile, Download>(GetSelectQuery().AsSql(), Map)).DistinctEntities();
 
-        private Task<IEnumerable<Download>> QueryAsync(Expression<Predicate<Download>> expression) =>
-            _connection.QueryAsync<Download, User, Role, Transaction, DownloadFile, Download>(GetSelectQuery(expression).AsSql(out object parameters), Map, parameters);
+        private async Task<IEnumerable<Download>> QueryAsync(Expression<Predicate<Download>> expression) =>
+            (await _connection.QueryAsync<Download, User, Role, Transaction, DownloadFile, Download>(GetSelectQuery(expression).AsSql(out object parameters), Map, parameters)).DistinctEntities();
 
         public override IEnumerable<Download> Select()
         {

@@ -6,9 +6,8 @@ using TobyMeehan.Sql.QueryBuilder;
 namespace TobyMeehan.Com.Data.Models
 {
     [SqlName("users")]
-    public class User : IEntity
+    public class User : EntityBase
     {
-        public string Id { get; set; }
         public string Username { get; set; }
         public string Email { get; set; }
         public int Balance { get; set; }

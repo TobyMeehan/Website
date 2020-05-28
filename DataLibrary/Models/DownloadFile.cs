@@ -3,9 +3,8 @@
 namespace TobyMeehan.Com.Data.Models
 {
     [SqlName("downloadfiles")]
-    public class DownloadFile : IEntity
+    public class DownloadFile : EntityBase
     {
-        public string Id { get; set; }
         public string DownloadId { get; set; }
         public string Filename { get; set; }
         public string RandomName { get; set; }

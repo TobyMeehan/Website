@@ -6,9 +6,8 @@ using TobyMeehan.Sql.QueryBuilder;
 namespace TobyMeehan.Com.Data.Models
 {
     [SqlName("authorizationcodes")]
-    public class AuthorizationCode : IEntity
+    public class AuthorizationCode : EntityBase
     {
-        public string Id { get; set; }
         public string ConnectionId { get; set; }
         public Connection Connection { get; set; }
         public string Code { get; set; }

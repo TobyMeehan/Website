@@ -6,9 +6,8 @@ using TobyMeehan.Sql.QueryBuilder;
 namespace TobyMeehan.Com.Data.Models
 {
     [SqlName("connections")]
-    public class Connection : IEntity
+    public class Connection : EntityBase
     {
-        public string Id { get; set; }
         public string AppId { get; set; }
         public Application Application { get; set; }
         public string UserId { get; set; }

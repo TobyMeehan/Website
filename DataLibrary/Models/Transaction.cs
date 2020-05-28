@@ -7,9 +7,8 @@ using TobyMeehan.Sql.QueryBuilder;
 namespace TobyMeehan.Com.Data.Models
 {
     [SqlName("transactions")]
-    public class Transaction : IEntity
+    public class Transaction : EntityBase
     {
-        public string Id { get; set; }
         public string UserId { get; set; }
         public string Sender { get; set; }
         public string Description { get; set; }

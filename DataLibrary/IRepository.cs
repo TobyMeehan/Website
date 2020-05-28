@@ -13,7 +13,9 @@ namespace TobyMeehan.Com.Data
 
         Task<IEnumerable<T>> GetByAsync(Expression<Predicate<T>> expression);
 
-        Task<T> GetBySingleAsync(Expression<Predicate<T>> expression);
+        Task<T> GetSingleByAsync(Expression<Predicate<T>> expression);
+
+        Task<T> GetByIdAsync(string id);
 
         Task AddAsync(object value);
 

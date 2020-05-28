@@ -47,16 +47,16 @@ namespace TobyMeehan.Com.Data.Sql
         }
 
         private IEnumerable<Connection> Query() => 
-            _connection.Query<Connection, User, Application, User, Role, Transaction, Connection>(GetSelectQuery().AsSql(), Map);
+            _connection.Query<Connection, User, Application, User, Role, Transaction, Connection>(GetSelectQuery().AsSql(), Map).DistinctEntities();
 
         private IEnumerable<Connection> Query(Expression<Predicate<Connection>> expression) =>
-            _connection.Query<Connection, User, Application, User, Role, Transaction, Connection>(GetSelectQuery(expression).AsSql(out object parameters), Map, parameters);
+            _connection.Query<Connection, User, Application, User, Role, Transaction, Connection>(GetSelectQuery(expression).AsSql(out object parameters), Map, parameters).DistinctEntities();
 
-        private Task<IEnumerable<Connection>> QueryAsync() =>
-            _connection.QueryAsync<Connection, User, Application, User, Role, Transaction, Connection>(GetSelectQuery().AsSql(), Map);
+        private async Task<IEnumerable<Connection>> QueryAsync() =>
+            (await _connection.QueryAsync<Connection, User, Application, User, Role, Transaction, Connection>(GetSelectQuery().AsSql(), Map)).DistinctEntities();
 
-        private Task<IEnumerable<Connection>> QueryAsync(Expression<Predicate<Connection>> expression) =>
-            _connection.QueryAsync<Connection, User, Application, User, Role, Transaction, Connection>(GetSelectQuery(expression).AsSql(out object parameters), Map, parameters);
+        private async Task<IEnumerable<Connection>> QueryAsync(Expression<Predicate<Connection>> expression) =>
+            (await _connection.QueryAsync<Connection, User, Application, User, Role, Transaction, Connection>(GetSelectQuery(expression).AsSql(out object parameters), Map, parameters)).DistinctEntities();
 
         public override IEnumerable<Connection> Select()
         {

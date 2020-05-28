@@ -9,7 +9,7 @@ using TobyMeehan.Sql;
 
 namespace TobyMeehan.Com.Data
 {
-    public class SqlRepository<T> : IRepository<T>
+    public class SqlRepository<T> : IRepository<T> where T : EntityBase
     {
         private readonly ISqlTable<T> _table;
 
@@ -33,7 +33,12 @@ namespace TobyMeehan.Com.Data
             return _table.SelectByAsync(expression);
         }
 
-        public async Task<T> GetBySingleAsync(Expression<Predicate<T>> expression)
+        public Task<T> GetByIdAsync(string id)
+        {
+            return GetSingleByAsync(x => x.Id == id);
+        }
+
+        public async Task<T> GetSingleByAsync(Expression<Predicate<T>> expression)
         {
             return (await GetByAsync(expression)).Single();
         }
