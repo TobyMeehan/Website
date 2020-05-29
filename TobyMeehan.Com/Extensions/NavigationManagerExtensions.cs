@@ -10,12 +10,12 @@ namespace TobyMeehan.Com.Extensions
     {
         public static string ToBaseRelativePath(this NavigationManager navigation)
         {
-            return navigation.ToBaseRelativePath(navigation.BaseUri);
+            return $"/{navigation.ToBaseRelativePath(navigation.Uri)}";
         }
 
         private static void NavigateToAuth(this NavigationManager navigation, string endpoint)
         {
-            navigation.NavigateTo($"/{endpoint}?ReturnUrl={System.Net.WebUtility.UrlEncode(navigation.ToBaseRelativePath(navigation.BaseUri))}", true);
+            navigation.NavigateTo($"/{endpoint}?ReturnUrl={System.Net.WebUtility.UrlEncode(navigation.ToBaseRelativePath())}", true);
         }
 
         public static void NavigateToLogin(this NavigationManager navigation) => navigation.NavigateToAuth("login");
