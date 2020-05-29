@@ -13,34 +13,17 @@ namespace TobyMeehan.Com.Components.Accounts
 {
     public partial class ChangeUsernameForm : ComponentBase
     {
-        [Inject] private IRepository<User> users { get; set; }
-        [Inject] private NavigationManager navigation { get; set; }
+        [Parameter] public EventCallback<UsernameViewModel> OnValidSubmit { get; set; }
 
-        [CascadingParameter] public Task<User> UserTask { get; set; }
-
-        private User _user;
         private UsernameViewModel _model = new UsernameViewModel();
 
         private ServerSideValidator _serverSideValidator;
 
-        protected override async Task OnInitializedAsync()
+        private Task Form_ValidSubmit()
         {
-            _user = await UserTask;
-            _model.Username = _user.Username;
+            return OnValidSubmit.InvokeAsync(_model);
         }
 
-        private async Task Form_ValidSubmit()
-        {
-            if (await users.AnyAsync(u => u.Username == _model.Username))
-            {
-                _serverSideValidator.Error(nameof(_model.Username), "That username is already in use.");
-
-                return;
-            }
-
-            await users.UpdateUsernameAsync(_user, _model.Username);
-
-            navigation.NavigateToRefresh();
-        }
+        public void InvalidUsername(params string[] messages) => _serverSideValidator.Error(nameof(_model.Username), messages);
     }
 }

@@ -14,29 +14,18 @@ namespace TobyMeehan.Com.Components.Accounts
 {
     public partial class ChangePasswordForm : ComponentBase
     {
-        [Inject] private IAuthentication<User> authentication { get; set; }
-        [Inject] private IRepository<User> users { get; set; }
-
-        [CascadingParameter] public Task<User> UserTask { get; set; }
+        [Parameter] public EventCallback<ChangePasswordViewModel> OnValidSubmit { get; set; }
 
         private ChangePasswordViewModel _model = new ChangePasswordViewModel();
-        private User _user;
 
         private ServerSideValidator _serverSideValidator;
 
-        protected override async Task OnInitializedAsync()
+        private Task Form_ValidSubmit()
         {
-            _user = await UserTask;
+            return OnValidSubmit.InvokeAsync(_model);
         }
 
-        private async Task Form_ValidSubmit()
-        {
-            if (!(await authentication.CheckPasswordAsync(_user.Username, _model.CurrentPassword)).Success)
-            {
-                _serverSideValidator.Error(nameof(_model.CurrentPassword), "Incorrect current password.");
-            }
-
-            await users.UpdatePasswordAsync(_user, _model.NewPassword);
-        }
+        public void InvalidCurrentPassword(params string[] messages) => _serverSideValidator.Error(nameof(_model.CurrentPassword), messages);
+        public void InvalidNewPassword(params string[] messages) => _serverSideValidator.Error(nameof(_model.NewPassword), messages);
     }
 }
