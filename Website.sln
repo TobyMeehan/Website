@@ -15,7 +15,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DownloadHost", "DownloadHos
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataLibrary", "DataLibrary\DataLibrary.csproj", "{DFA446E5-7636-46E3-8A66-CE870104488D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TobyMeehan.Com", "TobyMeehan.Com\TobyMeehan.Com.csproj", "{C1953EF6-31AD-4D82-B26A-EAB7783E2485}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TobyMeehan.Com", "TobyMeehan.Com\TobyMeehan.Com.csproj", "{C1953EF6-31AD-4D82-B26A-EAB7783E2485}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
