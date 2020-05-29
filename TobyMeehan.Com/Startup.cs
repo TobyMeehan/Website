@@ -17,6 +17,8 @@ using TobyMeehan.Com.Data.Authentication;
 using TobyMeehan.Com.Data.Sql;
 using TobyMeehan.Com.Data.Models;
 using TobyMeehan.Sql;
+using AutoMapper;
+using TobyMeehan.Com.Models;
 
 namespace TobyMeehan.Com
 {
@@ -42,6 +44,8 @@ namespace TobyMeehan.Com
 
             services.AddTransient(typeof(IRepository<>), typeof(SqlRepository<>));
             services.AddTransient<IAuthentication<User>, UserAuthentication>();
+
+            services.AddTransient<JavaScript>();
 
             services.AddRazorPages();
 
