@@ -1,14 +1,10 @@
-﻿@if (Model == null)
+﻿@typeparam T
+
+@if (_item == null)
 {
     <Loading></Loading>
 }
 else
 {
-    @ChildContent
-}
-
-@code {
-    [Parameter] public object Model { get; set; }
-
-    [Parameter] public RenderFragment ChildContent { get; set; }
+    @ChildContent(_item)
 }
