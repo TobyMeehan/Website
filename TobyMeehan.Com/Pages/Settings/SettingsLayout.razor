@@ -1,11 +1,13 @@
 ﻿@inherits LayoutComponentBase
 @layout DefaultLayout
 
+@inject IRepository<User> users
+
 <div class="d-flex justify-content-between">
     <h2>My Account</h2>
 
     <a href="/logout" class="btn btn-outline-warning btn-lg float-lg-right">Logout</a>
-</div> 
+</div>
 
 <div class="row">
     <div class="col-md-2">
@@ -18,6 +20,25 @@
     </div>
 
     <div class="col-md-10">
-        @Body
+        <Require Task="GetUserTask()">
+            <Loading>
+                <Loading></Loading>
+            </Loading>
+            <Completed>
+                <CascadingValue Value="context">
+                    @Body
+                </CascadingValue>
+            </Completed>
+        </Require>
     </div>
 </div>
+
+@code {
+    [CascadingParameter] public Task<AuthenticationState> AuthenticationStateTask { get; set; }
+
+    private async Task<User> GetUserTask()
+    {
+        AuthenticationState context = await AuthenticationStateTask;
+        return await users.GetByIdAsync(context.User.Id());
+    }
+}

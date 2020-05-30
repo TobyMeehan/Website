@@ -22,15 +22,9 @@ namespace TobyMeehan.Com.Pages.Settings
         [Inject] private IAuthentication<User> authentication { get; set; }
         [Inject] private NavigationManager navigation { get; set; }
 
-        private AccountSettingsForm _form;
-        private User _currentUser;
-        private AuthenticationState _context;
+        [CascadingParameter] public User CurrentUser { get; set; }
 
-        protected override async Task OnInitializedAsync()
-        {
-            _context = await AuthenticationStateTask;
-            _currentUser = await users.GetByIdAsync(_context.User.Id());
-        }
+        private AccountSettingsForm _form;
 
         private async Task UsernameForm_Submit(UsernameViewModel model)
         {
@@ -43,35 +37,35 @@ namespace TobyMeehan.Com.Pages.Settings
                 return;
             }
 
-            await users.UpdateUsernameAsync(_currentUser, model.Username);
+            await users.UpdateUsernameAsync(CurrentUser, model.Username);
 
             navigation.NavigateToRefresh();
         }
 
         private async Task PasswordForm_Submit(ChangePasswordViewModel model)
         {
-            if (!(await authentication.CheckPasswordAsync(_currentUser.Username, model.CurrentPassword)).Success)
+            if (!(await authentication.CheckPasswordAsync(CurrentUser.Username, model.CurrentPassword)).Success)
             {
                 _form.PasswordForm.InvalidCurrentPassword("Incorrect current password.");
 
                 return;
             }
 
-            await users.UpdatePasswordAsync(_currentUser, model.NewPassword);
+            await users.UpdatePasswordAsync(CurrentUser, model.NewPassword);
 
             model = new ChangePasswordViewModel();
         }
 
         private async Task AccountForm_Submit(PasswordViewModel model)
         {
-            if (!(await authentication.CheckPasswordAsync(_currentUser.Username, model.Password)).Success)
+            if (!(await authentication.CheckPasswordAsync(CurrentUser.Username, model.Password)).Success)
             {
                 _form.AccountForm.InvalidPassword("Incorrect password.");
 
                 return;
             }
 
-            await users.RemoveByIdAsync(_currentUser.Id);
+            await users.RemoveByIdAsync(CurrentUser.Id);
 
             navigation.NavigateTo("/logout", true);
         }
