@@ -12,76 +12,31 @@ using TobyMeehan.Sql.QueryBuilder;
 
 namespace TobyMeehan.Com.Data.Sql
 {
-    public class ConnectionTable : SqlTable<Connection>
+    public class ConnectionTable : MultiMappingTable<Connection, User, Application, User, Role, Transaction>
     {
-        private readonly IDbConnection _connection;
+        private readonly QueryFactory _factory;
 
-        public ConnectionTable(IDbConnection connection) : base(connection)
+        public ConnectionTable(QueryFactory factory) : base(factory)
         {
-            _connection = connection;
+            _factory = factory;
         }
 
-        private SqlQuery<Connection> GetSelectQuery()
+        protected override ExecutableSqlQuery<Connection> GetSql()
         {
-            return new SqlQuery<Connection>()
+            return _factory.Executable<Connection>()
                 .Select()
                 .JoinConnections();
         }
 
-        private SqlQuery<Connection> GetSelectQuery(Expression<Predicate<Connection>> expression)
-        {
-            return
-                GetSelectQuery()
-                .Where(expression);
-        }
-
-        private Connection Map(Connection connection, User connectionUser, Application app, User author, Role role, Transaction transaction)
+        protected override Connection Map(Connection connection, User connectionUser, Application app, User author, Role role, Transaction transaction)
         {
             connection.Application = connection.Application ?? app;
             connection.User = connection.User ?? connectionUser;
 
-            connection.Application = ApplicationTable.Map(app, author, role, transaction);
-            connection.User = UserTable.Map(connectionUser, role, transaction);
+            connection.Application = app.Map(author, role, transaction);
+            connection.User = connectionUser.Map(role, transaction);
 
             return connection;
         }
-
-        private IEnumerable<Connection> Query() => 
-            _connection.Query<Connection, User, Application, User, Role, Transaction, Connection>(GetSelectQuery().AsSql(), Map).DistinctEntities();
-
-        private IEnumerable<Connection> Query(Expression<Predicate<Connection>> expression) =>
-            _connection.Query<Connection, User, Application, User, Role, Transaction, Connection>(GetSelectQuery(expression).AsSql(out object parameters), Map, parameters).DistinctEntities();
-
-        private async Task<IEnumerable<Connection>> QueryAsync() =>
-            (await _connection.QueryAsync<Connection, User, Application, User, Role, Transaction, Connection>(GetSelectQuery().AsSql(), Map)).DistinctEntities();
-
-        private async Task<IEnumerable<Connection>> QueryAsync(Expression<Predicate<Connection>> expression) =>
-            (await _connection.QueryAsync<Connection, User, Application, User, Role, Transaction, Connection>(GetSelectQuery(expression).AsSql(out object parameters), Map, parameters)).DistinctEntities();
-
-        public override IEnumerable<Connection> Select()
-        {
-            return Query();
-        }
-
-        public override IEnumerable<Connection> Select(params string[] columns) => Select();
-
-        public override Task<IEnumerable<Connection>> SelectAsync()
-        {
-            return QueryAsync();
-        }
-        public override Task<IEnumerable<Connection>> SelectAsync(params string[] columns) => SelectAsync();
-
-        public override IEnumerable<Connection> SelectBy(Expression<Predicate<Connection>> expression)
-        {
-            return Query(expression);
-        }
-        public override IEnumerable<Connection> SelectBy(Expression<Predicate<Connection>> expression, params string[] columns) => SelectBy(expression);
-
-        public override Task<IEnumerable<Connection>> SelectByAsync(Expression<Predicate<Connection>> expression)
-        {
-            return QueryAsync(expression);
-        }
-
-        public override Task<IEnumerable<Connection>> SelectByAsync(Expression<Predicate<Connection>> expression, params string[] columns) => SelectByAsync(expression);
     }
 }

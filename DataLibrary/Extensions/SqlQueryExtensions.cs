@@ -8,7 +8,7 @@ namespace TobyMeehan.Com.Data.Extensions
 {
     public static class SqlQueryExtensions
     {
-        public static SqlQuery<T> JoinUsers<T>(this SqlQuery<T> query)
+        public static TQuery JoinUsers<T, TQuery>(this SqlQueryBase<T, TQuery> query) where TQuery : SqlQueryBase<T, TQuery>
         {
             return query
                 .LeftJoin<User, UserRole>((u, ur) => u.Id == ur.UserId)
@@ -17,14 +17,14 @@ namespace TobyMeehan.Com.Data.Extensions
 
         }
 
-        public static SqlQuery<T> JoinApplications<T>(this SqlQuery<T> query)
+        public static TQuery JoinApplications<T, TQuery>(this SqlQueryBase<T, TQuery> query) where TQuery : SqlQueryBase<T, TQuery>
         {
             return query
                 .InnerJoin<Application, User>((a, u) => a.UserId == u.Id)
                 .JoinUsers();
         }
 
-        public static SqlQuery<T> JoinConnections<T>(this SqlQuery<T> query)
+        public static TQuery JoinConnections<T, TQuery>(this SqlQueryBase<T, TQuery> query) where TQuery : SqlQueryBase<T, TQuery>
         {
             return query
                 .InnerJoin<Connection, User>((c, u) => c.UserId == u.Id)
@@ -32,7 +32,7 @@ namespace TobyMeehan.Com.Data.Extensions
                 .JoinApplications();
         }
 
-        public static SqlQuery<T> JoinDownloads<T>(this SqlQuery<T> query)
+        public static TQuery JoinDownloads<T, TQuery>(this SqlQueryBase<T, TQuery> query) where TQuery : SqlQueryBase<T, TQuery>
         {
             return query
                 .InnerJoin<Download, DownloadAuthor>((d, da) => d.Id == da.DownloadId)

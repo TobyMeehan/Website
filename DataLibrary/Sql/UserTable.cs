@@ -16,97 +16,25 @@ using TobyMeehan.Sql.QueryBuilder;
 
 namespace TobyMeehan.Com.Data.Sql
 {
-    public class UserTable : SqlTable<User>
+    public class UserTable : MultiMappingTable<User, Role, Transaction>
     {
-        private readonly IDbConnection _connection;
+        private readonly QueryFactory _factory;
 
-        public UserTable(IDbConnection connection) : base(connection)
+        public UserTable(QueryFactory factory) : base(factory)
         {
-            _connection = connection;
+            _factory = factory;
         }
 
-        private SqlQuery<User> GetSelectQuery()
+        protected override ExecutableSqlQuery<User> GetSql()
         {
-            return new SqlQuery<User>()
+            return _factory.Executable<User>()
                 .Select()
                 .JoinUsers();
         }
 
-        private SqlQuery<User> GetSelectQuery(Expression<Predicate<User>> expression)
+        protected override User Map(User user, Role role, Transaction transaction)
         {
-            return GetSelectQuery()
-                .Where(expression);
-        }
-
-        internal static User Map(User user, Role role, Transaction transaction)
-        {
-            user.Roles = user.Roles ?? new List<Role>();
-            user.Transactions = user.Transactions ?? new List<Transaction>();
-
-            user.Roles.Add(role);
-            user.Transactions.Add(transaction);
-
-            return user;
-        }
-
-        private IEnumerable<User> Query()
-        {
-            return _connection.Query<User, Role, Transaction, User>(GetSelectQuery().AsSql(), Map).DistinctEntities();
-        }
-
-        private async Task<IEnumerable<User>> QueryAsync()
-        {
-            return (await _connection.QueryAsync<User, Role, Transaction, User>(GetSelectQuery().AsSql(), Map)).DistinctEntities();
-        }
-
-        private IEnumerable<User> Query(Expression<Predicate<User>> expression)
-        {
-            return _connection.Query<User, Role, Transaction, User>(GetSelectQuery(expression).AsSql(out object parameters), Map, parameters).DistinctEntities();
-        }
-
-        private async Task<IEnumerable<User>> QueryAsync(Expression<Predicate<User>> expression)
-        {
-            return (await _connection.QueryAsync<User, Role, Transaction, User>(GetSelectQuery(expression).AsSql(out object parameters), Map, parameters)).DistinctEntities();
-        }
-
-
-        public override IEnumerable<User> Select()
-        {
-            return Query();
-        }
-        public override IEnumerable<User> Select(params string[] columns)
-        {
-            return Select();
-        }
-
-
-        public override Task<IEnumerable<User>> SelectAsync()
-        {
-            return QueryAsync();
-        }
-        public override Task<IEnumerable<User>> SelectAsync(params string[] columns)
-        {
-            return SelectAsync();
-        }
-
-
-        public override IEnumerable<User> SelectBy(Expression<Predicate<User>> expression)
-        {
-            return Query(expression);
-        }
-        public override IEnumerable<User> SelectBy(Expression<Predicate<User>> expression, params string[] columns)
-        {
-            return SelectBy(expression);
-        }
-
-
-        public override Task<IEnumerable<User>> SelectByAsync(Expression<Predicate<User>> expression)
-        {
-            return QueryAsync(expression);
-        }
-        public override Task<IEnumerable<User>> SelectByAsync(Expression<Predicate<User>> expression, params string[] columns)
-        {
-            return SelectByAsync(expression);
+            return user.Map(role, transaction);
         }
     }
 }
