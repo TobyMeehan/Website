@@ -1,0 +1,10 @@
+﻿<CardDeck>
+    @foreach (var download in Downloads)
+    {
+        <DownloadCard Download="download"></DownloadCard>
+    }
+</CardDeck>
+
+@code {
+    [Parameter] public IEnumerable<Download> Downloads { get; set; }
+}
