@@ -33,6 +33,11 @@ namespace TobyMeehan.Com.Data
             return _table.SelectByAsync(expression);
         }
 
+        public Task<IEnumerable<T>> GetByAsync<U>(Expression<Func<T, U, bool>> expression)
+        {
+            return _table.SelectByAsync(expression);
+        }
+
         public Task<T> GetByIdAsync(string id)
         {
             return GetSingleByAsync(x => x.Id == id);
@@ -41,6 +46,11 @@ namespace TobyMeehan.Com.Data
         public async Task<T> GetSingleByAsync(Expression<Predicate<T>> expression)
         {
             return (await GetByAsync(expression)).Single();
+        }
+
+        public async Task<T> GetSingleByAsync<U>(Expression<Func<T, U, bool>> expression)
+        {
+            return (await _table.SelectByAsync(expression)).Single();
         }
 
         public virtual Task RemoveByAsync(Expression<Predicate<T>> expression)
