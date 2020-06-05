@@ -8,7 +8,7 @@ namespace TobyMeehan.Com.Components
 {
     public class AttributableComponentBase : ComponentBase
     {
-        private Dictionary<string, object> _additionalAttributes;
+        private Dictionary<string, object> _additionalAttributes = new Dictionary<string, object>();
 
         [Parameter(CaptureUnmatchedValues = true)]
         public Dictionary<string, object> AdditionalAttributes
