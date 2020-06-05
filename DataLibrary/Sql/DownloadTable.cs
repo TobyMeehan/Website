@@ -23,7 +23,7 @@ namespace TobyMeehan.Com.Data.Sql
         {
             return base.GetQuery(dictionary)
                 .JoinDownloads()
-                .Map<User, Role, Transaction, DownloadFile>((download, user, role, transaction, file) =>
+                .Map<DownloadFile, User, Role, Transaction>((download, file, user, role, transaction) =>
                 {
                     if (!dictionary.TryGetValue(download.Id, out Download entry))
                     {
@@ -35,13 +35,21 @@ namespace TobyMeehan.Com.Data.Sql
                     }
 
                     if (!entry.Authors.TryGetItem(user.Id, out User userEntry))
+                    {
                         userEntry = user;
+                        entry.Authors.Add(userEntry);
+                    }
+                        
 
                     userEntry = userEntry.Map(role, transaction);
 
-                    if (!entry.Files.TryGetItem(file.Id, out DownloadFile fileEntry))
+                    if (file != null)
                     {
-                        fileEntry = file;
+                        if (!entry.Files.TryGetItem(file.Id, out DownloadFile fileEntry))
+                        {
+                            fileEntry = file;
+                            entry.Files.Add(fileEntry);
+                        }
                     }
 
                     return entry;

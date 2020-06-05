@@ -35,10 +35,10 @@ namespace TobyMeehan.Com.Data.Extensions
         public static ISqlQuery<T> JoinDownloads<T>(this ISqlQuery<T> query)
         {
             return query
+                .LeftJoin<Download, DownloadFile>((d, df) => d.Id == df.DownloadId)
                 .InnerJoin<Download, DownloadAuthor>((d, da) => d.Id == da.DownloadId)
                 .InnerJoin<DownloadAuthor, User>((da, u) => da.UserId == u.Id)
-                .JoinUsers()
-                .LeftJoin<Download, DownloadFile>((d, df) => d.Id == df.DownloadId);
+                .JoinUsers();
         }
     }
 }

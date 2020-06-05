@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
@@ -62,11 +63,7 @@ namespace TobyMeehan.Com.Data.Sql
         {
             using (IDbConnection connection = _connectionFactory.Invoke())
             {
-                var query = GetQuery().Where(expression);
-
-                string sql = query.ToSql();
-                var map = query.QueryMap;
-                return connection.QueryAsync(query);
+                return connection.QueryAsync(GetQuery().Where(expression));
             }
         }
         private Task<IEnumerable<T>> QueryAsync<TForeign>(Expression<Func<T, TForeign, bool>> expression)
@@ -78,24 +75,24 @@ namespace TobyMeehan.Com.Data.Sql
         }
 
 
-        public override IEnumerable<T> Select() => Query().DistinctEntities();
+        public override IEnumerable<T> Select() => Query().Distinct();
         public override IEnumerable<T> Select(params string[] columns) => Select();
 
-        public override async Task<IEnumerable<T>> SelectAsync() => (await QueryAsync()).DistinctEntities();
+        public override async Task<IEnumerable<T>> SelectAsync() => (await QueryAsync()).Distinct();
         public override Task<IEnumerable<T>> SelectAsync(params string[] columns) => SelectAsync();
 
-        public override IEnumerable<T> SelectBy(Expression<Predicate<T>> expression) => Query(expression).DistinctEntities();
+        public override IEnumerable<T> SelectBy(Expression<Predicate<T>> expression) => Query(expression).Distinct();
         public override IEnumerable<T> SelectBy(Expression<Predicate<T>> expression, params string[] columns) => SelectBy(expression);
 
         public override async Task<IEnumerable<T>> SelectByAsync(Expression<Predicate<T>> expression)
-            => (await QueryAsync(expression)).DistinctEntities();
+            => (await QueryAsync(expression)).Distinct();
         public override Task<IEnumerable<T>> SelectByAsync(Expression<Predicate<T>> expression, params string[] columns) => SelectByAsync(expression);
 
-        public override IEnumerable<T> SelectBy<TForeign>(Expression<Func<T, TForeign, bool>> expression) => Query(expression).DistinctEntities();
+        public override IEnumerable<T> SelectBy<TForeign>(Expression<Func<T, TForeign, bool>> expression) => Query(expression).Distinct();
         public override IEnumerable<T> SelectBy<TForeign>(Expression<Func<T, TForeign, bool>> expression, params string[] columns) => SelectBy(expression);
 
         public override async Task<IEnumerable<T>> SelectByAsync<TForeign>(Expression<Func<T, TForeign, bool>> expression)
-            => (await QueryAsync(expression)).DistinctEntities();
+            => (await QueryAsync(expression)).Distinct();
         public override Task<IEnumerable<T>> SelectByAsync<TForeign>(Expression<Func<T, TForeign, bool>> expression, params string[] columns) => SelectByAsync(expression);
     }
 }
