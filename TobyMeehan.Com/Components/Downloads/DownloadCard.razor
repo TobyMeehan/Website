@@ -15,10 +15,12 @@
             }
         </CardBody>
         <AuthorizeView Resource="Download" Policy="@AuthorizationPolicies.CanEditDownload">
-            <CardBody>
-                <a class="card-link" href="@($"/downloads/{Download.Id}/edit")">Edit</a>
-                <a class="card-link" href="@($"/downloads/{Download.Id}/delete")">Delete</a>
-            </CardBody>
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item">
+                    <a class="card-link" href="@($"/downloads/{Download.Id}/edit")">Edit</a>
+                    <a class="card-link" href="@($"/downloads/{Download.Id}/delete")">Delete</a>
+                </li>
+            </ul>
         </AuthorizeView>
         <CardFooter>
             <p class="text-muted mb-0">

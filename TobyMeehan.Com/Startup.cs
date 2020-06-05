@@ -64,10 +64,7 @@ namespace TobyMeehan.Com
                     options.SlidingExpiration = true;
                 });
 
-            services.AddAuthorization(options =>
-            {
-                options.AddAuthorizationPolicies();
-            });
+            services.AddAuthorizationPolicies();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
