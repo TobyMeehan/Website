@@ -25,7 +25,7 @@ namespace TobyMeehan.Com.Data.Sql
         protected override ISqlQuery<User> GetQuery(Dictionary<string, User> dictionary)
         {
             return new SqlQuery<User>()
-                .Select("users.Id, users.Username, roles.Id, roles.Name, transactions.Id, transactions.Sender, transactions.Amount")
+                .Select()
                 .JoinUsers()
                 .Map<Role, Transaction>((user, role, transaction) =>
                 {
