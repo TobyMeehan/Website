@@ -1,0 +1,26 @@
+﻿@page "/me/downloads"
+@layout SettingsLayout
+
+<Card class="my-3">
+    <h1>Downloads</h1>
+</Card>
+
+<Card class="my-3">
+    <AuthorizeView Policy="@AuthorizationPolicies.IsVerified">
+        <NotAuthorized>
+            <p>Your account must be verified to author downloads.</p>
+        </NotAuthorized>
+        <Authorized>
+            <Require Task="DownloadTask()" Context="downloads">
+                @if (!downloads.Any())
+                {
+                    <p>You haven't created any downloads.</p>
+                }
+
+                <p><a href="/downloads/add">Create Download</a></p>
+
+                <DownloadCardDeck Downloads="downloads"></DownloadCardDeck>
+            </Require>
+        </Authorized>
+    </AuthorizeView>
+</Card>

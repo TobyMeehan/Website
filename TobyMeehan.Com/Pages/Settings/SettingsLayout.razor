@@ -21,14 +21,9 @@
 
     <div class="col-md-10">
         <Require Task="GetUserTask()">
-            <Loading>
-                <Loading></Loading>
-            </Loading>
-            <Completed>
-                <CascadingValue Value="context">
-                    @Body
-                </CascadingValue>
-            </Completed>
+            <CascadingValue Value="context">
+                @Body
+            </CascadingValue>
         </Require>
     </div>
 </div>

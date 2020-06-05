@@ -22,11 +22,11 @@
         </AuthorizeView>
         <CardFooter>
             <p class="text-muted mb-0">
-                Created by <UserLink User="@Download.Authors.First()"></UserLink>
+                Created by <UserLink class="text-secondary text-decoration-none" User="@Download.Authors.First()"></UserLink>
 
-                @if (Download.Authors.Count > 1)
+                @if (Download.Authors.Count() > 1)
                 {
-                    @:&amp; @(Download.Authors.Count - 1) others
+                    @:&amp; @(Download.Authors.Count() - 1) others
                 }
             </p>
         </CardFooter>

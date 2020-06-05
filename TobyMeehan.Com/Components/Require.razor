@@ -2,35 +2,23 @@
 
 @if (Model == null && _context == null)
 {
-    @Loading
+    <Loading></Loading>
 }
 else
 {
-    RenderFragment<T> completed = Completed ?? ChildContent;
-    @completed(_context ?? Model)
+    @ChildContent(_context ?? Model)
 }
 
 @code {
     [Parameter] public T Model { get; set; }
     [Parameter] public Task<T> Task { get; set; }
     [Parameter] public RenderFragment<T> ChildContent { get; set; }
-    [Parameter] public RenderFragment<T> Completed { get; set; }
-    [Parameter] public RenderFragment Loading { get; set; }
 
     private T _context;
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         _context = await Task;
-    }
-
-    protected override async Task OnParametersSetAsync()
-    {
-        if (ChildContent != null && Completed != null)
-        {
-            throw new InvalidOperationException($"Do not specify both '{nameof(Completed)}' and '{nameof(ChildContent)}'.");
-        }
-
-        Loading ??= @<Loading></Loading>;
+        StateHasChanged();
     }
 }
