@@ -14,6 +14,7 @@ namespace TobyMeehan.Com.Authorization
         {
             options.AddPolicy(IsVerified, IsVerifiedPolicy());
             options.AddPolicy(IsAdmin, IsAdminPolicy());
+            options.AddPolicy(CanEditDownload, CanEditDownloadPolicy());
         }
     }
 }
