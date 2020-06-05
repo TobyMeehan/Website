@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using TobyMeehan.Com.Data.Models;
 
@@ -9,11 +10,11 @@ namespace TobyMeehan.Com.Data.Extensions
     {
         public static User Map(this User user, Role role, Transaction transaction)
         {
-            user.Roles = user.Roles ?? new List<Role>();
-            user.Transactions = user.Transactions ?? new List<Transaction>();
+            if (!user.Roles.TryGetItem(role.Id, out Role roleEntity))
+                user.Roles.Add(role);
 
-            user.Roles.Add(role);
-            user.Transactions.Add(transaction);
+            if (!user.Transactions.TryGetItem(transaction.Id, out Transaction transactionEntry))
+                user.Transactions.Add(transaction);
 
             return user;
         }
@@ -22,7 +23,7 @@ namespace TobyMeehan.Com.Data.Extensions
         {
             app.Author = app.Author ?? user;
 
-            app.Author = user.Map(role, transaction);
+            app.Author = app.Author.Map(role, transaction);
 
             return app;
         }

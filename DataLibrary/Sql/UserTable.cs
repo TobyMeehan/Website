@@ -16,25 +16,30 @@ using TobyMeehan.Sql.QueryBuilder;
 
 namespace TobyMeehan.Com.Data.Sql
 {
-    public class UserTable : MultiMappingTable<User, Role, Transaction>
+    public class UserTable : MultiMappingTableBase<User>
     {
-        private readonly QueryFactory _factory;
-
-        public UserTable(QueryFactory factory) : base(factory)
+        public UserTable(Func<IDbConnection> connectionFactory) : base(connectionFactory)
         {
-            _factory = factory;
         }
 
-        protected override ExecutableSqlQuery<User> GetSql()
+        protected override ISqlQuery<User> GetQuery(Dictionary<string, User> dictionary)
         {
-            return _factory.Executable<User>()
-                .Select()
-                .JoinUsers();
-        }
+            return new SqlQuery<User>()
+                .Select("users.Id, users.Username, roles.Id, roles.Name, transactions.Id, transactions.Sender, transactions.Amount")
+                .JoinUsers()
+                .Map<Role, Transaction>((user, role, transaction) =>
+                {
+                    if (!dictionary.TryGetValue(user.Id, out User entry))
+                    {
+                        entry = user;
+                        entry.Roles = new EntityCollection<Role>();
+                        entry.Transactions = new EntityCollection<Transaction>();
 
-        protected override User Map(User user, Role role, Transaction transaction)
-        {
-            return user.Map(role, transaction);
+                        dictionary.Add(entry.Id, entry);
+                    }
+
+                    return entry.Map(role, transaction);
+                });
         }
     }
 }

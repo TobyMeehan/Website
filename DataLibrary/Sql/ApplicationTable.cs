@@ -12,25 +12,26 @@ using TobyMeehan.Sql.QueryBuilder;
 
 namespace TobyMeehan.Com.Data.Sql
 {
-    public class ApplicationTable : MultiMappingTable<Application, User, Role, Transaction>
+    public class ApplicationTable : MultiMappingTableBase<Application>
     {
-        private readonly QueryFactory _factory;
-
-        public ApplicationTable(QueryFactory factory) : base(factory)
+        public ApplicationTable(Func<IDbConnection> connectionFactory) : base(connectionFactory)
         {
-            _factory = factory;
+
         }
 
-        protected override ExecutableSqlQuery<Application> GetSql()
+        protected override ISqlQuery<Application> GetQuery(Dictionary<string, Application> dictionary)
         {
-            return _factory.Executable<Application>()
-                .Select()
-                .JoinApplications();
-        }
+            return base.GetQuery(dictionary)
+                .JoinApplications()
+                .Map<User, Role, Transaction>((app, user, role, transaction) =>
+                {
+                    if (!dictionary.TryGetValue(app.Id, out Application entry))
+                    {
+                        entry = app;
+                    }
 
-        protected override Application Map(Application app, User user, Role role, Transaction transaction)
-        {
-            return app.Map(user, role, transaction);
+                    return entry.Map(user, role, transaction);
+                });
         }
     }
 }

@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,31 +13,39 @@ using TobyMeehan.Sql.QueryBuilder;
 
 namespace TobyMeehan.Com.Data.Sql
 {
-    public class DownloadTable : MultiMappingTable<Download, User, Role, Transaction, DownloadFile>
+    public class DownloadTable : MultiMappingTableBase<Download>
     {
-        private readonly QueryFactory _queryFactory;
-
-        public DownloadTable(QueryFactory queryFactory) : base(queryFactory)
+        public DownloadTable(Func<IDbConnection> connectionFactory) : base(connectionFactory)
         {
-            _queryFactory = queryFactory;
         }
 
-        protected override ExecutableSqlQuery<Download> GetSql()
+        protected override ISqlQuery<Download> GetQuery(Dictionary<string, Download> dictionary)
         {
-            return _queryFactory.Executable<Download>()
-                .Select()
-                .JoinDownloads();
-        }
+            return base.GetQuery(dictionary)
+                .JoinDownloads()
+                .Map<User, Role, Transaction, DownloadFile>((download, user, role, transaction, file) =>
+                {
+                    if (!dictionary.TryGetValue(download.Id, out Download entry))
+                    {
+                        entry = download;
+                        entry.Authors = new EntityCollection<User>();
+                        entry.Files = new EntityCollection<DownloadFile>();
 
-        protected override Download Map(Download download, User user, Role role, Transaction transaction, DownloadFile file)
-        {
-            download.Authors = download.Authors ?? new List<User>();
-            download.Files = download.Files ?? new List<DownloadFile>();
+                        dictionary.Add(entry.Id, entry);
+                    }
 
-            download.Authors.Add(user.Map(role, transaction));
-            download.Files.Add(file);
+                    if (!entry.Authors.TryGetItem(user.Id, out User userEntry))
+                        userEntry = user;
 
-            return download;
+                    userEntry = userEntry.Map(role, transaction);
+
+                    if (!entry.Files.TryGetItem(file.Id, out DownloadFile fileEntry))
+                    {
+                        fileEntry = file;
+                    }
+
+                    return entry;
+                });
         }
     }
 }

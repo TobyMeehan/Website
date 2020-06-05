@@ -1,198 +1,101 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
+using TobyMeehan.Com.Data.Models;
 using TobyMeehan.Sql;
 using TobyMeehan.Sql.QueryBuilder;
 
 namespace TobyMeehan.Com.Data.Sql
 {
-    public abstract class MultiMappingTableBase<T> : SqlTable<T>
+    public abstract class MultiMappingTableBase<T> : SqlTable<T> where T : EntityBase
     {
-        private readonly QueryFactory _queryFactory;
+        private readonly Func<IDbConnection> _connectionFactory;
 
-        public MultiMappingTableBase(QueryFactory queryFactory) : base(queryFactory)
+        public MultiMappingTableBase(Func<IDbConnection> connectionFactory) : base(connectionFactory)
         {
-            _queryFactory = queryFactory;
+            _connectionFactory = connectionFactory;
         }
 
-        protected virtual ExecutableSqlQuery<T> GetSql()
+        private ISqlQuery<T> GetQuery() => GetQuery(new Dictionary<string, T>());
+
+        protected virtual ISqlQuery<T> GetQuery(Dictionary<string, T> dictionary)
         {
-            return _queryFactory.Executable<T>()
+            return new SqlQuery<T>()
                 .Select();
         }
 
-        protected abstract IEnumerable<T> Query();
-        protected abstract IEnumerable<T> Query(Expression<Predicate<T>> expression);
-        protected abstract IEnumerable<T> Query<TForeign>(Expression<Func<T, TForeign, bool>> expression);
+        private IEnumerable<T> Query()
+        {
+            using (IDbConnection connection = _connectionFactory.Invoke())
+            {
+                return connection.Query(GetQuery());
+            }
+        }
 
-        protected abstract Task<IEnumerable<T>> QueryAsync();
-        protected abstract Task<IEnumerable<T>> QueryAsync(Expression<Predicate<T>> expression);
-        protected abstract Task<IEnumerable<T>> QueryAsync<TForeign>(Expression<Func<T, TForeign, bool>> expression);
+        private IEnumerable<T> Query(Expression<Predicate<T>> expression)
+        {
+            using (IDbConnection connection = _connectionFactory.Invoke())
+            {
+                return connection.Query(GetQuery().Where(expression));
+            }
+        }
+
+        private IEnumerable<T> Query<TForeign>(Expression<Func<T, TForeign, bool>> expression)
+        {
+            using (IDbConnection connection = _connectionFactory.Invoke())
+            {
+                return connection.Query(GetQuery().Where(expression));
+            }
+        }
+
+        private Task<IEnumerable<T>> QueryAsync()
+        {
+            using (IDbConnection connection = _connectionFactory.Invoke())
+            {
+                return connection.QueryAsync(GetQuery());
+            }
+        }
+        private Task<IEnumerable<T>> QueryAsync(Expression<Predicate<T>> expression)
+        {
+            using (IDbConnection connection = _connectionFactory.Invoke())
+            {
+                var query = GetQuery().Where(expression);
+
+                string sql = query.ToSql();
+                var map = query.QueryMap;
+                return connection.QueryAsync(query);
+            }
+        }
+        private Task<IEnumerable<T>> QueryAsync<TForeign>(Expression<Func<T, TForeign, bool>> expression)
+        {
+            using (IDbConnection connection = _connectionFactory.Invoke())
+            {
+                return connection.QueryAsync(GetQuery().Where(expression));
+            }
+        }
 
 
-        public override IEnumerable<T> Select() => Query();
+        public override IEnumerable<T> Select() => Query().DistinctEntities();
         public override IEnumerable<T> Select(params string[] columns) => Select();
 
-        public override Task<IEnumerable<T>> SelectAsync() => QueryAsync();
+        public override async Task<IEnumerable<T>> SelectAsync() => (await QueryAsync()).DistinctEntities();
         public override Task<IEnumerable<T>> SelectAsync(params string[] columns) => SelectAsync();
 
-        public override IEnumerable<T> SelectBy(Expression<Predicate<T>> expression) => Query(expression);
+        public override IEnumerable<T> SelectBy(Expression<Predicate<T>> expression) => Query(expression).DistinctEntities();
         public override IEnumerable<T> SelectBy(Expression<Predicate<T>> expression, params string[] columns) => SelectBy(expression);
 
-        public override Task<IEnumerable<T>> SelectByAsync(Expression<Predicate<T>> expression) => QueryAsync(expression);
+        public override async Task<IEnumerable<T>> SelectByAsync(Expression<Predicate<T>> expression)
+            => (await QueryAsync(expression)).DistinctEntities();
         public override Task<IEnumerable<T>> SelectByAsync(Expression<Predicate<T>> expression, params string[] columns) => SelectByAsync(expression);
 
-        public override IEnumerable<T> SelectBy<TForeign>(Expression<Func<T, TForeign, bool>> expression) => Query(expression);
+        public override IEnumerable<T> SelectBy<TForeign>(Expression<Func<T, TForeign, bool>> expression) => Query(expression).DistinctEntities();
         public override IEnumerable<T> SelectBy<TForeign>(Expression<Func<T, TForeign, bool>> expression, params string[] columns) => SelectBy(expression);
 
-        public override Task<IEnumerable<T>> SelectByAsync<TForeign>(Expression<Func<T, TForeign, bool>> expression) => QueryAsync(expression);
+        public override async Task<IEnumerable<T>> SelectByAsync<TForeign>(Expression<Func<T, TForeign, bool>> expression)
+            => (await QueryAsync(expression)).DistinctEntities();
         public override Task<IEnumerable<T>> SelectByAsync<TForeign>(Expression<Func<T, TForeign, bool>> expression, params string[] columns) => SelectByAsync(expression);
-    }
-
-    public abstract class MultiMappingTable<T, T1> : MultiMappingTableBase<T>
-    {
-        public MultiMappingTable(QueryFactory queryFactory) : base(queryFactory)
-        {
-            
-        }
-
-        protected abstract T Map(T value, T1 value1);
-
-        protected override IEnumerable<T> Query() 
-            => GetSql().Query<T1>(Map);
-        protected override Task<IEnumerable<T>> QueryAsync() 
-            => GetSql().QueryAsync<T1>(Map);
-
-        protected override IEnumerable<T> Query(Expression<Predicate<T>> expression) 
-            => GetSql().Where(expression).Query<T1>(Map);
-        protected override Task<IEnumerable<T>> QueryAsync(Expression<Predicate<T>> expression)
-            => GetSql().Where(expression).QueryAsync<T1>(Map);
-
-        protected override IEnumerable<T> Query<TForeign>(Expression<Func<T, TForeign, bool>> expression)
-            => GetSql().Where(expression).Query<T1>(Map);
-        protected override Task<IEnumerable<T>> QueryAsync<TForeign>(Expression<Func<T, TForeign, bool>> expression)
-            => GetSql().Where(expression).QueryAsync<T1>(Map);
-    }
-
-    public abstract class MultiMappingTable<T, T1, T2> : MultiMappingTableBase<T>
-    {
-        public MultiMappingTable(QueryFactory queryFactory) : base(queryFactory)
-        {
-        }
-
-        protected abstract T Map(T value, T1 value1, T2 value2);
-
-        protected override IEnumerable<T> Query()
-            => GetSql().Query<T1, T2>(Map);
-        protected override Task<IEnumerable<T>> QueryAsync()
-            => GetSql().QueryAsync<T1, T2>(Map);
-
-        protected override IEnumerable<T> Query(Expression<Predicate<T>> expression)
-            => GetSql().Where(expression).Query<T1, T2>(Map);
-        protected override Task<IEnumerable<T>> QueryAsync(Expression<Predicate<T>> expression)
-            => GetSql().Where(expression).QueryAsync<T1, T2>(Map);
-
-        protected override IEnumerable<T> Query<TForeign>(Expression<Func<T, TForeign, bool>> expression)
-            => GetSql().Where(expression).Query<T1, T2>(Map);
-        protected override Task<IEnumerable<T>> QueryAsync<TForeign>(Expression<Func<T, TForeign, bool>> expression)
-            => GetSql().Where(expression).QueryAsync<T1, T2>(Map);
-    }
-
-    public abstract class MultiMappingTable<T, T1, T2, T3> : MultiMappingTableBase<T>
-    {
-        public MultiMappingTable(QueryFactory queryFactory) : base(queryFactory)
-        {
-        }
-
-        protected abstract T Map(T value, T1 value1, T2 value2, T3 value3);
-
-        protected override IEnumerable<T> Query()
-            => GetSql().Query<T1, T2, T3>(Map);
-        protected override Task<IEnumerable<T>> QueryAsync()
-            => GetSql().QueryAsync<T1, T2, T3>(Map);
-
-        protected override IEnumerable<T> Query(Expression<Predicate<T>> expression)
-            => GetSql().Where(expression).Query<T1, T2, T3>(Map);
-        protected override Task<IEnumerable<T>> QueryAsync(Expression<Predicate<T>> expression)
-            => GetSql().Where(expression).QueryAsync<T1, T2, T3>(Map);
-
-        protected override IEnumerable<T> Query<TForeign>(Expression<Func<T, TForeign, bool>> expression)
-            => GetSql().Where(expression).Query<T1, T2, T3>(Map);
-        protected override Task<IEnumerable<T>> QueryAsync<TForeign>(Expression<Func<T, TForeign, bool>> expression)
-            => GetSql().Where(expression).QueryAsync<T1, T2, T3>(Map);
-    }
-
-    public abstract class MultiMappingTable<T, T1, T2, T3, T4> : MultiMappingTableBase<T>
-    {
-        public MultiMappingTable(QueryFactory queryFactory) : base(queryFactory)
-        {
-        }
-
-        protected abstract T Map(T value, T1 value1, T2 value2, T3 value3, T4 value4);
-
-        protected override IEnumerable<T> Query()
-            => GetSql().Query<T1, T2, T3, T4>(Map);
-        protected override Task<IEnumerable<T>> QueryAsync()
-            => GetSql().QueryAsync<T1, T2, T3, T4>(Map);
-
-        protected override IEnumerable<T> Query(Expression<Predicate<T>> expression)
-            => GetSql().Where(expression).Query<T1, T2, T3, T4>(Map);
-        protected override Task<IEnumerable<T>> QueryAsync(Expression<Predicate<T>> expression)
-            => GetSql().Where(expression).QueryAsync<T1, T2, T3, T4>(Map);
-
-        protected override IEnumerable<T> Query<TForeign>(Expression<Func<T, TForeign, bool>> expression)
-            => GetSql().Where(expression).Query<T1, T2, T3, T4>(Map);
-        protected override Task<IEnumerable<T>> QueryAsync<TForeign>(Expression<Func<T, TForeign, bool>> expression)
-            => GetSql().Where(expression).QueryAsync<T1, T2, T3, T4>(Map);
-    }
-
-    public abstract class MultiMappingTable<T, T1, T2, T3, T4, T5> : MultiMappingTableBase<T>
-    {
-        public MultiMappingTable(QueryFactory queryFactory) : base(queryFactory)
-        {
-        }
-
-        protected abstract T Map(T value, T1 value1, T2 value2, T3 value3, T4 value4, T5 value5);
-
-        protected override IEnumerable<T> Query()
-            => GetSql().Query<T1, T2, T3, T4, T5>(Map);
-        protected override Task<IEnumerable<T>> QueryAsync()
-            => GetSql().QueryAsync<T1, T2, T3, T4, T5>(Map);
-
-        protected override IEnumerable<T> Query(Expression<Predicate<T>> expression)
-            => GetSql().Where(expression).Query<T1, T2, T3, T4, T5>(Map);
-        protected override Task<IEnumerable<T>> QueryAsync(Expression<Predicate<T>> expression)
-            => GetSql().Where(expression).QueryAsync<T1, T2, T3, T4, T5>(Map);
-
-        protected override IEnumerable<T> Query<TForeign>(Expression<Func<T, TForeign, bool>> expression)
-            => GetSql().Where(expression).Query<T1, T2, T3, T4, T5>(Map);
-        protected override Task<IEnumerable<T>> QueryAsync<TForeign>(Expression<Func<T, TForeign, bool>> expression)
-            => GetSql().Where(expression).QueryAsync<T1, T2, T3, T4, T5>(Map);
-    }
-
-    public abstract class MultiMappingTable<T, T1, T2, T3, T4, T5, T6> : MultiMappingTableBase<T>
-    {
-        public MultiMappingTable(QueryFactory queryFactory) : base(queryFactory)
-        {
-        }
-
-        protected abstract T Map(T value, T1 value1, T2 value2, T3 value3, T4 value4, T5 value5, T6 value6);
-
-        protected override IEnumerable<T> Query()
-            => GetSql().Query<T1, T2, T3, T4, T5, T6>(Map);
-        protected override Task<IEnumerable<T>> QueryAsync()
-            => GetSql().QueryAsync<T1, T2, T3, T4, T5, T6>(Map);
-
-        protected override IEnumerable<T> Query(Expression<Predicate<T>> expression)
-            => GetSql().Where(expression).Query<T1, T2, T3, T4, T5, T6>(Map);
-        protected override Task<IEnumerable<T>> QueryAsync(Expression<Predicate<T>> expression)
-            => GetSql().Where(expression).QueryAsync<T1, T2, T3, T4, T5, T6>(Map);
-
-        protected override IEnumerable<T> Query<TForeign>(Expression<Func<T, TForeign, bool>> expression)
-            => GetSql().Where(expression).Query<T1, T2, T3, T4, T5, T6>(Map);
-        protected override Task<IEnumerable<T>> QueryAsync<TForeign>(Expression<Func<T, TForeign, bool>> expression)
-            => GetSql().Where(expression).QueryAsync<T1, T2, T3, T4, T5, T6>(Map);
     }
 }

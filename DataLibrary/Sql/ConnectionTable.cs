@@ -12,31 +12,31 @@ using TobyMeehan.Sql.QueryBuilder;
 
 namespace TobyMeehan.Com.Data.Sql
 {
-    public class ConnectionTable : MultiMappingTable<Connection, User, Application, User, Role, Transaction>
+    public class ConnectionTable : MultiMappingTableBase<Connection>
     {
-        private readonly QueryFactory _factory;
-
-        public ConnectionTable(QueryFactory factory) : base(factory)
+        public ConnectionTable(Func<IDbConnection> connectionFactory) : base(connectionFactory)
         {
-            _factory = factory;
+
         }
 
-        protected override ExecutableSqlQuery<Connection> GetSql()
+        protected override ISqlQuery<Connection> GetQuery(Dictionary<string, Connection> dictionary)
         {
-            return _factory.Executable<Connection>()
-                .Select()
-                .JoinConnections();
-        }
+            return base.GetQuery(dictionary)
+                .JoinConnections()
+                .Map<User, Application, User, Role, Transaction>((connection, user, app, author, role, transaction) =>
+                {
+                    if (!dictionary.TryGetValue(connection.Id, out Connection entry))
+                    {
+                        entry = connection;
+                    }
 
-        protected override Connection Map(Connection connection, User connectionUser, Application app, User author, Role role, Transaction transaction)
-        {
-            connection.Application = connection.Application ?? app;
-            connection.User = connection.User ?? connectionUser;
+                    entry.User = entry.User ?? user;
 
-            connection.Application = app.Map(author, role, transaction);
-            connection.User = connectionUser.Map(role, transaction);
+                    entry.Application = entry.Application ?? app;
+                    entry.Application = entry.Application.Map(author, role, transaction);
 
-            return connection;
+                    return entry;
+                });
         }
     }
 }
