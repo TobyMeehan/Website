@@ -7,7 +7,7 @@ namespace TobyMeehan.Com.Data.Models
     public class Scoreboard
     {
         public string AppId { get; set; }
-        public List<Objective> Objectives { get; set; }
-        public List<Score> Scores { get; set; }
+        public EntityCollection<Objective> Objectives { get; set; } = new EntityCollection<Objective>();
+        public EntityCollection<Score> Scores { get; set; } = new EntityCollection<Score>();
     }
 }
