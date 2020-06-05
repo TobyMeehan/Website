@@ -19,6 +19,7 @@ using TobyMeehan.Com.Data.Models;
 using TobyMeehan.Sql;
 using AutoMapper;
 using TobyMeehan.Com.Models;
+using TobyMeehan.Sql.QueryBuilder;
 
 namespace TobyMeehan.Com
 {
@@ -34,7 +35,7 @@ namespace TobyMeehan.Com
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddTransient<IDbConnection>(serviceProvider => new MySqlConnection(Configuration.GetConnectionString("Default")));
+            services.AddTransient<Func<IDbConnection>>(x => () => new MySqlConnection(Configuration.GetConnectionString("Default")));
 
             services.AddTransient<ISqlTable<User>, UserTable>();
             services.AddTransient<ISqlTable<Application>, ApplicationTable>();
@@ -82,19 +83,20 @@ namespace TobyMeehan.Com
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
+
             app.UseHttpsRedirection();
             app.UseStaticFiles();
+            app.UseCookiePolicy();
+            app.UseAuthentication();
 
             app.UseRouting();
 
-            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapBlazorHub();
                 endpoints.MapFallbackToPage("/_Host");
-                endpoints.MapControllerRoute("default", "{controller=Home}/{action=Index}/{id?}");
             });
         }
     }
