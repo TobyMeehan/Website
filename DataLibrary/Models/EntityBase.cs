@@ -22,7 +22,7 @@ namespace TobyMeehan.Com.Data.Models
 
         public override int GetHashCode()
         {
-            return base.GetHashCode();
+            return Id.GetHashCode();
         }
 
         public static bool operator ==(EntityBase x, EntityBase y)

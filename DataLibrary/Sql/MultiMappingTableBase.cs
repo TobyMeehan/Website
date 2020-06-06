@@ -28,7 +28,7 @@ namespace TobyMeehan.Com.Data.Sql
                 .Select();
         }
 
-        private IEnumerable<T> Query()
+        protected virtual IEnumerable<T> Query()
         {
             using (IDbConnection connection = _connectionFactory.Invoke())
             {
@@ -36,7 +36,7 @@ namespace TobyMeehan.Com.Data.Sql
             }
         }
 
-        private IEnumerable<T> Query(Expression<Predicate<T>> expression)
+        protected virtual IEnumerable<T> Query(Expression<Predicate<T>> expression)
         {
             using (IDbConnection connection = _connectionFactory.Invoke())
             {
@@ -44,7 +44,7 @@ namespace TobyMeehan.Com.Data.Sql
             }
         }
 
-        private IEnumerable<T> Query<TForeign>(Expression<Func<T, TForeign, bool>> expression)
+        protected virtual IEnumerable<T> Query<TForeign>(Expression<Func<T, TForeign, bool>> expression)
         {
             using (IDbConnection connection = _connectionFactory.Invoke())
             {
@@ -52,24 +52,26 @@ namespace TobyMeehan.Com.Data.Sql
             }
         }
 
-        private Task<IEnumerable<T>> QueryAsync()
+        protected virtual Task<IEnumerable<T>> QueryAsync()
         {
             using (IDbConnection connection = _connectionFactory.Invoke())
             {
                 return connection.QueryAsync(GetQuery());
             }
         }
-        private Task<IEnumerable<T>> QueryAsync(Expression<Predicate<T>> expression)
+        protected virtual Task<IEnumerable<T>> QueryAsync(Expression<Predicate<T>> expression)
         {
             using (IDbConnection connection = _connectionFactory.Invoke())
             {
                 return connection.QueryAsync(GetQuery().Where(expression));
             }
         }
-        private Task<IEnumerable<T>> QueryAsync<TForeign>(Expression<Func<T, TForeign, bool>> expression)
+        protected virtual Task<IEnumerable<T>> QueryAsync<TForeign>(Expression<Func<T, TForeign, bool>> expression)
         {
             using (IDbConnection connection = _connectionFactory.Invoke())
             {
+                var query = GetQuery().Where(expression);
+                string sql = query.ToSql();
                 return connection.QueryAsync(GetQuery().Where(expression));
             }
         }
