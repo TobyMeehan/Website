@@ -15,7 +15,7 @@ namespace TobyMeehan.Com.Pages.Settings
 
         [CascadingParameter] public User CurrentUser { get; set; }
 
-        private Task<IEnumerable<Download>> DownloadTask()
+        private Task<IList<Download>> DownloadTask()
         {
             return downloads.GetByUser(CurrentUser.Id);
         }

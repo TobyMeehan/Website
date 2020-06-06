@@ -1,0 +1,21 @@
+﻿@inherits AttributableComponentBase
+
+<Modal @attributes="AdditionalAttributes">
+    <Title>Download @Download.Title</Title>
+
+    <Body>
+        <ul>
+            @foreach (var file in Download.Files)
+            {
+                <li>
+                    <a href="@($"/downloads/{Download.Id}/{file.Filename}")">@file.Filename</a>
+                    <FileIcon Filename="@file.Filename"></FileIcon>
+                </li>
+            }
+        </ul>
+    </Body>
+</Modal>
+
+@code {
+    [Parameter] public Download Download { get; set; }
+}

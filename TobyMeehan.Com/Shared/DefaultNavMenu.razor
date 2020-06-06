@@ -34,7 +34,10 @@
                     <Authorized>
                         <div class="btn-group">
                             <a class="btn btn-outline-light" href="/me">
-                                <Username User="_user"></Username>
+                                @if (_user != null)
+                                {
+                                    <Username User="_user"></Username>
+                                }
                             </a>
                             <button type="button" class="btn btn-outline-light dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 <span class="sr-only">Toggle Dropdown</span>
