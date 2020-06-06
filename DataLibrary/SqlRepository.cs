@@ -23,19 +23,19 @@ namespace TobyMeehan.Com.Data
             return _table.InsertAsync(value);
         }
 
-        public virtual Task<IEnumerable<T>> GetAsync()
+        public virtual async Task<IList<T>> GetAsync()
         {
-            return _table.SelectAsync();
+            return (await _table.SelectAsync()).ToList();
         }
 
-        public virtual Task<IEnumerable<T>> GetByAsync(Expression<Predicate<T>> expression)
+        public virtual async Task<IList<T>> GetByAsync(Expression<Predicate<T>> expression)
         {
-            return _table.SelectByAsync(expression);
+            return (await _table.SelectByAsync(expression)).ToList();
         }
 
-        public Task<IEnumerable<T>> GetByAsync<U>(Expression<Func<T, U, bool>> expression)
+        public async Task<IList<T>> GetByAsync<U>(Expression<Func<T, U, bool>> expression)
         {
-            return _table.SelectByAsync(expression);
+            return (await _table.SelectByAsync(expression)).ToList();
         }
 
         public Task<T> GetByIdAsync(string id)

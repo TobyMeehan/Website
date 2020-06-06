@@ -9,13 +9,13 @@ namespace TobyMeehan.Com.Data
 {
     public interface IRepository<T>
     {
-        Task<IEnumerable<T>> GetAsync();
+        Task<IList<T>> GetAsync();
 
-        Task<IEnumerable<T>> GetByAsync(Expression<Predicate<T>> expression);
+        Task<IList<T>> GetByAsync(Expression<Predicate<T>> expression);
 
         Task<T> GetSingleByAsync(Expression<Predicate<T>> expression);
 
-        Task<IEnumerable<T>> GetByAsync<U>(Expression<Func<T, U, bool>> expression);
+        Task<IList<T>> GetByAsync<U>(Expression<Func<T, U, bool>> expression);
 
         Task<T> GetSingleByAsync<U>(Expression<Func<T, U, bool>> expression);
 
