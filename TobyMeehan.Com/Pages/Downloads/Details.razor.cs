@@ -7,12 +7,13 @@ using System.Threading.Tasks;
 using TobyMeehan.Com.Data;
 using TobyMeehan.Com.Data.Extensions;
 using TobyMeehan.Com.Data.Models;
+using TobyMeehan.Com.Data.Repositories;
 
 namespace TobyMeehan.Com.Pages.Downloads
 {
     public partial class Details : ComponentBase
     {
-        [Inject] private IRepository<Download> downloads { get; set; }
+        [Inject] private IDownloadRepository downloads { get; set; }
 
         [Parameter] public string Id { get; set; }
 
@@ -25,7 +26,7 @@ namespace TobyMeehan.Com.Pages.Downloads
 
         private async Task VerifyForm_Submit()
         {
-            await downloads.VerifyDownload(_download.Id, _download.Verified);
+            await downloads.UpdateAsync(_download);
 
             // TODO: alerts
         }
