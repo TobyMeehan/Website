@@ -5,7 +5,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Security.Cryptography;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
+using TobyMeehan.Com.Data.Upload;
 using static System.Net.Mime.MediaTypeNames;
 
 namespace TobyMeehan.Com.Data.CloudStorage
@@ -27,11 +29,21 @@ namespace TobyMeehan.Com.Data.CloudStorage
             }
         }
 
-        public async Task<string> UploadFileAsync(Stream stream, string bucket, string filename)
+        public async Task<string> UploadFileAsync(Stream stream, string bucket, string filename, CancellationToken cancellationToken = default, IProgress<IUploadProgress> progress = null)
         {
+            Progress<Google.Apis.Upload.IUploadProgress> googleProgress = new Progress<Google.Apis.Upload.IUploadProgress>();
+
+            if (progress != null)
+            {
+                googleProgress.ProgressChanged += (s, e) =>
+                {
+                    progress.Report(new GoogleUploadProgress(e, stream.Length));
+                };
+            }
+
             using (StorageClient client = await StorageClient.CreateAsync(_credential))
             {
-                var dataObject = await client.UploadObjectAsync(bucket, filename, Application.Octet, stream);
+                var dataObject = await client.UploadObjectAsync(bucket, filename, Application.Octet, stream, cancellationToken: cancellationToken, progress: googleProgress);
                 return dataObject.MediaLink;
             }
         }
