@@ -22,5 +22,15 @@ namespace TobyMeehan.Com
         public Task ShowUsernameTab() => ShowTab("#ChangeUsernameTab");
         public Task ShowPasswordTab() => ShowTab("#ChangePasswordTab");
         public Task ShowAccountTab() => ShowTab("#DeleteAccountTab");
+
+        public async Task InitCKEditor<T>(string id, DotNetObjectReference<T> dotNetReference) where T : class
+        {
+            await _jSRuntime.InvokeVoidAsync("CKEditor.init", id, dotNetReference);
+        }
+
+        public ValueTask DestroyCKEditor(string id)
+        {
+            return _jSRuntime.InvokeVoidAsync("CKEditor.destroy", id);
+        }
     }
 }
