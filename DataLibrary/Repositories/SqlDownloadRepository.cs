@@ -76,7 +76,13 @@ namespace TobyMeehan.Com.Data.Repositories
 
         public Task UpdateAsync(Download download)
         {
-            return _table.UpdateAsync(x => x.Id == $"{download.Id}", download);
+            return _table.UpdateAsync(x => x.Id == $"{download.Id}", new
+            {
+                download.Title,
+                download.ShortDescription,
+                download.LongDescription,
+                download.Verified
+            });
         }
     }
 }
