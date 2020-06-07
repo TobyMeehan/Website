@@ -13,13 +13,14 @@ using Microsoft.Extensions.Hosting;
 using MySql.Data.MySqlClient;
 using TobyMeehan.Com.Authorization;
 using TobyMeehan.Com.Data;
-using TobyMeehan.Com.Data.Authentication;
 using TobyMeehan.Com.Data.Sql;
 using TobyMeehan.Com.Data.Models;
 using TobyMeehan.Sql;
 using AutoMapper;
 using TobyMeehan.Com.Models;
 using TobyMeehan.Sql.QueryBuilder;
+using TobyMeehan.Com.Pages.Downloads;
+using TobyMeehan.Com.Data.Repositories;
 
 namespace TobyMeehan.Com
 {
@@ -43,10 +44,13 @@ namespace TobyMeehan.Com
             services.AddTransient<ISqlTable<Download>, DownloadTable>();
             services.AddTransient(typeof(ISqlTable<>), typeof(SqlTable<>));
 
-            services.AddTransient(typeof(IRepository<>), typeof(SqlRepository<>));
-            services.AddTransient<IAuthentication<User>, UserAuthentication>();
+            services.AddTransient<IUserRepository, SqlUserRepository>();
+            services.AddTransient<IDownloadRepository, SqlDownloadRepository>();
+            services.AddTransient<IConnectionRepository, SqlConnectionRepository>();
 
             services.AddTransient<JavaScript>();
+
+            services.AddScoped<EditDownloadState>();
 
             services.AddRazorPages();
 
