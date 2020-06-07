@@ -24,6 +24,7 @@ using TobyMeehan.Com.Data.Repositories;
 using TobyMeehan.Com.Data.Security;
 using TobyMeehan.Com.Data.CloudStorage;
 using Google.Apis.Auth.OAuth2;
+using TobyMeehan.Com.Tasks;
 
 namespace TobyMeehan.Com
 {
@@ -61,6 +62,7 @@ namespace TobyMeehan.Com
             services.AddTransient<JavaScript>();
 
             services.AddScoped<EditDownloadState>();
+            services.AddScoped<ProgressTaskState>();
 
             services.AddRazorPages();
 
