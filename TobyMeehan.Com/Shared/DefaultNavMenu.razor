@@ -57,7 +57,7 @@
 
 </nav>
 
-@inject IRepository<User> users
+@inject IUserRepository users
 
 @code {
     [CascadingParameter] public Task<AuthenticationState> AuthenticationStateTask { get; set; }

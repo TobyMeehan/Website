@@ -34,6 +34,11 @@ namespace TobyMeehan.Com.Data.Repositories
             return await GetByIdAsync(id);
         }
 
+        public async Task<bool> AnyUsernameAsync(string username)
+        {
+            return (await GetByUsernameAsync(username)) != null;
+        }
+
         public async Task<AuthenticationResult<User>> AuthenticateAsync(string username, string password)
         {
             User user = await GetByUsernameAsync(username);

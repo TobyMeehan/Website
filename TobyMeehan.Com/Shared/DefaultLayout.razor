@@ -1,5 +1,4 @@
 ﻿@inherits LayoutComponentBase
-@inject IRepository<User> users
 
 <div class="jumbotron banner-logo"></div>
 
@@ -25,19 +24,5 @@
 </footer>
 
 @code {
-    [CascadingParameter] public Task<AuthenticationState> AuthenticationStateTask { get; set; }
 
-    private Task<User> userTask;
-
-    protected override async Task OnInitializedAsync()
-    {
-        var context = await AuthenticationStateTask;
-
-        if (context.User.Identity.IsAuthenticated)
-        {
-            userTask = users.GetByIdAsync(context.User.Id());
-        }
-
-        userTask = Task.FromResult<User>(null);
-    }
 }

@@ -5,25 +5,26 @@ using System.Linq;
 using System.Threading.Tasks;
 using TobyMeehan.Com.Data;
 using TobyMeehan.Com.Data.Models;
+using TobyMeehan.Com.Data.Repositories;
 
 namespace TobyMeehan.Com.Pages.Settings
 {
     public partial class Connections : ComponentBase
     {
-        [Inject] private IRepository<Connection> connections { get; set; }
+        [Inject] private IConnectionRepository connections { get; set; }
 
         [CascadingParameter] public User CurrentUser { get; set; }
 
-        private List<Connection> _connections;
+        private IList<Connection> _connections;
 
         protected override async Task OnInitializedAsync()
         {
-            _connections = (await connections.GetByAsync<User>((c, u) => c.UserId == $"{CurrentUser.Id}")).ToList();
+            _connections = await connections.GetByUserAsync(CurrentUser.Id);
         }
 
         private async Task RevokeConnection(Connection connection)
         {
-            await connections.RemoveByIdAsync(connection.Id);
+            await connections.DeleteAsync(connection.Id);
             _connections.Remove(connection);
         }
     }

@@ -8,9 +8,9 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
 using TobyMeehan.Com.Data;
-using TobyMeehan.Com.Data.Authentication;
 using TobyMeehan.Com.Data.Extensions;
 using TobyMeehan.Com.Data.Models;
+using TobyMeehan.Com.Data.Repositories;
 using TobyMeehan.Com.Extensions;
 using TobyMeehan.Com.Models;
 
@@ -18,12 +18,10 @@ namespace TobyMeehan.Com.Controllers
 {
     public class AuthController : Controller
     {
-        private readonly IAuthentication<User> _authentication;
-        private readonly IRepository<User> _users;
+        private readonly IUserRepository _users;
 
-        public AuthController(IAuthentication<User> authentication, IRepository<User> users)
+        public AuthController(IUserRepository users)
         {
-            _authentication = authentication;
             _users = users;
         }
 
@@ -82,11 +80,11 @@ namespace TobyMeehan.Com.Controllers
 
             ReturnUrl ??= "/";
 
-            var result = await _authentication.CheckPasswordAsync(login.Username, login.Password);
+            var result = await _users.AuthenticateAsync(login.Username, login.Password);
 
             if (result.Success)
             {
-                await SignIn(result.Data);
+                await SignIn(result.Result);
 
                 return LocalRedirect(ReturnUrl);
             }
@@ -129,7 +127,7 @@ namespace TobyMeehan.Com.Controllers
                 return View();
             }
 
-            if ((await _users.GetByAsync(x => x.Username == register.Username)).Any())
+            if (await _users.AnyUsernameAsync(register.Username))
             {
                 ModelState.AddModelError(nameof(register.Username), "That username already exists.");
                 return View();
@@ -137,7 +135,7 @@ namespace TobyMeehan.Com.Controllers
 
             await _users.AddAsync(register.Username, register.Password);
 
-            var user = (await _users.GetByAsync(x => x.Username == register.Username)).Single();
+            var user = await _users.GetByUsernameAsync(register.Username);
 
             await SignIn(user);
 

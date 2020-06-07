@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using TobyMeehan.Com.Data;
-using TobyMeehan.Com.Data.Authentication;
 using TobyMeehan.Com.Data.Models;
 using TobyMeehan.Com.Extensions;
 using TobyMeehan.Com.Models;

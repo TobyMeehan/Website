@@ -6,18 +6,19 @@ using System.Threading.Tasks;
 using TobyMeehan.Com.Data;
 using TobyMeehan.Com.Data.Extensions;
 using TobyMeehan.Com.Data.Models;
+using TobyMeehan.Com.Data.Repositories;
 
 namespace TobyMeehan.Com.Pages.Settings
 {
     public partial class Downloads : ComponentBase
     {
-        [Inject] private IRepository<Download> downloads { get; set; }
+        [Inject] private IDownloadRepository downloads { get; set; }
 
         [CascadingParameter] public User CurrentUser { get; set; }
 
         private Task<IList<Download>> DownloadTask()
         {
-            return downloads.GetByUser(CurrentUser.Id);
+            return downloads.GetByAuthorAsync(CurrentUser.Id);
         }
     }
 }
