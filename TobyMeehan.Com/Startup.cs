@@ -21,6 +21,9 @@ using TobyMeehan.Com.Models;
 using TobyMeehan.Sql.QueryBuilder;
 using TobyMeehan.Com.Pages.Downloads;
 using TobyMeehan.Com.Data.Repositories;
+using TobyMeehan.Com.Data.Security;
+using TobyMeehan.Com.Data.CloudStorage;
+using Google.Apis.Auth.OAuth2;
 
 namespace TobyMeehan.Com
 {
@@ -44,9 +47,16 @@ namespace TobyMeehan.Com
             services.AddTransient<ISqlTable<Download>, DownloadTable>();
             services.AddTransient(typeof(ISqlTable<>), typeof(SqlTable<>));
 
+            services.AddTransient<ICloudStorage, GoogleCloudStorage>();
+            services.AddSingleton(GoogleCredential.FromFile(Configuration.GetSection("StorageCredential").Value));
+
             services.AddTransient<IUserRepository, SqlUserRepository>();
             services.AddTransient<IDownloadRepository, SqlDownloadRepository>();
             services.AddTransient<IConnectionRepository, SqlConnectionRepository>();
+
+            services.AddSingleton<IPasswordHash, BCryptPasswordHash>();
+
+            services.AddSingleton(ConfigureMapper());
 
             services.AddTransient<JavaScript>();
 
@@ -69,6 +79,14 @@ namespace TobyMeehan.Com
                 });
 
             services.AddAuthorizationPolicies();
+        }
+
+        private IMapper ConfigureMapper()
+        {
+            return new MapperConfiguration(cfg =>
+            {
+                cfg.CreateMap<Download, DownloadViewModel>().ReverseMap();
+            }).CreateMapper();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
