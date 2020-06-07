@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TobyMeehan.Com.Data.Models;
+using TobyMeehan.Com.Data.Security;
 using TobyMeehan.Sql;
 
 namespace TobyMeehan.Com.Data.Repositories
@@ -11,10 +12,12 @@ namespace TobyMeehan.Com.Data.Repositories
     public class SqlUserRepository : SqlRepository<User>, IUserRepository
     {
         private readonly ISqlTable<User> _table;
+        private readonly IPasswordHash _passwordHash;
 
-        public SqlUserRepository(ISqlTable<User> table) : base(table)
+        public SqlUserRepository(ISqlTable<User> table, IPasswordHash passwordHash) : base(table)
         {
             _table = table;
+            _passwordHash = passwordHash;
         }
 
         public async Task<User> AddAsync(string username, string password)
@@ -25,10 +28,24 @@ namespace TobyMeehan.Com.Data.Repositories
             {
                 Id = id,
                 Username = username,
-                Password = password
+                HashedPassword = _passwordHash.HashPassword(password)
             });
 
             return await GetByIdAsync(id);
+        }
+
+        public async Task<AuthenticationResult<User>> AuthenticateAsync(string username, string password)
+        {
+            User user = await GetByUsernameAsync(username);
+
+            if (_passwordHash.CheckPassword(password, user?.HashedPassword))
+            {
+                return new AuthenticationResult<User>(user);
+            }
+            else
+            {
+                return new AuthenticationResult<User>();
+            }
         }
 
         public async Task<User> GetByUsernameAsync(string username)
