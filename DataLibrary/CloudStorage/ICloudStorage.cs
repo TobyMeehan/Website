@@ -10,5 +10,6 @@ namespace TobyMeehan.Com.Data.CloudStorage
     {
         Task DeleteFileAsync(string bucket, string filename);
         Task<string> UploadFileAsync(Stream stream, string bucket, string filename, CancellationToken cancellationToken = default, IProgress<IUploadProgress> progress = null);
+        Task DownloadFileAsync(string bucket, string filename, Stream destination);
     }
 }

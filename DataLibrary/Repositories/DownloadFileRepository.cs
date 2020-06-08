@@ -54,9 +54,21 @@ namespace TobyMeehan.Com.Data.Repositories
             await _table.DeleteAsync(f => f.Id == id);
         }
 
+        public Task DownloadAsync(string id, Stream stream)
+        {
+            string bucket = _configuration.GetSection("DownloadStorageBucket").Value;
+
+            return _storage.DownloadFileAsync(bucket, id, stream);
+        }
+
         public async Task<IList<DownloadFile>> GetAsync()
         {
             return (await _table.SelectAsync()).ToList();
+        }
+
+        public async Task<IList<DownloadFile>> GetByDownloadAndFilenameAsync(string downloadId, string filename)
+        {
+            return (await _table.SelectByAsync(f => f.DownloadId == downloadId && f.Filename == filename)).ToList();
         }
 
         public async Task<IList<DownloadFile>> GetByDownloadAsync(string downloadId)

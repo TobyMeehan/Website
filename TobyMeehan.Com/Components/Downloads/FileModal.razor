@@ -8,7 +8,7 @@
             @foreach (var file in Download.Files)
             {
                 <li>
-                    <a href="@($"/downloads/{Download.Id}/{file.Filename}")">@file.Filename</a>
+                    <FileLink Download="@Download.Id" Filename="@file.Filename">@file.Filename</FileLink>
                     <FileIcon Filename="@file.Filename"></FileIcon>
                 </li>
             }

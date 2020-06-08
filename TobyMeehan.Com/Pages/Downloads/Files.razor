@@ -28,7 +28,7 @@ else
                                 <FileIcon Filename="@file.Filename"></FileIcon>
                             </td>
                             <td>
-                                <a class="my-auto" href="@($"/downloads/{Id}/{file.Filename}")">@file.Filename</a>
+                                <FileLink class="my-auto" Download="@_download.Id" Filename="@file.Filename">@file.Filename</FileLink>
                             </td>
                             <td>
                                 <button class="btn btn-sm btn-outline-danger" @onclick="() => DeleteFile_Click(file)">Delete</button>
