@@ -8,6 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using TobyMeehan.Com.Data.CloudStorage;
 using TobyMeehan.Com.Data.Models;
+using TobyMeehan.Com.Data.Security;
 using TobyMeehan.Com.Data.Upload;
 using TobyMeehan.Sql;
 
@@ -24,9 +25,9 @@ namespace TobyMeehan.Com.Data.Repositories
             _authorTable = authorTable;
         }
 
-        public async Task<Download> AddAsync(string title, string shortDescription, string longDescription)
+        public async Task<Download> AddAsync(string title, string shortDescription, string longDescription, string userId)
         {
-            string id = Guid.NewGuid().ToString();
+            string id = RandomString.GeneratePseudo();
 
             await _table.InsertAsync(new
             {
@@ -35,6 +36,8 @@ namespace TobyMeehan.Com.Data.Repositories
                 ShortDescription = shortDescription,
                 LongDescription = longDescription
             });
+
+            await AddAuthorAsync(id, userId);
 
             return await GetByIdAsync(id);
         }

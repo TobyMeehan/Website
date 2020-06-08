@@ -1,0 +1,47 @@
+﻿@page "/downloads/add"
+
+<h1>Add Download</h1>
+
+<AuthorizeView Policy="@AuthorizationPolicies.IsVerified">
+    <NotAuthorized>
+        <Challenge></Challenge>
+    </NotAuthorized>
+    <Authorized>
+
+        <EditForm Model="_form" Context="formContext" OnValidSubmit="Form_Submit">
+            <DataAnnotationsValidator />
+
+            <div class="form-group">
+                <label for="Title">Title</label>
+                <div class="col-md-10">
+                    <InputText id="Title" @bind-Value="_form.Title" class="form-control" />
+                    <ValidationMessage For="() => _form.Title" />
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="ShortDescription">Short Description</label>
+                <div class="col-md-10">
+                    <InputText id="ShortDescription" @bind-Value="_form.ShortDescription" class="form-control" />
+                    <ValidationMessage For="() => _form.ShortDescription" />
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="LongDescription">Long Description</label>
+                <div class="col-md-10">
+                    <InputRichText Id="LongDescription" @bind-Value="_form.LongDescription" />
+                    <ValidationMessage For="() => _form.LongDescription" />
+                </div>
+            </div>
+
+            <div class="form-group">
+                <button type="submit" class="btn btn-dark">Continue</button>
+            </div>
+        </EditForm>
+    </Authorized>
+</AuthorizeView>
+
+<p>
+    <a href="/downloads">Back to List</a>
+</p>
