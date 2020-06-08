@@ -19,7 +19,7 @@ namespace TobyMeehan.Com.Pages.Settings
 
         protected override async Task OnInitializedAsync()
         {
-            _connections = await connections.GetByUserAsync(CurrentUser.Id);
+            _connections = await Task.Run(() => connections.GetByUserAsync(CurrentUser.Id));
         }
 
         private async Task RevokeConnection(Connection connection)

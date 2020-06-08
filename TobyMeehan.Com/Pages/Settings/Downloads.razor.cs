@@ -16,9 +16,11 @@ namespace TobyMeehan.Com.Pages.Settings
 
         [CascadingParameter] public User CurrentUser { get; set; }
 
-        private Task<IList<Download>> DownloadTask()
+        private IList<Download> _downloads;
+
+        protected async override Task OnInitializedAsync()
         {
-            return downloads.GetByAuthorAsync(CurrentUser.Id);
+            _downloads = await Task.Run(() => downloads.GetByAuthorAsync(CurrentUser.Id));
         }
     }
 }
