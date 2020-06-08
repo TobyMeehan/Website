@@ -1,0 +1,28 @@
+﻿<li class="@CssClass">
+    <div class="d-flex w-100 justify-content-between">
+        <span class="mr-2">
+            <FileIcon Filename="@Upload.Filename"></FileIcon>
+            @Upload.Filename
+        </span>
+        @CloseButton
+    </div>
+
+    @Content
+</li>
+
+@code {
+    [Parameter] public RenderFragment Content { get; set; }
+
+    [Parameter] public RenderFragment CloseButton { get; set; }
+
+    [Parameter] public FileUploadTask Upload { get; set; }
+
+    private string CssClass => "list-group-item list-group-item-" + Upload.Status switch
+    {
+        Com.Tasks.TaskStatus.Completed => "success",
+        Com.Tasks.TaskStatus.Cancelled => "warning",
+        Com.Tasks.TaskStatus.Failed => "danger",
+        Com.Tasks.TaskStatus.Queued => "info",
+        _ => "default"
+    };
+}

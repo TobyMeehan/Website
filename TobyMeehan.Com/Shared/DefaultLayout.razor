@@ -1,5 +1,7 @@
 ﻿@inherits LayoutComponentBase
 
+@inject ProgressTaskState taskState
+
 <div class="jumbotron banner-logo"></div>
 
 <DefaultNavMenu></DefaultNavMenu>
@@ -14,6 +16,35 @@
 
         <div class="col-sm-2"></div>
     </div>
+
+    @if (taskState.Tasks.Any(t => t is FileUploadTask))
+    {
+        <div class="toast show position-absolute" style="right: 75px; bottom: 75px; min-width: 20%;">
+            <div class="toast-header">
+                @if (taskState.Tasks.Any(t => t is FileUploadTask && t.Status == Tasks.TaskStatus.InProgress))
+                {
+                    <span class="spinner-border spinner-border-sm mr-2" role="status"></span>
+                }
+                else
+                {
+                    <span>
+                        <i class="fas fa-check mr-2"></i>
+                    </span>
+                }
+
+                <strong class="mr-auto">Uploading Files</strong>
+
+                <button type="button" class="close" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="toast-body p-0">
+                <UploadList Uploads="taskState.Tasks.Where(t => t is FileUploadTask).Select(t => t as FileUploadTask).ToList()"
+                            OnUploadDismiss="(upload) => taskState.Dismiss(upload)"></UploadList>
+            </div>
+        </div>
+    }
+
 </div>
 
 <hr />
@@ -24,5 +55,8 @@
 </footer>
 
 @code {
-
+    protected override void OnInitialized()
+    {
+        taskState.OnStateChanged += async () => await InvokeAsync(StateHasChanged);
+    }
 }
