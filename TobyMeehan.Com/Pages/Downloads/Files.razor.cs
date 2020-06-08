@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using TobyMeehan.Com.Data.Extensions;
 using TobyMeehan.Com.Data.Models;
 using TobyMeehan.Com.Data.Repositories;
 using TobyMeehan.Com.Data.Upload;
@@ -16,7 +17,8 @@ namespace TobyMeehan.Com.Pages.Downloads
 {
     public partial class Files : ComponentBase
     {
-        [Inject] private IDownloadRepository downloadRepository { get; set; }
+        [Inject] private IDownloadRepository downloads { get; set; }
+        [Inject] public IDownloadFileRepository downloadFiles { get; set; }
         [Inject] private ProgressTaskState taskState { get; set; }
         [Inject] private EditDownloadState editDownloadState { get; set; }
 
@@ -29,7 +31,7 @@ namespace TobyMeehan.Com.Pages.Downloads
 
         protected override async Task OnInitializedAsync()
         {
-            _download = await downloadRepository.GetByIdAsync(Id);
+            _download = await downloads.GetByIdAsync(Id);
             _files = _download.Files.Select(f => f.Filename).ToList();
 
             editDownloadState.Id = _download.Id;
@@ -58,20 +60,27 @@ namespace TobyMeehan.Com.Pages.Downloads
                 Func<CancellationToken, IProgress<IUploadProgress>, Task> uploadTask = async (cancellationToken, progress) =>
                 {
                     using Stream uploadStream = await file.OpenReadAsync();
-                    await downloadRepository.AddFileAsync(_download.Id, fileInfo.Name, uploadStream, cancellationToken, progress);
+                    await downloadFiles.AddAsync(_download.Id, fileInfo.Name, uploadStream, cancellationToken, progress);
                 };
 
                 var progressTask = new FileUploadTask(fileInfo.Name, _download, uploadTask);
 
-                progressTask.OnComplete += t => _files.Add(fileInfo.Name);
+                progressTask.OnComplete += async t => await RefreshFileList();
 
                 taskState.Add(progressTask);
             }
         }
 
+        private async Task RefreshFileList()
+        {
+            _download.Files = (await downloadFiles.GetByDownloadAsync(_download.Id)).ToEntityCollection();
+            StateHasChanged();
+        }
+
         private async Task DeleteFile_Click(DownloadFile file)
         {
-
+            await downloadFiles.DeleteAsync(file.Id);
+            await RefreshFileList();
         }
     }
 }

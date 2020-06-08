@@ -54,6 +54,7 @@ namespace TobyMeehan.Com
 
             services.AddTransient<IUserRepository, SqlUserRepository>();
             services.AddTransient<IDownloadRepository, SqlDownloadRepository>();
+            services.AddTransient<IDownloadFileRepository, DownloadFileRepository>();
             services.AddTransient<IConnectionRepository, SqlConnectionRepository>();
 
             services.AddSingleton<IPasswordHash, BCryptPasswordHash>();

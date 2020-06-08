@@ -21,17 +21,17 @@ else
 
             <table class="table table-hover table-sm">
                 <tbody>
-                    @foreach (string file in _files)
+                    @foreach (var file in _download.Files)
                     {
                         <tr>
                             <td>
-                                <FileIcon Filename="@file"></FileIcon>
+                                <FileIcon Filename="@file.Filename"></FileIcon>
                             </td>
                             <td>
-                                <a class="my-auto" href="@($"/downloads/{Id}/{file}")">@file</a>
+                                <a class="my-auto" href="@($"/downloads/{Id}/{file.Filename}")">@file.Filename</a>
                             </td>
                             <td>
-                                <button class="btn btn-sm btn-outline-danger">Delete</button>
+                                <button class="btn btn-sm btn-outline-danger" @onclick="() => DeleteFile_Click(file)">Delete</button>
                             </td>
                         </tr>
                     }
