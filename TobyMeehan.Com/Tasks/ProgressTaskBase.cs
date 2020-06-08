@@ -49,5 +49,10 @@ namespace TobyMeehan.Com.Tasks
                 NotifyComplete();
             }
         }
+
+        public virtual void Dispose()
+        {
+            CancellationTokenSource.Dispose();
+        }
     }
 }

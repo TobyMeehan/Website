@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace TobyMeehan.Com.Tasks
 {
-    public interface IProgressTask
+    public interface IProgressTask : IDisposable
     {
         Task Start();
 

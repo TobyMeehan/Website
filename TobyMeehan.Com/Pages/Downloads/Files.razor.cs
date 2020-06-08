@@ -58,13 +58,14 @@ namespace TobyMeehan.Com.Pages.Downloads
                     return;
                 }
 
-                Func<CancellationToken, IProgress<IUploadProgress>, Task> uploadTask = async (cancellationToken, progress) =>
+                Stream uploadStream = await file.OpenReadAsync();
+
+                Func<Stream, CancellationToken, IProgress<IUploadProgress>, Task> uploadTask = async (stream, cancellationToken, progress) =>
                 {
-                    using Stream uploadStream = await file.OpenReadAsync();
-                    await downloadFiles.AddAsync(_download.Id, fileInfo.Name, uploadStream, cancellationToken, progress);
+                    await downloadFiles.AddAsync(_download.Id, fileInfo.Name, stream, cancellationToken, progress);
                 };
 
-                var progressTask = new FileUploadTask(fileInfo.Name, _download, uploadTask);
+                var progressTask = new FileUploadTask(fileInfo.Name, _download, uploadStream, uploadTask);
 
                 progressTask.OnComplete += async t => await RefreshFileList();
 

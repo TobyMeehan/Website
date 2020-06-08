@@ -11,7 +11,9 @@ namespace TobyMeehan.Com.Tasks
 {
     public class FileUploadTask : ProgressTaskBase
     {
-        public FileUploadTask(string filename, Download download, Func<CancellationToken, Progress<IUploadProgress>, Task> task)
+        private readonly Stream _uploadStream;
+
+        public FileUploadTask(string filename, Download download, Stream uploadStream, Func<Stream, CancellationToken, Progress<IUploadProgress>, Task> task)
         {
             Progress<IUploadProgress> progress = new Progress<IUploadProgress>();
 
@@ -22,12 +24,20 @@ namespace TobyMeehan.Com.Tasks
                 NotifyProgressChanged();
             };
 
-            TaskSource = ct => task(ct, progress);
+            TaskSource = ct => task(_uploadStream, ct, progress);
             Filename = filename;
             Download = download;
+            _uploadStream = uploadStream;
         }
 
         public string Filename { get; set; }
         public Download Download { get; set; }
+
+        public override void Dispose()
+        {
+            _uploadStream.Dispose();
+
+            base.Dispose();
+        }
     }
 }
