@@ -20,22 +20,34 @@ namespace TobyMeehan.Com.Tasks
         protected void NotifyComplete() => OnComplete?.Invoke(this);
         public event Action<IProgressTask> OnComplete;
 
-        public Task Cancel()
+        public void Cancel()
         {
             CancellationTokenSource.Cancel();
-            Status = TaskStatus.Cancelled;
-            return Task.CompletedTask;
         }
 
         public async Task Start()
         {
             Status = TaskStatus.InProgress;
 
-            await TaskSource(CancellationTokenSource.Token);
-
-            Status = TaskStatus.Completed;
-
-            NotifyComplete();
+            try
+            {
+                await TaskSource(CancellationTokenSource.Token);
+                Status = TaskStatus.Completed;
+            }
+            catch (Exception ex) when (ex is OperationCanceledException || ex is TaskCanceledException)
+            {
+                Status = TaskStatus.Cancelled;
+                return;
+            }
+            catch
+            {
+                Status = TaskStatus.Failed;
+                return;
+            }
+            finally
+            {
+                NotifyComplete();
+            }
         }
     }
 }

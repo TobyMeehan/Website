@@ -19,15 +19,6 @@ namespace TobyMeehan.Com.Tasks
             {
                 PercentageProgress = e.PercentageProgress;
 
-                Status = e.Status switch
-                {
-                    UploadStatus.NotStarted => TaskStatus.InProgress,
-                    UploadStatus.Starting => TaskStatus.InProgress,
-                    UploadStatus.Uploading => TaskStatus.InProgress,
-                    UploadStatus.Completed => TaskStatus.Completed,
-                    UploadStatus.Failed => TaskStatus.Failed
-                };
-
                 NotifyProgressChanged();
             };
 

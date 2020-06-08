@@ -31,15 +31,12 @@ namespace TobyMeehan.Com.Tasks
             ItemAdded?.Invoke();
         }
 
-        private async void Item_OnComplete(IProgressTask task)
+        private void Item_OnComplete(IProgressTask task)
         {
             _items.Remove(task);
             _items.Add(task);
 
-            if (_items.First().Status == TaskStatus.Queued)
-            {
-                await _items.First().Start();
-            }
+            ItemAdded?.Invoke();
         }
 
         private event Action ItemAdded;
@@ -73,6 +70,19 @@ namespace TobyMeehan.Com.Tasks
             {
                 return _items.Remove(item);
             }
+        }
+
+        public int Remove(Func<IProgressTask, bool> predicate)
+        {
+            foreach (var task in _items.Where(predicate))
+            {
+                if (task.Status == TaskStatus.InProgress)
+                {
+                    task.Cancel();
+                }
+            }
+
+            return _items.RemoveAll(t => predicate(t) && t.Status != TaskStatus.InProgress);
         }
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();

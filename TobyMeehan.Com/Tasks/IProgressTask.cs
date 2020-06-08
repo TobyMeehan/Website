@@ -10,7 +10,7 @@ namespace TobyMeehan.Com.Tasks
     {
         Task Start();
 
-        Task Cancel();
+        void Cancel();
 
         int PercentageProgress { get; }
 

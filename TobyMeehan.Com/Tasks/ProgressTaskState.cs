@@ -16,6 +16,7 @@ namespace TobyMeehan.Com.Tasks
         public void Add(IProgressTask task)
         {
             task.OnProgress += t => StateHasChanged();
+            task.OnComplete += t => StateHasChanged();
 
             _tasks.Add(task);
 
@@ -27,6 +28,11 @@ namespace TobyMeehan.Com.Tasks
             _tasks.Remove(task);
 
             StateHasChanged();
+        }
+
+        public void Dismiss(Func<IProgressTask, bool> predicate)
+        {
+            _tasks.Remove(predicate);
         }
     }
 }

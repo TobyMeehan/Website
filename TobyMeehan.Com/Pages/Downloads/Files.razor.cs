@@ -37,12 +37,13 @@ namespace TobyMeehan.Com.Pages.Downloads
             editDownloadState.Id = _download.Id;
             editDownloadState.Title = _download.Title;
 
-            taskState.OnStateChanged += () =>
+            taskState.OnStateChanged += async () =>
             {
                 _uploadTasks = taskState.Tasks
-                    .Where(t => t is FileUploadTask file && file.Download == _download && !file.IsComplete())
+                    .Where(t => t is FileUploadTask file && file.Download == _download && file.Status != Tasks.TaskStatus.Completed)
                     .Select(f => f as FileUploadTask);
-                StateHasChanged();
+
+                await RefreshFileList();
             };
         }
 

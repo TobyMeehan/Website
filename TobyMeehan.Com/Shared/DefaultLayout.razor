@@ -34,7 +34,7 @@
 
                 <strong class="mr-auto">Uploading Files</strong>
 
-                <button type="button" class="close" aria-label="Close">
+                <button type="button" class="close" aria-label="Close" @onclick="() => taskState.Dismiss(t => t is FileUploadTask)">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
