@@ -4,9 +4,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using TobyMeehan.Com.Data.CloudStorage;
 using TobyMeehan.Com.Data.Models;
+using TobyMeehan.Com.Data.Upload;
 using TobyMeehan.Sql;
 
 namespace TobyMeehan.Com.Data.Repositories
@@ -52,13 +54,13 @@ namespace TobyMeehan.Com.Data.Repositories
             });
         }
 
-        public async Task AddFileAsync(string id, string filename, Stream uploadStream)
+        public async Task AddFileAsync(string id, string filename, Stream uploadStream, CancellationToken cancellationToken = default, IProgress<IUploadProgress> progress = null)
         {
             string bucket = _configuration.GetSection("DownloadStorageBucket").Value;
 
             string fileId = Guid.NewGuid().ToString();
 
-            string url = await _cloudStorage.UploadFileAsync(uploadStream, bucket, fileId);
+            string url = await _cloudStorage.UploadFileAsync(uploadStream, bucket, fileId, cancellationToken, progress);
 
             await _fileTable.InsertAsync(new
             {

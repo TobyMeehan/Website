@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using TobyMeehan.Com.Data.Models;
+using TobyMeehan.Com.Data.Upload;
 
 namespace TobyMeehan.Com.Data.Repositories
 {
@@ -21,7 +23,7 @@ namespace TobyMeehan.Com.Data.Repositories
 
         Task AddAuthorAsync(string id, string userId);
 
-        Task AddFileAsync(string id, string filename, Stream uploadStream);
+        Task AddFileAsync(string id, string filename, Stream uploadStream, CancellationToken cancellationToken = default, IProgress<IUploadProgress> progress = null);
 
         Task DeleteAsync(string id);
     }

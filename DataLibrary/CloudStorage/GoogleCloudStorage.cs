@@ -15,6 +15,7 @@ namespace TobyMeehan.Com.Data.CloudStorage
     public class GoogleCloudStorage : ICloudStorage
     {
         private readonly GoogleCredential _credential;
+        private readonly int _chunkSize = 512 * 1024;
 
         public GoogleCloudStorage(GoogleCredential credential)
         {
@@ -43,7 +44,13 @@ namespace TobyMeehan.Com.Data.CloudStorage
 
             using (StorageClient client = await StorageClient.CreateAsync(_credential))
             {
-                var dataObject = await client.UploadObjectAsync(bucket, filename, Application.Octet, stream, cancellationToken: cancellationToken, progress: googleProgress);
+                UploadObjectOptions options = new UploadObjectOptions
+                {
+                    ChunkSize = _chunkSize
+                };
+
+                var dataObject = await client.UploadObjectAsync(bucket, filename, Application.Octet, stream, options, cancellationToken, googleProgress);
+
                 return dataObject.MediaLink;
             }
         }

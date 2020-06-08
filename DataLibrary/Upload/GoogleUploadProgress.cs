@@ -9,7 +9,7 @@ namespace TobyMeehan.Com.Data.Upload
         public GoogleUploadProgress(Google.Apis.Upload.IUploadProgress googleUploadProgress, long totalBytes)
         {
             Status = (UploadStatus)googleUploadProgress.Status;
-            PercentageProgress = (int)(googleUploadProgress.BytesSent / totalBytes * 100);
+            PercentageProgress = (int)((decimal)googleUploadProgress.BytesSent / (decimal)totalBytes * 100m);
         }
 
         public UploadStatus Status { get; }
