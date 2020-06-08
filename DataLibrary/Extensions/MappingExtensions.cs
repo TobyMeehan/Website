@@ -10,10 +10,10 @@ namespace TobyMeehan.Com.Data.Extensions
     {
         public static User Map(this User user, Role role, Transaction transaction)
         {
-            if (!user.Roles.TryGetItem(role.Id, out Role roleEntity))
+            if (!user.Roles.TryGetItem(role?.Id, out Role roleEntity) && role != null)
                 user.Roles.Add(role);
 
-            if (!user.Transactions.TryGetItem(transaction.Id, out Transaction transactionEntry))
+            if (!user.Transactions.TryGetItem(transaction?.Id, out Transaction transactionEntry) && transaction != null)
                 user.Transactions.Add(transaction);
 
             return user;

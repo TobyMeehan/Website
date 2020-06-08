@@ -12,7 +12,7 @@ namespace TobyMeehan.Com.Data.Models
 
         public T this[string id] => _items[id];
 
-        public bool TryGetItem(string id, out T entity) => _items.TryGetValue(id, out entity);
+        public bool TryGetItem(string id, out T entity) => _items.TryGetValue(id ?? "", out entity);
 
         public void Add(T entity) => _items.Add(entity.Id, entity);
 
