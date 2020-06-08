@@ -23,8 +23,6 @@ namespace TobyMeehan.Com.Data.Repositories
 
         Task AddAuthorAsync(string id, string userId);
 
-        Task AddFileAsync(string id, string filename, Stream uploadStream, CancellationToken cancellationToken = default, IProgress<IUploadProgress> progress = null);
-
         Task DeleteAsync(string id);
     }
 }

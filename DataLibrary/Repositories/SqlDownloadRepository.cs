@@ -17,17 +17,11 @@ namespace TobyMeehan.Com.Data.Repositories
     {
         private readonly ISqlTable<Download> _table;
         private readonly ISqlTable<DownloadAuthor> _authorTable;
-        private readonly ISqlTable<DownloadFile> _fileTable;
-        private readonly ICloudStorage _cloudStorage;
-        private readonly IConfiguration _configuration;
 
-        public SqlDownloadRepository(ISqlTable<Download> table, ISqlTable<DownloadAuthor> authorTable, ISqlTable<DownloadFile> fileTable, ICloudStorage cloudStorage, IConfiguration configuration) : base(table)
+        public SqlDownloadRepository(ISqlTable<Download> table, ISqlTable<DownloadAuthor> authorTable) : base(table)
         {
             _table = table;
             _authorTable = authorTable;
-            _fileTable = fileTable;
-            _cloudStorage = cloudStorage;
-            _configuration = configuration;
         }
 
         public async Task<Download> AddAsync(string title, string shortDescription, string longDescription)
@@ -51,23 +45,6 @@ namespace TobyMeehan.Com.Data.Repositories
             {
                 DownloadId = id,
                 UserId = userId
-            });
-        }
-
-        public async Task AddFileAsync(string id, string filename, Stream uploadStream, CancellationToken cancellationToken = default, IProgress<IUploadProgress> progress = null)
-        {
-            string bucket = _configuration.GetSection("DownloadStorageBucket").Value;
-
-            string fileId = Guid.NewGuid().ToString();
-
-            string url = await _cloudStorage.UploadFileAsync(uploadStream, bucket, fileId, cancellationToken, progress);
-
-            await _fileTable.InsertAsync(new
-            {
-                Id = fileId,
-                DownloadId = id,
-                Filename = filename,
-                Url = url
             });
         }
 
