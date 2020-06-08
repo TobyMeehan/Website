@@ -25,6 +25,7 @@ using TobyMeehan.Com.Data.Security;
 using TobyMeehan.Com.Data.CloudStorage;
 using Google.Apis.Auth.OAuth2;
 using TobyMeehan.Com.Tasks;
+using Blazor.FileReader;
 
 namespace TobyMeehan.Com
 {
@@ -63,6 +64,8 @@ namespace TobyMeehan.Com
 
             services.AddScoped<EditDownloadState>();
             services.AddScoped<ProgressTaskState>();
+
+            services.AddFileReaderService();
 
             services.AddRazorPages();
 
