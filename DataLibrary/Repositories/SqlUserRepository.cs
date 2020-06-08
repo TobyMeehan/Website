@@ -53,6 +53,11 @@ namespace TobyMeehan.Com.Data.Repositories
             }
         }
 
+        public async Task<IList<User>> GetByRoleAsync(string name)
+        {
+            return (await _table.SelectByAsync<Role>((u, r) => r.Name == name)).ToList();
+        }
+
         public async Task<User> GetByUsernameAsync(string username)
         {
             return (await _table.SelectByAsync(x => x.Username == username)).SingleOrDefault();

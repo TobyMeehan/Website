@@ -53,6 +53,11 @@ namespace TobyMeehan.Com.Data.Repositories
             return (await _table.SelectByAsync<User>((d, u) => u.Id == userId)).ToList();
         }
 
+        public Task RemoveAuthorAsync(string id, string userId)
+        {
+            return _authorTable.DeleteAsync(x => x.DownloadId == id && x.UserId == userId);
+        }
+
         public Task UpdateAsync(Download download)
         {
             return _table.UpdateAsync(x => x.Id == $"{download.Id}", new

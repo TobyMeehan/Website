@@ -23,6 +23,8 @@ namespace TobyMeehan.Com.Data.Repositories
 
         Task AddAuthorAsync(string id, string userId);
 
+        Task RemoveAuthorAsync(string id, string userId);
+
         Task DeleteAsync(string id);
     }
 }
