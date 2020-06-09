@@ -21,6 +21,10 @@ namespace TobyMeehan.Com.Data.Repositories
 
         Task<User> AddAsync(string username, string password);
 
+        Task AddRoleAsync(string id, string roleId);
+
+        Task RemoveRoleAsync(string id, string roleId);
+
         Task<bool> AnyUsernameAsync(string username);
 
         Task UpdateUsernameAsync(string id, string username);

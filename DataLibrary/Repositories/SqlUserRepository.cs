@@ -12,11 +12,13 @@ namespace TobyMeehan.Com.Data.Repositories
     public class SqlUserRepository : SqlRepository<User>, IUserRepository
     {
         private readonly ISqlTable<User> _table;
+        private readonly ISqlTable<UserRole> _userRoleTable;
         private readonly IPasswordHash _passwordHash;
 
-        public SqlUserRepository(ISqlTable<User> table, IPasswordHash passwordHash) : base(table)
+        public SqlUserRepository(ISqlTable<User> table, ISqlTable<UserRole> userRoleTable, IPasswordHash passwordHash) : base(table)
         {
             _table = table;
+            _userRoleTable = userRoleTable;
             _passwordHash = passwordHash;
         }
 
@@ -32,6 +34,15 @@ namespace TobyMeehan.Com.Data.Repositories
             });
 
             return await GetByIdAsync(id);
+        }
+
+        public Task AddRoleAsync(string id, string roleId)
+        {
+            return _userRoleTable.InsertAsync(new UserRole
+            {
+                UserId = id,
+                RoleId = roleId
+            });
         }
 
         public async Task<bool> AnyUsernameAsync(string username)
@@ -64,6 +75,11 @@ namespace TobyMeehan.Com.Data.Repositories
         public async Task<User> GetByUsernameAsync(string username)
         {
             return (await _table.SelectByAsync(x => x.Username == username)).SingleOrDefault();
+        }
+
+        public Task RemoveRoleAsync(string id, string roleId)
+        {
+            return _userRoleTable.DeleteAsync(x => x.UserId == id && x.RoleId == roleId);
         }
 
         public Task UpdatePasswordAysnc(string id, string password)
