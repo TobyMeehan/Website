@@ -43,14 +43,17 @@ namespace TobyMeehan.Com.Data.Repositories
         {
             User user = await GetByUsernameAsync(username);
 
-            if (_passwordHash.CheckPassword(password, user?.HashedPassword))
-            {
-                return new AuthenticationResult<User>(user);
-            }
-            else
+            if (user == null)
             {
                 return new AuthenticationResult<User>();
             }
+
+            if (!_passwordHash.CheckPassword(password, user?.HashedPassword))
+            {
+                return new AuthenticationResult<User>();
+            }
+
+            return new AuthenticationResult<User>(user);
         }
 
         public async Task<IList<User>> GetByRoleAsync(string name)
