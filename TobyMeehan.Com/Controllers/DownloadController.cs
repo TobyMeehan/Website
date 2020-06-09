@@ -19,7 +19,7 @@ namespace TobyMeehan.Com.Controllers
             _files = files;
         }
 
-        [HttpGet("/downloads/{download}/{filename}")]
+        [HttpGet("/downloads/{download}/file/{filename}")]
         public async Task<IActionResult> Download(string download, string filename)
         {
             DownloadFile file = (await _files.GetByDownloadAndFilenameAsync(download, filename)).First();

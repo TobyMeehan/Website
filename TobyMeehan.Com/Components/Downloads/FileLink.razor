@@ -10,7 +10,7 @@
 
     [Parameter] public RenderFragment ChildContent { get; set; }
 
-    private string url => $"/downloads/{Download}/{Filename}";
+    private string url => $"/downloads/{Download}/file/{Filename}";
 
     private void DownloadFile()
     {
