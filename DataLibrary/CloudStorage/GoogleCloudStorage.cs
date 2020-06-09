@@ -39,6 +39,7 @@ namespace TobyMeehan.Com.Data.CloudStorage
                 googleProgress.ProgressChanged += (s, e) =>
                 {
                     progress.Report(new GoogleUploadProgress(e, stream.Length));
+                    GC.Collect();
                 };
             }
 
