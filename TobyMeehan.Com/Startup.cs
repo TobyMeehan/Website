@@ -53,8 +53,11 @@ namespace TobyMeehan.Com
             services.AddSingleton(GoogleCredential.FromFile(Configuration.GetSection("StorageCredential").Value));
 
             services.AddTransient<IUserRepository, SqlUserRepository>();
+
             services.AddTransient<IDownloadRepository, SqlDownloadRepository>();
             services.AddTransient<IDownloadFileRepository, DownloadFileRepository>();
+
+            services.AddTransient<IApplicationRepository, SqlApplicationRepository>();
             services.AddTransient<IConnectionRepository, SqlConnectionRepository>();
 
             services.AddSingleton<IPasswordHash, BCryptPasswordHash>();
