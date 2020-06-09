@@ -9,7 +9,11 @@ else
 {
     <AuthorizeView Resource="_download" Policy="@AuthorizationPolicies.CanEditDownload">
         <NotAuthorized>
-            <Challenge></Challenge>
+            <Challenge>
+                <Alert Context="BootstrapContext.Danger">
+                    You are not authorised to manage authors for this download.
+                </Alert>
+            </Challenge>
         </NotAuthorized>
         <Authorized>
             <div class="row">

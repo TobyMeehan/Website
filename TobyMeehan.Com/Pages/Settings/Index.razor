@@ -39,3 +39,7 @@
         <AccountSettingsForm @ref="_form" OnUsernameSubmit="UsernameForm_Submit" OnPasswordSubmit="PasswordForm_Submit" OnDeleteAccountSubmit="AccountForm_Submit"></AccountSettingsForm>
     </Body>
 </Modal>
+
+@code {
+    private RenderFragment _alertContent => @<span>Your password was changed.</span>;
+}

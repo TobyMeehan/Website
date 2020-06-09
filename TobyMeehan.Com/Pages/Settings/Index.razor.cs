@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using TobyMeehan.Com.Components;
 using TobyMeehan.Com.Components.Accounts;
 using TobyMeehan.Com.Data;
 using TobyMeehan.Com.Data.Extensions;
@@ -20,6 +21,7 @@ namespace TobyMeehan.Com.Pages.Settings
 
         [Inject] private IUserRepository users { get; set; }
         [Inject] private NavigationManager navigation { get; set; }
+        [Inject] private AlertState alertState { get; set; }
 
         [CascadingParameter] public User CurrentUser { get; set; }
 
@@ -53,6 +55,12 @@ namespace TobyMeehan.Com.Pages.Settings
             await users.UpdatePasswordAysnc(CurrentUser.Id, model.NewPassword);
 
             model = new ChangePasswordViewModel();
+
+            alertState.Add(new AlertModel
+            {
+                Context = BootstrapContext.Success,
+                ChildContent = _alertContent
+            });
         }
 
         private async Task AccountForm_Submit(PasswordViewModel model)

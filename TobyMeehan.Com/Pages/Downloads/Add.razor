@@ -4,7 +4,11 @@
 
 <AuthorizeView Policy="@AuthorizationPolicies.IsVerified">
     <NotAuthorized>
-        <Challenge></Challenge>
+        <Challenge>
+            <Alert Context="BootstrapContext.Danger">
+                You must have a verified account to create downloads.
+            </Alert>
+        </Challenge>
     </NotAuthorized>
     <Authorized>
 

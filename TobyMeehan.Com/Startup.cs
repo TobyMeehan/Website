@@ -66,6 +66,7 @@ namespace TobyMeehan.Com
 
             services.AddTransient<JavaScript>();
 
+            services.AddScoped<AlertState>();
             services.AddScoped<EditDownloadState>();
             services.AddScoped<ProgressTaskState>();
 
