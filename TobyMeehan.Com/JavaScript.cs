@@ -32,5 +32,10 @@ namespace TobyMeehan.Com
         {
             return _jSRuntime.InvokeVoidAsync("CKEditor.destroy", id);
         }
+
+        public ValueTask SetTitle(string title)
+        {
+            return _jSRuntime.InvokeVoidAsync(nameof(SetTitle), title);
+        }
     }
 }

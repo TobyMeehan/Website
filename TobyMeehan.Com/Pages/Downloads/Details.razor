@@ -1,5 +1,7 @@
 ﻿@page "/downloads/{Id}"
 
+<Title>@(_download?.Title ?? "Download")</Title>
+
 @if (_download == null)
 {
     <Loading></Loading>

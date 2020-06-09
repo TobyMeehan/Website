@@ -6,3 +6,7 @@
 window.ShowTab = (selector) => {
     $(selector).tab('show');
 }
+
+window.SetTitle = (title) => {
+    document.title = title;
+}
