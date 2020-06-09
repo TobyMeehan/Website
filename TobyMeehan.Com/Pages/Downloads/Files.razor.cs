@@ -27,7 +27,7 @@ namespace TobyMeehan.Com.Pages.Downloads
         private Download _download;
         private List<string> _files = new List<string>();
         private IEnumerable<FileUploadTask> _uploadTasks = new List<FileUploadTask>();
-        private readonly int _maxSize = 100 * 1024 * 1024;
+        private readonly int _maxSize = 200 * 1024 * 1024;
 
         protected override async Task OnInitializedAsync()
         {
