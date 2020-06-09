@@ -8,12 +8,14 @@ using TobyMeehan.Com.Data;
 using TobyMeehan.Com.Data.Extensions;
 using TobyMeehan.Com.Data.Models;
 using TobyMeehan.Com.Data.Repositories;
+using TobyMeehan.Com.Models;
 
 namespace TobyMeehan.Com.Pages.Downloads
 {
     public partial class Details : ComponentBase
     {
         [Inject] private IDownloadRepository downloads { get; set; }
+        [Inject] private AlertState alertState { get; set; }
 
         [Parameter] public string Id { get; set; }
 
@@ -28,7 +30,7 @@ namespace TobyMeehan.Com.Pages.Downloads
         {
             await downloads.UpdateAsync(_download);
 
-            // TODO: alerts
+            alertState.Add(new AlertModel { Context = BootstrapContext.Success, ChildContent = VerifyAlertContent(_download.Verified) });
         }
     }
 }

@@ -95,3 +95,8 @@ else
 
     <FileModal Download="@_download" id="FilesModal"></FileModal>
 }
+
+@code {
+    private RenderFragment VerifyAlertContent(DownloadVerification verification)
+        => @<span>Successfully changed verification to @verification.ToString().</span>;
+}
