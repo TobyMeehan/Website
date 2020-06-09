@@ -16,7 +16,11 @@ namespace TobyMeehan.Com.Data.Repositories
 
         Task<IList<Connection>> GetByApplicationAsync(string appId);
 
-        Task<Connection> AddAsync(string userId, string appId);
+        Task<Connection> GetByUserAndApplicationAsync(string userId, string appId);
+
+        Task<AuthorizationCode> GetByAuthorizationCodeAsync(string code);
+
+        Task<AuthorizationCode> AddAsync(string userId, string appId, string codeChallenge = null);
 
         Task DeleteAsync(string id);
     }
