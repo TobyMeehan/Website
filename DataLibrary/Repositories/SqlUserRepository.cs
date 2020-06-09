@@ -70,7 +70,7 @@ namespace TobyMeehan.Com.Data.Repositories
         {
             return _table.UpdateAsync(x => x.Id == id, new
             {
-                Password = password
+                HashedPassword = _passwordHash.HashPassword(password)
             });
         }
 

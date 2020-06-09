@@ -9,9 +9,9 @@ namespace TobyMeehan.Com.Extensions
     public static class ClaimsPrincipalExtensions
     {
         public static string Username(this ClaimsPrincipal user) 
-            => user.Claims.First(x => x.Type == ClaimTypes.Name).Value;
+            => user.Claims.FirstOrDefault(x => x.Type == ClaimTypes.Name)?.Value;
 
         public static string Id(this ClaimsPrincipal user)
-            => user.Claims.First(x => x.Type == ClaimTypes.NameIdentifier).Value;
+            => user.Claims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier)?.Value;
     }
 }
