@@ -32,7 +32,7 @@ namespace TobyMeehan.Com.Data.Repositories
 
             string id = Guid.NewGuid().ToString();
 
-            string url = await _storage.UploadFileAsync(uploadStream, bucket, id, cancellationToken, progress);
+            string url = await _storage.UploadFileAsync(uploadStream, bucket, id, filename, cancellationToken, progress);
 
             await _table.InsertAsync(new
             {

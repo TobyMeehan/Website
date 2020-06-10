@@ -9,7 +9,7 @@ namespace TobyMeehan.Com.Data.CloudStorage
     public interface ICloudStorage
     {
         Task DeleteFileAsync(string bucket, string filename);
-        Task<string> UploadFileAsync(Stream stream, string bucket, string filename, CancellationToken cancellationToken = default, IProgress<IUploadProgress> progress = null);
+        Task<string> UploadFileAsync(Stream stream, string bucket, string objectName, string filename, CancellationToken cancellationToken = default, IProgress<IUploadProgress> progress = null);
         Task DownloadFileAsync(string bucket, string filename, Stream destination);
     }
 }

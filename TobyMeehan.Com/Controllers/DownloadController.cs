@@ -24,11 +24,7 @@ namespace TobyMeehan.Com.Controllers
         {
             DownloadFile file = (await _files.GetByDownloadAndFilenameAsync(download, filename)).First();
 
-            using (MemoryStream ms = new MemoryStream())
-            {
-                await _files.DownloadAsync(file.Id, ms);
-                return File(ms.ToArray(), MediaTypeNames.Application.Octet);
-            }
+            return Redirect(file.Url);
         }
     }
 }
