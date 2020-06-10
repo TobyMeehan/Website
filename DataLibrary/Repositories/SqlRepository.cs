@@ -17,17 +17,17 @@ namespace TobyMeehan.Com.Data.Repositories
             _table = table;
         }
 
-        public async Task<IList<T>> GetAsync()
+        public virtual async Task<IList<T>> GetAsync()
         {
             return (await _table.SelectAsync()).ToList();
         }
 
-        public async Task<T> GetByIdAsync(string id)
+        public virtual async Task<T> GetByIdAsync(string id)
         {
             return (await _table.SelectByAsync(x => x.Id == id)).SingleOrDefault();
         }
 
-        public async Task DeleteAsync(string id)
+        public virtual async Task DeleteAsync(string id)
         {
             await _table.DeleteAsync(x => x.Id == id);
         }

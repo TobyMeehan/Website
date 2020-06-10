@@ -53,7 +53,13 @@ namespace TobyMeehan.Com.Data.Repositories
 
         public async Task<IList<Download>> GetByAuthorAsync(string userId)
         {
-            return (await _table.SelectByAsync<User>((d, u) => u.Id == userId)).ToList();
+            return (await _table.SelectByAsync<User>((d, u) => u.Id == userId))
+                .OrderByDescending(d => d.Updated).ThenBy(d => d.Title).ToList();
+        }
+
+        public override async Task<IList<Download>> GetAsync()
+        {
+            return (await base.GetAsync()).OrderByDescending(d => d.Updated).ThenBy(d => d.Title).ToList();
         }
 
         public Task RemoveAuthorAsync(string id, string userId)
