@@ -9,3 +9,12 @@
     Light,
     Dark
 }
+
+public enum UploadFileResult
+{
+    Success,
+    Cancelled,
+    Failed,
+    InProgress,
+    Queued
+}

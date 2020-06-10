@@ -1,0 +1,74 @@
+﻿@page "/downloads/{Id}/files"
+@layout EditLayout
+
+@if (_download == null)
+{
+    <Loading></Loading>
+}
+else
+{
+    <AuthorizeView Resource="_download" Policy="@AuthorizationPolicies.CanEditDownload">
+        <NotAuthorized>
+            <Challenge>
+                <Alert Context="BootstrapContext.Danger">
+                    You are not authorised to manage files for this download.
+                </Alert>
+            </Challenge>
+        </NotAuthorized>
+        <Authorized>
+            <div class="custom-file mb-3">
+                <EditForm Model="_download" Context="formContext">
+                    <InputFile id="FileUpload" class="custom-file-input" OnChange="FileUpload_Change" multiple />
+                    <label class="custom-file-label" for="FileUpload"><i class="fas fa-upload"></i> Upload file (200MB)</label>
+                </EditForm>
+            </div>
+
+            <table class="table table-hover table-sm">
+                <tbody>
+                    @foreach (var file in _download.Files)
+                    {
+                        <tr>
+                            <td>
+                                <FileIcon Filename="@file.Filename"></FileIcon>
+                            </td>
+                            <td>
+                                <FileLink class="my-auto" Download="@_download.Id" Filename="@file.Filename">@file.Filename</FileLink>
+                            </td>
+                            <td>
+                                <button class="btn btn-sm btn-outline-danger" @onclick="() => DeleteFile_Click(file)">Delete</button>
+                            </td>
+                        </tr>
+                    }
+
+                    @foreach (var upload in _uploadTasks)
+                    {
+                        <tr>
+                            <td>
+                                <i class="fas fa-file-upload"></i>
+                            </td>
+                            <td>
+                                @upload.Filename
+                            </td>
+                            <td>
+                                @switch (upload.Status)
+                                {
+                                    case Tasks.TaskStatus.InProgress:
+                                        <ProgressBar style="height: 20px;" Context="BootstrapContext.Primary" PercentageProgress="@upload.PercentageProgress">
+                                            Uploading @upload.PercentageProgress%
+                                        </ProgressBar>
+                                        break;
+
+                                    case Tasks.TaskStatus.Queued:
+                                        <ProgressBar style="height: 20px;" Context="BootstrapContext.Primary" PercentageProgress="100">
+                                            Queued
+                                        </ProgressBar>
+                                        break;
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </Authorized>
+    </AuthorizeView>
+}

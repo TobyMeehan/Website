@@ -1,0 +1,33 @@
+﻿@page "/me/transactions"
+@layout SettingsLayout
+@attribute [Authorize]
+
+<Title>Transactions</Title>
+
+<Card class="my-3">
+    <h1>Transactions</h1>
+</Card>
+
+<Card class="my-3">
+    <p>Balance: @CurrentUser.Balance</p>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">Sender</th>
+                <th scope="col">Description</th>
+                <th scope="col">Amount</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var transaction in CurrentUser.Transactions)
+            {
+                <tr>
+                    <td>@transaction.Sender</td>
+                    <td>@transaction.Description</td>
+                    <td>@transaction.Amount</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</Card>

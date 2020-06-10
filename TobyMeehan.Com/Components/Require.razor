@@ -1,0 +1,27 @@
+﻿@typeparam T
+
+@if (Model == null && _context == null)
+{
+    <Loading></Loading>
+}
+else
+{
+    @ChildContent(_context ?? Model)
+}
+
+@code {
+    [Parameter] public T Model { get; set; }
+    [Parameter] public Task<T> Task { get; set; }
+    [Parameter] public RenderFragment<T> ChildContent { get; set; }
+
+    private T _context;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (Task != null && firstRender)
+        {
+            _context = await Task;
+            StateHasChanged();
+        }
+    }
+}

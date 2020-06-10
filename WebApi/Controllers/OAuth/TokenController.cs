@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using AutoMapper;
 using DataAccessLibrary;
 using DataAccessLibrary.Data;
+using DataAccessLibrary.Security;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using WebApi.Jwt;
 using WebApi.Models;
 
 namespace WebApi.Controllers.OAuth
@@ -84,10 +85,23 @@ namespace WebApi.Controllers.OAuth
         {
             DateTime expiry = DateTime.UtcNow.AddDays(7);
 
+            List<Claim> claims = new List<Claim>
+            {
+               new Claim(ClaimTypes.Name, connection.User.Username),
+               new Claim(ClaimTypes.NameIdentifier, connection.User.Id),
+               new Claim(ClaimTypes.Role, connection.Application.Role ?? ApplicationRoles.ThirdParty),
+               new Claim(ClaimTypes.Actor, connection.Application.Id)
+            };
+
+            foreach (Role role in connection.User.Roles)
+            {
+                claims.Add(new Claim(ClaimTypes.Role, role.Name));
+            }
+
             JsonWebToken token = new JsonWebToken
             {
 
-                access_token = _tokenProvider.CreateToken(connection, expiry),
+                access_token = _tokenProvider.CreateToken(claims, expiry),
                 expires_in = 60 * 60 * 24 * 7
 
             };

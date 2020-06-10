@@ -1,0 +1,33 @@
+﻿@page "/downloads/{Id}/delete"
+@layout EditLayout
+
+@if (_download == null)
+{
+    <Loading></Loading>
+}
+else
+{
+    <AuthorizeView Resource="_download" Policy="@AuthorizationPolicies.CanEditDownload">
+        <NotAuthorized>
+            <Challenge>
+                <Alert Context="BootstrapContext.Danger">
+                    You are not authorised to delete this download.
+                </Alert>
+            </Challenge>
+        </NotAuthorized>
+        <Authorized>
+            <p>Are you sure you want to delete this?</p>
+
+            <Card class="my-3">
+                <h2>@_download.Title</h2>
+                <p class="lead">@_download.ShortDescription</p>
+                <hr />
+                <p>@((MarkupString)_download.LongDescription)</p>
+            </Card>
+
+            <p>Deleted downloads and their files are not retrievable. Deleting this download will be a permanent action.</p>
+
+            <button class="btn btn-danger" @onclick="ConfirmDelete">Confirm</button>
+        </Authorized>
+    </AuthorizeView>
+}

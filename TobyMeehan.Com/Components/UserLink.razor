@@ -1,0 +1,26 @@
+﻿@inherits AttributableComponentBase
+
+<a class="@CssClass text-secondary text-decoration-none" href="@_href" @attributes="AdditionalAttributes">@Username</a>
+
+@code {
+    [Parameter] public User User { get; set; }
+
+    private string _href;
+
+    protected override void OnInitialized()
+    {
+        if (AdditionalAttributes.TryGetValue("href", out object href))
+        {
+            _href = href.ToString();
+        }
+
+        _href = $"/users/{User.Username}";
+    }
+
+    private RenderFragment Content =>
+        @<div>
+            @Username
+    </div>;
+
+    private RenderFragment Username => @<Username User="@User"></Username>;
+}

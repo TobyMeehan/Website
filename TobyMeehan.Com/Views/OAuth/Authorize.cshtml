@@ -1,0 +1,46 @@
+﻿@model Tuple<TobyMeehan.Com.Data.Models.Application, TobyMeehan.Com.Data.Models.User>
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@{
+    ViewData["Title"] = $"Authorize {Model.Item1.Name}";
+    Layout = "~/Shared/_AuthLayout.cshtml";
+}
+
+<small class="text-muted">Connect to your account</small>
+
+<h1 class="d-flex justify-content-between">
+    @Model.Item1.Name
+
+    <span class="h3 my-auto">
+        <a href="/me" class="text-darklink text-decoration-none">
+            <component type="typeof(Username)" render-mode="ServerPrerendered" param-User="Model.Item2" />
+        </a>
+    </span>
+</h1>
+
+<p>@Model.Item1.Name would like access to</p>
+
+<ul class="list-group list-group-flush mb-3">
+    <li class="list-group-item bg-dark">
+        <h5>Account Data</h5>
+        <p class="mb-0">View your username, roles and transactions.</p>
+    </li>
+    <li class="list-group-item bg-dark">
+        <h5>Send &amp; Receive Transactions</h5>
+        <p class="mb-0">Alter your account balance.</p>
+    </li>
+    <li class="list-group-item bg-dark">
+        <h5>Manage Downloads</h5>
+        <p class="mb-0">Create, modify and delete downloads on your behalf.</p>
+    </li>
+</ul>
+
+<p>You can revoke access at any time by using the 'connections' tab in your account settings.</p>
+
+<form method="post" asp-antiforgery="true">
+    <button type="submit" class="btn btn-light">Authorise</button>
+</form>
+
+@section Scripts {
+
+}

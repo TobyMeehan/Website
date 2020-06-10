@@ -8,6 +8,7 @@ namespace DataAccessLibrary.Data
     {
         Task<AuthorizationCode> CreateAuthorizationCode(string userid, string appid, string codeChallenge = null);
         Task DeleteConnection(string connectionid);
+        Task DeleteInvalidAuthCodes();
         Task<AuthorizationCode> GetAuthorizationCode(string code);
         Task<Connection> GetConnectionByUserAndApplication(string userid, string appid);
         Task<List<Connection>> GetConnectionsByUser(string userid);

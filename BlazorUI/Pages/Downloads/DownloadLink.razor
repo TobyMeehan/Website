@@ -1,8 +1,0 @@
-﻿@if (NavLink)
-{
-    <NavLink @attributes="InputAttributes" href="@_action" Match="NavLinkMatch.All">@ChildContent</NavLink>
-}
-else
-{
-    <a @attributes="InputAttributes" href="@_action">@ChildContent</a>
-}

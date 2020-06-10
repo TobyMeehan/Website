@@ -1,0 +1,41 @@
+﻿<ul class="nav nav-tabs">
+    <li class="nav-item">
+        <a class="nav-link active" id="ChangeUsernameTab" data-toggle="tab" href="#ChangeUsernameContent" role="tab" aria-controls="username" aria-selected="true">Username</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" id="ChangePasswordTab" data-toggle="tab" href="#ChangePasswordContent" role="tab" aria-controls="password" aria-selected="false">Password</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" id="DeleteAccountTab" data-toggle="tab" href="#DeleteAccountContent" role="tab" aria-controls="account" aria-selected="false">Account</a>
+    </li>
+</ul>
+
+<div class="tab-content">
+    <div class="tab-pane fade show active" id="ChangeUsernameContent" role="tabpanel" aria-labelledby="ChangeUsernameTab">
+        <h5>Change Username</h5>
+
+        <ChangeUsernameForm OnValidSubmit="OnUsernameSubmit" @ref="UsernameForm"></ChangeUsernameForm>
+    </div>
+
+    <div class="tab-pane fade" id="ChangePasswordContent" role="tabpanel" aria-labelledby="ChangePasswordTab">
+        <h5>Change Password</h5>
+
+        <ChangePasswordForm OnValidSubmit="OnPasswordSubmit" @ref="PasswordForm"></ChangePasswordForm>
+    </div>
+
+    <div class="tab-pane fade" id="DeleteAccountContent" role="tabpanel" aria-labelledby="DeleteAccountTab">
+        <h5>Delete Account</h5>
+
+        <DeleteAccountForm OnValidSubmit="OnDeleteAccountSubmit" @ref="AccountForm"></DeleteAccountForm>
+    </div>
+</div>
+
+@code {
+    [Parameter] public EventCallback<UsernameViewModel> OnUsernameSubmit { get; set; }
+    [Parameter] public EventCallback<ChangePasswordViewModel> OnPasswordSubmit { get; set; }
+    [Parameter] public EventCallback<PasswordViewModel> OnDeleteAccountSubmit { get; set; }
+
+    public ChangeUsernameForm UsernameForm { get; set; }
+    public ChangePasswordForm PasswordForm { get; set; }
+    public DeleteAccountForm AccountForm { get; set; }
+}

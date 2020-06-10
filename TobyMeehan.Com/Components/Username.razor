@@ -1,0 +1,24 @@
+﻿@RoleIcon
+@User.Username
+
+@code {
+    [Parameter] public User User { get; set; }
+
+    private RenderFragment RoleIcon
+    {
+        get
+        {
+            if (User.Roles.Any(role => role.Name == UserRoles.Admin))
+            {
+                return@<i class="fas fa-user-shield"></i>;
+            }
+
+            if (User.Roles.Any(role => role.Name == UserRoles.Verified))
+            {
+                return @<i class="fas fa-user-check"></i>;
+            }
+
+            return @<i class="fas fa-user"></i>;
+        }
+    }
+}

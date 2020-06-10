@@ -1,0 +1,19 @@
+﻿@inherits AttributableComponentBase
+
+@inject NavigationManager navigation
+
+<a class="@CssClass" @attributes="AdditionalAttributes" href="@url" @onclick="DownloadFile" @onclick:preventDefault>@ChildContent</a>
+
+@code {
+    [Parameter] public string Download { get; set; }
+    [Parameter] public string Filename { get; set; }
+
+    [Parameter] public RenderFragment ChildContent { get; set; }
+
+    private string url => $"/downloads/{Download}/file/{Filename}";
+
+    private void DownloadFile()
+    {
+        navigation.NavigateTo(url, true);
+    }
+}

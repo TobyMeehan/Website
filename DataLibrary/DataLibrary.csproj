@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <AssemblyName>TobyMeehan.Com.Data</AssemblyName>
+    <RootNamespace>TobyMeehan.Com.Data</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Google.Cloud.Storage.V1" Version="3.1.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="3.1.1" />
+    <PackageReference Include="TobyMeehan.Sql" Version="0.4.2" />
+  </ItemGroup>
+
+</Project>

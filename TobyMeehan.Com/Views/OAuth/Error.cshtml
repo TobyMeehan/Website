@@ -1,0 +1,18 @@
+﻿@model OAuthErrorViewModel
+@{
+    ViewData["Title"] = "OAuth Error";
+    Layout = "~/Shared/_AuthLayout.cshtml";
+}
+
+<h1>Error</h1>
+
+<div class="alert alert-danger">
+    <h4 class="alert-heading">Authorisation Failed</h4>
+    <p>Something went wrong authorising your account. The message below was generated to help the developer of your application fix the issue.</p>
+    <hr />
+    <p>@Model.Message</p>
+</div>
+
+@section Scripts {
+
+}

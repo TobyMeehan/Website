@@ -16,6 +16,13 @@ namespace DataAccessLibrary.Storage
             _sqlDataAccess = sqlDataAccess;
         }
 
+        public async Task<List<AuthorizationCode>> Select()
+        {
+            string sql = "SELECT * FROM `authorizationcodes`";
+
+            return await _sqlDataAccess.LoadData<AuthorizationCode>(sql);
+        }
+
         public async Task<List<AuthorizationCode>> SelectByCode(string code)
         {
             string sql = "SELECT * FROM `authorizationcodes` WHERE `Code` = @code";

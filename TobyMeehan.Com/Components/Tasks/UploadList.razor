@@ -1,0 +1,56 @@
+﻿<ul class="list-group list-group-flush text-left">
+    @foreach (var upload in Uploads)
+    {
+        <UploadListItem Upload="upload">
+            <Content>
+                @switch (upload.Status)
+                {
+                    case Com.Tasks.TaskStatus.Queued:
+                        <small>Queued</small>
+                        break;
+                    case Com.Tasks.TaskStatus.InProgress:
+                        <ProgressBar PercentageProgress="upload.PercentageProgress" Context="BootstrapContext.Dark" class="mt-2">
+                            @upload.PercentageProgress%
+                        </ProgressBar>
+                        break;
+                    case Com.Tasks.TaskStatus.Failed:
+                        <small>Upload Failed</small>
+                        break;
+                    case Com.Tasks.TaskStatus.Cancelled:
+                        <small>Upload Cancelled</small>
+                        break;
+                    case Com.Tasks.TaskStatus.Completed:
+                        <small>Upload Complete</small>
+                        break;
+                    default:
+                        break;
+                }
+            </Content>
+            <CloseButton>
+                @if (upload.IsComplete())
+                {
+                    <button type="button" class="close ml-auto" aria-label="Close" @onclick="() => DismissUpload(upload)">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                }
+                else
+                {
+                    <button type="button" class="btn btn-link btn-sm p-0 text-muted" @onclick="() => DismissUpload(upload)">
+                        Cancel
+                    </button>
+                }
+            </CloseButton>
+        </UploadListItem>
+    }
+</ul>
+
+@code {
+    [Parameter] public List<FileUploadTask> Uploads { get; set; }
+
+    [Parameter] public EventCallback<FileUploadTask> OnUploadDismiss { get; set; }
+
+    private async Task DismissUpload(FileUploadTask upload)
+    {
+        await OnUploadDismiss.InvokeAsync(upload);
+    }
+}

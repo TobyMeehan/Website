@@ -1,0 +1,47 @@
+﻿@page "/me"
+@layout SettingsLayout
+@attribute [Authorize]
+
+@inject JavaScript interop
+
+<Title>My Account</Title>
+
+<AuthorizeView>
+    <Card class="my-3">
+        <div class="d-flex flex-row">
+            <h3 class="p-2">@context.User.Username()</h3>
+            <a href="#" class="p-2 my-1" title="Change Username" role="button" data-toggle="modal" data-target="#SettingsModal" @onclick="interop.ShowUsernameTab">Change</a>
+        </div>
+    </Card>
+
+    <Card class="my-3">
+        <div class="form-group">
+            <div class="input-group">
+                <div class="input-group-prepend">
+                    <span class="input-group-text">Password</span>
+                </div>
+                <input type="password" class="form-control" placeholder="••••••••" readonly />
+                <div class="input-group-append">
+                    <button class="btn btn-warning" data-toggle="modal" data-target="#SettingsModal" @onclick="interop.ShowPasswordTab">Change Password</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <button class="btn btn-danger btn-lg" data-toggle="modal" data-target="#SettingsModal" @onclick="interop.ShowAccountTab">Delete Account</button>
+        </div>
+    </Card>
+</AuthorizeView>
+
+<Modal id="SettingsModal">
+    <Title>
+        <i class="fas fa-user-edit"></i> Account Information
+    </Title>
+    <Body>
+        <AccountSettingsForm @ref="_form" OnUsernameSubmit="UsernameForm_Submit" OnPasswordSubmit="PasswordForm_Submit" OnDeleteAccountSubmit="AccountForm_Submit"></AccountSettingsForm>
+    </Body>
+</Modal>
+
+@code {
+    private RenderFragment _alertContent => @<span>Your password was changed.</span>;
+}

@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace DataAccessLibrary.Data
@@ -64,12 +65,12 @@ namespace DataAccessLibrary.Data
         }
         private async Task<Download> PopulateFiles(Download download)
         {
-            var files = await _downloadFileTable.Select(download.Id);
-            download.Files = new List<string>();
+            var files = await _downloadFileTable.SelectByDownload(download.Id);
+            download.Files = new List<DownloadFile>();
 
-            foreach (DownloadFileModel file in files)
+            foreach (DownloadFile file in files)
             {
-                download.Files.Add(file.Filename);
+                download.Files.Add(file);
             }
 
             return download;
@@ -156,37 +157,43 @@ namespace DataAccessLibrary.Data
             return await GetDownloadById(download.Id);
         }
 
-        public async Task<bool> TryAddFile(DownloadFileModel file, MemoryStream stream)
+        public async Task<UploadFileResult> TryAddFile(string downloadId, string filename, Stream stream, int bufferSize, IProgress<int> progress, CancellationToken cancellationToken)
         {
-            if (ValidateQuery(await _downloadTable.SelectById(file.DownloadId), out Download download))
+            if (!ValidateQuery(await _downloadTable.SelectById(downloadId), out Download download))
             {
-                try // try
-                {
-                    await _downloadFileApi.Post(file, stream);
-                }
-                catch (Exception e)
-                {
-                    try // try a second time
-                    {
-                        await _downloadFileApi.Post(file, stream);
-                    }
-                    catch (Exception ex) // fail after 2 attempts
-                    {
-                        return false;
-                    }
-                }
-
-                if (!(await _downloadFileTable.Select(file.DownloadId)).Any(f => f.Filename == file.Filename))
-                {
-                    await _downloadFileTable.Insert(file);
-                }
-
-                await UpdateDownload(download); // set Updated to current datetime
-
-                return true;
+                return UploadFileResult.Failed;
             }
 
-            return false;
+            UploadToken token = await _downloadFileApi.PostToken(downloadId, filename, _downloadFileApi.GetTotalFiles((int)stream.Length, bufferSize));
+
+            UploadFileResult result = UploadFileResult.Success;
+
+            try
+            {
+                if (!await _downloadFileApi.PostFile(token, stream, bufferSize, progress, cancellationToken))
+                {
+                    result = UploadFileResult.Failed;
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                result = UploadFileResult.Cancelled;
+            }
+
+            if (cancellationToken.IsCancellationRequested || result != UploadFileResult.Success)
+            {
+                await _downloadFileApi.Delete(download.Id, token.RandomName);
+                return result;
+            }
+
+            if (!(await _downloadFileTable.SelectByDownload(download.Id)).Any(f => f.Filename == filename))
+            {
+                await _downloadFileTable.Insert(download.Id, filename, token.RandomName);
+            }
+
+            await UpdateDownload(download); // set Updated to current datetime
+
+            return UploadFileResult.Success;
         }
 
         public async Task UpdateDownload(Download download)
@@ -235,18 +242,20 @@ namespace DataAccessLibrary.Data
         public async Task DeleteDownload(string downloadid)
         {
             await _downloadTable.Delete(downloadid);
+            await _downloadFileTable.DeleteByDownload(downloadid);
+            // TODO: when changing download host, add generic download delete.
+            await _downloadAuthorTable.DeleteByDownload(downloadid);
         }
 
-        public async Task DeleteFile(DownloadFileModel file)
+        public async Task DeleteFile(string downloadId, string id)
         {
-            if ((await _downloadTable.SelectById(file.DownloadId)).Any())
+            if (!ValidateQuery(await _downloadFileTable.SelectById(id), out DownloadFile file))
             {
-                if ((await _downloadFileTable.Select(file.DownloadId)).Where(f => f.Filename == file.Filename).Any())
-                {
-                    await _downloadFileTable.DeleteByFile(file);
-                    await _downloadFileApi.Delete(file.DownloadId, file.Filename);
-                }
+                return;
             }
+
+            await _downloadFileApi.Delete(downloadId, file.RandomName);
+            await _downloadFileTable.DeleteByFile(id);
         }
 
         public async Task<bool> IsAuthor(string downloadid, string userid)

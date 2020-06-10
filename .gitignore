@@ -360,3 +360,4 @@ DownloadHost/Files/
 /WebApi/.config/dotnet-tools.json
 /DownloadHost/.config/dotnet-tools.json
 /BlazorUI/.config/dotnet-tools.json
+/TobyMeehan.Com/storage-credential.json
