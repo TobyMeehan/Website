@@ -56,7 +56,7 @@ namespace TobyMeehan.Com.Data.CloudStorage
 
                 dataObject = await client.PatchObjectAsync(dataObject);
 
-                return $"https://storage.cloud.google.com/{dataObject.Bucket}/{dataObject.Name}";
+                return $"https://storage.googleapis.com/{dataObject.Bucket}/{dataObject.Name}";
             }
         }
 
