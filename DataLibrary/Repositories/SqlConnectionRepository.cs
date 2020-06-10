@@ -51,7 +51,8 @@ namespace TobyMeehan.Com.Data.Repositories
                 Id = id,
                 ConnectionId = connection.Id,
                 Expiry = DateTime.Now.AddMinutes(30),
-                Code = RandomString.GenerateCrypto()
+                Code = RandomString.GenerateCrypto(),
+                CodeChallenge = codeChallenge
             });
 
             return (await _authCodeTable.SelectByAsync(ac => ac.Id == id)).SingleOrDefault();
