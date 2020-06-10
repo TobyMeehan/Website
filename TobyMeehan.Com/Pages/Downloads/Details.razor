@@ -81,7 +81,7 @@ else
     <p>
         <a href="/downloads"><i class="fas fa-angle-left"></i> Back to List</a>
 
-        <AuthorizeView Resource="_download" Policy="@AuthorizationPolicies.IsAdmin">
+        <AuthorizeView Resource="_download" Policy="@AuthorizationPolicies.CanEditDownload">
             |
             <a href="@($"/downloads/{Id}/edit")"><i class="fas fa-edit"></i> Edit</a>
             |
