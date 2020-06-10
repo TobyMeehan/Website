@@ -34,7 +34,8 @@ namespace TobyMeehan.Com.Data.Repositories
                 Id = id,
                 Title = title,
                 ShortDescription = shortDescription,
-                LongDescription = longDescription
+                LongDescription = longDescription ?? "",
+                Updated = DateTime.Now
             });
 
             await AddAuthorAsync(id, userId);
@@ -74,7 +75,8 @@ namespace TobyMeehan.Com.Data.Repositories
                 download.Title,
                 download.ShortDescription,
                 download.LongDescription,
-                download.Verified
+                download.Verified,
+                Updated = DateTime.Now
             });
         }
     }
