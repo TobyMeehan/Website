@@ -21,7 +21,7 @@ namespace TobyMeehan.Com.Data.Repositories
             _authCodeTable = authCodeTable;
         }
 
-        private async Task<Connection> AddAsync(string userId, string appId)
+        private async Task<Connection> InsertConnectionAsync(string userId, string appId, string codeChallenge)
         {
             string id = Guid.NewGuid().ToString();
 
@@ -29,7 +29,8 @@ namespace TobyMeehan.Com.Data.Repositories
             {
                 Id = id,
                 UserId = userId,
-                AppId = appId
+                AppId = appId,
+                CodeChallenge = codeChallenge
             });
 
             return await GetByIdAsync(id);
@@ -41,7 +42,7 @@ namespace TobyMeehan.Com.Data.Repositories
 
             if (connection == null)
             {
-                connection = await AddAsync(userId, appId);
+                connection = await InsertConnectionAsync(userId, appId, codeChallenge);
             }
 
             string id = Guid.NewGuid().ToString();
