@@ -1,4 +1,6 @@
-﻿<nav class="navbar navbar-expand-lg sticky-top navbar-dark bg-dark mb-3">
+﻿@inject NavigationManager navigation
+
+<nav class="navbar navbar-expand-lg sticky-top navbar-dark bg-dark mb-3">
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".navbar-collapse">
         <span class="navbar-toggler-icon"></span>
     </button>
@@ -45,12 +47,18 @@
                                 <span class="sr-only">Toggle Dropdown</span>
                             </button>
                             <div class="dropdown-menu">
-                                <a class="dropdown-item" href="/logout"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                                <a class="dropdown-item" href="/logout" @onclick="Logout" @onclick:preventDefault>
+                                    <i class="fas fa-sign-out-alt"></i>
+                                    Logout
+                                </a>
                             </div>
                         </div>
                     </Authorized>
                     <NotAuthorized>
-                        <a class="btn btn-outline-light" href="/login"><i class="fas fa-sign-in-alt"></i> Login</a>
+                        <a class="btn btn-outline-light" href="/login" @onclick="Login" @onclick:preventDefault>
+                            <i class="fas fa-sign-in-alt"></i>
+                            Login
+                        </a>
                     </NotAuthorized>
                 </AuthorizeView>
             </div>
@@ -76,4 +84,8 @@
             _user = await users.GetByIdAsync(_context.User.Id());
         }
     }
+
+    private void Login() => navigation.NavigateToLogin();
+
+    private void Logout() => navigation.NavigateToLogout();
 }
