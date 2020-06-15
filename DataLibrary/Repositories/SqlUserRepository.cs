@@ -55,9 +55,16 @@ namespace TobyMeehan.Com.Data.Repositories
             });
         }
 
-        public Task RemoveProfilePictureAsync(string id)
+        public async Task RemoveProfilePictureAsync(string id)
         {
-            return _cloudStorage.DeleteFileAsync(_options.ProfilePictureStorageBucket, id);
+            await _cloudStorage.DeleteFileAsync(_options.ProfilePictureStorageBucket, id);
+
+            string p = null;
+
+            await _table.UpdateAsync(u => u.Id == id, new
+            {
+                ProfilePictureUrl = p
+            });
         }
 
         public Task AddRoleAsync(string id, string roleId)
