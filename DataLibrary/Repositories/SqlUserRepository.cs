@@ -45,9 +45,9 @@ namespace TobyMeehan.Com.Data.Repositories
             return await GetByIdAsync(id);
         }
 
-        public async Task AddProfilePictureAsync(string id, string filename, Stream fileStream, CancellationToken cancellationToken = default, IProgress<IUploadProgress> progress = null)
+        public async Task AddProfilePictureAsync(string id, string filename, string contentType, Stream fileStream, CancellationToken cancellationToken = default, IProgress<IUploadProgress> progress = null)
         {
-            CloudFile file = await _cloudStorage.UploadFileAsync(fileStream, _options.ProfilePictureStorageBucket, id, filename, cancellationToken, progress);
+            CloudFile file = await _cloudStorage.UploadFileAsync(fileStream, _options.ProfilePictureStorageBucket, id, filename, contentType, cancellationToken, progress);
 
             await _table.UpdateAsync(u => u.Id == id, new
             {

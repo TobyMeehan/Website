@@ -37,7 +37,7 @@ namespace TobyMeehan.Com.Data.CloudStorage
             }
         }
 
-        public async Task<CloudFile> UploadFileAsync(Stream stream, string bucket, string objectName, string filename, CancellationToken cancellationToken = default, IProgress<IUploadProgress> progress = null)
+        public async Task<CloudFile> UploadFileAsync(Stream stream, string bucket, string objectName, string filename, string contentType, CancellationToken cancellationToken = default, IProgress<IUploadProgress> progress = null)
         {
             Progress<Google.Apis.Upload.IUploadProgress> googleProgress = new Progress<Google.Apis.Upload.IUploadProgress>();
 
@@ -57,7 +57,7 @@ namespace TobyMeehan.Com.Data.CloudStorage
                     ChunkSize = _chunkSize
                 };
 
-                var dataObject = await client.UploadObjectAsync(bucket, objectName, MediaTypeNames.Application.Octet, stream, options, cancellationToken, googleProgress);
+                var dataObject = await client.UploadObjectAsync(bucket, objectName, contentType, stream, options, cancellationToken, googleProgress);
 
                 dataObject.ContentDisposition = $"filename=\"{filename}\"";
 

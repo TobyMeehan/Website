@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net.Mime;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -33,7 +34,7 @@ namespace TobyMeehan.Com.Data.Repositories
 
             string id = Guid.NewGuid().ToString();
 
-            CloudFile cf = await _storage.UploadFileAsync(uploadStream, bucket, id, filename, cancellationToken, progress);
+            CloudFile cf = await _storage.UploadFileAsync(uploadStream, bucket, id, filename, MediaTypeNames.Application.Octet, cancellationToken, progress);
 
             await _table.InsertAsync(new
             {

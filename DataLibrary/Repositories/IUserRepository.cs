@@ -28,7 +28,7 @@ namespace TobyMeehan.Com.Data.Repositories
 
         Task RemoveRoleAsync(string id, string roleId);
 
-        Task AddProfilePictureAsync(string id, string filename, Stream fileStream, CancellationToken cancellationToken = default, IProgress<IUploadProgress> progress = null);
+        Task AddProfilePictureAsync(string id, string filename, string contentType, Stream fileStream, CancellationToken cancellationToken = default, IProgress<IUploadProgress> progress = null);
 
         Task RemoveProfilePictureAsync(string id);
 
