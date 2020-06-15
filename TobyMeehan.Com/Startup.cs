@@ -73,7 +73,7 @@ namespace TobyMeehan.Com
                 .AddCookie(options =>
                 {
                     options.LoginPath = "/login";
-                    options.AccessDeniedPath = ""; // TODO:
+                    options.AccessDeniedPath = "/login";
 
                     options.ExpireTimeSpan = DateTimeOffset.UtcNow.AddMonths(6).Subtract(DateTimeOffset.UtcNow);
                     options.SlidingExpiration = true;

@@ -3,30 +3,37 @@
 
 @inject IUserRepository users
 
-<div class="d-flex justify-content-between">
-    <h2>My Account</h2>
+<AuthorizeView Context="authState">
+    <NotAuthorized>
+        <Challenge></Challenge>
+    </NotAuthorized>
+    <Authorized>
+        <div class="d-flex justify-content-between">
+            <h2>My Account</h2>
 
-    <a href="/logout" class="btn btn-outline-warning btn-lg float-lg-right">Logout</a>
-</div>
-
-<div class="row">
-    <div class="col-md-2">
-        <div class="nav flex-column nav-pills mt-3" aria-orientation="vertical">
-            <NavLink class="nav-link" href="/me" Match="NavLinkMatch.All">Settings</NavLink>
-            <NavLink class="nav-link" href="/me/transactions" Match="NavLinkMatch.All">Transactions</NavLink>
-            <NavLink class="nav-link" href="/me/downloads" Match="NavLinkMatch.All">Downloads</NavLink>
-            <NavLink class="nav-link" href="/me/connections" Match="NavLinkMatch.All">Connections</NavLink>
+            <a href="/logout" class="btn btn-outline-warning btn-lg float-lg-right">Logout</a>
         </div>
-    </div>
 
-    <div class="col-md-10">
-        <Require Task="GetUserTask()">
-            <CascadingValue Value="context">
-                @Body
-            </CascadingValue>
-        </Require>
-    </div>
-</div>
+        <div class="row">
+            <div class="col-md-2">
+                <div class="nav flex-column nav-pills mt-3" aria-orientation="vertical">
+                    <NavLink class="nav-link" href="/me" Match="NavLinkMatch.All">Settings</NavLink>
+                    <NavLink class="nav-link" href="/me/transactions" Match="NavLinkMatch.All">Transactions</NavLink>
+                    <NavLink class="nav-link" href="/me/downloads" Match="NavLinkMatch.All">Downloads</NavLink>
+                    <NavLink class="nav-link" href="/me/connections" Match="NavLinkMatch.All">Connections</NavLink>
+                </div>
+            </div>
+
+            <div class="col-md-10">
+                <Require Task="GetUserTask()">
+                    <CascadingValue Value="context">
+                        @Body
+                    </CascadingValue>
+                </Require>
+            </div>
+        </div>
+    </Authorized>
+</AuthorizeView>
 
 @code {
     [CascadingParameter] public Task<AuthenticationState> AuthenticationStateTask { get; set; }
