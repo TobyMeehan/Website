@@ -1,10 +1,15 @@
-﻿using System;
+﻿using Microsoft.Extensions.Options;
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
+using TobyMeehan.Com.Data.CloudStorage;
 using TobyMeehan.Com.Data.Models;
 using TobyMeehan.Com.Data.Security;
+using TobyMeehan.Com.Data.Upload;
 using TobyMeehan.Sql;
 
 namespace TobyMeehan.Com.Data.Repositories
@@ -14,12 +19,16 @@ namespace TobyMeehan.Com.Data.Repositories
         private readonly ISqlTable<User> _table;
         private readonly ISqlTable<UserRole> _userRoleTable;
         private readonly IPasswordHash _passwordHash;
+        private readonly ICloudStorage _cloudStorage;
+        private readonly DataAccessLibraryOptions _options;
 
-        public SqlUserRepository(ISqlTable<User> table, ISqlTable<UserRole> userRoleTable, IPasswordHash passwordHash) : base(table)
+        public SqlUserRepository(ISqlTable<User> table, ISqlTable<UserRole> userRoleTable, IPasswordHash passwordHash, ICloudStorage cloudStorage, IOptions<DataAccessLibraryOptions> options) : base(table)
         {
             _table = table;
             _userRoleTable = userRoleTable;
             _passwordHash = passwordHash;
+            _cloudStorage = cloudStorage;
+            _options = options.Value;
         }
 
         public async Task<User> AddAsync(string username, string password)
@@ -34,6 +43,28 @@ namespace TobyMeehan.Com.Data.Repositories
             });
 
             return await GetByIdAsync(id);
+        }
+
+        public async Task AddProfilePictureAsync(string id, string filename, string contentType, Stream fileStream, CancellationToken cancellationToken = default, IProgress<IUploadProgress> progress = null)
+        {
+            CloudFile file = await _cloudStorage.UploadFileAsync(fileStream, _options.ProfilePictureStorageBucket, id, filename, contentType, cancellationToken, progress);
+
+            await _table.UpdateAsync(u => u.Id == id, new
+            {
+                ProfilePictureUrl = file.MediaLink
+            });
+        }
+
+        public async Task RemoveProfilePictureAsync(string id)
+        {
+            await _cloudStorage.DeleteFileAsync(_options.ProfilePictureStorageBucket, id);
+
+            string p = null;
+
+            await _table.UpdateAsync(u => u.Id == id, new
+            {
+                ProfilePictureUrl = p
+            });
         }
 
         public Task AddRoleAsync(string id, string roleId)

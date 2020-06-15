@@ -26,6 +26,7 @@ using TobyMeehan.Com.Data.CloudStorage;
 using Google.Apis.Auth.OAuth2;
 using TobyMeehan.Com.Tasks;
 using Blazor.FileReader;
+using TobyMeehan.Com.Data.Extensions;
 
 namespace TobyMeehan.Com
 {
@@ -41,27 +42,16 @@ namespace TobyMeehan.Com
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddTransient<Func<IDbConnection>>(x => () => new MySqlConnection(Configuration.GetConnectionString("Default")));
+            services.AddDataAccessLibrary(options =>
+            {
 
-            services.AddTransient<ISqlTable<User>, UserTable>();
-            services.AddTransient<ISqlTable<Application>, ApplicationTable>();
-            services.AddTransient<ISqlTable<Connection>, ConnectionTable>();
-            services.AddTransient<ISqlTable<Download>, DownloadTable>();
-            services.AddTransient(typeof(ISqlTable<>), typeof(SqlTable<>));
+                options.ConnectionFactory = () => new MySqlConnection(Configuration.GetConnectionString("Default"));
+                options.StorageCredential = GoogleCredential.FromFile(Configuration.GetSection("StorageCredential").Value);
 
-            services.AddTransient<ICloudStorage, GoogleCloudStorage>();
-            services.AddSingleton(GoogleCredential.FromFile(Configuration.GetSection("StorageCredential").Value));
+                options.DownloadStorageBucket = Configuration.GetSection("DownloadStorageBucket").Value;
+                options.ProfilePictureStorageBucket = Configuration.GetSection("ProfilePictureStorageBucket").Value;
 
-            services.AddTransient<IUserRepository, SqlUserRepository>();
-            services.AddTransient<IRoleRepository, SqlRoleRepository>();
-
-            services.AddTransient<IDownloadRepository, SqlDownloadRepository>();
-            services.AddTransient<IDownloadFileRepository, DownloadFileRepository>();
-
-            services.AddTransient<IApplicationRepository, SqlApplicationRepository>();
-            services.AddTransient<IConnectionRepository, SqlConnectionRepository>();
-
-            services.AddSingleton<IPasswordHash, BCryptPasswordHash>();
+            });
 
             services.AddSingleton(ConfigureMapper());
 
@@ -83,7 +73,7 @@ namespace TobyMeehan.Com
                 .AddCookie(options =>
                 {
                     options.LoginPath = "/login";
-                    options.AccessDeniedPath = ""; // TODO:
+                    options.AccessDeniedPath = "/login";
 
                     options.ExpireTimeSpan = DateTimeOffset.UtcNow.AddMonths(6).Subtract(DateTimeOffset.UtcNow);
                     options.SlidingExpiration = true;

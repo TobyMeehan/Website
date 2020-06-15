@@ -1,8 +1,10 @@
 ﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net.Mime;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -17,29 +19,29 @@ namespace TobyMeehan.Com.Data.Repositories
     {
         private readonly ISqlTable<DownloadFile> _table;
         private readonly ICloudStorage _storage;
-        private readonly IConfiguration _configuration;
+        private readonly DataAccessLibraryOptions _options;
 
-        public DownloadFileRepository(ISqlTable<DownloadFile> table, ICloudStorage storage, IConfiguration configuration)
+        public DownloadFileRepository(ISqlTable<DownloadFile> table, ICloudStorage storage, IOptions<DataAccessLibraryOptions> options)
         {
             _table = table;
             _storage = storage;
-            _configuration = configuration;
+            _options = options.Value;
         }
 
         public async Task<DownloadFile> AddAsync(string downloadId, string filename, Stream uploadStream, CancellationToken cancellationToken = default, IProgress<IUploadProgress> progress = null)
         {
-            string bucket = _configuration.GetSection("DownloadStorageBucket").Value;
+            string bucket = _options.DownloadStorageBucket;
 
             string id = Guid.NewGuid().ToString();
 
-            string url = await _storage.UploadFileAsync(uploadStream, bucket, id, filename, cancellationToken, progress);
+            CloudFile cf = await _storage.UploadFileAsync(uploadStream, bucket, id, filename, MediaTypeNames.Application.Octet, cancellationToken, progress);
 
             await _table.InsertAsync(new
             {
                 Id = id,
                 DownloadID = downloadId,
                 Filename = filename,
-                Url = url
+                Url = cf.DownloadLink
             });
 
             return (await _table.SelectByAsync(f => f.Id == id)).SingleOrDefault();
@@ -47,7 +49,7 @@ namespace TobyMeehan.Com.Data.Repositories
 
         public async Task DeleteAsync(string id)
         {
-            string bucket = _configuration.GetSection("DownloadStorageBucket").Value;
+            string bucket = _options.DownloadStorageBucket;
 
             await _storage.DeleteFileAsync(bucket, id);
 
@@ -56,7 +58,7 @@ namespace TobyMeehan.Com.Data.Repositories
 
         public Task DownloadAsync(string id, Stream stream)
         {
-            string bucket = _configuration.GetSection("DownloadStorageBucket").Value;
+            string bucket = _options.DownloadStorageBucket;
 
             return _storage.DownloadFileAsync(bucket, id, stream);
         }

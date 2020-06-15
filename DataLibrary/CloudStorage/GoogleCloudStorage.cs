@@ -7,8 +7,10 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using TobyMeehan.Com.Data.Models;
 using TobyMeehan.Com.Data.Upload;
-using static System.Net.Mime.MediaTypeNames;
+using System.Net.Mime;
+using Google.Apis.Storage.v1.Data;
 
 namespace TobyMeehan.Com.Data.CloudStorage
 {
@@ -22,6 +24,11 @@ namespace TobyMeehan.Com.Data.CloudStorage
             _credential = credential;
         }
 
+        private string GetDownloadLink(Google.Apis.Storage.v1.Data.Object obj)
+        {
+            return $"https://storage.googleapis.com/{obj.Bucket}/{obj.Name}";
+        }
+
         public async Task DeleteFileAsync(string bucket, string filename)
         {
             using (StorageClient client = await StorageClient.CreateAsync(_credential))
@@ -30,7 +37,7 @@ namespace TobyMeehan.Com.Data.CloudStorage
             }
         }
 
-        public async Task<string> UploadFileAsync(Stream stream, string bucket, string objectName, string filename, CancellationToken cancellationToken = default, IProgress<IUploadProgress> progress = null)
+        public async Task<CloudFile> UploadFileAsync(Stream stream, string bucket, string objectName, string filename, string contentType, CancellationToken cancellationToken = default, IProgress<IUploadProgress> progress = null)
         {
             Progress<Google.Apis.Upload.IUploadProgress> googleProgress = new Progress<Google.Apis.Upload.IUploadProgress>();
 
@@ -50,13 +57,13 @@ namespace TobyMeehan.Com.Data.CloudStorage
                     ChunkSize = _chunkSize
                 };
 
-                var dataObject = await client.UploadObjectAsync(bucket, objectName, Application.Octet, stream, options, cancellationToken, googleProgress);
+                var dataObject = await client.UploadObjectAsync(bucket, objectName, contentType, stream, options, cancellationToken, googleProgress);
 
                 dataObject.ContentDisposition = $"filename=\"{filename}\"";
 
                 dataObject = await client.PatchObjectAsync(dataObject);
 
-                return $"https://storage.googleapis.com/{dataObject.Bucket}/{dataObject.Name}";
+                return new CloudFile(GetDownloadLink(dataObject), dataObject.MediaLink);
             }
         }
 

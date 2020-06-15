@@ -1,0 +1,7 @@
+﻿<img src="@ProfilePictureUrl" style="height: 1.4em;" class="rounded" />
+
+@code {
+    [Parameter] public User User { get; set; }
+
+    private string ProfilePictureUrl => User.ProfilePictureUrl ?? "/img/DefaultProfile.svg";
+}

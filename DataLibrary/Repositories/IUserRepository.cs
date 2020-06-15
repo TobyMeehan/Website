@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using TobyMeehan.Com.Data.Models;
+using TobyMeehan.Com.Data.Upload;
 
 namespace TobyMeehan.Com.Data.Repositories
 {
@@ -24,6 +27,10 @@ namespace TobyMeehan.Com.Data.Repositories
         Task AddRoleAsync(string id, string roleId);
 
         Task RemoveRoleAsync(string id, string roleId);
+
+        Task AddProfilePictureAsync(string id, string filename, string contentType, Stream fileStream, CancellationToken cancellationToken = default, IProgress<IUploadProgress> progress = null);
+
+        Task RemoveProfilePictureAsync(string id);
 
         Task<bool> AnyUsernameAsync(string username);
 

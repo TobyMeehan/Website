@@ -1,8 +1,11 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿using Blazor.FileReader;
+using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using TobyMeehan.Com.Components;
 using TobyMeehan.Com.Components.Accounts;
@@ -10,8 +13,10 @@ using TobyMeehan.Com.Data;
 using TobyMeehan.Com.Data.Extensions;
 using TobyMeehan.Com.Data.Models;
 using TobyMeehan.Com.Data.Repositories;
+using TobyMeehan.Com.Data.Upload;
 using TobyMeehan.Com.Extensions;
 using TobyMeehan.Com.Models;
+using TobyMeehan.Com.Tasks;
 
 namespace TobyMeehan.Com.Pages.Settings
 {
@@ -75,6 +80,42 @@ namespace TobyMeehan.Com.Pages.Settings
             await users.DeleteAsync(CurrentUser.Id);
 
             navigation.NavigateTo("/logout", true);
+        }
+
+        private readonly int _maxSize = 10 * 1024 * 1024;
+        private async Task ProfilePicture_Change(IEnumerable<IFileReference> files)
+        {
+            IFileReference file = files.FirstOrDefault();
+
+            if (file == null)
+            {
+                return;
+            }
+
+            var fileInfo = await file.ReadFileInfoAsync();
+
+            if (fileInfo.Size > _maxSize)
+            {
+                return;
+            }
+
+            using (Stream uploadStream = await file.OpenReadAsync())
+            {
+                await users.AddProfilePictureAsync(CurrentUser.Id, fileInfo.Name, fileInfo.Type, uploadStream);
+            }
+
+            Refresh();
+        }
+
+        private async Task RemoveProfilePicture()
+        {
+            await users.RemoveProfilePictureAsync(CurrentUser.Id);
+            Refresh();
+        }
+
+        private void Refresh()
+        {
+            navigation.NavigateTo("/me", true);
         }
     }
 }

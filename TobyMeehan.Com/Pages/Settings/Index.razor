@@ -1,6 +1,5 @@
 ﻿@page "/me"
 @layout SettingsLayout
-@attribute [Authorize]
 
 @inject JavaScript interop
 
@@ -28,6 +27,25 @@
         </div>
 
         <div class="form-group">
+            <div class="input-group">
+                <div class="input-group-prepend">
+                    <span class="input-group-text">
+                        <ProfilePicture User="CurrentUser"></ProfilePicture>
+                    </span>
+                </div>
+                <div class="custom-file">
+                    <InputFile id="ProfilePicture" class="custom-file-input" OnChange="ProfilePicture_Change" />
+                    <label class="custom-file-label" for="ProfilePicture"><i class="fas fa-upload"></i> Profile Picture (10MB)</label>
+                </div>
+                <div class="input-group-append">
+                    <button class="btn btn-outline-danger" @onclick="RemoveProfilePicture">
+                        Remove
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group">
             <button class="btn btn-danger btn-lg" data-toggle="modal" data-target="#SettingsModal" @onclick="interop.ShowAccountTab">Delete Account</button>
         </div>
     </Card>
@@ -43,5 +61,5 @@
 </Modal>
 
 @code {
-    private RenderFragment _alertContent => @<span>Your password was changed.</span>;
+    private RenderFragment _alertContent =>@<span>Your password was changed.</span>;
 }
