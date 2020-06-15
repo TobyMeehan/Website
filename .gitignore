@@ -361,3 +361,4 @@ DownloadHost/Files/
 /DownloadHost/.config/dotnet-tools.json
 /BlazorUI/.config/dotnet-tools.json
 /TobyMeehan.Com/storage-credential.json
+/TobyMeehan.Com/connectionStrings.Development.json

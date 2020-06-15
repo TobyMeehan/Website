@@ -20,7 +20,14 @@ namespace TobyMeehan.Com
             Host.CreateDefaultBuilder(args)
                 .ConfigureAppConfiguration((hostingContext, config) =>
                 {
-                    config.AddJsonFile("connectionStrings.json");
+                    if (hostingContext.HostingEnvironment.IsDevelopment())
+                    {
+                        config.AddJsonFile("connectionStrings.Development.json");
+                    }
+                    else
+                    {
+                        config.AddJsonFile("connectionStrings.json");
+                    }
                 })
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
