@@ -8,7 +8,6 @@
 
   <ItemGroup>
     <PackageReference Include="Google.Cloud.Storage.V1" Version="3.1.0" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="3.1.5" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="3.1.5" />
     <PackageReference Include="Microsoft.Extensions.Options" Version="3.1.5" />
     <PackageReference Include="TobyMeehan.Sql" Version="0.4.2" />
