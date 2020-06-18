@@ -49,6 +49,18 @@
             <button class="btn btn-danger btn-lg" data-toggle="modal" data-target="#SettingsModal" @onclick="interop.ShowAccountTab">Delete Account</button>
         </div>
     </Card>
+
+    <Card class="my-3">
+        <EditForm Model="CurrentUser" OnValidSubmit="DescriptionForm_Submit" Context="editContext">
+            <div class="form-group">
+                <InputRichText Id="Description" @bind-Value="CurrentUser.Description" />
+            </div>
+
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary">Save</button>
+            </div>
+        </EditForm>
+    </Card>
 </AuthorizeView>
 
 <Modal id="SettingsModal">
