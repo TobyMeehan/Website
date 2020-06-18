@@ -128,5 +128,13 @@ namespace TobyMeehan.Com.Data.Repositories
                 Username = username
             });
         }
+
+        public Task UpdateDescriptionAsync(string id, string description)
+        {
+            return _table.UpdateAsync(u => u.Id == id, new
+            {
+                Description = description
+            });
+        }
     }
 }

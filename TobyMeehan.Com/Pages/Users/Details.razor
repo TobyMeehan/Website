@@ -19,6 +19,13 @@ else
         </h3>
     </Card>
 
+    @if (!string.IsNullOrEmpty(_user.Description))
+    {
+        <Card class="my-3">
+            @((MarkupString)_user.Description)
+        </Card>
+    }
+
     @if (_user.IsVerified())
     {
         <Card class="my-3">

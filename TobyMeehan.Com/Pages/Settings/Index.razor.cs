@@ -113,6 +113,11 @@ namespace TobyMeehan.Com.Pages.Settings
             Refresh();
         }
 
+        private async Task DescriptionForm_Submit()
+        {
+            await users.UpdateDescriptionAsync(CurrentUser.Id, CurrentUser.Description);
+        }
+
         private void Refresh()
         {
             navigation.NavigateTo("/me", true);
