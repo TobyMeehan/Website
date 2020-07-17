@@ -1,0 +1,12 @@
+﻿<img src="@User.ProfilePictureUrl" class="mr-3" height="64" width="64" />
+<div class="media-body">
+    <h5 class="mt-0"><UserLink User="User">@User.Username</UserLink></h5>
+
+    @ChildContent
+</div>
+
+@code {
+    [Parameter] public User User { get; set; }
+
+    [Parameter] public RenderFragment ChildContent { get; set; }
+}

@@ -1,0 +1,35 @@
+﻿@inherits AttributableComponentBase
+
+<div class="media @CssClass" @attributes="AdditionalAttributes">
+    <img src="@User.ProfilePictureUrl" class="mr-3" height="64" width="64" />
+
+    <div class="media-body">
+        <EditForm Model="_model" OnSubmit="Form_Submit">
+            <DataAnnotationsValidator />
+
+            <div class="form-group">
+                <InputTextArea class="form-control" rows="2" placeholder="Add a comment" @bind-Value="_model.Content" />
+                <ValidationMessage For="() => _model.Content" />
+            </div>
+
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary">Comment</button>
+                <button type="reset" class="btn btn-secondary">Cancel</button>
+            </div>
+        </EditForm>
+    </div>
+</div>
+
+@code {
+    private CommentViewModel _model = new CommentViewModel();
+
+    [Parameter] public User User { get; set; }
+
+    [Parameter] public EventCallback<CommentViewModel> OnSubmit { get; set; }
+
+    private async Task Form_Submit()
+    {
+        await OnSubmit.InvokeAsync(_model);
+        _model = new CommentViewModel();
+    }
+}

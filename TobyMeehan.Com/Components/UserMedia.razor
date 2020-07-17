@@ -1,0 +1,12 @@
+﻿@inherits AttributableComponentBase
+
+<div class="media @CssClass" @attributes="AdditionalAttributes">
+    <UserMediaContent User="User">
+        @ChildContent
+    </UserMediaContent>
+</div>
+
+@code {
+    [Parameter] public User User { get; set; }
+    [Parameter] public RenderFragment ChildContent { get; set; }
+}
