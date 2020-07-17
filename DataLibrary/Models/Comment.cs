@@ -6,11 +6,8 @@ using TobyMeehan.Sql.QueryBuilder;
 namespace TobyMeehan.Com.Data.Models
 {
     [SqlName("comments")]
-    public class Comment : EntityBase
+    public class Comment : Message
     {
         public string EntityId { get; set; }
-        public string UserId { get; set; }
-        public User User { get; set; }
-        public string Content { get; set; }
     }
 }

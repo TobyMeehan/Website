@@ -17,7 +17,6 @@ namespace TobyMeehan.Com.Data.Models
         public string Version { get; set; }
         public DateTime? Updated { get; set; }
         public EntityCollection<User> Authors { get; set; } = new EntityCollection<User>();
-        public EntityCollection<Comment> Comments { get; set; } = new EntityCollection<Comment>();
         public DownloadVerification Verified { get; set; }
         public virtual int VerifiedId
         {
