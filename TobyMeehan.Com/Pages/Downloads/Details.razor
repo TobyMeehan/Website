@@ -8,95 +8,115 @@
 }
 else
 {
-    <div class="d-md-flex justify-content-between text-center text-md-left">
-        <h1>@_download.Title</h1>
-        <br />
-        @if (_download.Authors.Count() == 1)
-        {
-            <h1>
-                <small class="text-muted">
-                    <UserLink User="_download.Authors.First()"></UserLink>
-                </small>
-            </h1>
-        }
-        else
-        {
-            <ul>
-                @foreach (var author in _download.Authors)
-                {
-                    <li class="h5 font-weight-light">
-                        <UserLink User="author"></UserLink>
-                    </li>
-                }
-            </ul>
-        }
-    </div>
+    <div class="row">
+        <div class="col-md-9">
+            <Card class="mb-3 border-dark">
+                <div class="d-md-flex justify-content-between text-center text-md-left">
+                    <div>
+                        <h1 class="d-inline font-weight-light">
+                            @_download.Title
+                        </h1>
 
-    @((MarkupString)_download.LongDescription)
+                        <span class="font-weight-light d-none d-md-inline">
+                            @switch (_download.Verified)
+                            {
+                                case DownloadVerification.Dangerous:
+                                    <span class="text-danger">
+                                        <i class="fas fa-exclamation"></i> Dangerous
+                                    </span>
+                                    break;
+                                case DownloadVerification.Verified:
+                                    <span class="text-success">
+                                        <i class="fas fa-check"></i> Verified
+                                    </span>
+                                    break;
+                            }
+                        </span>
+                    </div>
 
-    <AuthorizeView Policy="@AuthorizationPolicies.IsAdmin">
-        <Authorized>
-            <Card class="border-dark mb-2">
-                <EditForm Model="_download" OnSubmit="VerifyForm_Submit" Context="formContext" class="form-inline">
-                    <label class="my-1 mr-sm-2"><i class="fas fa-user-shield mr-1"></i> Set verification:</label>
-                    <InputSelect @bind-Value="@_download.Verified" class="custom-select my-1 mr-sm-2">
-                        <option value="@(DownloadVerification.None)">None</option>
-                        <option value="@(DownloadVerification.Verified)">Verified</option>
-                        <option value="@(DownloadVerification.Dangerous)">Dangerous</option>
-                    </InputSelect>
-                    <button type="submit" class="btn btn-dark">Submit</button>
-                </EditForm>
+                    <br />
+
+                    <button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#FilesModal"><i class="fas fa-download"></i> Download</button>
+                </div>
             </Card>
-        </Authorized>
-        <NotAuthorized>
-            @switch (_download.Verified)
+
+            @((MarkupString)_download.LongDescription)
+
+            <hr />
+
+            <h4>Comments (@_comments.Count())</h4>
+
+            @if (_comments == null)
             {
-                case DownloadVerification.Dangerous:
-                    <Card class="border-danger mb-2">
-                        <div class="text-danger">
-                            <i class="fas fa-exclamation"></i>
-                            This download has been marked as dangerous and could potentially cause damage to your computer.
-                        </div>
-                    </Card>
-                    break;
-                case DownloadVerification.Verified:
-                    <Card class="border-success mb-2">
-                        <div class="text-success">
-                            <i class="fas fa-check"></i>
-                            This download is verified and safe to use on your computer.
-                        </div>
-                    </Card>
-                    break;
+                <Loading></Loading>
             }
-        </NotAuthorized>
-    </AuthorizeView>
+            else
+            {
+                <CommentSection Comments="_comments" User="_user" OnCommentAdded="CommentForm_Submit" OnCommentChanged="Comment_Edit" OnCommentDeleted="Comment_Delete"></CommentSection>
+            }
+        </div>
+        <div class="col-md-3 text-center">
+            <Card class="mb-3">
+                <Content>
+                    <CardBody>
+                        <h5 class="card-title m-0">Authors</h5>
+                    </CardBody>
 
-    @if (_download.Updated != null)
-    {
-        <p class="text-muted font-weight-light">Last updated @_download.UpdatedString()</p>
-    }
+                    <ul class="list-group list-group-flush">
+                        @foreach (var author in _download.Authors)
+                        {
+                            <li class="list-group-item">
+                                <UserLink User="author"></UserLink>
+                            </li>
+                        }
+                    </ul>
+                </Content>
+            </Card>
 
-    <button type="button" class="btn btn-primary my-2" data-toggle="modal" data-target="#FilesModal"><i class="fas fa-download"></i> Download</button>
+            <AuthorizeView Resource="_download" Policy="@AuthorizationPolicies.CanEditDownload">
+                <div class="list-group mb-3">
+                    <a class="list-group-item list-group-item-action" href="@($"/downloads/{Id}/edit")">
+                        <i class="fas fa-edit"></i> Edit
+                    </a>
+                    <a class="list-group-item list-group-item-action" href="@($"/downloads/{Id}/files")">
+                        <i class="far fa-folder-open"></i> File Manager
+                    </a>
+                    <a class="list-group-item list-group-item-action" href="@($"/downloads/{Id}/authors")">
+                        <i class="fas fa-users-cog"></i> Authors
+                    </a>
+                    <a class="list-group-item list-group-item-action" href="@($"/downloads/{Id}/delete")">
+                        <i class="fas fa-trash"></i> Delete
+                    </a>
+                </div>
+            </AuthorizeView>
 
-    <p>
-        <a href="/downloads"><i class="fas fa-angle-left"></i> Back to List</a>
+            <AuthorizeView Policy="@AuthorizationPolicies.IsAdmin">
+                <Card class="mb-3">
+                    <EditForm Model="_download" OnSubmit="VerifyForm_Submit" Context="formContext" class="form-inline">
+                        <label class="my-1 mr-sm-0"><i class="fas fa-user-shield mr-1"></i></label>
+                        <InputSelect @bind-Value="@_download.Verified" class="custom-select my-1 mr-sm-2">
+                            <option value="@(DownloadVerification.None)">None</option>
+                            <option value="@(DownloadVerification.Verified)">Verified</option>
+                            <option value="@(DownloadVerification.Dangerous)">Dangerous</option>
+                        </InputSelect>
+                        <button type="submit" class="btn btn-dark">Submit</button>
+                    </EditForm>
+                </Card>
+            </AuthorizeView>
 
-        <AuthorizeView Resource="_download" Policy="@AuthorizationPolicies.CanEditDownload">
-            |
-            <a href="@($"/downloads/{Id}/edit")"><i class="fas fa-edit"></i> Edit</a>
-            |
-            <a href="@($"/downloads/{Id}/files")"><i class="far fa-folder-open"></i> File Manager</a>
-            |
-            <a href="@($"/downloads/{Id}/authors")"><i class="fas fa-users-cog"></i> Authors</a>
-            |
-            <a href="@($"/downloads/{Id}/delete")"><i class="fas fa-trash"></i> Delete</a>
-        </AuthorizeView>
-    </p>
+            @if (_download.Updated != null)
+            {
+                <Card class="mb-3">
+                    <small class="text-muted font-weight-light">Last updated @_download.UpdatedString()</small>
+                </Card>
+            }
+        </div>
+    </div>
 
     <FileModal Download="@_download" id="FilesModal"></FileModal>
 }
 
 @code {
     private RenderFragment VerifyAlertContent(DownloadVerification verification)
-        => @<span>Successfully changed verification to @verification.ToString().</span>;
+        =>@<span>Successfully changed verification to @verification.ToString().</span>;
 }

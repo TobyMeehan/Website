@@ -25,6 +25,7 @@ namespace TobyMeehan.Com.Data.Extensions
             services.AddTransient<ISqlTable<Application>, ApplicationTable>();
             services.AddTransient<ISqlTable<Connection>, ConnectionTable>();
             services.AddTransient<ISqlTable<Download>, DownloadTable>();
+            services.AddTransient<ISqlTable<Comment>, CommentTable>();
             services.AddTransient(typeof(ISqlTable<>), typeof(SqlTable<>));
 
 
@@ -40,6 +41,8 @@ namespace TobyMeehan.Com.Data.Extensions
 
             services.AddTransient<IApplicationRepository, SqlApplicationRepository>();
             services.AddTransient<IConnectionRepository, SqlConnectionRepository>();
+
+            services.AddTransient<ICommentRepository, SqlCommentRepository>();
 
             services.AddSingleton<IPasswordHash, BCryptPasswordHash>();
 

@@ -16,7 +16,8 @@ namespace TobyMeehan.Com.Data.Sql
     public class DownloadTable : MultiMappingTableBase<Download>
     {
         public DownloadTable(Func<IDbConnection> connectionFactory) : base(connectionFactory)
-        {
+        { 
+
         }
 
         protected override ISqlQuery<Download> GetQuery(Dictionary<string, Download> dictionary)
@@ -39,7 +40,6 @@ namespace TobyMeehan.Com.Data.Sql
                         userEntry = user;
                         entry.Authors.Add(userEntry);
                     }
-                        
 
                     userEntry = userEntry.Map(role, transaction);
 

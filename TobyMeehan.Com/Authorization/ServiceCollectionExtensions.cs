@@ -13,12 +13,14 @@ namespace TobyMeehan.Com.Authorization
         public static void AddAuthorizationPolicies(this IServiceCollection services)
         {
             services.AddSingleton<IAuthorizationHandler, CanEditDownloadAuthorizationHandler>();
+            services.AddSingleton<IAuthorizationHandler, CanEditCommentAuthorizationHandler>();
 
             services.AddAuthorization(options =>
             {
                 options.AddPolicy(IsVerified, IsVerifiedPolicy());
                 options.AddPolicy(IsAdmin, IsAdminPolicy());
                 options.AddPolicy(CanEditDownload, CanEditDownloadPolicy());
+                options.AddPolicy(CanEditComment, CanEditCommentPolicy());
             });
         }
     }
