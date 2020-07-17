@@ -13,5 +13,9 @@ namespace TobyMeehan.Com.Data.Repositories
         Task<IList<Comment>> GetByEntityAsync(string entityId);
 
         Task AddAsync(string entityId, string userId, string content);
+
+        Task UpdateAsync(string id, string content);
+
+        Task DeleteAsync(string id);
     }
 }
