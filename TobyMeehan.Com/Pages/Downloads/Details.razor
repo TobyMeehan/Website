@@ -42,6 +42,17 @@ else
 
             @((MarkupString)_download.LongDescription)
 
+            <AuthorizeView>
+                <hr />
+                @if (_comments == null)
+                {
+                    <Loading></Loading>
+                }
+                else
+                {
+                    <CommentSection Comments="_comments" User="_user" OnCommentAdded="CommentForm_Submit"></CommentSection>
+                }
+            </AuthorizeView>
         </div>
         <div class="col-md-3 text-center">
             <Card class="mb-3">
