@@ -1,13 +1,15 @@
-﻿<InputComment User="User" Placeholder="Add a comment" OnSubmit="OnCommentAdded">
-    <SubmitButton>Comment</SubmitButton>
-</InputComment>
+﻿<AuthorizeView>
+    <InputComment User="User" Placeholder="Add a comment" OnSubmit="OnCommentAdded">
+        <SubmitButton>Comment</SubmitButton>
+    </InputComment>
+</AuthorizeView>
 
 <hr />
 
 <ul class="list-unstyled">
     @foreach (var comment in Comments)
     {
-        <CommentThread Comment="comment"></CommentThread>
+        <CommentThread Comment="comment" OnCommentChanged="OnCommentChanged" OnCommentDeleted="OnCommentDeleted"></CommentThread>
     }
 </ul>
 
@@ -17,5 +19,6 @@
 
     [Parameter] public EventCallback<CommentViewModel> OnCommentAdded { get; set; }
     [Parameter] public EventCallback<CommentViewModel> OnCommentChanged { get; set; }
+    [Parameter] public EventCallback<Comment> OnCommentDeleted { get; set; }
 
 }

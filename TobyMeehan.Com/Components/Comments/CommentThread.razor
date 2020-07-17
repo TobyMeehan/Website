@@ -1,7 +1,10 @@
 ﻿@inherits AttributableComponentBase
 
-<CommentListItem Comment="Comment"></CommentListItem>
+<CommentListItem Comment="Comment" OnEdit="OnCommentChanged" OnDelete="OnCommentDeleted"></CommentListItem>
 
 @code {
     [Parameter] public Comment Comment { get; set; }
+
+    [Parameter] public EventCallback<CommentViewModel> OnCommentChanged { get; set; }
+    [Parameter] public EventCallback<Comment> OnCommentDeleted { get; set; }
 }

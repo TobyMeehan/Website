@@ -2,7 +2,7 @@
 
 @if (_isInEditMode)
 {
-    <InputComment User="Comment.User" Value="@Comment.Content" OnSubmit="Edit_Submit" OnCancel="Edit_Click">
+    <InputComment User="Comment.User" Comment="Comment" OnSubmit="Edit_Submit" OnCancel="Edit_Click">
         <SubmitButton>Save</SubmitButton>
     </InputComment>
 }
@@ -13,14 +13,20 @@ else
             <div class="d-flex justify-content-between">
                 <div>
                     <UserLink User="Comment.User">@Comment.User.Username</UserLink>
-                    <small class="text-muted">@Comment.DateString()</small>
+                    <small class="text-muted">
+                        @Comment.DateString()
+                        @if (Comment.Edited != null)
+                        {
+                            <span>(edited)</span>
+                        }
+                    </small>
                 </div>
                 <AuthorizeView Resource="Comment" Policy="@AuthorizationPolicies.CanEditComment">
                     <div class="btn-group btn-group-sm" role="group">
                         <button type="button" class="btn btn-warning" @onclick="Edit_Click">
                             <i class="fas fa-edit"></i> Edit
                         </button>
-                        <button type="button" class="btn btn-danger btn-sm">
+                        <button type="button" class="btn btn-danger btn-sm" @onclick="() => OnDelete.InvokeAsync(Comment)">
                             <i class="fas fa-trash"></i> Delete
                         </button>
                     </div>
@@ -28,7 +34,9 @@ else
             </div>
         </Title>
         <ChildContent>
-            <p class="mb-1">@Comment.Content</p>
+            <p class="mb-1">
+                @((MarkupString)WebUtility.HtmlEncode(Comment.Content).Replace("\n", "<br />"))
+            </p>
         </ChildContent>
     </UserMediaListItem>
 }

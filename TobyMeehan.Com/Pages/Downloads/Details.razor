@@ -42,17 +42,18 @@ else
 
             @((MarkupString)_download.LongDescription)
 
-            <AuthorizeView>
-                <hr />
-                @if (_comments == null)
-                {
-                    <Loading></Loading>
-                }
-                else
-                {
-                    <CommentSection Comments="_comments" User="_user" OnCommentAdded="CommentForm_Submit"></CommentSection>
-                }
-            </AuthorizeView>
+            <hr />
+
+            <h4>Comments (@_comments.Count())</h4>
+
+            @if (_comments == null)
+            {
+                <Loading></Loading>
+            }
+            else
+            {
+                <CommentSection Comments="_comments" User="_user" OnCommentAdded="CommentForm_Submit" OnCommentChanged="Comment_Edit" OnCommentDeleted="Comment_Delete"></CommentSection>
+            }
         </div>
         <div class="col-md-3 text-center">
             <Card class="mb-3">

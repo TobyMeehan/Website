@@ -10,12 +10,12 @@ namespace TobyMeehan.Com.Extensions
     {
         private static string Pluralise(int unitTime, string timeUnit)
         {
-            return $"{unitTime} {timeUnit}{(unitTime > 1 ? "s" : "")}";
+            return $"{unitTime} {timeUnit}{(unitTime == 1 ? "" : "s")}";
         }
 
         public static string DateString(this Comment comment)
         {
-            DateTime date = comment.Edited ?? comment.Sent;
+            DateTime date = comment.Sent;
             TimeSpan timeSpan = DateTime.Now - date;
             string interval;
 
