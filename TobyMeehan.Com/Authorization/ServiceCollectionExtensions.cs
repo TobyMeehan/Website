@@ -13,6 +13,7 @@ namespace TobyMeehan.Com.Authorization
         public static void AddAuthorizationPolicies(this IServiceCollection services)
         {
             services.AddSingleton<IAuthorizationHandler, CanEditDownloadAuthorizationHandler>();
+            services.AddSingleton<IAuthorizationHandler, CanEditCommentAuthorizationHandler>();
 
             services.AddAuthorization(options =>
             {
