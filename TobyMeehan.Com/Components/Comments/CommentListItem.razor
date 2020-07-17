@@ -1,0 +1,59 @@
+﻿@inherits AttributableComponentBase
+
+@if (_isInEditMode)
+{
+    <InputComment User="Comment.User" Value="@Comment.Content" OnSubmit="Edit_Submit" OnCancel="Edit_Click">
+        <SubmitButton>Save</SubmitButton>
+    </InputComment>
+}
+else
+{
+    <UserMediaListItem User="Comment.User" class="@($"mb-4 {CssClass}")" @attributes="AdditionalAttributes">
+        <Title>
+            <div class="d-flex justify-content-between">
+                <div>
+                    <UserLink User="Comment.User">@Comment.User.Username</UserLink>
+                    <small class="text-muted">@Comment.DateString()</small>
+                </div>
+                <AuthorizeView Resource="Comment" Policy="@AuthorizationPolicies.CanEditComment">
+                    <div class="btn-group btn-group-sm" role="group">
+                        <button type="button" class="btn btn-warning" @onclick="Edit_Click">
+                            <i class="fas fa-edit"></i> Edit
+                        </button>
+                        <button type="button" class="btn btn-danger btn-sm">
+                            <i class="fas fa-trash"></i> Delete
+                        </button>
+                    </div>
+                </AuthorizeView>
+            </div>
+        </Title>
+        <ChildContent>
+            <p class="mb-1">@Comment.Content</p>
+        </ChildContent>
+    </UserMediaListItem>
+}
+
+@code {
+    [Parameter] public Comment Comment { get; set; }
+
+    [Parameter] public EventCallback<CommentViewModel> OnEdit { get; set; }
+    [Parameter] public EventCallback<Comment> OnDelete { get; set; }
+
+    private bool _isInEditMode = false;
+
+    private void Edit_Click()
+    {
+        _isInEditMode = !_isInEditMode;
+    }
+
+    private async Task Delete_Click()
+    {
+        await OnDelete.InvokeAsync(Comment);
+    }
+
+    private async Task Edit_Submit(CommentViewModel model)
+    {
+        await OnEdit.InvokeAsync(model);
+        Edit_Click();
+    }
+}

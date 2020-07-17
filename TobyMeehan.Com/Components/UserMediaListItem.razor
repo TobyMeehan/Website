@@ -2,11 +2,13 @@
 
 <li class="media @CssClass" @attributes="AdditionalAttributes">
     <UserMediaContent User="User">
-        @ChildContent
+        <Title>@Title</Title>
+        <ChildContent>@ChildContent</ChildContent>
     </UserMediaContent>
 </li>
 
 @code {
     [Parameter] public User User { get; set; }
     [Parameter] public RenderFragment ChildContent { get; set; }
+    [Parameter] public RenderFragment Title { get; set; }
 }

@@ -1,8 +1,6 @@
 ﻿@inherits AttributableComponentBase
 
-<UserMediaListItem User="Comment.User" class="@(CssClass ?? "")" @attributes="AdditionalAttributes">
-    @Comment.Content
-</UserMediaListItem>
+<CommentListItem Comment="Comment"></CommentListItem>
 
 @code {
     [Parameter] public Comment Comment { get; set; }
