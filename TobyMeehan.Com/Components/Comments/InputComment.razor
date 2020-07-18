@@ -60,6 +60,11 @@
 
     protected virtual async Task Form_Submit()
     {
+        if (_model.Content.Length < 1)
+        {
+            return;
+        }
+
         await OnSubmit.InvokeAsync(_model);
         _model.Content = "";
     }
