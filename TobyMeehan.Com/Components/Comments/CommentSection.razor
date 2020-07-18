@@ -1,5 +1,5 @@
 ﻿<AuthorizeView>
-    <InputComment User="User" Placeholder="Add a comment" OnSubmit="OnCommentAdded">
+    <InputComment User="User" Entity="Entity" Placeholder="Add a comment" OnSubmit="OnCommentAdded">
         <SubmitButton>Comment</SubmitButton>
     </InputComment>
 </AuthorizeView>
@@ -9,13 +9,14 @@
 <ul class="list-unstyled">
     @foreach (var comment in Comments)
     {
-        <CommentThread Comment="comment" OnCommentChanged="OnCommentChanged" OnCommentDeleted="OnCommentDeleted"></CommentThread>
+        <CommentThread Comment="comment.Key" Replies="comment.Value" User="User" OnCommentAdded="OnCommentAdded" OnCommentChanged="OnCommentChanged" OnCommentDeleted="OnCommentDeleted"></CommentThread>
     }
 </ul>
 
 @code {
     [Parameter] public User User { get; set; }
-    [Parameter] public IEnumerable<Comment> Comments { get; set; }
+    [Parameter] public IDictionary<Comment, IEnumerable<Comment>> Comments { get; set; }
+    [Parameter] public EntityBase Entity { get; set; }
 
     [Parameter] public EventCallback<CommentViewModel> OnCommentAdded { get; set; }
     [Parameter] public EventCallback<CommentViewModel> OnCommentChanged { get; set; }

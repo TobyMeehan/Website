@@ -21,6 +21,8 @@
                 </button>
             </div>
         </EditForm>
+
+        @ChildContent
     </div>
 </div>
 
@@ -30,8 +32,10 @@
     [Parameter] public string Placeholder { get; set; }
     [Parameter] public string Value { get; set; }
     [Parameter] public Comment Comment { get; set; }
+    [Parameter] public EntityBase Entity { get; set; }
 
     [Parameter] public RenderFragment SubmitButton { get; set; }
+    [Parameter] public RenderFragment ChildContent { get; set; }
 
     [Parameter] public EventCallback<CommentViewModel> OnSubmit { get; set; }
     [Parameter] public EventCallback OnCancel { get; set; }
@@ -44,6 +48,11 @@
         {
             Value = Comment.Content;
             _model.Id = Comment.Id;
+        }
+
+        if (Entity != null)
+        {
+            _model.EntityId = Entity.Id;
         }
 
         _model.Content = Value;

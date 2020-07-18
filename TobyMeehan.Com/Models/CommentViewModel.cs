@@ -10,6 +10,8 @@ namespace TobyMeehan.Com.Models
     {
         public string Id { get; set; }
 
+        public string EntityId { get; set; }
+
         [MaxLength(321, ErrorMessage = "Comments should be less than 321 characters.")]
         [MinLength(1, ErrorMessage = "You need to actually write something.")]
         public string Content { get; set; }
