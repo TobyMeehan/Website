@@ -1,10 +1,51 @@
 ﻿@inherits AttributableComponentBase
 
-<CommentListItem Comment="Comment" OnEdit="OnCommentChanged" OnDelete="OnCommentDeleted"></CommentListItem>
+<CommentListItem Comment="Comment" OnEdit="OnCommentChanged" OnDelete="OnCommentDeleted">
+    @if (_isReplyMode)
+    {
+        <InputComment User="User" Entity="Comment" Placeholder="Add reply" OnCancel="ToggleReplyMode" OnSubmit="Reply_Submit">
+            <SubmitButton>Reply</SubmitButton>
+        </InputComment>
+    }
+    else
+    {
+        <AuthorizeView>
+            <button type="button" class="btn btn-primary btn-sm mb-2" @onclick="ToggleReplyMode">Reply</button>
+        </AuthorizeView>
+    }
+
+    @if (Replies.Any())
+    {
+        <ul class="list-unstyled">
+            @foreach (var reply in Replies)
+            {
+                <CommentListItem Comment="reply" OnEdit="OnCommentChanged" OnDelete="OnCommentDeleted"></CommentListItem>
+            }
+        </ul>
+    }
+</CommentListItem>
+
+
 
 @code {
     [Parameter] public Comment Comment { get; set; }
+    [Parameter] public IEnumerable<Comment> Replies { get; set; } = new List<Comment>();
+    [Parameter] public User User { get; set; }
 
+    [Parameter] public EventCallback<CommentViewModel> OnCommentAdded { get; set; }
     [Parameter] public EventCallback<CommentViewModel> OnCommentChanged { get; set; }
     [Parameter] public EventCallback<Comment> OnCommentDeleted { get; set; }
+
+    private bool _isReplyMode = false;
+
+    private void ToggleReplyMode()
+    {
+        _isReplyMode = !_isReplyMode;
+    }
+
+    private async Task Reply_Submit(CommentViewModel comment)
+    {
+        await OnCommentAdded.InvokeAsync(comment);
+        ToggleReplyMode();
+    }
 }

@@ -12,6 +12,10 @@
         <div class="col-sm-2"></div>
 
         <div class="col-sm-8">
+            <div id="blazor-error-ui" class="alert alert-danger" role="alert">
+                Oh blast, it looks like something fucked up. You can continue using the website by <a href="" class="alert-link reload">reloading</a> the page. If you are really awesome, you can <a href="https://github.com/TobyMeehan/Website/issues/new/choose" class="alert-link">create an issue</a> so I can fix the problem.
+            </div>
+
             @foreach (var alert in alertState)
             {
                 <Alert Model="alert"></Alert>

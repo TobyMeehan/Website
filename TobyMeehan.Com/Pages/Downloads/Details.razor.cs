@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Google.Protobuf.WellKnownTypes;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using System;
@@ -26,7 +27,7 @@ namespace TobyMeehan.Com.Pages.Downloads
 
         private Download _download;
         private User _user;
-        private IEnumerable<Comment> _comments;
+        private IDictionary<Comment, IEnumerable<Comment>> _comments;
         private AuthenticationState _context;
 
         protected override async Task OnInitializedAsync()
@@ -43,7 +44,16 @@ namespace TobyMeehan.Com.Pages.Downloads
 
         private async Task ResetComments()
         {
-            _comments = (await Task.Run(() => comments.GetByEntityAsync(Id))).OrderBy(c => c.Sent).Reverse();
+            var list = (await Task.Run(() => comments.GetByEntityAsync(Id))).OrderBy(c => c.Sent).Reverse();
+
+            _comments = new Dictionary<Comment, IEnumerable<Comment>>();
+
+            foreach (var item in list)
+            {
+                IEnumerable<Comment> replies = await comments.GetByEntityAsync(item.Id);
+                replies = replies.OrderBy(c => c.Sent).Reverse();
+                _comments.Add(item, replies);
+            }
         }
 
         private async Task VerifyForm_Submit()
@@ -55,7 +65,7 @@ namespace TobyMeehan.Com.Pages.Downloads
 
         private async Task CommentForm_Submit(CommentViewModel comment)
         {
-            await comments.AddAsync(_download.Id, _user.Id, comment.Content);
+            await comments.AddAsync(comment.EntityId, _user.Id, comment.Content);
             await ResetComments();
         }
 

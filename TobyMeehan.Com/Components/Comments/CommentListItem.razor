@@ -4,6 +4,9 @@
 {
     <InputComment User="Comment.User" Comment="Comment" OnSubmit="Edit_Submit" OnCancel="Edit_Click">
         <SubmitButton>Save</SubmitButton>
+        <ChildContent>
+            @ChildContent
+        </ChildContent>
     </InputComment>
 }
 else
@@ -37,6 +40,8 @@ else
             <p class="mb-1">
                 @((MarkupString)WebUtility.HtmlEncode(Comment.Content).Replace("\n", "<br />"))
             </p>
+
+            @ChildContent
         </ChildContent>
     </UserMediaListItem>
 }
@@ -46,6 +51,8 @@ else
 
     [Parameter] public EventCallback<CommentViewModel> OnEdit { get; set; }
     [Parameter] public EventCallback<Comment> OnDelete { get; set; }
+
+    [Parameter] public RenderFragment ChildContent { get; set; }
 
     private bool _isInEditMode = false;
 
