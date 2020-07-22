@@ -21,6 +21,7 @@ namespace TobyMeehan.Com.Pages
 
         private Timer _timer;
         private int _secondsElapsed;
+        private int _percentageProgress => GetPercentageProgress();
 
         protected override async Task OnInitializedAsync()
         {
