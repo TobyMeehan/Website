@@ -129,10 +129,10 @@ namespace TobyMeehan.Com
 
             app.UseEndpoints(endpoints =>
             {
+                endpoints.MapControllerRoute("default", "{controller=Home}/{action=Index}/{id?}");
                 endpoints.MapHub<ButtonHub>("/buttonhub");
                 endpoints.MapBlazorHub();
                 endpoints.MapFallbackToPage("/_Host");
-                endpoints.MapControllerRoute("default", "{controller=Home}/{action=Index}/{id?}");
             });
         }
     }

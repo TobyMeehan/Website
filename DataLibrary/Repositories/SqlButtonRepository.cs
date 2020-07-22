@@ -50,7 +50,7 @@ namespace TobyMeehan.Com.Data.Repositories
 
         public int GetButtonPercentage(int buttonSeconds)
         {
-            double totalSeconds = TimeSpan.FromMinutes(2).TotalSeconds; // TODO: set to 15 hours
+            double totalSeconds = TimeSpan.FromHours(15).TotalSeconds;
 
             return (int)(((double)buttonSeconds / totalSeconds) * 100d);
         }
