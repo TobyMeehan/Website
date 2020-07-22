@@ -1,0 +1,14 @@
+﻿<AuthorizeView>
+    <div class="jumbotron">
+        <div class="row">
+            <div class="col-12">
+                <button class="btn btn-secondary mx-auto" @onclick="() => OnButtonClick(context.User.Id())">The Button</button>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <ProgressBar Context="BootstrapContext.Secondary" PercentageProgress="GetPercentageProgress()"></ProgressBar>
+            </div>
+        </div>
+    </div>
+</AuthorizeView>
