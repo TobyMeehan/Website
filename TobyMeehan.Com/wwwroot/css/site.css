@@ -30,6 +30,34 @@
     padding: 0;
 }
 
+.button-purple {
+    background-color: purple;
+    color: white;
+}
+
+.button-blue {
+    background-color: #0083C7;
+    color: white;
+}
+
+.button-green {
+    background-color: #02be01;
+    color: white;
+}
+
+.button-yellow {
+    background-color: #E5D900;
+}
+
+.button-orange {
+    background-color: #e59500;
+}
+
+.button-red {
+    background-color: #e50000;
+    color: white;
+}
+
 @media (min-width: 0) {
     .card-deck-responsive .card {
         flex: 0 0 calc(100% - 30px);

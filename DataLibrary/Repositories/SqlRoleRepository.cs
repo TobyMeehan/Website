@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TobyMeehan.Com.Data.Models;
@@ -27,6 +28,11 @@ namespace TobyMeehan.Com.Data.Repositories
             });
 
             return await GetByIdAsync(id);
+        }
+
+        public async Task<Role> GetByNameAsync(string name)
+        {
+            return (await _table.SelectByAsync(r => r.Name == name)).SingleOrDefault();
         }
     }
 }

@@ -44,6 +44,8 @@ namespace TobyMeehan.Com.Data.Extensions
 
             services.AddTransient<ICommentRepository, SqlCommentRepository>();
 
+            services.AddTransient<IButtonRepository, SqlButtonRepository>();
+
             services.AddSingleton<IPasswordHash, BCryptPasswordHash>();
 
 

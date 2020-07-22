@@ -12,9 +12,9 @@ else
         <h3>
             <Username User="_user"></Username>
 
-            @if (_user.Roles.Any())
+            @if (_user.IsVerified())
             {
-                <small class="text-muted">@_user.Roles.First().Name</small>
+                <small class="text-muted">Verified</small>
             }
         </h3>
     </Card>
