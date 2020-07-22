@@ -12,6 +12,8 @@ namespace TobyMeehan.Com.Data.Repositories
 
         Task<IList<ButtonPress>> GetByUserAsync(string userId);
 
+        int GetButtonPercentage(int buttonSeconds);
+
         Task AddAsync(string userId, TimeSpan buttonTimeSpan);
     }
 }

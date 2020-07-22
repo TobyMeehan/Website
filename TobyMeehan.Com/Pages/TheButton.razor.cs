@@ -21,7 +21,7 @@ namespace TobyMeehan.Com.Pages
 
         private Timer _timer;
         private int _secondsElapsed;
-        private int _percentageProgress => GetPercentageProgress();
+        private int _percentageProgress => presses.GetButtonPercentage(_secondsElapsed);
 
         protected override async Task OnInitializedAsync()
         {
@@ -45,13 +45,6 @@ namespace TobyMeehan.Com.Pages
             });
 
             await _hubConnection.StartAsync();
-        }
-
-        private int GetPercentageProgress()
-        {
-            double totalSeconds = TimeSpan.FromMinutes(1).TotalSeconds;
-
-            return (int)(((double)_secondsElapsed / totalSeconds) * 100d);
         }
 
         private void SetTimer()

@@ -12,6 +12,8 @@ namespace TobyMeehan.Com.Data.Repositories
 
         Task<Role> GetByIdAsync(string id);
 
+        Task<Role> GetByNameAsync(string name);
+
         Task<Role> AddAsync(string name);
 
         Task DeleteAsync(string id);
