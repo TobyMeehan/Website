@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.SignalR.Client;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,18 +13,37 @@ namespace TobyMeehan.Com.Pages
     public partial class TheButton : ComponentBase, IDisposable
     {
         [Inject] private IButtonRepository presses { get; set; }
+        [Inject] private NavigationManager navigation { get; set; }
 
         private IEnumerable<ButtonPress> _previousPresses = new List<ButtonPress>();
+
+        private HubConnection _hubConnection;
 
         private Timer _timer;
         private int _secondsElapsed;
 
         protected override async Task OnInitializedAsync()
         {
-            _previousPresses = await Task.Run(presses.GetAsync);
+            await ConfigureHubConnection();
 
-            _secondsElapsed = _previousPresses.OrderByDescending(p => p.TimePressed).FirstOrDefault()?.ButtonSeconds ?? 0;
+            _previousPresses = await Task.Run(presses.GetAsync);
+            _secondsElapsed = (int)(DateTime.Now - _previousPresses.Max(p => p.TimePressed)).TotalSeconds;
+
             SetTimer();
+        }
+
+        private async Task ConfigureHubConnection()
+        {
+            _hubConnection = new HubConnectionBuilder()
+                .WithUrl(navigation.ToAbsoluteUri("/buttonhub"))
+                .Build();
+
+            _hubConnection.On("ButtonPressed", () =>
+            {
+                _secondsElapsed = 0;
+            });
+
+            await _hubConnection.StartAsync();
         }
 
         private int GetPercentageProgress()
@@ -49,13 +69,13 @@ namespace TobyMeehan.Com.Pages
 
         private async Task OnButtonClick(string userId)
         {
-            await presses.AddAsync(userId, TimeSpan.FromSeconds(_secondsElapsed));
-            _secondsElapsed = 0;
+            await _hubConnection.SendAsync("PressButton", userId, _secondsElapsed);
         }
 
         public void Dispose()
         {
             _timer?.Dispose();
+            _ = _hubConnection.DisposeAsync();
         }
     }
 }

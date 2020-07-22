@@ -27,6 +27,9 @@ using Google.Apis.Auth.OAuth2;
 using TobyMeehan.Com.Tasks;
 using Blazor.FileReader;
 using TobyMeehan.Com.Data.Extensions;
+using TobyMeehan.Com.Hubs;
+using Microsoft.AspNetCore.ResponseCompression;
+using System.Net.Mime;
 
 namespace TobyMeehan.Com
 {
@@ -65,9 +68,18 @@ namespace TobyMeehan.Com
 
             services.AddRazorPages();
 
+            services.AddSignalR();
             services.AddServerSideBlazor();
 
             services.AddControllersWithViews();
+
+            services.AddResponseCompression(options =>
+            {
+                options.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(new[]
+                {
+                    MediaTypeNames.Application.Octet
+                });
+            });
 
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
                 .AddCookie(options =>
@@ -93,6 +105,8 @@ namespace TobyMeehan.Com
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            app.UseResponseCompression();
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -115,6 +129,7 @@ namespace TobyMeehan.Com
 
             app.UseEndpoints(endpoints =>
             {
+                endpoints.MapHub<ButtonHub>("/buttonhub");
                 endpoints.MapBlazorHub();
                 endpoints.MapFallbackToPage("/_Host");
                 endpoints.MapControllerRoute("default", "{controller=Home}/{action=Index}/{id?}");
