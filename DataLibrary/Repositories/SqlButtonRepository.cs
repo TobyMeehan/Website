@@ -50,7 +50,7 @@ namespace TobyMeehan.Com.Data.Repositories
 
         public int GetButtonPercentage(int buttonSeconds)
         {
-            double totalSeconds = TimeSpan.FromMinutes(1).TotalSeconds;
+            double totalSeconds = TimeSpan.FromMinutes(2).TotalSeconds; // TODO: set to 15 hours
 
             return (int)(((double)buttonSeconds / totalSeconds) * 100d);
         }
@@ -60,7 +60,7 @@ namespace TobyMeehan.Com.Data.Repositories
             switch (GetButtonPercentage(buttonSeconds))
             {
                 case int i when i > 100: // the button is dead, ignore
-                    return null;
+                    return UserRoles.Purple; // TODO: revert to null
                 case int i when i > 93: // red
                     return UserRoles.Red;
                 case int i when i > 80: // orange

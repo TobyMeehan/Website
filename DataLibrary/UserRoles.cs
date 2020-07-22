@@ -6,9 +6,9 @@ namespace TobyMeehan.Com.Data
 {
     public class UserRoles
     {
-        public const string Admin = "Admin";
+        public const string Admin = nameof(Admin);
 
-        public const string Verified = "Verified";
+        public const string Verified = nameof(Verified);
 
         // Button Roles
         public const string Purple = nameof(Purple);

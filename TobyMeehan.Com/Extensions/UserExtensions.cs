@@ -13,5 +13,12 @@ namespace TobyMeehan.Com.Extensions
         {
             return user.Roles.Any(r => r.Name == UserRoles.Verified);
         }
+
+        public static bool TryGetButtonRole(this User user, out Role buttonRole)
+        {
+            buttonRole = user.Roles.FirstOrDefault(r => UserRoles.ButtonRoles.Contains(r.Name));
+
+            return buttonRole != null;
+        }
     }
 }

@@ -2,6 +2,13 @@
     <ProfilePicture User="User" style="height: 1.4em;"></ProfilePicture>
 
     @User.Username
+
+    @if (User.TryGetButtonRole(out Role buttonRole))
+    {
+        <span class="@($"badge badge-pill button-{buttonRole.Name.ToLower()}")">
+            @buttonRole.Name
+        </span>
+    }
 </span>
 
 @code {

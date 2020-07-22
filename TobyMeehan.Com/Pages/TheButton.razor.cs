@@ -28,7 +28,15 @@ namespace TobyMeehan.Com.Pages
             await ConfigureHubConnection();
 
             _previousPresses = await Task.Run(presses.GetAsync);
-            _secondsElapsed = (int)(DateTime.Now - _previousPresses.Max(p => p.TimePressed)).TotalSeconds;
+
+            if (_previousPresses.Any())
+            {
+                _secondsElapsed = (int)(DateTime.Now - _previousPresses.Max(p => p.TimePressed)).TotalSeconds;
+            }
+            else
+            {
+                _secondsElapsed = 0;
+            }
 
             SetTimer();
         }
