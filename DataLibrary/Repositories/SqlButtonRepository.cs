@@ -60,7 +60,7 @@ namespace TobyMeehan.Com.Data.Repositories
             switch (GetButtonPercentage(buttonSeconds))
             {
                 case int i when i > 100: // the button is dead, ignore
-                    return UserRoles.Purple; // TODO: revert to null
+                    return null;
                 case int i when i > 93: // red
                     return UserRoles.Red;
                 case int i when i > 80: // orange

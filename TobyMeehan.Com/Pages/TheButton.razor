@@ -1,41 +1,50 @@
-﻿<AuthorizeView>
-    <div class="jumbotron py-4">
-        <div class="row mb-4">
-            <div class="col-12 d-flex justify-content-center">
-                <button class="btn btn-secondary btn-lg" @onclick="() => OnButtonClick(context.User.Id())">The Button</button>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-12">
-                <div class="progress" style="height: 40px;" role="progressbar" aria-valuemin="0" aria-valuenow="@_percentageProgress" aria-valuemax="100">
-                    <div class="progress-bar button-purple" style="@($"width: {_percentageProgress.Clamp(0, 20)}%;")"></div>
-
-                    @if (_percentageProgress > 20)
-                    {
-                        <div class="progress-bar button-blue" style="@($"width: {(_percentageProgress - 20).Clamp(0, 20)}%;")"></div>
-                    }
-
-                    @if (_percentageProgress > 40)
-                    {
-                        <div class="progress-bar button-green" style="@($"width: {(_percentageProgress - 40).Clamp(0, 20)}%;")"></div>
-                    }
-
-                    @if (_percentageProgress > 60)
-                    {
-                        <div class="progress-bar button-yellow" style="@($"width: {(_percentageProgress - 60).Clamp(0, 20)}%;")"></div>
-                    }
-
-                    @if (_percentageProgress > 80)
-                    {
-                        <div class="progress-bar button-orange" style="@($"width: {(_percentageProgress - 80).Clamp(0, 13)}%;")"></div>
-                    }
-
-                    @if (_percentageProgress > 93)
-                    {
-                        <div class="progress-bar button-red" style="@($"width: {(_percentageProgress - 93).Clamp(0, 7)}%;")"></div>
-                    }
-                </div>
-            </div>
-        </div>
+﻿<div class="jumbotron py-4 text-center">
+    <div class="mb-4">
+        @if (_percentageProgress >= 100)
+        {
+            <button class="btn btn-danger btn-lg" disabled>The <i class="fas fa-skull-crossbones"></i> Button</button>
+            <p>The experiment is over. Thank you for taking part.</p>
+        }
+        else
+        {
+            <AuthorizeView>
+                <NotAuthorized>
+                    <button class="btn btn-secondary btn-lg" disabled>The Button</button>
+                    <p><a href="/login">Sign in</a> to use the button.</p>
+                </NotAuthorized>
+                <Authorized>
+                    <button class="btn btn-secondary btn-lg" @onclick="() => OnButtonClick(context.User.Id())">The Button</button>
+                </Authorized>
+            </AuthorizeView>
+        }
     </div>
-</AuthorizeView>
+
+    <div class="progress" style="height: 40px;" role="progressbar" aria-valuemin="0" aria-valuenow="@_percentageProgress" aria-valuemax="100">
+        <div class="progress-bar button-purple" style="@($"width: {_percentageProgress.Clamp(0, 20)}%;")"></div>
+
+        @if (_percentageProgress > 20)
+        {
+            <div class="progress-bar button-blue" style="@($"width: {(_percentageProgress - 20).Clamp(0, 20)}%;")"></div>
+        }
+
+        @if (_percentageProgress > 40)
+        {
+            <div class="progress-bar button-green" style="@($"width: {(_percentageProgress - 40).Clamp(0, 20)}%;")"></div>
+        }
+
+        @if (_percentageProgress > 60)
+        {
+            <div class="progress-bar button-yellow" style="@($"width: {(_percentageProgress - 60).Clamp(0, 20)}%;")"></div>
+        }
+
+        @if (_percentageProgress > 80)
+        {
+            <div class="progress-bar button-orange" style="@($"width: {(_percentageProgress - 80).Clamp(0, 13)}%;")"></div>
+        }
+
+        @if (_percentageProgress > 93)
+        {
+            <div class="progress-bar button-red" style="@($"width: {(_percentageProgress - 93).Clamp(0, 7)}%;")"></div>
+        }
+    </div>
+</div>

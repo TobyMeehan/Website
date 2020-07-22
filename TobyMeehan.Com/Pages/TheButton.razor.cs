@@ -22,12 +22,14 @@ namespace TobyMeehan.Com.Pages
         private Timer _timer;
         private int _secondsElapsed;
         private int _percentageProgress => presses.GetButtonPercentage(_secondsElapsed);
+        private int _clickCount;
 
         protected override async Task OnInitializedAsync()
         {
             await ConfigureHubConnection();
 
             _previousPresses = await Task.Run(presses.GetAsync);
+            _clickCount = _previousPresses.Count();
 
             if (_previousPresses.Any())
             {
@@ -50,6 +52,7 @@ namespace TobyMeehan.Com.Pages
             _hubConnection.On("ButtonPressed", () =>
             {
                 _secondsElapsed = 0;
+                _clickCount++;
             });
 
             await _hubConnection.StartAsync();
