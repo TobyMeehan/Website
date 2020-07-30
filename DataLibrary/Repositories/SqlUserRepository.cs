@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using TobyMeehan.Com.Data.CloudStorage;
+using TobyMeehan.Com.Data.Configuration;
 using TobyMeehan.Com.Data.Models;
 using TobyMeehan.Com.Data.Security;
 using TobyMeehan.Com.Data.Upload;
@@ -20,9 +21,9 @@ namespace TobyMeehan.Com.Data.Repositories
         private readonly ISqlTable<UserRole> _userRoleTable;
         private readonly IPasswordHash _passwordHash;
         private readonly ICloudStorage _cloudStorage;
-        private readonly DataAccessLibraryOptions _options;
+        private readonly CloudStorageOptions _options;
 
-        public SqlUserRepository(ISqlTable<User> table, ISqlTable<UserRole> userRoleTable, IPasswordHash passwordHash, ICloudStorage cloudStorage, IOptions<DataAccessLibraryOptions> options) : base(table)
+        public SqlUserRepository(ISqlTable<User> table, ISqlTable<UserRole> userRoleTable, IPasswordHash passwordHash, ICloudStorage cloudStorage, IOptions<CloudStorageOptions> options) : base(table)
         {
             _table = table;
             _userRoleTable = userRoleTable;

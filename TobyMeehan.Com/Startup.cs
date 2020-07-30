@@ -30,6 +30,7 @@ using TobyMeehan.Com.Data.Extensions;
 using TobyMeehan.Com.Hubs;
 using Microsoft.AspNetCore.ResponseCompression;
 using System.Net.Mime;
+using TobyMeehan.Com.Data.Configuration;
 
 namespace TobyMeehan.Com
 {
@@ -45,16 +46,14 @@ namespace TobyMeehan.Com
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDataAccessLibrary(options =>
-            {
-
-                options.ConnectionFactory = () => new MySqlConnection(Configuration.GetConnectionString("Default"));
-                options.StorageCredential = GoogleCredential.FromFile(Configuration.GetSection("StorageCredential").Value);
-
-                options.DownloadStorageBucket = Configuration.GetSection("DownloadStorageBucket").Value;
-                options.ProfilePictureStorageBucket = Configuration.GetSection("ProfilePictureStorageBucket").Value;
-
-            });
+            services.AddDataAccessLibrary()
+                .AddSqlDatabase(() => new MySqlConnection(Configuration.GetConnectionString("Default")))
+                .AddBCryptPasswordHash()
+                .AddGoogleCloudStorage(GoogleCredential.FromFile(Configuration.GetSection("StorageCredential").Value), options =>
+                {
+                    options.DownloadStorageBucket = Configuration.GetSection("DownloadStorageBucket").Value;
+                    options.ProfilePictureStorageBucket = Configuration.GetSection("ProfilePictureStorageBucket").Value;
+                });
 
             services.AddSingleton(ConfigureMapper());
 
