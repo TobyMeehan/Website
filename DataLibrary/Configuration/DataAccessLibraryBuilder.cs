@@ -42,6 +42,7 @@ namespace TobyMeehan.Com.Data.Configuration
 
             Services.AddTransient<IApplicationRepository, SqlApplicationRepository>();
             Services.AddTransient<IConnectionRepository, SqlConnectionRepository>();
+            Services.AddTransient<IOAuthSessionRepository, SqlOAuthSessionRepository>();
 
             Services.AddTransient<ICommentRepository, SqlCommentRepository>();
 
