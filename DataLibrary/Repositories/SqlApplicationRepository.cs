@@ -62,7 +62,8 @@ namespace TobyMeehan.Com.Data.Repositories
             {
                 Name = application.Name ?? record.Name,
                 RedirectUri = application.RedirectUri ?? record.RedirectUri,
-                Secret = application.Secret ?? record.Secret
+                Secret = application.Secret ?? record.Secret,
+                Description = application.Description ?? record.Description
             });
         }
 
