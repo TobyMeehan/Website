@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TobyMeehan.Com.Data.Extensions;
 using TobyMeehan.Com.Data.Models;
 using TobyMeehan.Sql;
 
@@ -17,7 +18,7 @@ namespace TobyMeehan.Com.Data.Repositories
             _table = table;
         }
 
-        public async Task<Application> AddAsync(string userId, string name, string redirectUri, string secret = null)
+        public async Task<Application> AddAsync(string userId, string name, string redirectUri, bool secret)
         {
             if ((await GetByUserAndNameAsync(userId, name)) != null)
             {
@@ -28,10 +29,11 @@ namespace TobyMeehan.Com.Data.Repositories
 
             await _table.InsertAsync(new
             {
+                Id = id,
                 UserId = userId,
                 Name = name,
                 RedirectUri = redirectUri,
-                Secret = secret
+                Secret = secret ? Guid.NewGuid().ToToken() : null
             });
 
             return (await _table.SelectByAsync(a => a.Id == id)).SingleOrDefault();
@@ -52,14 +54,15 @@ namespace TobyMeehan.Com.Data.Repositories
             return (await _table.SelectByAsync(a => a.UserId == userId)).ToList();
         }
 
-        public Task UpdateAsync(Application application)
+        public async Task UpdateAsync(Application application)
         {
-            return _table.UpdateAsync(a => a.Id == $"{application.Id}", new
+            Application record = await GetByIdAsync(application.Id);
+
+            await _table.UpdateAsync(a => a.Id == $"{application.Id}", new
             {
-                application.Name,
-                application.RedirectUri,
-                application.Secret,
-                application.Role
+                Name = application.Name ?? record.Name,
+                RedirectUri = application.RedirectUri ?? record.RedirectUri,
+                Secret = application.Secret ?? record.Secret
             });
         }
 

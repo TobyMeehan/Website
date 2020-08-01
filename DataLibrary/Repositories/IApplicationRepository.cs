@@ -18,7 +18,7 @@ namespace TobyMeehan.Com.Data.Repositories
 
         Task<Application> GetByUserAndNameAsync(string userId, string name);
 
-        Task<Application> AddAsync(string userId, string name, string redirectUri, string secret = null);
+        Task<Application> AddAsync(string userId, string name, string redirectUri, bool secret);
 
         Task UpdateAsync(Application application);
 
