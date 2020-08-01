@@ -1,0 +1,25 @@
+﻿@page "/developer"
+
+<h1>Developer</h1>
+
+<p>Using the API you can make your own applications which connect to registered users on the site. Here you can view and manage applications you've created.</p>
+
+<hr />
+
+<div class="row m-0">
+    <h2>Your Applications</h2>
+
+    <a class="btn btn-primary ml-auto" href="/developer/applications/create">
+        <div class="my-auto">
+            New Application
+        </div>
+    </a>
+</div>
+
+
+<CardDeck>
+    @foreach (var application in _applications)
+    {
+        <ApplicationCard Application="application"></ApplicationCard>
+    }
+</CardDeck>

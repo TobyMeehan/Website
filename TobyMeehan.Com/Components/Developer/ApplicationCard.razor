@@ -1,0 +1,11 @@
+﻿<Card class="my-3 text-center">
+    <h5 class="card-title">
+        <a href="@($"/developer/applications/{Application.Id}")" class="stretched-link">
+            @Application.Name
+        </a>
+    </h5>
+</Card>
+
+@code {
+    [Parameter] public Application Application { get; set; }
+}
