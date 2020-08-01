@@ -10,3 +10,7 @@ window.ShowTab = (selector) => {
 window.SetTitle = (title) => {
     document.title = title;
 }
+
+window.CopyToClipboard = (text) => {
+    navigator.clipboard.writeText(text);
+}

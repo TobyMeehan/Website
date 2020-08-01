@@ -37,5 +37,10 @@ namespace TobyMeehan.Com
         {
             return _jSRuntime.InvokeVoidAsync(nameof(SetTitle), title);
         }
+
+        public ValueTask CopyToClipboard(string text)
+        {
+            return _jSRuntime.InvokeVoidAsync(nameof(CopyToClipboard), text);
+        }
     }
 }
