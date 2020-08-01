@@ -96,6 +96,7 @@ namespace TobyMeehan.Com
             return new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<Download, DownloadViewModel>().ReverseMap();
+                cfg.CreateMap<Application, ApplicationViewModel>().ReverseMap();
             }).CreateMapper();
         }
 
