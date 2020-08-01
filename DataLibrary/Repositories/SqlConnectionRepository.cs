@@ -13,50 +13,10 @@ namespace TobyMeehan.Com.Data.Repositories
     public class SqlConnectionRepository : SqlRepository<Connection>, IConnectionRepository
     {
         private readonly ISqlTable<Connection> _table;
-        private readonly ISqlTable<AuthorizationCode> _authCodeTable;
 
-        public SqlConnectionRepository(ISqlTable<Connection> table, ISqlTable<AuthorizationCode> authCodeTable) : base(table)
+        public SqlConnectionRepository(ISqlTable<Connection> table) : base(table)
         {
             _table = table;
-            _authCodeTable = authCodeTable;
-        }
-
-        private async Task<Connection> InsertConnectionAsync(string userId, string appId, string codeChallenge)
-        {
-            string id = Guid.NewGuid().ToString();
-
-            await _table.InsertAsync(new
-            {
-                Id = id,
-                UserId = userId,
-                AppId = appId,
-                CodeChallenge = codeChallenge
-            });
-
-            return await GetByIdAsync(id);
-        }
-
-        public async Task<AuthorizationCode> AddAsync(string userId, string appId, string codeChallenge = null)
-        {
-            Connection connection = await GetByUserAndApplicationAsync(userId, appId);
-
-            if (connection == null)
-            {
-                connection = await InsertConnectionAsync(userId, appId, codeChallenge);
-            }
-
-            string id = Guid.NewGuid().ToString();
-
-            await _authCodeTable.InsertAsync(new
-            {
-                Id = id,
-                ConnectionId = connection.Id,
-                Expiry = DateTime.Now.AddMinutes(30),
-                Code = RandomString.GenerateCrypto(),
-                CodeChallenge = codeChallenge
-            });
-
-            return (await _authCodeTable.SelectByAsync(ac => ac.Id == id)).SingleOrDefault();
         }
 
         public async Task<IList<Connection>> GetByApplicationAsync(string appId)
@@ -64,14 +24,23 @@ namespace TobyMeehan.Com.Data.Repositories
             return (await _table.SelectByAsync(c => c.AppId == appId)).ToList();
         }
 
-        public async Task<AuthorizationCode> GetByAuthorizationCodeAsync(string code)
+        public async Task<Connection> GetOrCreateAsync(string userId, string appId)
         {
-            return (await _authCodeTable.SelectByAsync(ac => ac.Code == code)).SingleOrDefault();
-        }
+            Connection connection = (await _table.SelectByAsync(c => c.UserId == userId && c.AppId == appId)).SingleOrDefault();
 
-        public async Task<Connection> GetByUserAndApplicationAsync(string userId, string appId)
-        {
-            return (await _table.SelectByAsync(c => c.UserId == userId && c.AppId == appId)).SingleOrDefault();
+            if (connection == null)
+            {
+                string id = Guid.NewGuid().ToString();
+
+                await _table.InsertAsync(new
+                {
+                    Id = id,
+                    UserId = userId,
+                    AppId = appId
+                });
+            }
+
+            return connection ?? (await _table.SelectByAsync(c => c.UserId == userId && c.AppId == appId)).SingleOrDefault();
         }
 
         public async Task<IList<Connection>> GetByUserAsync(string userId)

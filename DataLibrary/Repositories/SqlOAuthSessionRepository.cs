@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using TobyMeehan.Com.Data.Models;
@@ -18,7 +19,7 @@ namespace TobyMeehan.Com.Data.Repositories
             _table = table;
         }
 
-        public async Task<OAuthSession> AddAsync(string connectionId, string codeChallenge, DateTime expiry)
+        public async Task<OAuthSession> AddAsync(string connectionId, string codeChallenge, DateTime? expiry = null)
         {
             string id = Guid.NewGuid().ToString();
 
@@ -28,7 +29,7 @@ namespace TobyMeehan.Com.Data.Repositories
                 ConnectionId = connectionId,
                 AuthorizationCode = RandomString.GenerateCrypto(),
                 CodeChallenge = codeChallenge,
-                Expiry = DateTime.Now.AddMinutes(30)
+                Expiry = expiry ?? DateTime.Now.AddMinutes(30)
             });
 
             return (await _table.SelectByAsync(s => s.Id == id)).Single();
@@ -37,6 +38,20 @@ namespace TobyMeehan.Com.Data.Repositories
         public Task DeleteByConnectionAsync(string connectionId)
         {
             return _table.DeleteAsync(s => s.ConnectionId == connectionId);
+        }
+
+        public async Task<string> GenerateRefreshToken(OAuthSession session)
+        {
+            string refreshToken = RandomString.GenerateCrypto();
+
+            await _table.UpdateAsync(s => s.Id == $"{session.Id}", new
+            {
+                RefreshToken = refreshToken,
+                Expiry = DateTime.UtcNow.AddMonths(6),
+                AuthorizationCode = ""
+            });
+
+            return refreshToken;
         }
 
         public async Task<OAuthSession> GetByAuthCodeAsync(string authCode)

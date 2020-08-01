@@ -8,7 +8,7 @@ namespace TobyMeehan.Com.Data.Repositories
 {
     public interface IOAuthSessionRepository
     {
-        Task<OAuthSession> AddAsync(string connectionId, string codeChallenge, DateTime expiry);
+        Task<OAuthSession> AddAsync(string connectionId, string codeChallenge, DateTime? expiry = null);
 
         Task<IList<OAuthSession>> GetAsync();
 
@@ -17,6 +17,8 @@ namespace TobyMeehan.Com.Data.Repositories
         Task<OAuthSession> GetByAuthCodeAsync(string authCode);
 
         Task<OAuthSession> GetByRefreshTokenAsync(string refreshToken);
+
+        Task<string> GenerateRefreshToken(OAuthSession session);
 
         Task DeleteAsync(string id);
 
