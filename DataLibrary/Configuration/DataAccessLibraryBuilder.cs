@@ -67,5 +67,19 @@ namespace TobyMeehan.Com.Data.Configuration
 
             return this;
         }
+
+        public DataAccessLibraryBuilder AddDefaultCloudStorage()
+        {
+            Services.AddTransient<ICloudStorage, DefaultCloudStorage>();
+
+            return this;
+        }
+
+        public DataAccessLibraryBuilder AddDefaultTokenProvider()
+        {
+            Services.AddTransient<ITokenProvider, DefaultTokenProvider>();
+
+            return this;
+        }
     }
 }
