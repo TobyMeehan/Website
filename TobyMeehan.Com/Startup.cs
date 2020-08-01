@@ -12,6 +12,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using MySql.Data.MySqlClient;
 using TobyMeehan.Com.Authorization;
+using TobyMeehan.Com.AspNetCore;
 using TobyMeehan.Com.Data;
 using TobyMeehan.Com.Data.Sql;
 using TobyMeehan.Com.Data.Models;
@@ -31,6 +32,10 @@ using TobyMeehan.Com.Hubs;
 using Microsoft.AspNetCore.ResponseCompression;
 using System.Net.Mime;
 using TobyMeehan.Com.Data.Configuration;
+using System.Security.Cryptography;
+using Microsoft.AspNetCore.DataProtection;
+using System.IO;
+using TobyMeehan.Com.AspNetCore.Authentication;
 
 namespace TobyMeehan.Com
 {
@@ -53,7 +58,8 @@ namespace TobyMeehan.Com
                 {
                     options.DownloadStorageBucket = Configuration.GetSection("DownloadStorageBucket").Value;
                     options.ProfilePictureStorageBucket = Configuration.GetSection("ProfilePictureStorageBucket").Value;
-                });
+                })
+                .AddDefaultTokenProvider();
 
             services.AddSingleton(ConfigureMapper());
 
@@ -80,21 +86,7 @@ namespace TobyMeehan.Com
                 });
             });
 
-            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-                .AddCookie(options =>
-                {
-                    options.LoginPath = "/login";
-                    options.AccessDeniedPath = "/login";
-
-#if DEBUG
-                    options.Cookie.Domain = "localhost";
-#else
-                    options.Cookie.Domain = ".tobymeehan.com";
-#endif
-
-                    options.ExpireTimeSpan = DateTimeOffset.UtcNow.AddMonths(6).Subtract(DateTimeOffset.UtcNow);
-                    options.SlidingExpiration = true;
-                });
+            services.AddSharedCookieAuthentication(Configuration.GetSection("KeyRingPath").Value);
 
             services.AddAuthorizationPolicies();
         }
@@ -105,6 +97,28 @@ namespace TobyMeehan.Com
             {
                 cfg.CreateMap<Download, DownloadViewModel>().ReverseMap();
             }).CreateMapper();
+        }
+
+        private DirectoryInfo GetKeyDirectory()
+        {
+            string applicationPath = Directory.GetCurrentDirectory();
+            DirectoryInfo directoryInfo = new DirectoryInfo(applicationPath);
+            string keyRingPath = Configuration.GetSection("Keys").GetValue<string>("KeyRingPath");
+
+            do
+            {
+                directoryInfo = directoryInfo.Parent;
+
+                DirectoryInfo keyRingInfo = new DirectoryInfo(Path.Combine(directoryInfo.FullName, keyRingPath));
+
+                if (keyRingInfo.Exists)
+                {
+                    return keyRingInfo;
+                }
+            }
+            while (directoryInfo.Parent != null);
+
+            throw new Exception("Key ring path not found.");
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

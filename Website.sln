@@ -11,7 +11,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataLibrary", "DataLibrary\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TobyMeehan.Com", "TobyMeehan.Com\TobyMeehan.Com.csproj", "{C1953EF6-31AD-4D82-B26A-EAB7783E2485}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TobyMeehan.Com.Api", "TobyMeehan.Com.Api\TobyMeehan.Com.Api.csproj", "{B72B2EAC-7039-413D-A129-66A427B18DF1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TobyMeehan.Com.Api", "TobyMeehan.Com.Api\TobyMeehan.Com.Api.csproj", "{B72B2EAC-7039-413D-A129-66A427B18DF1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TobyMeehan.Com.AspNetCore", "TobyMeehan.Com.AspNetCore\TobyMeehan.Com.AspNetCore.csproj", "{773362C8-E5D5-4F5F-ACDF-ADB952C079BC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,6 +41,10 @@ Global
 		{B72B2EAC-7039-413D-A129-66A427B18DF1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B72B2EAC-7039-413D-A129-66A427B18DF1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B72B2EAC-7039-413D-A129-66A427B18DF1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{773362C8-E5D5-4F5F-ACDF-ADB952C079BC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{773362C8-E5D5-4F5F-ACDF-ADB952C079BC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{773362C8-E5D5-4F5F-ACDF-ADB952C079BC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{773362C8-E5D5-4F5F-ACDF-ADB952C079BC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

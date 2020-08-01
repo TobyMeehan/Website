@@ -13,6 +13,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\DataLibrary\DataLibrary.csproj" />
+    <ProjectReference Include="..\TobyMeehan.Com.AspNetCore\TobyMeehan.Com.AspNetCore.csproj" />
   </ItemGroup>
 
 </Project>

@@ -1,12 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -14,6 +16,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.VisualBasic.CompilerServices;
 using MySql.Data.MySqlClient;
 using TobyMeehan.Com.Api.Models;
+using TobyMeehan.Com.AspNetCore.Authentication;
 using TobyMeehan.Com.Data.Configuration;
 using TobyMeehan.Com.Data.Models;
 using TobyMeehan.Com.Data.Security;
@@ -34,9 +37,10 @@ namespace TobyMeehan.Com.Api
         {
             services.AddDataAccessLibrary()
                 .AddSqlDatabase(() => new MySqlConnection(Configuration.GetConnectionString("Default")))
-                .AddBCryptPasswordHash();
+                .AddBCryptPasswordHash()
+                .AddDefaultCloudStorage();
 
-            var tokenProvider = new RsaTokenProvider("api.tobymeehan.com", "OAuth Application", Guid.NewGuid().ToString().ToUpperInvariant());
+            var tokenProvider = new RsaTokenProvider("api.tobymeehan.com", "api.tobymeehan.com", Guid.NewGuid().ToString().ToUpperInvariant());
             services.AddSingleton<ITokenProvider>(tokenProvider);
 
             services.AddSingleton(ConfigureMapper());
@@ -49,24 +53,28 @@ namespace TobyMeehan.Com.Api
                 options.TokenValidationParameters = tokenProvider.GetValidationParameters();
             });
 
-            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(options =>
+            services.AddSharedCookieAuthentication(Configuration.GetSection("KeyRingPath").Value, options =>
             {
-#if DEBUG
-                options.Cookie.Domain = "localhost";
-#else
-                options.Cookie.Domain = ".tobymeehan.com";
-#endif
+                Func<HttpContext, string> getReturnUrl = context => $"?ReturnUrl={WebUtility.UrlEncode($"{context.Request.Host}{context.Request.Path}")}";
 
                 options.Events = new CookieAuthenticationEvents
                 {
                     OnRedirectToLogin = context =>
                     {
-                        context.HttpContext.Response.Redirect("https://tobymeehan.com/login");
+#if DEBUG
+                        context.HttpContext.Response.Redirect($"https://localhost:44373/login{getReturnUrl(context.HttpContext)}");
+#else
+                        context.HttpContext.Response.Redirect("https://tobymeehan.com/login{getReturnUrl(context.HttpContext)}");
+#endif
                         return Task.CompletedTask;
                     },
                     OnRedirectToAccessDenied = context =>
                     {
-                        context.HttpContext.Response.Redirect("https://tobymeehan.com/login");
+#if DEBUG
+                        context.HttpContext.Response.Redirect("https://localhost:44373/login{getReturnUrl(context.HttpContext)}");
+#else
+                        context.HttpContext.Response.Redirect("https://tobymeehan.com/login{getReturnUrl(context.HttpContext)}");
+#endif
                         return Task.CompletedTask;
                     }
                 };

@@ -53,7 +53,7 @@ namespace TobyMeehan.Com.Api.Controllers.OAuth
         [HttpPost]
         public async Task<IActionResult> Index([FromBody] string connectionId, string client_id, string redirect_uri, string scope, string state, string code_challenge)
         {
-            var session = await _sessions.AddAsync(connectionId, code_challenge);
+            var session = await _sessions.AddAsync(connectionId, redirect_uri, code_challenge);
 
             string returnCode = WebUtility.UrlEncode(session.AuthorizationCode);
             string returnState = WebUtility.UrlEncode(state);
