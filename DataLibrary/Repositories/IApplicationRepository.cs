@@ -23,5 +23,7 @@ namespace TobyMeehan.Com.Data.Repositories
         Task UpdateAsync(Application application);
 
         Task DeleteAsync(string id);
+
+        Task<bool> ValidateAsync(string id, string secret, string redirectUri, bool ignoreSecret);
     }
 }

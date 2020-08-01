@@ -4,6 +4,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using TobyMeehan.Com.Data.Extensions;
 using TobyMeehan.Com.Data.Models;
 using TobyMeehan.Com.Data.Security;
 using TobyMeehan.Sql;
@@ -13,13 +14,15 @@ namespace TobyMeehan.Com.Data.Repositories
     public class SqlOAuthSessionRepository : SqlRepository<OAuthSession>, IOAuthSessionRepository
     {
         private readonly ISqlTable<OAuthSession> _table;
+        private readonly ITokenProvider _tokenProvider;
 
-        public SqlOAuthSessionRepository(ISqlTable<OAuthSession> table) : base(table)
+        public SqlOAuthSessionRepository(ISqlTable<OAuthSession> table, ITokenProvider tokenProvider) : base(table)
         {
             _table = table;
+            _tokenProvider = tokenProvider;
         }
 
-        public async Task<OAuthSession> AddAsync(string connectionId, string codeChallenge, DateTime? expiry = null)
+        public async Task<OAuthSession> AddAsync(string connectionId, string redirectUri, string codeChallenge, DateTime? expiry = null)
         {
             string id = Guid.NewGuid().ToString();
 
@@ -27,7 +30,8 @@ namespace TobyMeehan.Com.Data.Repositories
             {
                 Id = id,
                 ConnectionId = connectionId,
-                AuthorizationCode = RandomString.GenerateCrypto(),
+                AuthorizationCode = Guid.NewGuid().ToToken(),
+                RedirectUri = redirectUri,
                 CodeChallenge = codeChallenge,
                 Expiry = expiry ?? DateTime.Now.AddMinutes(30)
             });
@@ -40,18 +44,37 @@ namespace TobyMeehan.Com.Data.Repositories
             return _table.DeleteAsync(s => s.ConnectionId == connectionId);
         }
 
-        public async Task<string> GenerateRefreshToken(OAuthSession session)
+        public async Task<WebToken> GenerateToken(OAuthSession session)
         {
-            string refreshToken = RandomString.GenerateCrypto();
+            session.RefreshToken = Guid.NewGuid().ToToken();
 
             await _table.UpdateAsync(s => s.Id == $"{session.Id}", new
             {
-                RefreshToken = refreshToken,
+                session.RefreshToken,
                 Expiry = DateTime.UtcNow.AddMonths(6),
                 AuthorizationCode = ""
             });
 
-            return refreshToken;
+            DateTime expiry = DateTime.UtcNow.AddDays(1);
+
+            List<Claim> claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.NameIdentifier, session.Connection.User.Id),
+                new Claim(ClaimTypes.Name, session.Connection.User.Username),
+                new Claim(ClaimTypes.Actor, session.Connection.Application.Id)
+            };
+
+            foreach (var role in session.Connection.User.Roles)
+            {
+                claims.Add(new Claim(ClaimTypes.Role, $"User:{role.Name}"));
+            }
+
+            return new WebToken
+            {
+                AccessToken = _tokenProvider.CreateToken(claims, expiry),
+                ExpiresIn = expiry.ToBinary(),
+                RefreshToken = session.RefreshToken
+            };
         }
 
         public async Task<OAuthSession> GetByAuthCodeAsync(string authCode)

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using TobyMeehan.Com.Api.Extensions;
 using TobyMeehan.Com.Api.Models;
@@ -12,6 +13,7 @@ using TobyMeehan.Com.Data.Repositories;
 namespace TobyMeehan.Com.Api.Controllers.OAuth
 {
     [Route("/oauth/[controller]")]
+    [Authorize]
     public class AuthorizeController : Controller
     {
         private readonly IConnectionRepository _connections;

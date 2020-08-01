@@ -62,5 +62,22 @@ namespace TobyMeehan.Com.Data.Repositories
                 application.Role
             });
         }
+
+        public async Task<bool> ValidateAsync(string id, string secret, string redirectUri, bool ignoreSecret)
+        {
+            var application = await GetByIdAsync(id);
+
+            if (application == null)
+                return false;
+
+            bool valid = true;
+
+            valid = (secret != null || ignoreSecret) && valid;
+            valid = (application.Secret == secret || ignoreSecret) && valid;
+
+            valid = application.RedirectUri == redirectUri && valid;
+
+            return valid;
+        }
     }
 }
