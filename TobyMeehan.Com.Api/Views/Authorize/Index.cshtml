@@ -1,0 +1,59 @@
+﻿@model ConnectionModel
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html lang="en" class="h-100">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>Authorize @Model.Application.Name</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" />
+</head>
+<body class="h-100">
+    <div class="banner d-flex h-100">
+        <div class="card mx-auto align-self-center bg-dark text-light card-centre">
+            <div class="card-body">
+                <small class="text-muted">Connect to your account</small>
+
+                <h1 class="d-flex justify-content-between">
+                    @Model.Application.Name
+
+                    <span class="h3 my-auto">
+                        @Model.User.Username
+                    </span>
+                </h1>
+
+                <p>@Model.Application.Name would like access to</p>
+
+                <ul class="list-group list-group-flush mb-3">
+                    <li class="list-group-item bg-dark">
+                        <h5>Account Data</h5>
+                        <p class="mb-0">View your username, roles and transactions.</p>
+                    </li>
+                    <li class="list-group-item bg-dark">
+                        <h5>Send &amp; Receive Transactions</h5>
+                        <p class="mb-0">Alter your account balance.</p>
+                    </li>
+                    <li class="list-group-item bg-dark">
+                        <h5>Manage Downloads</h5>
+                        <p class="mb-0">Create, modify and delete downloads on your behalf.</p>
+                    </li>
+                </ul>
+
+                <p>You can revoke access at any time by using the 'connections' tab in your account settings.</p>
+
+                <form method="post" asp-antiforgery="true">
+                    <input type="hidden" name="ConnectionId" value="@Model.Id" />
+                    <button type="submit" class="btn btn-light">Authorise</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
