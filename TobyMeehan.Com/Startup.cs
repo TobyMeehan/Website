@@ -86,6 +86,12 @@ namespace TobyMeehan.Com
                     options.LoginPath = "/login";
                     options.AccessDeniedPath = "/login";
 
+#if DEBUG
+                    options.Cookie.Domain = "localhost";
+#else
+                    options.Cookie.Domain = ".tobymeehan.com";
+#endif
+
                     options.ExpireTimeSpan = DateTimeOffset.UtcNow.AddMonths(6).Subtract(DateTimeOffset.UtcNow);
                     options.SlidingExpiration = true;
                 });
