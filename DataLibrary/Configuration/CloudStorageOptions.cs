@@ -8,5 +8,6 @@ namespace TobyMeehan.Com.Data.Configuration
     {
         public string DownloadStorageBucket { get; set; }
         public string ProfilePictureStorageBucket { get; set; }
+        public string AppIconStorageBucket { get; set; }
     }
 }

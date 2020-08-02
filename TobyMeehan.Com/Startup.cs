@@ -51,13 +51,16 @@ namespace TobyMeehan.Com
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            var storageConfig = Configuration.GetSection("CloudStorage");
+
             services.AddDataAccessLibrary()
                 .AddSqlDatabase(() => new MySqlConnection(Configuration.GetConnectionString("Default")))
                 .AddBCryptPasswordHash()
-                .AddGoogleCloudStorage(GoogleCredential.FromFile(Configuration.GetSection("StorageCredential").Value), options =>
+                .AddGoogleCloudStorage(GoogleCredential.FromFile(storageConfig.GetSection("StorageCredential").Value), options =>
                 {
-                    options.DownloadStorageBucket = Configuration.GetSection("DownloadStorageBucket").Value;
-                    options.ProfilePictureStorageBucket = Configuration.GetSection("ProfilePictureStorageBucket").Value;
+                    options.DownloadStorageBucket = storageConfig.GetSection("DownloadBucket").Value;
+                    options.ProfilePictureStorageBucket = storageConfig.GetSection("ProfilePictureBucket").Value;
+                    options.AppIconStorageBucket = storageConfig.GetSection("AppIconBucket").Value;
                 })
                 .AddDefaultTokenProvider();
 

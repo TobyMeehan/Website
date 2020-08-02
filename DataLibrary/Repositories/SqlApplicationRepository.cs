@@ -1,8 +1,13 @@
-﻿using System;
+﻿using Microsoft.Extensions.Options;
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
+using TobyMeehan.Com.Data.CloudStorage;
+using TobyMeehan.Com.Data.Configuration;
 using TobyMeehan.Com.Data.Extensions;
 using TobyMeehan.Com.Data.Models;
 using TobyMeehan.Sql;
@@ -12,10 +17,14 @@ namespace TobyMeehan.Com.Data.Repositories
     public class SqlApplicationRepository : SqlRepository<Application>, IApplicationRepository
     {
         private readonly ISqlTable<Application> _table;
+        private readonly ICloudStorage _cloudStorage;
+        private readonly CloudStorageOptions _options;
 
-        public SqlApplicationRepository(ISqlTable<Application> table) : base(table)
+        public SqlApplicationRepository(ISqlTable<Application> table, ICloudStorage cloudStorage, IOptions<CloudStorageOptions> options) : base(table)
         {
             _table = table;
+            _cloudStorage = cloudStorage;
+            _options = options.Value;
         }
 
         public async Task<Application> AddAsync(string userId, string name, string redirectUri, bool secret)
@@ -39,6 +48,18 @@ namespace TobyMeehan.Com.Data.Repositories
             return (await _table.SelectByAsync(a => a.Id == id)).SingleOrDefault();
         }
 
+        public async Task<string> AddIconAsync(string id, string filename, string contentType, Stream fileStream, CancellationToken cancellationToken = default)
+        {
+            CloudFile file = await _cloudStorage.UploadFileAsync(fileStream, _options.AppIconStorageBucket, id, filename, contentType, cancellationToken);
+
+            await _table.UpdateAsync(a => a.Id == id, new
+            {
+                IconUrl = file.MediaLink
+            });
+
+            return file.MediaLink;
+        }
+
         public async Task<IList<Application>> GetByNameAsync(string name)
         {
             return (await _table.SelectByAsync(a => a.Name == name)).ToList();
@@ -52,6 +73,16 @@ namespace TobyMeehan.Com.Data.Repositories
         public async Task<IList<Application>> GetByUserAsync(string userId)
         {
             return (await _table.SelectByAsync(a => a.UserId == userId)).ToList();
+        }
+
+        public async Task RemoveIconAsync(string id)
+        {
+            await _cloudStorage.DeleteFileAsync(_options.AppIconStorageBucket, id);
+
+            await _table.UpdateAsync(a => a.Id == id, new
+            {
+                IconUrl = null as string
+            });
         }
 
         public async Task UpdateAsync(Application application)

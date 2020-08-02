@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using TobyMeehan.Com.Data.Models;
 
@@ -21,6 +23,10 @@ namespace TobyMeehan.Com.Data.Repositories
         Task<Application> AddAsync(string userId, string name, string redirectUri, bool secret);
 
         Task UpdateAsync(Application application);
+
+        Task<string> AddIconAsync(string id, string filename, string contentType, Stream fileStream, CancellationToken cancellationToken = default);
+
+        Task RemoveIconAsync(string id);
 
         Task DeleteAsync(string id);
 

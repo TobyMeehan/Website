@@ -12,6 +12,7 @@ namespace TobyMeehan.Com.Data.Models
         public User Author { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
+        public string IconUrl { get; set; }
         public string RedirectUri { get; set; }
         public string Secret { get; set; }
         public string Role { get; set; }
