@@ -8,7 +8,7 @@ namespace TobyMeehan.Com.Data.Repositories
 {
     public interface IOAuthSessionRepository
     {
-        Task<OAuthSession> AddAsync(string connectionId, string redirectUri, string codeChallenge, DateTime? expiry = null);
+        Task<OAuthSession> AddAsync(string connectionId, string redirectUri, string scope, string codeChallenge, DateTime? expiry = null);
 
         Task<IList<OAuthSession>> GetAsync();
 

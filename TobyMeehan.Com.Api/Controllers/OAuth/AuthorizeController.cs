@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using TobyMeehan.Com.Api.Authorization;
 using TobyMeehan.Com.Api.Extensions;
 using TobyMeehan.Com.Api.Models;
 using TobyMeehan.Com.Data.Repositories;
@@ -29,7 +30,7 @@ namespace TobyMeehan.Com.Api.Controllers.OAuth
 
         private bool ValidateApplication(ApplicationModel application, string clientId, string redirectUri)
         {
-            return application.Id == clientId && application.RedirectUri == redirectUri;
+            return application.Id == clientId && new Uri(application.RedirectUri) == new Uri(redirectUri);
         }
 
         [HttpGet]
@@ -47,18 +48,38 @@ namespace TobyMeehan.Com.Api.Controllers.OAuth
                 return BadRequest("Client credentials were invalid.");
             }
 
-            return View(connection);
+            ViewBag.RedirectUri = redirect_uri;
+
+            var scopes = scope?.Split(' ').Select(x => x.ToLower()) ?? new List<string>();
+
+            if (!scopes.Any(x => Roles.Scopes.All.Contains(x)))
+            {
+                return Error(redirect_uri, nameof(scope), "No scopes were provided.");
+            }
+
+            return View(new AuthorizeViewModel { Connection = connection, Scopes = scope.Split(' ').Select(x => x.ToLower()) });
         }
 
         [HttpPost]
         public async Task<IActionResult> Index([FromBody] string connectionId, string client_id, string redirect_uri, string scope, string state, string code_challenge)
         {
-            var session = await _sessions.AddAsync(connectionId, redirect_uri, code_challenge);
+            var session = await _sessions.AddAsync(connectionId, redirect_uri, scope ?? "", code_challenge);
 
             string returnCode = WebUtility.UrlEncode(session.AuthorizationCode);
             string returnState = WebUtility.UrlEncode(state);
 
             return Redirect($"{redirect_uri}?code={returnCode}&state={returnState}");
+        }
+
+        [Route("cancel")]
+        public IActionResult Cancel(string redirect_uri)
+        {
+            return Error(redirect_uri, "access_denied", "User denied the request.");
+        }
+
+        private IActionResult Error(string redirectUri, string error, string message)
+        {
+            return Redirect($"{redirectUri}?error={WebUtility.UrlEncode(error)}&error_message={WebUtility.UrlEncode(message)}");
         }
     }
 }

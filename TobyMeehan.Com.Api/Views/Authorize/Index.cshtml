@@ -1,4 +1,4 @@
-﻿@model ConnectionModel
+﻿@model AuthorizeViewModel
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 
 @{
@@ -11,49 +11,89 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width" />
-    <title>Authorize @Model.Application.Name</title>
+    <title>Authorize @Model.Connection.Application.Name</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" />
 </head>
 <body class="h-100">
-    <div class="banner d-flex h-100">
-        <div class="card mx-auto align-self-center bg-dark text-light card-centre">
-            <div class="card-body">
-                <small class="text-muted">Connect to your account</small>
+    <div class="banner text-light">
 
-                <h1 class="d-flex justify-content-between">
-                    @Model.Application.Name
+        <div class="authorize-row authorize-header">
+            <h1 class="text-logo h2 authorize-title">
+                <a href="https://tobymeehan.com" class="text-reset text-decoration-none">Toby Meehan</a>
+            </h1>
+        </div>
 
-                    <span class="h3 my-auto">
-                        @Model.User.Username
-                    </span>
-                </h1>
+        <div class="authorize-row authorize-content">
+            <div class="card bg-dark card-centre">
+                <div class="card-body">
 
-                <p>@Model.Application.Name would like access to</p>
+                    <div class="text-center">
+                        @if (Model.Connection.Application.IconUrl != null)
+                        {
+                            <img class="rounded" src="@Model.Connection.Application.IconUrl" height="64" width="64" />
+                        }
+                        else
+                        {
+                            <svg role="img" class="rounded" style="right:0;" height="64" width="64">
+                                <rect width="100%" height="100%" fill="#6c757d"></rect>
+                                <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="#f8f9fa" font-size="1.25rem">
+                                    @Model.Connection.Application.Name.First()
+                                </text>
+                            </svg>
+                        }
 
-                <ul class="list-group list-group-flush mb-3">
-                    <li class="list-group-item bg-dark">
-                        <h5>Account Data</h5>
-                        <p class="mb-0">View your username, roles and transactions.</p>
-                    </li>
-                    <li class="list-group-item bg-dark">
-                        <h5>Send &amp; Receive Transactions</h5>
-                        <p class="mb-0">Alter your account balance.</p>
-                    </li>
-                    <li class="list-group-item bg-dark">
-                        <h5>Manage Downloads</h5>
-                        <p class="mb-0">Create, modify and delete downloads on your behalf.</p>
-                    </li>
-                </ul>
+                        <img class="rounded" src="@(Model.Connection.User.ProfilePictureUrl ?? "https://tobymeehan.com/img/DefaultProfile.svg)")" height="64" width="64">
+                    </div>
 
-                <p>You can revoke access at any time by using the 'connections' tab in your account settings.</p>
+                    <p class="lead text-center">Connect to <span class="font-weight-bold">@Model.Connection.Application.Name</span></p>
 
-                <form method="post" asp-antiforgery="true">
-                    <input type="hidden" name="ConnectionId" value="@Model.Id" />
-                    <button type="submit" class="btn btn-light">Authorise</button>
-                </form>
+                    <p class="font-weight-light mb-1">@Model.Connection.Application.Name would like access to:</p>
+
+                    <ul class="list-group list-group-flush mb-3">
+                        @foreach (var scope in Model.Scopes)
+                        {
+                            @switch (scope)
+                            {
+                                case Roles.Scopes.Identify:
+                                    <li class="list-group-item bg-dark">
+                                        <h5>Account Data</h5>
+                                        <p class="mb-0">View your username, balance and roles.</p>
+                                    </li>
+                                    break;
+                                case Roles.Scopes.Transactions:
+                                    <li class="list-group-item bg-dark">
+                                        <h5>Send &amp; Receive Transactions</h5>
+                                        <p class="mb-0">Alter your account balance.</p>
+                                    </li>
+                                    break;
+                                case Roles.Scopes.Downloads:
+                                    <li class="list-group-item bg-dark">
+                                        <h5>Manage Downloads</h5>
+                                        <p class="mb-0">Create, modify and delete downloads on your behalf.</p>
+                                    </li>
+                                    break;
+                                default:
+                                    break;
+                            }
+                        }
+                    </ul>
+
+                    <div class="mb-3" style="line-height: 1.1;">
+                        <small>You can revoke access at any time by using the 'connections' tab in your account settings.</small>
+                    </div>
+
+                    <form method="post" asp-antiforgery="true">
+                        <input type="hidden" name="ConnectionId" value="@Model.Connection.Id" />
+
+                        <button type="submit" class="btn btn-light">Authorise</button>
+                        <a asp-action="Cancel" asp-route-redirect_uri="@ViewBag.RedirectUri" class="btn btn-link text-light">Cancel</a>
+                    </form>
+
+                </div>
             </div>
         </div>
+
     </div>
 </body>
 </html>

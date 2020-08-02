@@ -12,6 +12,10 @@ namespace TobyMeehan.Com.Data.Models
         public Connection Connection { get; set; }
         public string AuthorizationCode { get; set; }
         public string RedirectUri { get; set; }
+
+        public string Scope { get; set; }
+        public IEnumerable<string> Scopes => Scope.Split(' ');
+
         public string CodeChallenge { get; set; }
         public string RefreshToken { get; set; }
         public DateTime Expiry { get; set; }

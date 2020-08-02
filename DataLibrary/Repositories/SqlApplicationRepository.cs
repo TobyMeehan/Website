@@ -110,7 +110,7 @@ namespace TobyMeehan.Com.Data.Repositories
             valid = (secret != null || ignoreSecret) && valid;
             valid = (application.Secret == secret || ignoreSecret) && valid;
 
-            valid = application.RedirectUri == redirectUri && valid;
+            valid = new Uri(application.RedirectUri) == new Uri(redirectUri) && valid;
 
             return valid;
         }

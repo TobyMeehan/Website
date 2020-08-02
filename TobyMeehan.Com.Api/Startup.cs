@@ -85,6 +85,9 @@ namespace TobyMeehan.Com.Api
         {
             return new MapperConfiguration(cfg =>
             {
+                cfg.CreateMap(typeof(Data.Models.EntityCollection<>), typeof(Api.Models.EntityCollection<>));
+                cfg.CreateMap<EntityBase, EntityModel>().ReverseMap();
+
                 cfg.CreateMap<Connection, ConnectionModel>().ReverseMap();
                 cfg.CreateMap<Application, ApplicationModel>().ReverseMap();
                 cfg.CreateMap<User, UserModel>().ReverseMap();

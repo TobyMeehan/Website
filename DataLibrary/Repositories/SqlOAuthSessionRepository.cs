@@ -22,7 +22,7 @@ namespace TobyMeehan.Com.Data.Repositories
             _tokenProvider = tokenProvider;
         }
 
-        public async Task<OAuthSession> AddAsync(string connectionId, string redirectUri, string codeChallenge, DateTime? expiry = null)
+        public async Task<OAuthSession> AddAsync(string connectionId, string redirectUri, string scope, string codeChallenge, DateTime? expiry = null)
         {
             string id = Guid.NewGuid().ToString();
 
@@ -32,6 +32,7 @@ namespace TobyMeehan.Com.Data.Repositories
                 ConnectionId = connectionId,
                 AuthorizationCode = Guid.NewGuid().ToToken(),
                 RedirectUri = redirectUri,
+                Scope = scope,
                 CodeChallenge = codeChallenge,
                 Expiry = expiry ?? DateTime.Now.AddMinutes(30)
             });
