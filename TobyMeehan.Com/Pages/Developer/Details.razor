@@ -10,7 +10,19 @@ else
 
     <div class="row">
         <div class="col-md-2">
+            <label>Icon</label>
 
+            <Card class="text-center">
+                <label for="UploadIcon" class="d-block" style="cursor: pointer;">
+                    <AppIcon Application="_application"></AppIcon>
+                </label>
+
+                <button type="button" class="btn btn-danger btn-sm btn-block mb-0 mt-2" @onclick="RemoveIcon_Click">
+                    Remove
+                </button>
+            </Card>
+
+            <InputFile id="UploadIcon" accept="image/*" hidden OnChange="Icon_Change" />
         </div>
 
         <div class="col-md-10">

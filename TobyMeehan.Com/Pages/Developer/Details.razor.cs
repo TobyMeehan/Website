@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Blazor.FileReader;
 using Microsoft.AspNetCore.Components;
 using System;
 using System.Collections.Generic;
@@ -40,6 +41,22 @@ namespace TobyMeehan.Com.Pages.Developer
         {
             await applications.DeleteAsync(Id);
             navigation.NavigateTo("/developer");
+        }
+
+        private async Task Icon_Change(IEnumerable<IFileReference> files)
+        {
+            var file = files.FirstOrDefault();
+            var info = await file.ReadFileInfoAsync();
+
+            string url = await applications.AddIconAsync(Id, info.Name, info.Type, await file.OpenReadAsync());
+
+            _application.IconUrl = url;
+        }
+
+        private async Task RemoveIcon_Click()
+        {
+            await applications.RemoveIconAsync(Id);
+            _application.IconUrl = null;
         }
     }
 }

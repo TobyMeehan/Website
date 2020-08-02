@@ -14,6 +14,7 @@ namespace TobyMeehan.Com.Models
 
         [MaxLength(400, ErrorMessage = "Maximum 400 characters.")]
         public string Description { get; set; }
+        public string IconUrl { get; set; }
         public string RedirectUri { get; set; }
         
     }

@@ -1,8 +1,8 @@
-﻿<div class="card-deck card-deck-responsive">
+﻿<div class="@($"card-deck card-deck-responsive-{CardsPerRow}")">
     @ChildContent
 </div>
 
 @code {
     [Parameter] public RenderFragment ChildContent { get; set; }
-
+    [Parameter] public int CardsPerRow { get; set; } = 3;
 }

@@ -1,6 +1,8 @@
 ﻿<Card class="my-3 text-center">
-    <h5 class="card-title">
-        <a href="@($"/developer/applications/{Application.Id}")" class="stretched-link">
+    <AppIcon Application="Application"></AppIcon>
+
+    <h5 class="card-title mb-0 mt-2">
+        <a href="@($"/developer/applications/{Application.Id}")" class="stretched-link text-reset">
             @Application.Name
         </a>
     </h5>
