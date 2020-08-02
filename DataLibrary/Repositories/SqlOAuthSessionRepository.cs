@@ -15,11 +15,23 @@ namespace TobyMeehan.Com.Data.Repositories
     {
         private readonly ISqlTable<OAuthSession> _table;
         private readonly ITokenProvider _tokenProvider;
+        private readonly IConnectionRepository _connections;
 
-        public SqlOAuthSessionRepository(ISqlTable<OAuthSession> table, ITokenProvider tokenProvider) : base(table)
+        public SqlOAuthSessionRepository(ISqlTable<OAuthSession> table, ITokenProvider tokenProvider, IConnectionRepository connections) : base(table)
         {
             _table = table;
             _tokenProvider = tokenProvider;
+            _connections = connections;
+        }
+
+        protected override async Task<IEnumerable<OAuthSession>> FormatAsync(IEnumerable<OAuthSession> values)
+        {
+            foreach (var session in values)
+            {
+                session.Connection = await _connections.GetByIdAsync(session.ConnectionId);
+            }
+
+            return values;
         }
 
         public async Task<OAuthSession> AddAsync(string connectionId, string redirectUri, string scope, string codeChallenge, DateTime? expiry = null)
@@ -37,7 +49,7 @@ namespace TobyMeehan.Com.Data.Repositories
                 Expiry = expiry ?? DateTime.Now.AddMinutes(30)
             });
 
-            return (await _table.SelectByAsync(s => s.Id == id)).Single();
+            return (await SelectAsync(s => s.Id == id)).Single();
         }
 
         public Task DeleteByConnectionAsync(string connectionId)
@@ -70,6 +82,11 @@ namespace TobyMeehan.Com.Data.Repositories
                 claims.Add(new Claim(ClaimTypes.Role, $"User:{role.Name}"));
             }
 
+            foreach (var scope in session.Scopes)
+            {
+                claims.Add(new Claim(ClaimTypes.Role, $"Scope:{scope}"));
+            }
+
             return new WebToken
             {
                 AccessToken = _tokenProvider.CreateToken(claims, expiry),
@@ -80,12 +97,12 @@ namespace TobyMeehan.Com.Data.Repositories
 
         public async Task<OAuthSession> GetByAuthCodeAsync(string authCode)
         {
-            return (await _table.SelectByAsync(s => s.AuthorizationCode == authCode)).Single();
+            return (await SelectAsync(s => s.AuthorizationCode == authCode)).Single();
         }
 
         public async Task<OAuthSession> GetByRefreshTokenAsync(string refreshToken)
         {
-            return (await _table.SelectByAsync(s => s.RefreshToken == refreshToken)).Single();
+            return (await SelectAsync(s => s.RefreshToken == refreshToken)).Single();
         }
     }
 }

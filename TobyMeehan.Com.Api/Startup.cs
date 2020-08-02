@@ -16,6 +16,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.VisualBasic.CompilerServices;
 using MySql.Data.MySqlClient;
 using TobyMeehan.Com.Api.Models;
+using TobyMeehan.Com.Api.Models.OAuth;
 using TobyMeehan.Com.AspNetCore.Authentication;
 using TobyMeehan.Com.Data.Configuration;
 using TobyMeehan.Com.Data.Models;
@@ -92,6 +93,8 @@ namespace TobyMeehan.Com.Api
                 cfg.CreateMap<Application, ApplicationModel>().ReverseMap();
                 cfg.CreateMap<User, UserModel>().ReverseMap();
                 cfg.CreateMap<Role, RoleModel>().ReverseMap();
+
+                cfg.CreateMap<WebToken, JsonWebTokenResponse>().ReverseMap();
             }).CreateMapper();
         }
 

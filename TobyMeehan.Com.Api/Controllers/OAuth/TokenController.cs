@@ -19,7 +19,7 @@ using TobyMeehan.Com.Data.Security;
 
 namespace TobyMeehan.Com.Api.Controllers.OAuth
 {
-    [Route("oauth/[controller]")]
+    [Route("oauth/token")]
     [ApiController]
     public class TokenController : ControllerBase
     {
@@ -41,17 +41,17 @@ namespace TobyMeehan.Com.Api.Controllers.OAuth
 
             if (session == null)
             {
-                return BadRequest("Invalid authorization code.");
+                return BadRequest(new ErrorResponse("Invalid authorization code."));
             }
 
-            if (!await _applications.ValidateAsync(request.ClientId, request.ClientSecret, request.RedirectUri, session.CodeChallenge == new SHA256Managed().ComputeCodeChallenge(request.CodeVerifier)))
+            if (!await _applications.ValidateAsync(request.ClientId, request.ClientSecret, request.RedirectUri, session.CodeChallenge == new SHA256Managed().ComputeCodeChallenge(request.CodeVerifier ?? "")))
             {
-                return BadRequest("Invalid application credentials.");
+                return BadRequest(new ErrorResponse("Invalid application credentials."));
             }
 
             if (session.RedirectUri != request.RedirectUri)
             {
-                return BadRequest("Inconsistent redirect URI.");
+                return BadRequest(new ErrorResponse("Inconsistent redirect URI."));
             }
 
             var token = await _sessions.GenerateToken(session);
