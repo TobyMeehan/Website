@@ -25,6 +25,7 @@ namespace TobyMeehan.Com.Pages.Developer
 
         private Application _application;
         private ApplicationViewModel _model = new ApplicationViewModel();
+        private string _iconError;
 
         protected override async Task OnInitializedAsync()
         {
@@ -47,6 +48,16 @@ namespace TobyMeehan.Com.Pages.Developer
         {
             var file = files.FirstOrDefault();
             var info = await file.ReadFileInfoAsync();
+
+            if (!info.Type.StartsWith("image/"))
+            {
+                _iconError = "Icon must be an image.";
+                return;
+            }
+            else
+            {
+                _iconError = null;
+            }
 
             string url = await applications.AddIconAsync(Id, info.Name, info.Type, await file.OpenReadAsync());
 

@@ -9,27 +9,7 @@
 </div>
 
 @code {
-    private Uri GetUri()
-    {
-        if (Uri.TryCreate(CurrentValue, UriKind.Absolute, out Uri result))
-        {
-            return result;
-        }
-
-        return null;
-    }
-
-    private string _scheme
-    {
-        get
-        {
-            return GetUri()?.Scheme ?? "https";
-        }
-        set
-        {
-            CurrentValue = $"{value}://{_path}";
-        }
-    }
+    private string _scheme;
 
     private string _path
     {
@@ -39,8 +19,15 @@
         }
         set
         {
-            CurrentValue = $"{_scheme}://{value}";
+            SetCurrentValue(value);
         }
+    }
+
+    protected override void OnInitialized()
+    {
+        _scheme = GetUri()?.Scheme ?? "https";
+
+        base.OnInitialized();
     }
 
     protected override bool TryParseValueFromString(string value, out string result, out string validationErrorMessage)
@@ -49,5 +36,27 @@
         result = value;
 
         return Uri.TryCreate(value, UriKind.Absolute, out Uri uri);
+    }
+
+    private void SetCurrentValue(string path)
+    {
+        if (path.Length > 0)
+        {
+            CurrentValue = $"{_scheme}://{path}";
+        }
+        else
+        {
+            CurrentValue = path;
+        }
+    }
+
+    private Uri GetUri()
+    {
+        if (Uri.TryCreate(CurrentValue, UriKind.Absolute, out Uri result))
+        {
+            return result;
+        }
+
+        return null;
     }
 }

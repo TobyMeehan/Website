@@ -9,13 +9,17 @@ else
     <h2>Information</h2>
 
     <div class="row">
-        <div class="col-md-2">
+        <div class="col-md-3">
             <label>Icon</label>
 
             <Card class="text-center">
                 <label for="UploadIcon" class="d-block" style="cursor: pointer;">
                     <AppIcon Application="_application"></AppIcon>
                 </label>
+
+                <div class="validation-message">
+                    @_iconError
+                </div>
 
                 <button type="button" class="btn btn-danger btn-sm btn-block mb-0 mt-2" @onclick="RemoveIcon_Click">
                     Remove
@@ -25,7 +29,7 @@ else
             <InputFile id="UploadIcon" accept="image/*" hidden OnChange="Icon_Change" />
         </div>
 
-        <div class="col-md-10">
+        <div class="col-md-9">
             <EditForm Model="_model" OnValidSubmit="InformationForm_Submit">
                 <DataAnnotationsValidator />
                 <ServerSideValidator @ref="_serverSideValidator" />
