@@ -33,9 +33,11 @@
     protected override bool TryParseValueFromString(string value, out string result, out string validationErrorMessage)
     {
         validationErrorMessage = "Invalid URL format.";
-        result = value;
 
-        return Uri.TryCreate(value, UriKind.Absolute, out Uri uri);
+        bool success = Uri.TryCreate(value, UriKind.Absolute, out Uri uri);
+        result = uri?.AbsoluteUri ?? value;
+
+        return success;
     }
 
     private void SetCurrentValue(string path)
