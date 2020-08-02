@@ -17,18 +17,18 @@ namespace TobyMeehan.Com.Api.Authorization
         {
             public static IEnumerable<string> All => new List<string>
             {
-                Identify,
-                Transactions,
-                Downloads,
-                Connections,
-                Applications
+                "identify",
+                "transactions",
+                "downloads",
+                "connections",
+                "applications"
             };
 
-            public const string Identify = "identify";
-            public const string Transactions = "transactions";
-            public const string Downloads = "downloads";
-            public const string Connections = "connections";
-            public const string Applications = "applications";
+            public const string Identify = "Scope:identify";
+            public const string Transactions = "Scope:transactions";
+            public const string Downloads = "Scope:downloads";
+            public const string Connections = "Scope:connections";
+            public const string Applications = "Scope:applications";
         }
     }
 }
