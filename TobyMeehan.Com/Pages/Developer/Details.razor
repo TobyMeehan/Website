@@ -80,4 +80,64 @@ else
             </EditForm>
         </div>
     </div>
+
+    <hr />
+
+    <h2>Scoreboard</h2>
+
+    <p>Use the scoreboard to persist user-specific data between sessions. Data stored in the scoreboard is not shown anywhere other than where your app displays it, so you can use it for whatever you like.</p>
+
+    <EditForm class="form-inline" Model="_objectiveForm" OnValidSubmit="AddObjective_Submit">
+        <label class="mr-2" for="ObjectiveName">New Objective</label>
+
+        <InputText class="form-control mr-sm-2" id="ObjectiveName" placeholder="Objective Name" @bind-Value="_objectiveForm.Name" />
+
+        <button type="submit" class="btn btn-primary">Create</button>
+    </EditForm>
+
+    @if (!_scoreboard.Any())
+    {
+        <p class="font-weight-light mt-3">Your scoreboard does not have any objectives.</p>
+    }
+    else
+    {
+        @foreach (var objective in _scoreboard)
+        {
+            <Card class="my-3">
+                <Content>
+                    <CardHeader>
+                        <div class="row m-0">
+                            <h5 class="my-auto mr-2">@objective.Name</h5>
+                            <button class="btn btn-secondary btn-sm" @onclick="() => js.CopyToClipboard(objective.Id)">Copy ID</button>
+
+                            <button class="btn btn-outline-danger btn-sm ml-auto" @onclick="() => DeleteObjective_Click(objective)">Delete</button>
+                        </div>
+                    </CardHeader>
+                    <CardBody>
+                        <table class="table table-hover">
+                            <thead class="thead-light">
+                                <tr>
+                                    <th scope="col">User</th>
+                                    <th scope="col">Score</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var score in objective.Scores)
+                                {
+                                    <tr>
+                                        <td>
+                                            <UserLink User="score.User"></UserLink>
+                                        </td>
+                                        <td>
+                                            @score.Value
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </CardBody>
+                </Content>
+            </Card>
+        }
+    }
 }

@@ -16,9 +16,8 @@ namespace TobyMeehan.Com.Data.Sql
 
         protected override ISqlQuery<Objective> GetQuery(Dictionary<string, Objective> dictionary)
         {
-            return base.GetQuery(dictionary)
-                .Select()
-                .InnerJoin<Score>((o, s) => s.ObjectiveId == o.Id)
+            var query = base.GetQuery(dictionary)
+                .LeftJoin<Score>((o, s) => s.ObjectiveId == o.Id)
                 .Map<Score>((objective, score) =>
                 {
                     if (!dictionary.TryGetValue(objective.Id, out Objective entry))
@@ -29,13 +28,17 @@ namespace TobyMeehan.Com.Data.Sql
                         dictionary.Add(entry.Id, entry);
                     }
 
-                    if (!entry.Scores.TryGetItem(score.Id, out Score scoreEntry))
+                    if (score != null && !entry.Scores.TryGetItem(score?.Id, out Score scoreEntry))
                     {
                         entry.Scores.Add(score);
                     }
 
                     return entry;
                 });
+
+            string fuckyou = query.ToSql();
+
+            return query;
         }
     }
 }

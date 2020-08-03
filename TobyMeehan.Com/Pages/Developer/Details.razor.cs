@@ -15,6 +15,7 @@ namespace TobyMeehan.Com.Pages.Developer
     public partial class Details : ComponentBase
     {
         [Inject] private IApplicationRepository applications { get; set; }
+        [Inject] private IScoreboardRepository scoreboard { get; set; }
         [Inject] private IMapper mapper { get; set; }
         [Inject] private JavaScript js { get; set; }
         [Inject] public NavigationManager navigation { get; set; }
@@ -25,12 +26,15 @@ namespace TobyMeehan.Com.Pages.Developer
 
         private Application _application;
         private ApplicationViewModel _model = new ApplicationViewModel();
+        private ObjectiveViewModel _objectiveForm = new ObjectiveViewModel();
+        private IList<Objective> _scoreboard;
         private string _iconError;
 
         protected override async Task OnInitializedAsync()
         {
             _application = await Task.Run(async () => await applications.GetByIdAsync(Id));
             _model = mapper.Map<ApplicationViewModel>(_application);
+            _scoreboard = await Task.Run(async () => await scoreboard.GetByApplicationAsync(Id));
         }
 
         private async Task InformationForm_Submit()
@@ -68,6 +72,18 @@ namespace TobyMeehan.Com.Pages.Developer
         {
             await applications.RemoveIconAsync(Id);
             _application.IconUrl = null;
+        }
+
+        public async Task AddObjective_Submit()
+        {
+            var objective = await scoreboard.AddAsync(Id, _objectiveForm.Name);
+            _scoreboard.Add(objective);
+        }
+
+        private async Task DeleteObjective_Click(Objective objective)
+        {
+            await scoreboard.DeleteAsync(objective.Id);
+            _scoreboard.Remove(objective);
         }
     }
 }
