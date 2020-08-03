@@ -15,6 +15,8 @@ namespace TobyMeehan.Com.Api.Controllers
     {
         public string UserId => User.Claims.First(x => x.Type == ClaimTypes.NameIdentifier).Value;
 
+        public string AppId => User.Claims.First(x => x.Type == ClaimTypes.Actor).Value;
+
         public bool HasScope(string scope) => User.IsInRole($"Scope:{scope}");
 
         protected IActionResult Forbid(ErrorResponse error)
