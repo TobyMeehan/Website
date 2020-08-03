@@ -34,7 +34,7 @@ namespace TobyMeehan.Com.Data.Repositories
 
         Task RemoveProfilePictureAsync(string id);
 
-        Task AddTransactionAsync(string id, string appId, string description, int amount);
+        Task<Transaction> AddTransactionAsync(string id, string appId, string description, int amount);
 
         Task<bool> AnyUsernameAsync(string username);
 
