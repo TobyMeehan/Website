@@ -29,6 +29,7 @@ namespace TobyMeehan.Com.Data.Configuration
             Services.AddTransient<ISqlTable<User>, UserTable>();
             Services.AddTransient<ISqlTable<Application>, ApplicationTable>();
             Services.AddTransient<ISqlTable<Connection>, ConnectionTable>();
+            Services.AddTransient<ISqlTable<Objective>, ScoreboardTable>();
             Services.AddTransient<ISqlTable<Download>, DownloadTable>();
             Services.AddTransient<ISqlTable<Comment>, CommentTable>();
             Services.AddTransient(typeof(ISqlTable<>), typeof(SqlTable<>));
@@ -43,6 +44,8 @@ namespace TobyMeehan.Com.Data.Configuration
             Services.AddTransient<IApplicationRepository, SqlApplicationRepository>();
             Services.AddTransient<IConnectionRepository, SqlConnectionRepository>();
             Services.AddTransient<IOAuthSessionRepository, SqlOAuthSessionRepository>();
+
+            Services.AddTransient<IScoreboardRepository, ScoreboardRepository>();
 
             Services.AddTransient<ICommentRepository, SqlCommentRepository>();
 
