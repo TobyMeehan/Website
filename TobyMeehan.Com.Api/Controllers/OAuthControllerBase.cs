@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using TobyMeehan.Com.Api.Authorization;
 using TobyMeehan.Com.Api.Models.Api;
 
 namespace TobyMeehan.Com.Api.Controllers
@@ -18,6 +20,13 @@ namespace TobyMeehan.Com.Api.Controllers
         protected IActionResult Forbid(ErrorResponse error)
         {
             return StatusCode((int)HttpStatusCode.Forbidden, error);
+        }
+
+        protected IActionResult Forbid(AuthorizationFailure failure)
+        {
+            string message = (failure.FailedRequirements.FirstOrDefault(r => r is AuthorizationRequirement) as AuthorizationRequirement).FailureMessage;
+
+            return Forbid(new ErrorResponse(message));
         }
     }
 }

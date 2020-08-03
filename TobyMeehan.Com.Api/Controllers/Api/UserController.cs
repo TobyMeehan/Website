@@ -18,11 +18,13 @@ namespace TobyMeehan.Com.Api.Controllers.Api
     {
         private readonly IUserRepository _users;
         private readonly IMapper _mapper;
+        private readonly IAuthorizationService _authorizationService;
 
-        public UserController(IUserRepository users, IMapper mapper)
+        public UserController(IUserRepository users, IMapper mapper, IAuthorizationService authorizationService)
         {
             _users = users;
             _mapper = mapper;
+            _authorizationService = authorizationService;
         }
 
         [HttpGet]
