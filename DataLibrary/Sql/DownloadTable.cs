@@ -24,7 +24,7 @@ namespace TobyMeehan.Com.Data.Sql
         {
             return base.GetQuery(dictionary)
                 .JoinDownloads()
-                .Map<DownloadFile, User, Role, Transaction>((download, file, user, role, transaction) =>
+                .Map<DownloadFile, User, Role>((download, file, user, role) =>
                 {
                     if (!dictionary.TryGetValue(download.Id, out Download entry))
                     {
@@ -41,7 +41,7 @@ namespace TobyMeehan.Com.Data.Sql
                         entry.Authors.Add(userEntry);
                     }
 
-                    userEntry = userEntry.Map(role, transaction);
+                    userEntry = userEntry.Map(role);
 
                     if (file != null)
                     {

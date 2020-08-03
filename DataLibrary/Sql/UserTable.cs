@@ -27,18 +27,17 @@ namespace TobyMeehan.Com.Data.Sql
             return new SqlQuery<User>()
                 .Select()
                 .JoinUsers()
-                .Map<Role, Transaction>((user, role, transaction) =>
+                .Map<Role>((user, role) =>
                 {
                     if (!dictionary.TryGetValue(user.Id, out User entry))
                     {
                         entry = user;
                         entry.Roles = new EntityCollection<Role>();
-                        entry.Transactions = new EntityCollection<Transaction>();
 
                         dictionary.Add(entry.Id, entry);
                     }
 
-                    return entry.Map(role, transaction);
+                    return entry.Map(role);
                 });
         }
     }

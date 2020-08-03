@@ -23,14 +23,14 @@ namespace TobyMeehan.Com.Data.Sql
         {
             return base.GetQuery(dictionary)
                 .JoinApplications()
-                .Map<User, Role, Transaction>((app, user, role, transaction) =>
+                .Map<User, Role>((app, user, role) =>
                 {
                     if (!dictionary.TryGetValue(app.Id, out Application entry))
                     {
                         entry = app;
                     }
 
-                    return entry.Map(user, role, transaction);
+                    return entry.Map(user, role);
                 });
         }
     }

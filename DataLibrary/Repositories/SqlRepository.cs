@@ -48,5 +48,10 @@ namespace TobyMeehan.Com.Data.Repositories
         {
             return await FormatAsync(await _table.SelectByAsync(expression));
         }
+
+        protected async Task<IEnumerable<T>> SelectAsync<TForeign>(Expression<Func<T, TForeign, bool>> expression)
+        {
+            return await FormatAsync(await _table.SelectByAsync(expression));
+        }
     }
 }

@@ -21,7 +21,7 @@ namespace TobyMeehan.Com.Data.Sql
             return base.GetQuery(dictionary)
                 .InnerJoin<Comment, User>((c, u) => c.UserId == u.Id)
                 .JoinUsers()
-                .Map<User, Role, Transaction>((comment, user, role, transaction) =>
+                .Map<User, Role>((comment, user, role) =>
                 {
                     if (!dictionary.TryGetValue(comment.Id, out Comment entry))
                     {
@@ -29,7 +29,7 @@ namespace TobyMeehan.Com.Data.Sql
                         dictionary.Add(entry.Id, entry);
                     }
 
-                    entry.User = user.Map(role, transaction);
+                    entry.User = user.Map(role);
 
                     return entry;
                 });

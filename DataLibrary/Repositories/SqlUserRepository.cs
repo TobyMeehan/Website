@@ -8,6 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using TobyMeehan.Com.Data.CloudStorage;
 using TobyMeehan.Com.Data.Configuration;
+using TobyMeehan.Com.Data.Extensions;
 using TobyMeehan.Com.Data.Models;
 using TobyMeehan.Com.Data.Security;
 using TobyMeehan.Com.Data.Upload;
@@ -21,15 +22,27 @@ namespace TobyMeehan.Com.Data.Repositories
         private readonly ISqlTable<UserRole> _userRoleTable;
         private readonly IPasswordHash _passwordHash;
         private readonly ICloudStorage _cloudStorage;
+        private readonly ITransactionRepository _transactions;
         private readonly CloudStorageOptions _options;
 
-        public SqlUserRepository(ISqlTable<User> table, ISqlTable<UserRole> userRoleTable, IPasswordHash passwordHash, ICloudStorage cloudStorage, IOptions<CloudStorageOptions> options) : base(table)
+        public SqlUserRepository(ISqlTable<User> table, ISqlTable<UserRole> userRoleTable, IPasswordHash passwordHash, ICloudStorage cloudStorage, ITransactionRepository transactions, IOptions<CloudStorageOptions> options) : base(table)
         {
             _table = table;
             _userRoleTable = userRoleTable;
             _passwordHash = passwordHash;
             _cloudStorage = cloudStorage;
+            _transactions = transactions;
             _options = options.Value;
+        }
+
+        protected override async Task<IEnumerable<User>> FormatAsync(IEnumerable<User> values)
+        {
+            foreach (var user in values)
+            {
+                user.Transactions = (await _transactions.GetByUserAsync(user.Id)).ToEntityCollection();
+            }
+
+            return await base.FormatAsync(values);
         }
 
         public async Task<User> AddAsync(string username, string password)
@@ -101,12 +114,12 @@ namespace TobyMeehan.Com.Data.Repositories
 
         public async Task<IList<User>> GetByRoleAsync(string name)
         {
-            return (await _table.SelectByAsync<Role>((u, r) => r.Name == name)).ToList();
+            return (await SelectAsync<Role>((u, r) => r.Name == name)).ToList();
         }
 
         public async Task<User> GetByUsernameAsync(string username)
         {
-            return (await _table.SelectByAsync(x => x.Username == username)).SingleOrDefault();
+            return (await SelectAsync(x => x.Username == username)).SingleOrDefault();
         }
 
         public Task RemoveRoleAsync(string id, string roleId)
@@ -136,6 +149,20 @@ namespace TobyMeehan.Com.Data.Repositories
             {
                 Description = description
             });
+        }
+
+        public async Task<Transaction> AddTransactionAsync(string id, string appId, string description, int amount)
+        {
+            var transaction = await _transactions.AddAsync(id, appId, description, amount);
+
+            var user = (await _table.SelectByAsync(u => u.Id == id)).Single();
+
+            await _table.UpdateAsync(u => u.Id == id, new
+            {
+                Balance = user.Balance + amount
+            });
+
+            return transaction;
         }
     }
 }
