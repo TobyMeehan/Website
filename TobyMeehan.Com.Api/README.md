@@ -265,3 +265,47 @@
 
 - `200 OK` on success
 - `404 Not Found` if the download does not exits
+
+## Scoreboard
+
+### Get Scoreboard
+
+**Definition**
+
+`GET /applications/@me/scoreboard`
+
+**Response**
+
+- `200 OK` on success
+
+### Add Objective
+
+**Definition**
+
+`POST /applications/@me/scoreboard`
+
+**Response**
+
+- `201 Created` on success
+
+### Delete Objective
+
+**Definition**
+
+`DELETE /applications/@me/scoreboard/{id}`
+
+**Response**
+
+- `204 No Content` on success
+- `404 Not Found` if the objective does not exist
+
+### Set Score
+
+**Definition**
+
+`PUT /applications/@me/scoreboard/{id}/users/{id}`
+
+**Response**
+
+- `204 No Content` on success
+- `404 Not Found` if the user or objective does not exist
