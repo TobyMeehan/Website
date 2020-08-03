@@ -15,14 +15,7 @@ namespace TobyMeehan.Com.Api.Authorization
         {
             switch (requirement.Operation)
             {
-                case Operation.Create: // User must be verified, session must have downloads scope
-
-                    if (!context.User.IsInRole(Roles.Scopes.Downloads))
-                    {
-                        requirement.FailureMessage = "The 'downloads' scope is required to create a download.";
-                        break;
-                    }
-
+                case Operation.Create: // User must be verified
                     if (!context.User.IsInRole(Roles.User.Verified))
                     {
                         requirement.FailureMessage = "User must be verified to create a download.";
@@ -36,14 +29,7 @@ namespace TobyMeehan.Com.Api.Authorization
                     context.Succeed(requirement);
 
                     break;
-                case Operation.Update: // User must be an author of the download, session must have downloads scope
-
-                    if (!context.User.IsInRole(Roles.Scopes.Downloads))
-                    {
-                        requirement.FailureMessage = "The 'downloads' scope is required to update a download.";
-                        break;
-                    }
-
+                case Operation.Update: // User must be an author of the download
                     if (!resource?.Authors?.Any(u => u.Id == context.User.Id()) ?? false)
                     {
                         requirement.FailureMessage = "User must be an author to update a download.";
@@ -53,13 +39,7 @@ namespace TobyMeehan.Com.Api.Authorization
                     context.Succeed(requirement);
 
                     break;
-                case Operation.Delete: // User must be an author of the download, session must have downloads scope
-
-                    if (!context.User.IsInRole(Roles.Scopes.Downloads))
-                    {
-                        requirement.FailureMessage = "The 'downloads' scope is required to delete a download.";
-                        break;
-                    }
+                case Operation.Delete: // User must be an author of the download
 
                     if (!resource?.Authors?.Any(u => u.Id == context.User.Id()) ?? false)
                     {

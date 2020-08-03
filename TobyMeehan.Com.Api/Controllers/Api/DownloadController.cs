@@ -55,6 +55,7 @@ namespace TobyMeehan.Com.Api.Controllers.Api
 
         [HttpPost]
         [Authorize]
+        [Scope("downloads")]
         public async Task<IActionResult> Post(DownloadRequest request)
         {
             var result = await _authorizationService.AuthorizeAsync(User, new DownloadModel(), new AuthorizationRequirement(Operation.Create));
@@ -76,6 +77,7 @@ namespace TobyMeehan.Com.Api.Controllers.Api
 
         [HttpDelete("{id}")]
         [Authorize]
+        [Scope("downloads")]
         public async Task<IActionResult> Delete(string id)
         {
             var download = _mapper.Map<DownloadModel>(await _downloads.GetByIdAsync(id));
