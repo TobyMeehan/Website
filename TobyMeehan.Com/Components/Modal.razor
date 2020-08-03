@@ -11,7 +11,14 @@
                 @Body
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                @if (Footer == null)
+                {
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                }
+                else
+                {
+                    @Footer
+                }
             </div>
         </div>
     </div>
@@ -20,4 +27,5 @@
 @code {
     [Parameter] public RenderFragment Title { get; set; }
     [Parameter] public RenderFragment Body { get; set; }
+    [Parameter] public RenderFragment Footer { get; set; }
 }

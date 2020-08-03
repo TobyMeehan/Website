@@ -75,11 +75,22 @@ else
                 <div class="form-group row">
                     <button type="submit" class="btn btn-primary">Save</button>
 
-                    <button type="button" class="btn btn-danger ml-auto" @onclick="Delete_Click">Delete</button>
+                    <button type="button" class="btn btn-danger ml-auto" data-toggle="modal" data-target="#DeleteModal">Delete</button>
                 </div>
             </EditForm>
         </div>
     </div>
+
+    <Modal id="DeleteModal">
+        <Title>Delete @_application.Name</Title>
+        <Body>
+            Are you sure you want to delete @_application.Name? This action cannot be undone.
+        </Body>
+        <Footer>
+            <button class="btn btn-danger" data-dismiss="modal" @onclick="Delete_Click">Delete</button>
+            <button class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+        </Footer>
+    </Modal>
 
     <hr />
 
