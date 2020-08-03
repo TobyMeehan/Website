@@ -266,6 +266,19 @@
 - `200 OK` on success
 - `404 Not Found` if the download does not exits
 
+## Application
+
+### Get Application
+
+**Definition**
+
+`GET /applications/{id}`
+
+**Response**
+
+- `200 OK` on success
+- `404 Not Found` if the application does not exist
+
 ## Scoreboard
 
 ### Get Scoreboard
