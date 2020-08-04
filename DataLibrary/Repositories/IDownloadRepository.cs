@@ -19,7 +19,7 @@ namespace TobyMeehan.Com.Data.Repositories
 
         Task<Download> AddAsync(string title, string shortDescription, string longDescription, string userId);
 
-        Task UpdateAsync(Download download);
+        Task<Download> UpdateAsync(string id, Download download);
 
         Task AddAuthorAsync(string id, string userId);
 

@@ -11,6 +11,7 @@ using Org.BouncyCastle.Ocsp;
 using TobyMeehan.Com.Api.Authorization;
 using TobyMeehan.Com.Api.Models;
 using TobyMeehan.Com.Api.Models.Api;
+using TobyMeehan.Com.Data.Models;
 using TobyMeehan.Com.Data.Repositories;
 
 namespace TobyMeehan.Com.Api.Controllers.Api
@@ -67,12 +68,30 @@ namespace TobyMeehan.Com.Api.Controllers.Api
 
             var download = await _downloads.AddAsync(request.Title, request.ShortDescription, request.LongDescription, UserId);
 
-            foreach (var author in request.Authors.Where(x => x.Id != UserId))
+            return Created(Url.Action(nameof(Get), new { download.Id }), download);
+        }
+
+        [HttpPut("{id}")]
+        [Authorize]
+        [Scope("downloads")]
+        public async Task<IActionResult> Put(string id, DownloadRequest request)
+        {
+            var download = _mapper.Map<DownloadModel>(await _downloads.GetByIdAsync(id));
+
+            if (download == null)
             {
-                await _downloads.AddAuthorAsync(author.Id, UserId);
+                return NotFound(new ErrorResponse("The download does not exist."));
+            }
+            var result = await _authorizationService.AuthorizeAsync(User, download, new AuthorizationRequirement(Operation.Update));
+
+            if (!result.Succeeded)
+            {
+                return Forbid(result.Failure);
             }
 
-            return Created(Url.Action(nameof(Get), new { download.Id }), download);
+            var updated = await _downloads.UpdateAsync(id, _mapper.Map<Download>(request));
+
+            return Ok(_mapper.Map<DownloadResponse>(updated));
         }
 
         [HttpDelete("{id}")]
@@ -82,16 +101,16 @@ namespace TobyMeehan.Com.Api.Controllers.Api
         {
             var download = _mapper.Map<DownloadModel>(await _downloads.GetByIdAsync(id));
 
+            if (download == null)
+            {
+                return NotFound(new ErrorResponse("The download does not exist."));
+            }
+
             var result = await _authorizationService.AuthorizeAsync(User, download, new AuthorizationRequirement(Operation.Delete));
 
             if (!result.Succeeded)
             {
                 return Forbid(result.Failure);
-            }
-
-            if (download == null)
-            {
-                return NotFound(new ErrorResponse("The download does not exist."));
             }
 
             await _downloads.DeleteAsync(id);
