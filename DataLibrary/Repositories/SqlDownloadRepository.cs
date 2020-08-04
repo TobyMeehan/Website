@@ -67,11 +67,19 @@ namespace TobyMeehan.Com.Data.Repositories
             return _authorTable.DeleteAsync(x => x.DownloadId == id && x.UserId == userId);
         }
 
+        public Task VerifyAsync(string id, DownloadVerification verification)
+        {
+            return _table.UpdateAsync(d => d.Id == id, new
+            {
+                Verified = verification
+            });
+        }
+
         public async Task<Download> UpdateAsync(string id, Download download)
         {
             var record = await GetByIdAsync(id);
 
-            await _table.UpdateAsync(x => x.Id == $"{download.Id}", new
+            await _table.UpdateAsync(x => x.Id == id, new
             {
                 Title = download.Title ?? record.Title,
                 ShortDescription = download.ShortDescription ?? record.ShortDescription,

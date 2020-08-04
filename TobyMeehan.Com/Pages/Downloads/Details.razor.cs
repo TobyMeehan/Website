@@ -58,7 +58,7 @@ namespace TobyMeehan.Com.Pages.Downloads
 
         private async Task VerifyForm_Submit()
         {
-            await downloads.UpdateAsync(_download);
+            await downloads.VerifyAsync(Id, _download.Verified);
 
             alertState.Add(new AlertModel { Context = BootstrapContext.Success, ChildContent = VerifyAlertContent(_download.Verified) });
         }

@@ -22,7 +22,15 @@
             @foreach (var transaction in CurrentUser.Transactions)
             {
                 <tr>
-                    <td>@transaction.Sender</td>
+                    <td>
+                        <div class="row m-0">
+                            <div class="mr-1" style="width: 1.4em;">
+                                <AppIcon Application="transaction.Application" FontSize="0.7"></AppIcon>
+                            </div>
+
+                            @transaction.Application.Name
+                        </div>
+                    </td>
                     <td>@transaction.Description</td>
                     <td>@transaction.Amount</td>
                 </tr>

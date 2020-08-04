@@ -40,24 +40,24 @@ else
                     <ValidationMessage For="() => _model.Name" />
                 </div>
 
-                <div class="form-group row">
-                    <div class="col-md-6">
-                        <label>Client ID</label>
+                <div class="card-group mb-2">
+                    <Card>
+                        <label class="m-0">Client ID</label>
                         <br />
                         <code>@_application.Id</code>
                         <br />
-                        <button class="btn btn-secondary btn-sm" @onclick="() => js.CopyToClipboard(_application.Id)">Copy</button>
-                    </div>
-                    <div class="col-md-6">
-                        <label>Client Secret</label>
+                        <button class="btn btn-secondary btn-sm mt-2" @onclick="() => js.CopyToClipboard(_application.Id)">Copy</button>
+                    </Card>
+                    <Card>
+                        <label class="m-0">Client Secret</label>
                         @if (_application.Secret != null)
                         {
                             <br />
                             <code>@_application.Secret</code>
                             <br />
-                            <button class="btn btn-secondary btn-sm" @onclick="() => js.CopyToClipboard(_application.Secret)">Copy</button>
+                            <button class="btn btn-secondary btn-sm mt-2" @onclick="() => js.CopyToClipboard(_application.Secret)">Copy</button>
                         }
-                    </div>
+                    </Card>
                 </div>
 
                 <div class="form-group">
@@ -72,10 +72,10 @@ else
                     <ValidationMessage For="() => _model.Description" />
                 </div>
 
-                <div class="form-group row">
+                <div class="form-group row m-0">
                     <button type="submit" class="btn btn-primary">Save</button>
 
-                    <button type="button" class="btn btn-danger ml-auto" data-toggle="modal" data-target="#DeleteModal">Delete</button>
+                    <button type="button" class="btn btn-danger ml-auto" data-toggle="modal" data-target="#DeleteModal">Delete App</button>
                 </div>
             </EditForm>
         </div>

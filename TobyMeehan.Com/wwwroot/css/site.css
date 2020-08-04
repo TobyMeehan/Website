@@ -117,9 +117,9 @@
     background-color: rgba(255, 255, 255, 0.1);
 }
 
-.form-control.valid {
+/*.form-control.valid {
     border-color: #28a745;
-}
+}*/
 
 .form-control.invalid {
     border-color: #dc3545;

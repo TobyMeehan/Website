@@ -25,6 +25,8 @@ namespace TobyMeehan.Com.Data.Repositories
 
         Task RemoveAuthorAsync(string id, string userId);
 
+        Task VerifyAsync(string id, DownloadVerification verification);
+
         Task DeleteAsync(string id);
     }
 }
