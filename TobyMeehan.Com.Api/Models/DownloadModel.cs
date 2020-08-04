@@ -11,5 +11,6 @@ namespace TobyMeehan.Com.Api.Models
         public string ShortDescription { get; set; }
         public string LongDescription { get; set; }
         public EntityCollection<UserModel> Authors { get; set; }
+        public EntityCollection<DownloadFileModel> Files { get; set; }
     }
 }
