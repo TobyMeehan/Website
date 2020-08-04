@@ -17,62 +17,6 @@
 }
 ```
 
-## Models
-
-### User
-
-```json
-{
-	"id": "",
-	"username": "Steve",
-	"balance": 1600,
-	"roles": [
-		"id": "",
-		"name": "Verified"
-	]
-}
-```
-
-### Partial User
-
-```json
-{
-	"id": "",
-	"username": "Bob"
-}
-```
-
-### Download
-
-```json
-{
-	"id": "",
-	"title": "Pseudocode Editor",
-	"shortDescription": "Simple plaintext description",
-	"longDescription": "More detailed HTML description"
-}
-```
-
-### Application
-
-```json
-{
-	"id": "",
-	"name": "Casino",
-
-}
-```
-
-### Connection
-
-```json
-{
-	"id": "",
-	"userid": "",
-	"appid": ""
-}
-```
-
 ## User
 
 ### Get User
@@ -133,20 +77,6 @@
 - `404 Not Found` if the user does not exist
 - `403 Forbidden` without `transactions` scope
 
-### Get User Transaction
-
-**Definition**
-
-`GET /users/{id}/transactions/{id}`
-
-- Requires `transactions` scope
-
-**Response**
-
-- `200 OK` on success
-- `404 Not Found` if the user or transaction does not exist
-- `403 Forbidden` without `transactions` scope
-
 ### Send User Transaction
 
 **Definition**
@@ -167,18 +97,6 @@
 - `201 Created` on success
 - `404 Not Found` if the user does not exist
 - `403 Forbidden` without `transactions` scope
-
-### List User Connections
-
-**Definition**
-
-`GET /users/{id}/connections`
-
-**Response**
-
-- `200 OK` on success
-- `404 Not Found` if the user does not exist
-- `403 Forbidden` if the `connections` scope is lacking
 
 ## Download
 
@@ -230,7 +148,7 @@
 - `201 Created` on success
 - `403 Forbidden` if the `downloads` scope is lacking
 
-### Update Download
+### Update Download - TODO
 
 ### Delete Download
 
@@ -255,7 +173,7 @@
 - `200 OK` on success
 - `404 Not Found` if the download does not exist
 
-### List Download Comments
+### List Download Comments - TODO
 
 **Definition**
 
