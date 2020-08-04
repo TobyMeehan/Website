@@ -56,7 +56,7 @@ namespace TobyMeehan.Com.Data.Repositories
 
         public async Task SetScoreAsync(string id, string userId, int value)
         {
-            var score = await _scoreTable.SelectByAsync(x => x.ObjectiveId == id && x.UserId == userId);
+            var score = (await _scoreTable.SelectByAsync(x => x.ObjectiveId == id && x.UserId == userId)).SingleOrDefault();
 
             if (score == null)
             {

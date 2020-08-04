@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -15,7 +16,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.VisualBasic.CompilerServices;
 using MySql.Data.MySqlClient;
+using TobyMeehan.Com.Api.Authorization;
 using TobyMeehan.Com.Api.Models;
+using TobyMeehan.Com.Api.Models.Api;
 using TobyMeehan.Com.Api.Models.OAuth;
 using TobyMeehan.Com.AspNetCore.Authentication;
 using TobyMeehan.Com.Data.Configuration;
@@ -80,6 +83,25 @@ namespace TobyMeehan.Com.Api
                     }
                 };
             });
+
+            services.AddAuthorization(options =>
+            {
+                AuthorizationPolicy jwt = new AuthorizationPolicyBuilder(JwtBearerDefaults.AuthenticationScheme)
+                    .RequireAuthenticatedUser()
+                    .Build();
+
+                AuthorizationPolicy cookies = new AuthorizationPolicyBuilder(CookieAuthenticationDefaults.AuthenticationScheme)
+                    .RequireAuthenticatedUser()
+                    .Build();
+
+                options.AddPolicy("jwt", jwt);
+                options.AddPolicy("cookies", cookies);
+
+                options.DefaultPolicy = jwt;
+            });
+
+            services.AddSingleton<IAuthorizationHandler, UserAuthorizationHandler>();
+            services.AddSingleton<IAuthorizationHandler, DownloadOperationAuthorizationHandler>();
         }
 
         private IMapper ConfigureMapper()
@@ -88,13 +110,31 @@ namespace TobyMeehan.Com.Api
             {
                 cfg.CreateMap(typeof(Data.Models.EntityCollection<>), typeof(Api.Models.EntityCollection<>));
                 cfg.CreateMap<EntityBase, EntityModel>().ReverseMap();
-
                 cfg.CreateMap<Connection, ConnectionModel>().ReverseMap();
                 cfg.CreateMap<Application, ApplicationModel>().ReverseMap();
                 cfg.CreateMap<User, UserModel>().ReverseMap();
                 cfg.CreateMap<Role, RoleModel>().ReverseMap();
 
+
                 cfg.CreateMap<WebToken, JsonWebTokenResponse>().ReverseMap();
+
+                cfg.CreateMap<Application, ApplicationResponse>();
+                cfg.CreateMap<ApplicationModel, ApplicationResponse>();
+
+                cfg.CreateMap<Download, DownloadResponse>();
+                cfg.CreateMap<DownloadModel, DownloadResponse>();
+
+                cfg.CreateMap<Objective, ObjectiveResponse>();
+                cfg.CreateMap<Score, ScoreResponse>();
+
+                cfg.CreateMap<User, UserResponse>();
+                cfg.CreateMap<UserModel, UserResponse>();
+                cfg.CreateMap<User, PartialUserResponse>();
+                cfg.CreateMap<UserModel, PartialUserResponse>();
+
+                cfg.CreateMap<Role, RoleResponse>();
+                cfg.CreateMap<RoleModel, RoleResponse>();
+                cfg.CreateMap<Transaction, TransactionResponse>();
             }).CreateMapper();
         }
 

@@ -8,18 +8,18 @@ namespace TobyMeehan.Com.Api.Models
 {
     public class EntityCollection<T> : IEnumerable<T> where T : EntityModel
     {
-        private List<T> _items = new List<T>();
+        public List<T> Items { get; set; }
 
-        public T this[string id] => _items.Single(i => i.Id == id);
+        public T this[string id] => Items.Single(i => i.Id == id);
 
         public IEnumerator<T> GetEnumerator()
         {
-            return _items.GetEnumerator();
+            return Items.GetEnumerator();
         }
 
         public bool TryGetItem(string id, out T entity)
         {
-            entity = _items.FirstOrDefault(i => i.Id == id);
+            entity = Items.FirstOrDefault(i => i.Id == id);
 
             return entity != null;
         }

@@ -14,7 +14,7 @@ using TobyMeehan.Com.Data.Repositories;
 namespace TobyMeehan.Com.Api.Controllers.OAuth
 {
     [Route("/oauth/[controller]")]
-    [Authorize]
+    [Authorize("cookies")]
     public class AuthorizeController : Controller
     {
         private readonly IConnectionRepository _connections;

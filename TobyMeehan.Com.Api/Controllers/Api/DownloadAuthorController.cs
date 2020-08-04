@@ -29,7 +29,7 @@ namespace TobyMeehan.Com.Api.Controllers.Api
             _authorizationService = authorizationService;
         }
 
-        [HttpGet("/users/{userid}/downloads")]
+        [HttpGet("users/{userid}/downloads")]
         [Authorize]
         [Scope("downloads")]
         public async Task<IActionResult> GetDownloads(string userid)
@@ -51,7 +51,7 @@ namespace TobyMeehan.Com.Api.Controllers.Api
             return Ok(_mapper.Map<List<DownloadResponse>>(downloads));
         }
 
-        [HttpDelete("/users/{userid}/downloads/{downloadid}")]
+        [HttpDelete("users/{userid}/downloads/{downloadid}")]
         [Authorize]
         [Scope("downloads")]
         public async Task<IActionResult> Delete(string userid, string downloadid)
@@ -80,7 +80,7 @@ namespace TobyMeehan.Com.Api.Controllers.Api
             return NoContent();
         }
 
-        [HttpGet("/downloads/{id}/authors")]
+        [HttpGet("downloads/{id}/authors")]
         [Authorize]
         public async Task<IActionResult> GetAuthors(string id)
         {

@@ -37,6 +37,7 @@ namespace TobyMeehan.Com.Data.Configuration
 
             Services.AddTransient<IUserRepository, SqlUserRepository>();
             Services.AddTransient<IRoleRepository, SqlRoleRepository>();
+            Services.AddTransient<ITransactionRepository, TransactionRepository>();
 
             Services.AddTransient<IDownloadRepository, SqlDownloadRepository>();
             Services.AddTransient<IDownloadFileRepository, DownloadFileRepository>();

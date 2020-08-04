@@ -37,7 +37,7 @@ namespace TobyMeehan.Com.Api.Controllers.Api
             return Ok(_mapper.Map<List<PartialUserResponse>>(users));
         }
 
-        [HttpGet]
+        [HttpGet("{id}")]
         [Authorize]
         public async Task<IActionResult> Get(string id)
         {

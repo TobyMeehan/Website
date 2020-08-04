@@ -58,7 +58,7 @@ namespace TobyMeehan.Com.Api.Controllers.Api
             return Created(Url.Action(nameof(Get)), _mapper.Map<ObjectiveResponse>(objective));
         }
 
-        [HttpDelete("{id")]
+        [HttpDelete("{id}")]
         [Authorize]
         public async Task<IActionResult> Delete(string id)
         {
@@ -74,7 +74,7 @@ namespace TobyMeehan.Com.Api.Controllers.Api
             return NoContent();
         }
 
-        [HttpPut("/{id}/users/{userid}")]
+        [HttpPut("{id}/users/{userid}")]
         [Authorize]
         public async Task<IActionResult> PutScore(string id, string userid, ScoreRequest request)
         {

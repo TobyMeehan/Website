@@ -12,8 +12,7 @@ namespace TobyMeehan.Com.Data.Extensions
         {
             return query
                 .LeftJoin<User, UserRole>((u, ur) => u.Id == ur.UserId)
-                .LeftJoin<UserRole, Role>((ur, r) => ur.RoleId == r.Id)
-                .LeftJoin<User, Transaction>((u, t) => u.Id == t.UserId);
+                .LeftJoin<UserRole, Role>((ur, r) => ur.RoleId == r.Id);
 
         }
 
