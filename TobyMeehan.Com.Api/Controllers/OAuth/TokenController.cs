@@ -58,5 +58,30 @@ namespace TobyMeehan.Com.Api.Controllers.OAuth
 
             return Ok(_mapper.Map<JsonWebTokenResponse>(token));
         }
+
+        [HttpPost]
+        public async Task<IActionResult> Post([FromForm] RefreshTokenRequest request)
+        {
+            var session = await _sessions.GetByRefreshTokenAsync(request.RefreshToken);
+
+            if (session == null)
+            {
+                return BadRequest(new ErrorResponse("Invalid refresh token."));
+            }
+
+            if (!await _applications.ValidateAsync(request.ClientId, request.ClientSecret, request.RedirectUri, request.ClientSecret == null))
+            {
+                return BadRequest(new ErrorResponse("Invalid application credentials."));
+            }
+
+            if (session.RedirectUri != request.RedirectUri)
+            {
+                return BadRequest(new ErrorResponse("Inconsistent redirect URI."));
+            }
+
+            var token = await _sessions.GenerateToken(session);
+
+            return Ok(_mapper.Map<JsonWebTokenResponse>(token));
+        }
     }
 }
