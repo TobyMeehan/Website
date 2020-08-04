@@ -33,8 +33,6 @@
 - `404 Not Found` if the user does not exist
 - Will return a partial user without `identify` scope
 
-### Update User
-
 ### Get User Downloads
 
 **Definition**
@@ -132,23 +130,33 @@
 	"title": "New Download",
 	"shortDescription": "Short simple description",
 	"longDescription": "Longer HTML description without script or style tags"
-	"authors": [
-		{
-			"id": ""
-		},
-		{
-			"id", ""
-		}
-	]
 }
 ```
 
 **Response**
 
 - `201 Created` on success
-- `403 Forbidden` if the `downloads` scope is lacking
+- `403 Forbidden` without `downloads` scope
 
-### Update Download - TODO
+### Update Download
+
+**Definition**
+
+`PUT /downloads`
+
+```json
+{
+	"title": "Updated Download",
+	"shortDescription": "New short description",
+	"longDescription": "New long Description"
+}
+```
+
+**Response**
+
+- `200 OK` on success
+- `404 Not Found` if the download does not exist
+- `403 Forbidden` without `downloads` scope or if the user is not an author
 
 ### Delete Download
 
@@ -160,7 +168,7 @@
 
 - `204 No Content` on success
 - `404 Not Found` if the download does not exist
-- `403 Forbidden` if the `downloads` scope is lacking
+- `403 Forbidden` without `downloads` scope or if the user is not an author
 
 ### List Download Authors
 
@@ -173,16 +181,37 @@
 - `200 OK` on success
 - `404 Not Found` if the download does not exist
 
-### List Download Comments - TODO
+### List Download Files
 
 **Definition**
 
-`GET /downloads/{id}/comments`
+`GET /downloads/{id}/files`
 
 **Response**
 
 - `200 OK` on success
-- `404 Not Found` if the download does not exits
+- `404 Not Found` if the download does not exist
+
+### Create Download File
+
+**Definition**
+
+`POST /downloads/{id}/files`
+
+```json
+{
+	"filename": "filename.txt"
+}
+```
+
++ attached file
+
+**Response**
+
+- `201 Created` on success
+- `404 Not Found` if the download does not exist
+
+### Get/Delete download file are not implemented pending changes to the file system
 
 ## Application
 
