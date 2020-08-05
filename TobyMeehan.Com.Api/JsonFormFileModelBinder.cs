@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Binders;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
@@ -14,9 +15,9 @@ namespace TobyMeehan.Com.Api
     {
         private readonly FormFileModelBinder _formFileModelBinder;
 
-        public JsonFormFileModelBinder(FormFileModelBinder formFileModelBinder)
+        public JsonFormFileModelBinder(ILoggerFactory loggerFactory)
         {
-            _formFileModelBinder = formFileModelBinder;
+            _formFileModelBinder = new FormFileModelBinder(loggerFactory);
         }
 
         public async Task BindModelAsync(ModelBindingContext bindingContext)
