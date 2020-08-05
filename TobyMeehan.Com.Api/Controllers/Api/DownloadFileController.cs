@@ -46,24 +46,24 @@ namespace TobyMeehan.Com.Api.Controllers.Api
             return Ok(_mapper.Map<List<DownloadFileResponse>>(download.Files));
         }
 
-        [HttpGet("{fileid}")]
-        [Authorize]
-        public async Task<IActionResult> Get(string id, string fileid)
-        {
-            var download = await _downloads.GetByIdAsync(id);
+        //[HttpGet("{fileid}")]
+        //[Authorize]
+        //public async Task<IActionResult> Get(string id, string fileid)
+        //{
+        //    var download = await _downloads.GetByIdAsync(id);
 
-            if (download == null)
-            {
-                return NotFound(new ErrorResponse("The download does not exist."));
-            }
+        //    if (download == null)
+        //    {
+        //        return NotFound(new ErrorResponse("The download does not exist."));
+        //    }
 
-            if (!download.Files.TryGetItem(fileid, out DownloadFile file))
-            {
-                return NotFound(new ErrorResponse("The file does not exist."));
-            }
+        //    if (!download.Files.TryGetItem(fileid, out DownloadFile file))
+        //    {
+        //        return NotFound(new ErrorResponse("The file does not exist."));
+        //    }
 
-            return Ok(_mapper.Map<DownloadFileResponse>(file));
-        }
+        //    return Ok(_mapper.Map<DownloadFileResponse>(file));
+        //}
 
         [HttpPost]
         [Authorize]
@@ -99,33 +99,33 @@ namespace TobyMeehan.Com.Api.Controllers.Api
             return Created($"{Url.Action(nameof(Get))}/{file.Id}", file);
         }
 
-        [HttpDelete("{fileid}")]
-        [Authorize]
-        [Scope("downloads")]
-        public async Task<IActionResult> Delete(string id, string fileid)
-        {
-            var download = _mapper.Map<DownloadModel>(await _downloads.GetByIdAsync(id));
+        //[HttpDelete("{fileid}")]
+        //[Authorize]
+        //[Scope("downloads")]
+        //public async Task<IActionResult> Delete(string id, string fileid)
+        //{
+        //    var download = _mapper.Map<DownloadModel>(await _downloads.GetByIdAsync(id));
 
-            if (download == null)
-            {
-                return NotFound(new ErrorResponse("The download does not exist."));
-            }
+        //    if (download == null)
+        //    {
+        //        return NotFound(new ErrorResponse("The download does not exist."));
+        //    }
 
-            var result = await _authorizationService.AuthorizeAsync(User, download, new AuthorizationRequirement(Operation.Delete));
+        //    var result = await _authorizationService.AuthorizeAsync(User, download, new AuthorizationRequirement(Operation.Delete));
 
-            if (!result.Succeeded)
-            {
-                return Forbid(result.Failure);
-            }
+        //    if (!result.Succeeded)
+        //    {
+        //        return Forbid(result.Failure);
+        //    }
 
-            if (!download.Files.TryGetItem(fileid, out DownloadFileModel file))
-            {
-                return NotFound(new ErrorResponse("The file does not exist."));
-            }
+        //    if (!download.Files.TryGetItem(fileid, out DownloadFileModel file))
+        //    {
+        //        return NotFound(new ErrorResponse("The file does not exist."));
+        //    }
 
-            await _files.DeleteAsync(fileid);
+        //    await _files.DeleteAsync(fileid);
 
-            return NoContent();
-        }
+        //    return NoContent();
+        //}
     }
 }
