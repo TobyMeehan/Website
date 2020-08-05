@@ -24,7 +24,7 @@ namespace TobyMeehan.Com.Data.Repositories
             _authorTable = authorTable;
         }
 
-        public async Task<Download> AddAsync(string title, string shortDescription, string longDescription, string userId)
+        public async Task<Download> AddAsync(string title, string shortDescription, string longDescription, Version version, string userId)
         {
             string id = RandomString.GeneratePseudo();
 
@@ -34,6 +34,7 @@ namespace TobyMeehan.Com.Data.Repositories
                 Title = title,
                 ShortDescription = shortDescription,
                 LongDescription = longDescription ?? "",
+                VersionString = version.ToString(),
                 Updated = DateTime.Now
             });
 
@@ -79,11 +80,17 @@ namespace TobyMeehan.Com.Data.Repositories
         {
             var record = await GetByIdAsync(id);
 
+            if (download.Version == null || download.Version < record.Version)
+            {
+                download.Version = record.Version;
+            }
+
             await _table.UpdateAsync(x => x.Id == id, new
             {
                 Title = download.Title ?? record.Title,
                 ShortDescription = download.ShortDescription ?? record.ShortDescription,
                 LongDescription = download.LongDescription ?? record.LongDescription,
+                download.Version,
                 Updated = DateTime.Now
             });
 
