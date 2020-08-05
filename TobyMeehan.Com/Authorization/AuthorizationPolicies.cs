@@ -12,6 +12,7 @@ namespace TobyMeehan.Com.Authorization
         public const string IsAdmin = "IsAdmin";
         public const string CanEditDownload = "CanEditDownload";
         public const string CanEditComment = "CanEditComment";
+        public const string CanEditApplication = "CanEditApplication";
 
         public static AuthorizationPolicy IsVerifiedPolicy() => new AuthorizationPolicyBuilder()
             .RequireAuthenticatedUser()
@@ -31,6 +32,11 @@ namespace TobyMeehan.Com.Authorization
         public static AuthorizationPolicy CanEditCommentPolicy() => new AuthorizationPolicyBuilder()
             .RequireAuthenticatedUser()
             .AddRequirements(new EditCommentRequirement())
+            .Build();
+
+        public static AuthorizationPolicy CanEditApplicationPolicy() => new AuthorizationPolicyBuilder()
+            .RequireAuthenticatedUser()
+            .AddRequirements(new EditApplicationRequirement())
             .Build();
     }
 }

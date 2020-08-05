@@ -1,34 +1,41 @@
 ﻿@page "/developer/applications/create"
 
-<h1>New Application</h1>
+<AuthorizeView Context="authState">
+    <NotAuthorized>
+        <Challenge></Challenge>
+    </NotAuthorized>
+    <Authorized>
+        <h1>New Application</h1>
 
-<EditForm Model="_model" OnValidSubmit="Form_Submit">
-    <DataAnnotationsValidator />
-    <ServerSideValidator />
+        <EditForm Model="_model" OnValidSubmit="Form_Submit">
+            <DataAnnotationsValidator />
+            <ServerSideValidator />
 
-    <div class="form-group">
-        <label for="Name">Application Name</label>
-        <InputText class="form-control" id="Name" @bind-Value="_model.Name" />
-        <ValidationMessage For="() => _model.Name" />
-    </div>
+            <div class="form-group">
+                <label for="Name">Application Name</label>
+                <InputText class="form-control" id="Name" @bind-Value="_model.Name" />
+                <ValidationMessage For="() => _model.Name" />
+            </div>
 
-    <div class="form-group">
-        <label for="RedirectUri">Redirect URI</label>
-        <InputRedirectUri id="RedirectUri" @bind-Value="_model.RedirectUri" />
-        <ValidationMessage For="() => _model.RedirectUri" />
-    </div>
+            <div class="form-group">
+                <label for="RedirectUri">Redirect URI</label>
+                <InputRedirectUri id="RedirectUri" @bind-Value="_model.RedirectUri" />
+                <ValidationMessage For="() => _model.RedirectUri" />
+            </div>
 
-    <div class="form-group">
-        <label for="Type">Application Type</label>
-        <InputSelect id="Type" class="custom-select" @bind-Value="_model.Type">
-            <option value="@(CreateApplicationViewModel.ApplicationType.WebServer)">Web Server</option>
-            <option value="@(CreateApplicationViewModel.ApplicationType.SinglePage)">Single Page</option>
-            <option value="@(CreateApplicationViewModel.ApplicationType.Native)">Native</option>
-            <option value="@(CreateApplicationViewModel.ApplicationType.Mobile)">Mobile</option>
-        </InputSelect>
-    </div>
+            <div class="form-group">
+                <label for="Type">Application Type</label>
+                <InputSelect id="Type" class="custom-select" @bind-Value="_model.Type">
+                    <option value="@(CreateApplicationViewModel.ApplicationType.WebServer)">Web Server</option>
+                    <option value="@(CreateApplicationViewModel.ApplicationType.SinglePage)">Single Page</option>
+                    <option value="@(CreateApplicationViewModel.ApplicationType.Native)">Native</option>
+                    <option value="@(CreateApplicationViewModel.ApplicationType.Mobile)">Mobile</option>
+                </InputSelect>
+            </div>
 
-    <div class="form-group">
-        <button type="submit" class="btn btn-primary">Create</button>
-    </div>
-</EditForm>
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary">Create</button>
+            </div>
+        </EditForm>
+    </Authorized>
+</AuthorizeView>
