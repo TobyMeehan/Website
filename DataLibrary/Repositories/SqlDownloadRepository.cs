@@ -80,8 +80,13 @@ namespace TobyMeehan.Com.Data.Repositories
         {
             var record = await GetByIdAsync(id);
 
-            if (download.Version == null || download.Version < record.Version)
+            if (download.Version != null && download.Version > record.Version)
             {
+                download.Updated = DateTime.Now;
+            }
+            else
+            {
+                download.Updated = record.Updated;
                 download.Version = record.Version;
             }
 
@@ -90,8 +95,8 @@ namespace TobyMeehan.Com.Data.Repositories
                 Title = download.Title ?? record.Title,
                 ShortDescription = download.ShortDescription ?? record.ShortDescription,
                 LongDescription = download.LongDescription ?? record.LongDescription,
-                download.Version,
-                Updated = DateTime.Now
+                download.VersionString,
+                download.Updated
             });
 
             return await GetByIdAsync(id);

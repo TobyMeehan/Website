@@ -15,7 +15,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TobyMeehan.Com.Api", "TobyM
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TobyMeehan.Com.AspNetCore", "TobyMeehan.Com.AspNetCore\TobyMeehan.Com.AspNetCore.csproj", "{773362C8-E5D5-4F5F-ACDF-ADB952C079BC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataAccessLibrary.Tests", "DataAccessLibrary.Tests\DataAccessLibrary.Tests.csproj", "{251791F7-1F90-4EFD-9CED-3867E789BB4C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataAccessLibrary.Tests", "DataAccessLibrary.Tests\DataAccessLibrary.Tests.csproj", "{251791F7-1F90-4EFD-9CED-3867E789BB4C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

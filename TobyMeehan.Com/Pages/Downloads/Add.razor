@@ -42,6 +42,14 @@
             </div>
 
             <div class="form-group">
+                <label for="Version">Initial Version</label>
+                <div class="col-md-10">
+                    <InputVersion @bind-Value="_form.Version" />
+                    <ValidationMessage For="() => _form.Version" />
+                </div>
+            </div>
+
+            <div class="form-group">
                 <button type="submit" class="btn btn-dark">Continue</button>
             </div>
         </EditForm>

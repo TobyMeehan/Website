@@ -28,7 +28,7 @@ namespace TobyMeehan.Com.Pages.Downloads
 
         private async Task Form_Submit()
         {
-            Download download = await downloads.AddAsync(_form.Title, _form.ShortDescription, _form.LongDescription, _context.User.Id());
+            Download download = await downloads.AddAsync(_form.Title, _form.ShortDescription, _form.LongDescription, _form.Version, _context.User.Id());
 
             navigation.NavigateTo($"/downloads/{download.Id}/files");
         }

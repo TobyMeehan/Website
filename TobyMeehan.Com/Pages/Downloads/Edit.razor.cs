@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using TobyMeehan.Com.Components;
 using TobyMeehan.Com.Data;
 using TobyMeehan.Com.Data.Models;
 using TobyMeehan.Com.Data.Repositories;
@@ -21,6 +22,7 @@ namespace TobyMeehan.Com.Pages.Downloads
 
         private Download _download;
         private DownloadViewModel _form;
+        private ServerSideValidator _serverSideValidator;
 
         protected override async Task OnInitializedAsync()
         {
@@ -33,9 +35,16 @@ namespace TobyMeehan.Com.Pages.Downloads
 
         private async Task EditForm_Submit()
         {
+            if (_form.Version < _download.Version)
+            {
+                _serverSideValidator.Error(nameof(_form.Version), "New version must be greater than or equal to current version.");
+                return;
+            }
+
             _download.Title = _form.Title;
             _download.ShortDescription = _form.ShortDescription;
             _download.LongDescription = _form.LongDescription;
+            _download.Version = _form.Version;
 
             await downloads.UpdateAsync(Id, _download);
             editDownloadState.Title = _form.Title;

@@ -106,7 +106,8 @@ else
 
             @if (_download.Updated != null)
             {
-                <Card class="mb-3">
+                <Card class="mb-3 font-weight-light">
+                    <p class="mb-0">Latest Version @_download.Version</p>
                     <small class="text-muted font-weight-light">Last updated @_download.UpdatedString()</small>
                 </Card>
             }

@@ -1,0 +1,46 @@
+﻿@inherits InputBase<Version>
+
+<div class="form-inline">
+    <div class="form-group">
+        <InputNumber class="form-control" placeholder="Major" min="0" @bind-Value="_major" />
+    </div>
+    <div class="form-group font-weight-bold mx-2">
+        .
+    </div>
+    <div class="form-group">
+        <InputNumber class="form-control" placeholder="Minor" min="0" @bind-Value="_minor" />
+    </div>
+    <div class="form-group font-weight-bold mx-2">
+        .
+    </div>
+    <div class="form-group">
+        <InputNumber class="form-control" placeholder="Patch" min="0" @bind-Value="_patch" />
+    </div>
+</div>
+
+@code {
+    private int _major
+    {
+        get => CurrentValue.Major;
+        set => CurrentValue = new Version(value < 0 ? 0 : value, _minor, _patch);
+    }
+
+    private int _minor
+    {
+        get => CurrentValue.Minor;
+        set => CurrentValue = new Version(_major, value < 0 ? 0 : value, _patch);
+    }
+
+    private int _patch
+    {
+        get => CurrentValue.Build;
+        set => CurrentValue = new Version(_major, _minor, value < 0 ? 0 : value);
+    }
+
+    protected override bool TryParseValueFromString(string value, out Version result, out string validationErrorMessage)
+    {
+        validationErrorMessage = null;
+
+        return Version.TryParse(value, out result);
+    }
+}
