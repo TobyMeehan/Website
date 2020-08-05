@@ -12,26 +12,23 @@
 
 <ul class="nav nav-tabs mb-3">
     <li class="nav-item">
-        <NavLink class="nav-link" href="@($"/downloads/{state.Id}/edit")"><i class="fas fa-edit"></i> Edit</NavLink>
+        <NavLink class="nav-link text-light" href="@($"/downloads/{state.Id}")" Match="NavLinkMatch.All"><i class="fas fa-file-alt"></i> Page</NavLink>
     </li>
     <li class="nav-item">
-        <NavLink class="nav-link" href="@($"/downloads/{state.Id}/files")"><i class="far fa-folder-open"></i> File Manager</NavLink>
+        <NavLink class="nav-link text-light" href="@($"/downloads/{state.Id}/edit")"><i class="fas fa-edit"></i> Edit</NavLink>
     </li>
     <li class="nav-item">
-        <NavLink class="nav-link" href="@($"/downloads/{state.Id}/authors")"><i class="fas fa-users-cog"></i> Authors</NavLink>
+        <NavLink class="nav-link text-light" href="@($"/downloads/{state.Id}/files")"><i class="far fa-folder-open"></i> File Manager</NavLink>
     </li>
     <li class="nav-item">
-        <NavLink class="nav-link" href="@($"/downloads/{state.Id}/delete")"><i class="fas fa-trash"></i> Delete</NavLink>
+        <NavLink class="nav-link text-light" href="@($"/downloads/{state.Id}/authors")"><i class="fas fa-users-cog"></i> Authors</NavLink>
+    </li>
+    <li class="nav-item">
+        <NavLink class="nav-link text-light" href="@($"/downloads/{state.Id}/delete")"><i class="fas fa-trash"></i> Delete</NavLink>
     </li>
 </ul>
 
 @Body
-
-<p>
-    <a href="/downloads"><i class="fas fa-angle-left"></i> Back to List</a>
-    |
-    <a href="@($"/downloads/{state.Id}")">View Page</a>
-</p>
 
 @code {
     protected override void OnInitialized()

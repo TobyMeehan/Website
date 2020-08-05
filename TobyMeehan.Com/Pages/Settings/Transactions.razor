@@ -10,15 +10,15 @@
 <Card class="my-3">
     <p>Balance: @CurrentUser.Balance</p>
 
-    <table class="table">
-        <thead>
+    <Table>
+        <Head>
             <tr>
                 <th scope="col">Sender</th>
                 <th scope="col">Description</th>
                 <th scope="col">Amount</th>
             </tr>
-        </thead>
-        <tbody>
+        </Head>
+        <Body>
             @foreach (var transaction in CurrentUser.Transactions)
             {
                 <tr>
@@ -35,6 +35,6 @@
                     <td>@transaction.Amount</td>
                 </tr>
             }
-        </tbody>
-    </table>
+        </Body>
+    </Table>
 </Card>

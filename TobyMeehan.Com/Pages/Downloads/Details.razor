@@ -17,7 +17,7 @@ else
                             @_download.Title
                         </h1>
 
-                        <span class="font-weight-light d-none d-md-inline">
+                        <span class="font-weight-light d-none d-md-inline mt-2">
                             @switch (_download.Verified)
                             {
                                 case DownloadVerification.Dangerous:
@@ -99,7 +99,7 @@ else
                             <option value="@(DownloadVerification.Verified)">Verified</option>
                             <option value="@(DownloadVerification.Dangerous)">Dangerous</option>
                         </InputSelect>
-                        <button type="submit" class="btn btn-dark">Submit</button>
+                        <button type="submit" class="btn btn-light">Submit</button>
                     </EditForm>
                 </Card>
             </AuthorizeView>

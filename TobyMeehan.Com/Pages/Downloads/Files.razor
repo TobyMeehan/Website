@@ -23,8 +23,8 @@ else
                 </EditForm>
             </div>
 
-            <table class="table table-hover table-sm">
-                <tbody>
+            <Table Hover="true" class="table-sm">
+                <Body>
                     @foreach (var file in _download.Files)
                     {
                         <tr>
@@ -67,6 +67,12 @@ else
                             </td>
                         </tr>
                     }
+                </Body>
+            </Table>
+
+            <table class="table table-hover table-sm">
+                <tbody>
+                    
                 </tbody>
             </table>
         </Authorized>

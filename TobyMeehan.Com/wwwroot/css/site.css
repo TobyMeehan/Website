@@ -9,6 +9,12 @@
     color: #6c757d;
 }
 
+.footer {
+    min-height: 60px;
+    line-height: 60px;
+    border-top: 1px solid #161619;
+}
+
 .banner {
     margin-bottom: 0;
     border-radius: 0;

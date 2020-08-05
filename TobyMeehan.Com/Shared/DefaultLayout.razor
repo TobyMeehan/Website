@@ -3,66 +3,66 @@
 @inject AlertState alertState
 @inject ProgressTaskState taskState
 
-<div class="jumbotron banner-logo"></div>
+<div class="banner">
 
-<DefaultNavMenu></DefaultNavMenu>
+    <header>
+        <DefaultNavMenu></DefaultNavMenu>
+    </header>
 
-<div class="container-fluid">
-    <div class="row">
-        <div class="col-sm-2"></div>
+    <div class="container-fluid" style="margin-top: 56px; margin-bottom: 56px;">
+        <div class="row">
+            <div class="col-sm-2"></div>
 
-        <div class="col-sm-8">
-            <div id="blazor-error-ui" class="alert alert-danger" role="alert">
-                Oh blast, it looks like something fucked up. You can continue using the website by <a href="" class="alert-link reload">reloading</a> the page. If you are really awesome, you can <a href="https://github.com/TobyMeehan/Website/issues/new/choose" class="alert-link">create an issue</a> so I can fix the problem.
-            </div>
+            <main class="col-sm-8 bg-main text-light pt-3" style="min-height: calc(100vh - 112px);">
+                    <div id="blazor-error-ui" class="alert alert-danger" role="alert">
+                        Oh blast, it looks like something fucked up. You can continue using the website by <a href="" class="alert-link reload">reloading</a> the page. If you are really awesome, you can <a href="https://github.com/TobyMeehan/Website/issues/new/choose" class="alert-link">create an issue</a> so I can fix the problem.
+                    </div>
 
-            @foreach (var alert in alertState)
+                    @foreach (var alert in alertState)
+                    {
+                        <Alert Model="alert"></Alert>
+                    }
+
+                    @Body
+            </main>
+
+            <div class="col-sm-2"></div>
+
+            @if (taskState.Tasks.Any(t => t is FileUploadTask))
             {
-                <Alert Model="alert"></Alert>
+                <div class="toast show position-absolute" style="right: 75px; bottom: 75px; min-width: 20%;">
+                    <div class="toast-header">
+                        @if (taskState.Tasks.Any(t => t is FileUploadTask && t.Status == Tasks.TaskStatus.InProgress))
+                        {
+                            <span class="spinner-border spinner-border-sm mr-2" role="status"></span>
+                        }
+                        else
+                        {
+                            <span>
+                                <i class="fas fa-check mr-2"></i>
+                            </span>
+                        }
+
+                        <strong class="mr-auto">Uploading Files</strong>
+
+                        <button type="button" class="close" aria-label="Close" @onclick="() => taskState.Dismiss(t => t is FileUploadTask)">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="toast-body p-0">
+                        <UploadList Uploads="taskState.Tasks.Where(t => t is FileUploadTask).Select(t => t as FileUploadTask).ToList()"
+                                    OnUploadDismiss="(upload) => taskState.Dismiss(upload)"></UploadList>
+                    </div>
+                </div>
             }
 
-            @Body
         </div>
-
-        <div class="col-sm-2"></div>
     </div>
 
-    @if (taskState.Tasks.Any(t => t is FileUploadTask))
-    {
-        <div class="toast show position-absolute" style="right: 75px; bottom: 75px; min-width: 20%;">
-            <div class="toast-header">
-                @if (taskState.Tasks.Any(t => t is FileUploadTask && t.Status == Tasks.TaskStatus.InProgress))
-                {
-                    <span class="spinner-border spinner-border-sm mr-2" role="status"></span>
-                }
-                else
-                {
-                    <span>
-                        <i class="fas fa-check mr-2"></i>
-                    </span>
-                }
-
-                <strong class="mr-auto">Uploading Files</strong>
-
-                <button type="button" class="close" aria-label="Close" @onclick="() => taskState.Dismiss(t => t is FileUploadTask)">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="toast-body p-0">
-                <UploadList Uploads="taskState.Tasks.Where(t => t is FileUploadTask).Select(t => t as FileUploadTask).ToList()"
-                            OnUploadDismiss="(upload) => taskState.Dismiss(upload)"></UploadList>
-            </div>
-        </div>
-    }
-
+    <footer class="container-fluid fixed-bottom bg-darker text-center text-light" style="min-height: 56px; line-height:56px;">
+        <p class="m-0">&copy; @DateTime.Now.Year Toby Meehan</p>
+    </footer>
 </div>
-
-<hr />
-
-<footer class="container-fluid text-center">
-    <p>&copy; @DateTime.Now.Year Toby Meehan</p>
-    <p><a href="/update">Version 2.2</a></p>
-</footer>
 
 @code {
     protected override void OnInitialized()

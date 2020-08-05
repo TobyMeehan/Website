@@ -1,0 +1,34 @@
+﻿body {
+}
+
+.bg-main {
+    background-color: #18191c;
+}
+
+.bg-darker {
+    background-color: #292b2f;
+    /*background-color: #2f3136;*/
+}
+
+.list-group-item {
+    color: #fff;
+    background-color: #343a40;
+}
+
+.list-group-item-action:hover, .list-group-item-action:focus {
+    color: #fff;
+    background-color: rgba(255,255,255,.075);
+}
+
+.nav-tabs {
+    border-bottom-color: #343a40;
+}
+
+    .nav-tabs .nav-item.show .nav-link, .nav-tabs .nav-link.active {
+        background-color: #343a40;
+        border-color: #343a40;
+    }
+
+    .nav-tabs .nav-link:focus, .nav-tabs .nav-link:hover {
+        border-color: #343a40;
+    }
