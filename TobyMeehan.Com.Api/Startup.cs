@@ -44,7 +44,7 @@ namespace TobyMeehan.Com.Api
                 .AddBCryptPasswordHash()
                 .AddDefaultCloudStorage();
 
-            var tokenProvider = new RsaTokenProvider("api.tobymeehan.com", "api.tobymeehan.com", Guid.NewGuid().ToString().ToUpperInvariant());
+            var tokenProvider = new RsaTokenProvider("api.tobymeehan.com", "api.tobymeehan.com", "api.tobymeehan.com");
             services.AddSingleton<ITokenProvider>(tokenProvider);
 
             services.AddSingleton(ConfigureMapper());
@@ -114,6 +114,8 @@ namespace TobyMeehan.Com.Api
                 cfg.CreateMap<Application, ApplicationModel>().ReverseMap();
                 cfg.CreateMap<User, UserModel>().ReverseMap();
                 cfg.CreateMap<Role, RoleModel>().ReverseMap();
+                cfg.CreateMap<Download, DownloadModel>().ReverseMap();
+                cfg.CreateMap<DownloadFile, DownloadFileModel>().ReverseMap();
 
 
                 cfg.CreateMap<WebToken, JsonWebTokenResponse>().ReverseMap();
@@ -121,8 +123,13 @@ namespace TobyMeehan.Com.Api
                 cfg.CreateMap<Application, ApplicationResponse>();
                 cfg.CreateMap<ApplicationModel, ApplicationResponse>();
 
+                cfg.CreateMap<DownloadRequest, Download>();
+                cfg.CreateMap<DownloadRequest, DownloadModel>();
                 cfg.CreateMap<Download, DownloadResponse>();
                 cfg.CreateMap<DownloadModel, DownloadResponse>();
+
+                cfg.CreateMap<DownloadFile, DownloadFileResponse>();
+                cfg.CreateMap<DownloadFileModel, DownloadFileResponse>();
 
                 cfg.CreateMap<Objective, ObjectiveResponse>();
                 cfg.CreateMap<Score, ScoreResponse>();
