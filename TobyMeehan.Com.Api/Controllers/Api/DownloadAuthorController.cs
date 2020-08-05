@@ -31,7 +31,6 @@ namespace TobyMeehan.Com.Api.Controllers.Api
 
         [HttpGet("users/{userid}/downloads")]
         [Authorize]
-        [Scope("downloads")]
         public async Task<IActionResult> GetDownloads(string userid)
         {
             if (userid == "@me")
