@@ -62,6 +62,7 @@ namespace TobyMeehan.Com.Data.Repositories
             {
                 await _scoreTable.InsertAsync(new
                 {
+                    Id = Guid.NewGuid().ToToken(),
                     ObjectiveId = id,
                     UserId = userId,
                     Value = 0
