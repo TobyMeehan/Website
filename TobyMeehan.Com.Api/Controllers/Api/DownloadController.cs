@@ -66,7 +66,12 @@ namespace TobyMeehan.Com.Api.Controllers.Api
                 return Forbid(result.Failure);
             }
 
-            var download = await _downloads.AddAsync(request.Title, request.ShortDescription, request.LongDescription, UserId);
+            if (!Version.TryParse(request.Version, out Version version))
+            {
+                return BadRequest(new ErrorResponse("Invalid version string."));
+            }
+
+            var download = await _downloads.AddAsync(request.Title, request.ShortDescription, request.LongDescription, version, UserId);
 
             return Created(Url.Action(nameof(Get), new { download.Id }), download);
         }
@@ -87,6 +92,11 @@ namespace TobyMeehan.Com.Api.Controllers.Api
             if (!result.Succeeded)
             {
                 return Forbid(result.Failure);
+            }
+
+            if (!Version.TryParse(request.Version, out Version version))
+            {
+                return BadRequest(new ErrorResponse("Invalid version string."));
             }
 
             var updated = await _downloads.UpdateAsync(id, _mapper.Map<Download>(request));

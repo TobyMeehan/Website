@@ -123,10 +123,23 @@ namespace TobyMeehan.Com.Api
                 cfg.CreateMap<Application, ApplicationResponse>();
                 cfg.CreateMap<ApplicationModel, ApplicationResponse>();
 
-                cfg.CreateMap<DownloadRequest, Download>();
-                cfg.CreateMap<DownloadRequest, DownloadModel>();
-                cfg.CreateMap<Download, DownloadResponse>();
-                cfg.CreateMap<DownloadModel, DownloadResponse>();
+                cfg.CreateMap<DownloadRequest, Download>()
+                    .ForMember(
+                        dest => dest.Version,
+                        opt => opt.MapFrom(src => Version.Parse(src.Version)));
+                cfg.CreateMap<DownloadRequest, DownloadModel>()
+                    .ForMember(
+                        dest => dest.Version,
+                        opt => opt.MapFrom(src => Version.Parse(src.Version)));
+
+                cfg.CreateMap<Download, DownloadResponse>()
+                    .ForMember(
+                        dest => dest.Version,
+                        opt => opt.MapFrom(src => src.VersionString));
+                cfg.CreateMap<DownloadModel, DownloadResponse>()
+                    .ForMember(
+                        dest => dest.Version,
+                        opt => opt.MapFrom(src => src.Version.ToString()));
 
                 cfg.CreateMap<DownloadFile, DownloadFileResponse>();
                 cfg.CreateMap<DownloadFileModel, DownloadFileResponse>();

@@ -15,5 +15,7 @@ namespace TobyMeehan.Com.Api.Models.Api
 
         [JsonPropertyName("long_description")]
         public string LongDescription { get; set; }
+
+        public string Version { get; set; }
     }
 }
