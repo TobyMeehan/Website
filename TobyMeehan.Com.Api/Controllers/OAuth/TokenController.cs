@@ -35,7 +35,18 @@ namespace TobyMeehan.Com.Api.Controllers.OAuth
         }
 
         [HttpPost]
-        public async Task<IActionResult> Post([FromForm] AuthCodeTokenRequest request)
+        [Consumes("application/x-www-form-urlencoded")]
+        public Task<IActionResult> Post([FromForm(Name = "grant_type")] string grant, [FromForm] AuthCodeTokenRequest authCodeRequest, [FromForm] RefreshTokenRequest refreshTokenRequest)
+        {
+            return grant switch
+            {
+                "authorization_code" => AuthorizationCode(authCodeRequest),
+                "refresh_token" => RefreshToken(refreshTokenRequest),
+                _ => Task.FromResult<IActionResult>(BadRequest(new ErrorResponse("Invalid grant type."))),
+            };
+        }
+
+        private async Task<IActionResult> AuthorizationCode(AuthCodeTokenRequest request)
         {
             var session = await _sessions.GetByAuthCodeAsync(request.Code);
 
@@ -60,13 +71,18 @@ namespace TobyMeehan.Com.Api.Controllers.OAuth
         }
 
         [HttpPost]
-        public async Task<IActionResult> Post([FromForm] RefreshTokenRequest request)
+        public async Task<IActionResult> RefreshToken(RefreshTokenRequest request)
         {
             var session = await _sessions.GetByRefreshTokenAsync(request.RefreshToken);
 
             if (session == null)
             {
                 return BadRequest(new ErrorResponse("Invalid refresh token."));
+            }
+
+            if (session.Expiry < DateTime.Now)
+            {
+                return BadRequest(new ErrorResponse("Refresh token has expired."));
             }
 
             if (!await _applications.ValidateAsync(request.ClientId, request.ClientSecret, request.RedirectUri, request.ClientSecret == null))
