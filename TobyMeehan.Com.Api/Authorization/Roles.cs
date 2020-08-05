@@ -9,8 +9,8 @@ namespace TobyMeehan.Com.Api.Authorization
     {
         public static class User
         {
-            public const string Admin = nameof(Admin);
-            public const string Verified = nameof(Verified);
+            public const string Admin = "User:Admin";
+            public const string Verified = "User:Verified";
         }
 
         public static class Scopes
