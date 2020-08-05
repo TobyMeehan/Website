@@ -90,7 +90,7 @@ namespace TobyMeehan.Com.Data.Repositories
             return new WebToken
             {
                 AccessToken = _tokenProvider.CreateToken(claims, expiry),
-                ExpiresIn = expiry.ToBinary(),
+                ExpiresIn = (long)(expiry - DateTime.Now).TotalSeconds,
                 RefreshToken = session.RefreshToken
             };
         }
