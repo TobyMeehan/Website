@@ -16,6 +16,7 @@ namespace TobyMeehan.Com.Pages.Developer
     {
         [Inject] private IApplicationRepository applications { get; set; }
         [Inject] private IScoreboardRepository scoreboard { get; set; }
+        [Inject] private IDownloadRepository downloads { get; set; }
         [Inject] private IMapper mapper { get; set; }
         [Inject] private JavaScript js { get; set; }
         [Inject] public NavigationManager navigation { get; set; }
@@ -28,6 +29,7 @@ namespace TobyMeehan.Com.Pages.Developer
         private ApplicationViewModel _model = new ApplicationViewModel();
         private ObjectiveViewModel _objectiveForm = new ObjectiveViewModel();
         private IList<Objective> _scoreboard;
+        private IList<Download> _userDownloads;
         private string _iconError;
 
         protected override async Task OnInitializedAsync()
@@ -35,6 +37,7 @@ namespace TobyMeehan.Com.Pages.Developer
             _application = await Task.Run(async () => await applications.GetByIdAsync(Id));
             _model = mapper.Map<ApplicationViewModel>(_application);
             _scoreboard = await Task.Run(async () => await scoreboard.GetByApplicationAsync(Id));
+            _userDownloads = await Task.Run(async () => await downloads.GetByAuthorAsync(_application.Author.Id));
         }
 
         private async Task InformationForm_Submit()
@@ -84,6 +87,18 @@ namespace TobyMeehan.Com.Pages.Developer
         {
             await scoreboard.DeleteAsync(objective.Id);
             _scoreboard.Remove(objective);
+        }
+
+        private async Task AddDownload_Click(Download download)
+        {
+            await applications.AddDownloadAsync(Id, download.Id);
+            _application.Download = download;
+        }
+
+        private async Task RemoveDownload_Click()
+        {
+            await applications.RemoveDownloadAsync(Id);
+            _application.Download = null;
         }
     }
 }

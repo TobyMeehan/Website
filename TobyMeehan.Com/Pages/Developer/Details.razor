@@ -103,6 +103,74 @@ else
 
             <hr />
 
+            <div class="row m-0">
+                <h2>Download</h2>
+
+                @if (_application.Download == null)
+                {
+                    <button class="btn btn-primary btn-lg ml-auto" data-toggle="modal" data-target="#DownloadModal">Add Download</button>
+                }
+                else
+                {
+                    <button class="btn btn-danger btn-lg ml-auto" @onclick="RemoveDownload_Click">Remove Download</button>
+                }
+            </div>
+
+            @if (_application.Download == null)
+            {
+                <p>Link your application's files and community by connecting a download.</p>
+            }
+            else
+            {
+                <div class="row">
+                    <div class="col-md-4">
+                        <DownloadCard Download="_application.Download"></DownloadCard>
+                    </div>
+                    <div class="col-md-8">
+                        @((MarkupString)_application.Download.LongDescription)
+                    </div>
+                </div>
+            }
+
+            <Modal id="DownloadModal">
+                <Title>Connect Download</Title>
+                <Body>
+                    @if (_userDownloads == null)
+                    {
+                        <Loading></Loading>
+                    }
+                    else if (!_userDownloads.Any())
+                    {
+                        <p>You have not created any downloads. <a href="/downloads/add">New Download</a></p>
+                    }
+                    else
+                    {
+                        <div class="list-group">
+                            @foreach (var download in _userDownloads)
+                            {
+                                <button class="list-group-item list-group-item-reset list-group-item-action" data-dismiss="modal" @onclick="() => AddDownload_Click(download)">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h5>@download.Title</h5>
+                                        <small>@download.Version</small>
+                                    </div>
+
+                                    <p class="mb-1">@download.ShortDescription</p>
+
+                                    @if (download.Updated != null)
+                                    {
+                                        <small class="text-muted">@download.UpdatedString()</small>
+                                    }
+                                </button>
+                            }
+
+                        </div>
+
+                    }
+                </Body>
+            </Modal>
+
+            <hr />
+
             <h2>Scoreboard</h2>
 
             <p>Use the scoreboard to persist user-specific data between sessions. Data stored in the scoreboard is not shown anywhere other than where your app displays it, so you can use it for whatever you like.</p>

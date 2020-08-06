@@ -20,6 +20,16 @@
     background-color: rgba(255,255,255,.075);
 }
 
+.list-group-item-reset {
+    color: #495057;
+    background-color: #fff;
+}
+
+.list-group-item-action.list-group-item-reset:hover, .list-group-item-action.list-group-item-reset:focus {
+    color: #495057;
+    background-color: #f8f9fa;
+}
+
 .nav-tabs {
     border-bottom-color: #343a40;
 }

@@ -28,6 +28,10 @@ namespace TobyMeehan.Com.Data.Repositories
 
         Task RemoveIconAsync(string id);
 
+        Task AddDownloadAsync(string id, string downloadId);
+
+        Task RemoveDownloadAsync(string id);
+
         Task DeleteAsync(string id);
 
         Task<bool> ValidateAsync(string id, string secret, string redirectUri, bool ignoreSecret);
