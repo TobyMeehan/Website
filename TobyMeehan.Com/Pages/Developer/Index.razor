@@ -1,0 +1,40 @@
+﻿@page "/developer"
+
+<h1>Developer</h1>
+
+<p>Using the API you can make your own applications which connect to registered users on the site. Here you can view and manage applications you've created.</p>
+
+<AuthorizeView>
+    <NotAuthorized>
+        <p><a href="/login">Sign in</a> to use applications.</p>
+    </NotAuthorized>
+    <Authorized>
+        <hr />
+
+        <div class="row m-0">
+            <h2>Your Applications</h2>
+
+            <a class="btn btn-primary btn-lg ml-auto" href="/developer/applications/create">
+                New Application
+            </a>
+        </div>
+
+        @if (_applications == null)
+        {
+            <Loading></Loading>
+        }
+        else if (!_applications.Any())
+        {
+            <p>You have not created any applications.</p>
+        }
+        else
+        {
+            <CardDeck CardsPerRow="5">
+                @foreach (var application in _applications)
+                {
+                    <ApplicationCard Application="application"></ApplicationCard>
+                }
+            </CardDeck>
+        }
+    </Authorized>
+</AuthorizeView>

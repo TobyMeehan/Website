@@ -10,23 +10,33 @@
 <Card class="my-3">
     <p>Balance: @CurrentUser.Balance</p>
 
-    <table class="table">
-        <thead>
-            <tr>
-                <th scope="col">Sender</th>
-                <th scope="col">Description</th>
-                <th scope="col">Amount</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var transaction in CurrentUser.Transactions)
-            {
+    @foreach (var date in CurrentUser.Transactions.OrderByDescending(x => x.Sent).GroupBy(x => x.Sent.Date))
+    {
+        <Table>
+            <Head>
                 <tr>
-                    <td>@transaction.Sender</td>
-                    <td>@transaction.Description</td>
-                    <td>@transaction.Amount</td>
+                    <th colspan="4" class="text-center">@date.Key.ToLongDateString()</th>
                 </tr>
-            }
-        </tbody>
-    </table>
+            </Head>
+            <Body>
+                @foreach (var transaction in date)
+                {
+                    <tr>
+                        <td>
+                            <div class="row m-0">
+                                <div class="mr-1" style="width: 1.4em;">
+                                    <AppIcon Application="transaction.Application" FontSize="0.7"></AppIcon>
+                                </div>
+
+                                @transaction.Application.Name
+                            </div>
+                        </td>
+                        <td>@transaction.Description</td>
+                        <td>@transaction.Amount</td>
+                        <td>@transaction.Sent.TimeOfDay.Hours:@transaction.Sent.TimeOfDay.Minutes</td>
+                    </tr>
+                }
+            </Body>
+        </Table>
+    }
 </Card>

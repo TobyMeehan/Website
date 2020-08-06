@@ -10,5 +10,6 @@ namespace TobyMeehan.Com.Data.Models
     {
         public string AppId { get; set; }
         public string Name { get; set; }
+        public EntityCollection<Score> Scores { get; set; }
     }
 }

@@ -9,13 +9,15 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/lib/fontawesome/css/all.css" />
     <link rel="stylesheet" href="~/css/site.css" />
+    <link rel="stylesheet" href="~/css/carddeck.css" />
     <link rel="stylesheet" href="~/css/fonts.css" />
+    <link rel="stylesheet" href="~/css/darktheme.css" />
 
     <partial name="~/Shared/_Favicons.cshtml" />
 
     @RenderSection("Head", required: false)
 </head>
-<body class="h-100">
+<body class="@ViewData["BodyClass"]">
     @RenderBody()
 
     <script src="https://cdn.ckeditor.com/ckeditor5/16.0.0/classic/ckeditor.js"></script>

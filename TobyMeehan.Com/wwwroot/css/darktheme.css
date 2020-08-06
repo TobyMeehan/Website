@@ -1,0 +1,41 @@
+﻿body {
+}
+
+.bg-main {
+    background-color: #18191c;
+}
+
+.bg-darker {
+    background-color: #292b2f;
+    /*background-color: #2f3136;*/
+}
+
+.list-group-item:not(.list-group-item-default):not(.list-group-item-success):not(.list-group-item-warning):not(.list-group-item-danger):not(.list-group-item-info) {
+    color: #fff;
+    background-color: #343a40;
+}
+
+.list-group-item-action:not(.list-group-item-default):not(.list-group-item-success):not(.list-group-item-warning):not(.list-group-item-danger):not(.list-group-item-info):hover,
+.list-group-item-action:not(.list-group-item-default):not(.list-group-item-success):not(.list-group-item-warning):not(.list-group-item-danger):not(.list-group-item-info):focus {
+    color: #fff;
+    background-color: rgba(255,255,255,.075);
+}
+
+.list-group-item-action.list-group-item-reset:not(.list-group-item-default):not(.list-group-item-success):not(.list-group-item-warning):not(.list-group-item-danger):not(.list-group-item-info):hover,
+.list-group-item-action.list-group-item-reset:not(.list-group-item-default):not(.list-group-item-success):not(.list-group-item-warning):not(.list-group-item-danger):not(.list-group-item-info):focus {
+    color: #495057;
+    background-color: #f8f9fa;
+}
+
+.nav-tabs {
+    border-bottom-color: #343a40;
+}
+
+    .nav-tabs .nav-item.show .nav-link, .nav-tabs .nav-link.active {
+        background-color: #343a40;
+        border-color: #343a40;
+    }
+
+    .nav-tabs .nav-link:focus, .nav-tabs .nav-link:hover {
+        border-color: #343a40;
+    }

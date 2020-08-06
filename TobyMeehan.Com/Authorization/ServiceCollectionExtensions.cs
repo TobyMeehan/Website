@@ -14,6 +14,7 @@ namespace TobyMeehan.Com.Authorization
         {
             services.AddSingleton<IAuthorizationHandler, CanEditDownloadAuthorizationHandler>();
             services.AddSingleton<IAuthorizationHandler, CanEditCommentAuthorizationHandler>();
+            services.AddSingleton<IAuthorizationHandler, CanEditApplicationAuthorizationHandler>();
 
             services.AddAuthorization(options =>
             {
@@ -21,6 +22,7 @@ namespace TobyMeehan.Com.Authorization
                 options.AddPolicy(IsAdmin, IsAdminPolicy());
                 options.AddPolicy(CanEditDownload, CanEditDownloadPolicy());
                 options.AddPolicy(CanEditComment, CanEditCommentPolicy());
+                options.AddPolicy(CanEditApplication, CanEditApplicationPolicy());
             });
         }
     }

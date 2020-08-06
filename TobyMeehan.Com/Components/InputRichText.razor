@@ -1,7 +1,9 @@
 ﻿@inherits InputTextArea
 @inject JavaScript js
 
-<textarea @attributes="AdditionalAttributes" id="@Id" class="@CssClass d-none" value="@CurrentValue"></textarea> 
+<div class="text-body">
+    <textarea @attributes="AdditionalAttributes" id="@Id" class="@CssClass d-none" value="@CurrentValue"></textarea>
+</div>
 
 @code {
     string _id;

@@ -9,15 +9,15 @@
 
 <Card class="my-3">
     <Require Model="_connections">
-        <table class="table">
-            <thead>
+        <Table>
+            <Head>
                 <tr>
                     <th scope="col">Name</th>
                     <th scope="col">Author</th>
                     <th></th>
                 </tr>
-            </thead>
-            <tbody>
+            </Head>
+            <Body>
                 @foreach (var connection in _connections)
                 {
                     <tr>
@@ -31,7 +31,7 @@
                         </td>
                     </tr>
                 }
-            </tbody>
-        </table>
+            </Body>
+        </Table>
     </Require>
 </Card>

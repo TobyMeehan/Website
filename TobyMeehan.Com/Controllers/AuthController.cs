@@ -56,7 +56,7 @@ namespace TobyMeehan.Com.Controllers
 
             if (User.Identity.IsAuthenticated)
             {
-                return LocalRedirect(ReturnUrl);
+                return Redirect(ReturnUrl);
             }
 
             return View();
@@ -70,7 +70,7 @@ namespace TobyMeehan.Com.Controllers
 
             if (User.Identity.IsAuthenticated)
             {
-                return LocalRedirect(ReturnUrl);
+                return Redirect(ReturnUrl);
             }
 
             if (!ModelState.IsValid)
@@ -86,7 +86,7 @@ namespace TobyMeehan.Com.Controllers
             {
                 await SignIn(result.Result);
 
-                return LocalRedirect(ReturnUrl);
+                return Redirect(ReturnUrl);
             }
             else
             {
@@ -105,7 +105,7 @@ namespace TobyMeehan.Com.Controllers
 
             if (User.Identity.IsAuthenticated)
             {
-                return LocalRedirect(ReturnUrl);
+                return Redirect(ReturnUrl);
             }
 
             return View();
@@ -119,7 +119,7 @@ namespace TobyMeehan.Com.Controllers
 
             if (User.Identity.IsAuthenticated)
             {
-                return LocalRedirect(ReturnUrl);
+                return Redirect(ReturnUrl);
             }
 
             if (!ModelState.IsValid)
@@ -139,7 +139,7 @@ namespace TobyMeehan.Com.Controllers
 
             await SignIn(user);
 
-            return LocalRedirect(ReturnUrl);
+            return Redirect(ReturnUrl);
         }
 
         [Route("/logout")]
@@ -149,7 +149,7 @@ namespace TobyMeehan.Com.Controllers
 
             await HttpContext.SignOutAsync();
 
-            return LocalRedirect(ReturnUrl);
+            return Redirect(ReturnUrl);
         }
 
         [Route("/refresh")]
@@ -163,7 +163,7 @@ namespace TobyMeehan.Com.Controllers
 
             await SignIn(user);
 
-            return LocalRedirect(ReturnUrl);
+            return Redirect(ReturnUrl);
         }
     }
 }

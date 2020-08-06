@@ -15,5 +15,8 @@ namespace TobyMeehan.Com.Models
         public string ShortDescription { get; set; }
 
         public string LongDescription { get; set; }
+
+        [Required]
+        public Version Version { get; set; } = new Version(1, 0, 0);
     }
 }

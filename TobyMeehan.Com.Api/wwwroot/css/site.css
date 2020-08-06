@@ -1,0 +1,76 @@
+﻿@import url('https://fonts.googleapis.com/css2?family=Rock+Salt&display=swap');
+
+.text-logo {
+    font-family: 'Rock Salt', cursive;
+}
+
+.banner {
+    background-image: url("/img/Banner.svg");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+    display: flex;
+    flex-flow: column;
+    height: 100%;
+}
+
+    .banner .authorize-row {
+    }
+
+        .banner .authorize-row.authorize-header {
+            flex: 0 1 auto;
+        }
+
+    .banner .authorize-content {
+        flex: 1 1 auto;
+    }
+
+    .banner .authorize-row.authorize-footer {
+        flex: 0 1 40px;
+    }
+
+.card-centre {
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.authorize-title {
+    margin-top: 24px;
+}
+
+@media (min-width: 0){
+    .card-centre {
+        width: 95%;
+    }
+
+    .authorize-title {
+        width: 100%;
+        text-align: center;
+        margin-bottom: 24px;
+    }
+}
+
+@media (min-width: 576px) {
+    .card-centre {
+        width: 75%;
+    }
+
+    .authorize-title {
+        text-align: left;
+        padding-left: 24px;
+        margin-bottom: initial;
+    }
+}
+
+@media (min-width: 768px) {
+    .card-centre {
+        width: 45%;
+    }
+}
+
+@media (min-width: 992px) {
+    .card-centre {
+        width: 20%;
+    }
+}

@@ -1,6 +1,6 @@
 ﻿@inject NavigationManager navigation
 
-<nav class="navbar navbar-expand-lg sticky-top navbar-dark bg-dark mb-3">
+<nav class="navbar navbar-expand-lg navbar-dark bg-darker fixed-top" style="min-height: 56px;">
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".navbar-collapse">
         <span class="navbar-toggler-icon"></span>
     </button>
@@ -19,11 +19,13 @@
             <li class="nav-item">
                 <NavLink class="nav-link" href="/downloads" Match="NavLinkMatch.Prefix">Downloads</NavLink>
             </li>
+            <AuthorizeView>
+                <li class="nav-item">
+                    <NavLink class="nav-link" href="/developer" Match="NavLinkMatch.Prefix">Developer</NavLink>
+                </li>
+            </AuthorizeView>
             <li class="nav-item">
                 <NavLink class="nav-link" href="https://github.com/TobyMeehan/Website">GitHub</NavLink>
-            </li>
-            <li class="nav-item">
-                <NavLink class="nav-link" href="https://api.tobymeehan.com">API</NavLink>
             </li>
             <AuthorizeView Policy="@AuthorizationPolicies.IsAdmin">
                 <li class="nav-item">

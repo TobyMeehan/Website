@@ -1,0 +1,99 @@
+﻿@model AuthorizeViewModel
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html lang="en" class="h-100">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>Authorize @Model.Connection.Application.Name</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" />
+</head>
+<body class="h-100">
+    <div class="banner text-light">
+
+        <div class="authorize-row authorize-header">
+            <h1 class="text-logo h2 authorize-title">
+                <a href="https://tobymeehan.com" class="text-reset text-decoration-none">Toby Meehan</a>
+            </h1>
+        </div>
+
+        <div class="authorize-row authorize-content">
+            <div class="card bg-dark card-centre">
+                <div class="card-body">
+
+                    <div class="text-center">
+                        @if (Model.Connection.Application.IconUrl != null)
+                        {
+                            <img class="rounded" src="@Model.Connection.Application.IconUrl" height="64" width="64" />
+                        }
+                        else
+                        {
+                            <svg role="img" class="rounded" style="right:0;" height="64" width="64">
+                                <rect width="100%" height="100%" fill="#6c757d"></rect>
+                                <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="#f8f9fa" font-size="1.25rem">
+                                    @Model.Connection.Application.Name.First()
+                                </text>
+                            </svg>
+                        }
+
+                        <img class="rounded" src="@(Model.Connection.User.ProfilePictureUrl ?? "https://tobymeehan.com/img/DefaultProfile.svg)")" height="64" width="64">
+                    </div>
+
+                    <p class="lead text-center">Connect to <span class="font-weight-bold">@Model.Connection.Application.Name</span></p>
+
+                    <p class="font-weight-light mb-1">@Model.Connection.Application.Name would like access to:</p>
+
+                    <ul class="list-group list-group-flush mb-3">
+                        @foreach (var scope in Model.Scopes)
+                        {
+                            @switch (scope)
+                            {
+                                case Scopes.Identify:
+                                    <li class="list-group-item bg-dark">
+                                        <h5>Account Data</h5>
+                                        <p class="mb-0">View your username, balance and roles.</p>
+                                    </li>
+                                    break;
+                                case Scopes.Transactions:
+                                    <li class="list-group-item bg-dark">
+                                        <h5>Send &amp; Receive Transactions</h5>
+                                        <p class="mb-0">Alter your account balance.</p>
+                                    </li>
+                                    break;
+                                case Scopes.Downloads:
+                                    <li class="list-group-item bg-dark">
+                                        <h5>Manage Downloads</h5>
+                                        <p class="mb-0">Create, modify and delete downloads on your behalf.</p>
+                                    </li>
+                                    break;
+                                default:
+                                    break;
+                            }
+                        }
+                    </ul>
+
+                    <div class="mb-3" style="line-height: 1.1;">
+                        <small>You can revoke access at any time by using the 'connections' tab in your account settings.</small>
+                    </div>
+
+                    <form method="post" asp-antiforgery="true">
+                        <input type="hidden" name="ConnectionId" value="@Model.Connection.Id" />
+
+                        <button type="submit" class="btn btn-light">Authorise</button>
+                        <a asp-action="Cancel" asp-route-redirect_uri="@ViewBag.RedirectUri" class="btn btn-link text-light">Cancel</a>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+</body>
+</html>

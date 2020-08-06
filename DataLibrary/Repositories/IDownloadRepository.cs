@@ -17,13 +17,15 @@ namespace TobyMeehan.Com.Data.Repositories
 
         Task<Download> GetByIdAsync(string id);
 
-        Task<Download> AddAsync(string title, string shortDescription, string longDescription, string userId);
+        Task<Download> AddAsync(string title, string shortDescription, string longDescription, Version version, string userId);
 
-        Task UpdateAsync(Download download);
+        Task<Download> UpdateAsync(string id, Download download);
 
         Task AddAuthorAsync(string id, string userId);
 
         Task RemoveAuthorAsync(string id, string userId);
+
+        Task VerifyAsync(string id, DownloadVerification verification);
 
         Task DeleteAsync(string id);
     }

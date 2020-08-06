@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using TobyMeehan.Com.Data.CloudStorage;
+using TobyMeehan.Com.Data.Configuration;
 using TobyMeehan.Com.Data.Models;
 using TobyMeehan.Com.Data.Upload;
 using TobyMeehan.Sql;
@@ -18,9 +19,9 @@ namespace TobyMeehan.Com.Data.Repositories
     {
         private readonly ISqlTable<DownloadFile> _table;
         private readonly ICloudStorage _storage;
-        private readonly DataAccessLibraryOptions _options;
+        private readonly CloudStorageOptions _options;
 
-        public DownloadFileRepository(ISqlTable<DownloadFile> table, ICloudStorage storage, IOptions<DataAccessLibraryOptions> options)
+        public DownloadFileRepository(ISqlTable<DownloadFile> table, ICloudStorage storage, IOptions<CloudStorageOptions> options)
         {
             _table = table;
             _storage = storage;

@@ -1,0 +1,21 @@
+﻿<div class="square">
+    @if (Application.IconUrl != null)
+    {
+        <img src="@Application.IconUrl" class="d-block rounded" />
+    }
+    else
+    {
+        <svg role="img" class="rounded" style="right:0;">
+            <rect width="100%" height="100%" fill="#6c757d"></rect>
+            <text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="#f8f9fa" font-size="@(FontSize)rem" >
+                @Application.Name.First()
+            </text>
+        </svg>
+    }
+</div>
+
+@code {
+    [Parameter] public Application Application { get; set; }
+
+    [Parameter] public double FontSize { get; set; } = 1.25;
+}
