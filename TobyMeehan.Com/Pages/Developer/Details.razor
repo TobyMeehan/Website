@@ -148,7 +148,7 @@ else
                         <div class="list-group">
                             @foreach (var download in _userDownloads)
                             {
-                                <button class="list-group-item list-group-item-reset list-group-item-action" data-dismiss="modal" @onclick="() => AddDownload_Click(download)">
+                                <button class="list-group-item list-group-item-default list-group-item-action" data-dismiss="modal" @onclick="() => AddDownload_Click(download)">
                                     <div class="d-flex w-100 justify-content-between">
                                         <h5>@download.Title</h5>
                                         <small>@download.Version</small>
