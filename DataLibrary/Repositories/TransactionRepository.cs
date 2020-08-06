@@ -40,7 +40,8 @@ namespace TobyMeehan.Com.Data.Repositories
                 UserId = userId,
                 AppId = appId,
                 Description = description,
-                Amount = amount
+                Amount = amount,
+                Sent = DateTime.Now
             });
 
             return await GetByIdAsync(id);

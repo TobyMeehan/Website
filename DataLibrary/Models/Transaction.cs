@@ -14,5 +14,6 @@ namespace TobyMeehan.Com.Data.Models
         public Application Application { get; set; }
         public string Description { get; set; }
         public int Amount { get; set; }
+        public DateTime Sent { get; set; }
     }
 }
