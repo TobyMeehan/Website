@@ -1,26 +1,27 @@
-name: .NET Core
+name: Deploy
 
 on:
   push:
     branches: [ master ]
 
 jobs:
-  build:
-
+  website:
+    name: Deploy Website
     runs-on: ubuntu-latest
-
     steps:
+    
     - uses: actions/checkout@v2
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: 3.1.101
+    
     - name: Install dependencies
-      run: dotnet restore
-      
+      run: dotnet restore      
+
     - name: .NET Publish
-      run: dotnet publish ./TobyMeehan.Com -c Release -o ./publish/TobyMeehan.Com --no-restore --verbosity normal
-      
+      run: dotnet publish ./TobyMeehan.Com -c Release -o ./publish/TobyMeehan.Com --no-restore --verbosity normal      
+    
     - name: FTP Deploy
       uses: sebastianpopp/ftp-action@v2.0.0
       with:
@@ -36,3 +37,37 @@ jobs:
         localDir: ./publish/TobyMeehan.Com
         # Remote directory
         remoteDir: /httpdocs
+  
+  webapi:
+    name: Deploy Web API
+    runs-on: ubuntu-latest
+    steps:
+      
+      - uses: actions/checkout@v2
+      - name: Setup .NET Core
+        uses: actions/setup-dotnet:v1
+        with:
+          dotnet-version: 3.1.101
+      
+      - name: Install Dependencies
+        run: dotnet restore
+      
+      - name: .NET Publish
+        run: dotnet publish ./TobyMeehan.Com.Api -c Release -o ./publish/TobyMeehan.Com --no-restore --verbosity normal
+      
+      - name: FTP Deploy
+        uses: sebastianpopp/ftp-action@v2.0.0
+        with:
+          # FTP host
+          host: ${{ secrets.FTP_SERVER }}
+          # FTP user
+          user: ${{ secrets.FTP_ACCOUNT_USERNAME }}
+          # FTP password
+          password: ${{ secrets.FTP_ACCOUNT_PASSWORD }}
+          # Force SSL encryption
+          forceSsl: false
+          # Local directory
+          localDir: ./publish/TobyMeehan.Com
+          # Remote directory
+          remoteDir: /api
+        
