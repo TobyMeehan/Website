@@ -8,6 +8,7 @@ namespace TobyMeehan.Com.Api.Models.Api
 {
     public class ApplicationResponse
     {
+        public string Id { get; set; }
         public string Name { get; set; }
 
         [JsonPropertyName("user_id")]
