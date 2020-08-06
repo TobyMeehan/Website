@@ -16,5 +16,8 @@ namespace TobyMeehan.Com.Api.Models.Api
 
         [JsonPropertyName("icon_url")]
         public string IconUrl { get; set; }
+
+        [JsonPropertyName("download_id")]
+        public string DownloadId { get; set; }
     }
 }

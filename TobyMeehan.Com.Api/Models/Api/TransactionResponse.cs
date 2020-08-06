@@ -14,5 +14,6 @@ namespace TobyMeehan.Com.Api.Models.Api
         public string AppId { get; set; }
         public string Description { get; set; }
         public int Amount { get; set; }
+        public DateTime Sent { get; set; }
     }
 }
