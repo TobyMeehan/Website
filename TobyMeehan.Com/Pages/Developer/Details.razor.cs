@@ -81,6 +81,7 @@ namespace TobyMeehan.Com.Pages.Developer
         {
             var objective = await scoreboard.AddAsync(Id, _objectiveForm.Name);
             _scoreboard.Add(objective);
+            _objectiveForm = new ObjectiveViewModel();
         }
 
         private async Task DeleteObjective_Click(Objective objective)
