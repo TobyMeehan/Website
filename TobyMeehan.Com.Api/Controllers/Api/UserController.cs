@@ -7,8 +7,10 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using TobyMeehan.Com.Api.Authorization;
+using TobyMeehan.Com.Api.Extensions;
 using TobyMeehan.Com.Api.Models;
 using TobyMeehan.Com.Api.Models.Api;
+using TobyMeehan.Com.AspNetCore.Extensions;
 using TobyMeehan.Com.Data.Repositories;
 
 namespace TobyMeehan.Com.Api.Controllers.Api
@@ -19,13 +21,11 @@ namespace TobyMeehan.Com.Api.Controllers.Api
     {
         private readonly IUserRepository _users;
         private readonly IMapper _mapper;
-        private readonly IAuthorizationService _authorizationService;
 
-        public UserController(IUserRepository users, IMapper mapper, IAuthorizationService authorizationService)
+        public UserController(IUserRepository users, IMapper mapper)
         {
             _users = users;
             _mapper = mapper;
-            _authorizationService = authorizationService;
         }
 
         [HttpGet]
@@ -53,7 +53,7 @@ namespace TobyMeehan.Com.Api.Controllers.Api
                 return NotFound(new ErrorResponse("User does not exist."));
             }
 
-            if ((await _authorizationService.AuthorizeAsync(User, user, new IdentifyScopeRequirement())).Succeeded)
+            if (user.Id == User.Id() && User.HasScope(Scopes.Identify))
             {
                 return Ok(_mapper.Map<UserResponse>(user));
             }

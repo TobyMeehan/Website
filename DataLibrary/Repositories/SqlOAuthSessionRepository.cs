@@ -79,12 +79,12 @@ namespace TobyMeehan.Com.Data.Repositories
 
             foreach (var role in session.Connection.User.Roles)
             {
-                claims.Add(new Claim(ClaimTypes.Role, $"User:{role.Name}"));
+                claims.Add(new Claim(ClaimTypes.Role, role.Name));
             }
 
             foreach (var scope in session.Scopes)
             {
-                claims.Add(new Claim(ClaimTypes.Role, $"Scope:{scope}"));
+                claims.Add(new Claim("scp", scope));
             }
 
             return new WebToken

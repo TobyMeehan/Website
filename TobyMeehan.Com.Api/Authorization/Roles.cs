@@ -9,26 +9,8 @@ namespace TobyMeehan.Com.Api.Authorization
     {
         public static class User
         {
-            public const string Admin = "User:Admin";
-            public const string Verified = "User:Verified";
-        }
-
-        public static class Scopes
-        {
-            public static IEnumerable<string> All => new List<string>
-            {
-                "identify",
-                "transactions",
-                "downloads",
-                "connections",
-                "applications"
-            };
-
-            public const string Identify = "Scope:identify";
-            public const string Transactions = "Scope:transactions";
-            public const string Downloads = "Scope:downloads";
-            public const string Connections = "Scope:connections";
-            public const string Applications = "Scope:applications";
+            public const string Admin = "Admin";
+            public const string Verified = "Verified";
         }
     }
 }

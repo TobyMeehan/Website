@@ -17,18 +17,9 @@ namespace TobyMeehan.Com.Api.Controllers
 
         public string AppId => User.Claims.First(x => x.Type == ClaimTypes.Actor).Value;
 
-        public bool HasScope(string scope) => User.IsInRole($"Scope:{scope}");
-
         protected IActionResult Forbid(ErrorResponse error)
         {
             return StatusCode((int)HttpStatusCode.Forbidden, error);
-        }
-
-        protected IActionResult Forbid(AuthorizationFailure failure)
-        {
-            string message = (failure.FailedRequirements.FirstOrDefault(r => r is AuthorizationRequirement) as AuthorizationRequirement).FailureMessage;
-
-            return Forbid(new ErrorResponse(message));
         }
     }
 }

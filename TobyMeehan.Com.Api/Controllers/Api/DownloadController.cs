@@ -11,6 +11,7 @@ using Org.BouncyCastle.Ocsp;
 using TobyMeehan.Com.Api.Authorization;
 using TobyMeehan.Com.Api.Models;
 using TobyMeehan.Com.Api.Models.Api;
+using TobyMeehan.Com.AspNetCore.Authorization;
 using TobyMeehan.Com.Data.Models;
 using TobyMeehan.Com.Data.Repositories;
 
@@ -55,17 +56,9 @@ namespace TobyMeehan.Com.Api.Controllers.Api
         }
 
         [HttpPost]
-        [Authorize]
-        [Scope("downloads")]
+        [Authorize(ScopePolicies.HasDownloadsScope, Roles = "Verified")]
         public async Task<IActionResult> Post(DownloadRequest request)
         {
-            var result = await _authorizationService.AuthorizeAsync(User, new DownloadModel(), new AuthorizationRequirement(Operation.Create));
-
-            if (!result.Succeeded)
-            {
-                return Forbid(result.Failure);
-            }
-
             if (!Version.TryParse(request.Version, out Version version))
             {
                 return BadRequest(new ErrorResponse("Invalid version string."));
@@ -77,21 +70,21 @@ namespace TobyMeehan.Com.Api.Controllers.Api
         }
 
         [HttpPut("{id}")]
-        [Authorize]
-        [Scope("downloads")]
+        [Authorize(ScopePolicies.HasDownloadsScope)]
         public async Task<IActionResult> Put(string id, DownloadRequest request)
         {
-            var download = _mapper.Map<DownloadModel>(await _downloads.GetByIdAsync(id));
+            var download = await _downloads.GetByIdAsync(id);
 
             if (download == null)
             {
                 return NotFound(new ErrorResponse("The download does not exist."));
             }
-            var result = await _authorizationService.AuthorizeAsync(User, download, new AuthorizationRequirement(Operation.Update));
+
+            var result = await _authorizationService.AuthorizeAsync(User, download, new UpdateOperationAuthorizationRequirement());
 
             if (!result.Succeeded)
             {
-                return Forbid(result.Failure);
+                return Forbid(new ErrorResponse("Not authorized to modify download."));
             }
 
             if (!Version.TryParse(request.Version, out Version version))
@@ -105,22 +98,21 @@ namespace TobyMeehan.Com.Api.Controllers.Api
         }
 
         [HttpDelete("{id}")]
-        [Authorize]
-        [Scope("downloads")]
+        [Authorize(ScopePolicies.HasDownloadsScope)]
         public async Task<IActionResult> Delete(string id)
         {
-            var download = _mapper.Map<DownloadModel>(await _downloads.GetByIdAsync(id));
+            var download = await _downloads.GetByIdAsync(id);
 
             if (download == null)
             {
                 return NotFound(new ErrorResponse("The download does not exist."));
             }
 
-            var result = await _authorizationService.AuthorizeAsync(User, download, new AuthorizationRequirement(Operation.Delete));
+            var result = await _authorizationService.AuthorizeAsync(User, download, new DeleteOperationAuthorizationRequirement());
 
             if (!result.Succeeded)
             {
-                return Forbid(result.Failure);
+                return Forbid(new ErrorResponse("Not authorized to delete download."));
             }
 
             await _downloads.DeleteAsync(id);

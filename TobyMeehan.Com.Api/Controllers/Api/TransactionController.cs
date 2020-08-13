@@ -28,8 +28,7 @@ namespace TobyMeehan.Com.Api.Controllers.Api
         }
 
         [HttpGet]
-        [Authorize]
-        [Scope("transactions")]
+        [Authorize(ScopePolicies.HasTransactionsScope)]
         public async Task<IActionResult> Get(string id)
         {
             if (id == "@me")
@@ -48,8 +47,7 @@ namespace TobyMeehan.Com.Api.Controllers.Api
         }
 
         [HttpPost]
-        [Authorize]
-        [Scope("transactions")]
+        [Authorize(ScopePolicies.HasTransactionsScope)]
         public async Task<IActionResult> Post(string id, [FromBody] TransactionRequest request, [FromQuery] bool? allowNegative)
         {
             if (id == "@me")

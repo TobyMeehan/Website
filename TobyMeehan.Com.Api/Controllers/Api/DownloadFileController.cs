@@ -10,6 +10,7 @@ using Org.BouncyCastle.Ocsp;
 using TobyMeehan.Com.Api.Authorization;
 using TobyMeehan.Com.Api.Models;
 using TobyMeehan.Com.Api.Models.Api;
+using TobyMeehan.Com.AspNetCore.Authorization;
 using TobyMeehan.Com.Data.Models;
 using TobyMeehan.Com.Data.Repositories;
 
@@ -66,22 +67,21 @@ namespace TobyMeehan.Com.Api.Controllers.Api
         //}
 
         [HttpPost]
-        [Authorize]
-        [Scope("downloads")]
+        [Authorize(ScopePolicies.HasDownloadsScope)]
         public async Task<IActionResult> Post(string id, DownloadFileRequest request, bool? overwriteExisting)
         {
-            var download = _mapper.Map<DownloadModel>(await _downloads.GetByIdAsync(id));
+            var download = await _downloads.GetByIdAsync(id);
 
             if (download == null)
             {
                 return NotFound("The download does not exist.");
             }
 
-            var result = await _authorizationService.AuthorizeAsync(User, download, new AuthorizationRequirement(Operation.Update));
+            var result = await _authorizationService.AuthorizeAsync(User, download, new UpdateOperationAuthorizationRequirement());
 
             if (!result.Succeeded)
             {
-                return Forbid(result.Failure);
+                return Forbid(new ErrorResponse("Not authorized to upload file."));
             }
 
             var existingFiles = download.Files.Where(f => f.Filename == request.Filename);
