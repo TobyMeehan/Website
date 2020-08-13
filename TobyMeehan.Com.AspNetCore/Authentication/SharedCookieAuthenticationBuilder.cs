@@ -8,10 +8,15 @@ using System.Text;
 
 namespace TobyMeehan.Com.AspNetCore.Authentication
 {
-    public static class ServiceCollectionExtensions
+    public class SharedCookieAuthenticationBuilder
     {
-        public static void AddSharedCookieAuthentication(this IServiceCollection services, string keyRingPath, Action<CookieAuthenticationOptions> configureOptions = null)
+        private readonly string _keyRingPath;
+
+        public SharedCookieAuthenticationBuilder(IServiceCollection services, string keyRingPath, Action<CookieAuthenticationOptions> configureOptions = null)
         {
+            Services = services;
+            _keyRingPath = keyRingPath;
+
             services.AddDataProtection()
                 .PersistKeysToFileSystem(GetKeyRingDirectoryInfo(keyRingPath))
                 .SetApplicationName("App.TobyMeehan.Com");
@@ -37,7 +42,9 @@ namespace TobyMeehan.Com.AspNetCore.Authentication
                 });
         }
 
-        private static DirectoryInfo GetKeyRingDirectoryInfo(string keyRingPath)
+        public IServiceCollection Services { get; }
+
+        private DirectoryInfo GetKeyRingDirectoryInfo(string keyRingPath)
         {
             DirectoryInfo directoryInfo = new DirectoryInfo(Directory.GetCurrentDirectory());
 
