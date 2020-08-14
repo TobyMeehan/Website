@@ -3,18 +3,10 @@ using System.Collections.Generic;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace DataAccessLibrary.Security
+namespace TobyMeehan.Com.Data.Security
 {
-    /// <summary>
-    /// Generator for API client secrets.
-    /// </summary>
     class RandomString
     {
-        /// <summary>
-        /// Generates a secure random string for use as a secure secret.
-        /// </summary>
-        /// <param name="length">Length of secret. Defaults to 32.</param>
-        /// <returns></returns>
         public static string GenerateCrypto(int length = 32)
         {
             RandomNumberGenerator cryptoRandomDataGenerator = new RNGCryptoServiceProvider();

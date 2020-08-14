@@ -1,16 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using TobyMeehan.Sql.QueryBuilder;
 
-namespace DataAccessLibrary.Models
+namespace TobyMeehan.Com.Data.Models
 {
-    public class User
+    [SqlName("users")]
+    public class User : EntityBase
     {
-        public string Id { get; set; }
         public string Username { get; set; }
         public string Email { get; set; }
-        public List<Role> Roles { get; set; }
-        public List<Transaction> Transactions { get; set; }
         public int Balance { get; set; }
+        public string HashedPassword { get; set; }
+        public string Description { get; set; }
+        public string ProfilePictureUrl { get; set; }
+        public EntityCollection<Role> Roles { get; set; } = new EntityCollection<Role>();
+        public EntityCollection<Transaction> Transactions { get; set; } = new EntityCollection<Transaction>();
     }
 }

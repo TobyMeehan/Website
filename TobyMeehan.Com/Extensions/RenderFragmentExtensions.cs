@@ -21,6 +21,8 @@ namespace TobyMeehan.Com.Extensions
             var frames = renderTreeBuilder.GetFrames();
             var content = new StringBuilder();
 
+#pragma warning disable BL0006 // Do not use RenderTree types
+
             foreach (var frame in frames.Array)
             {
                 switch (frame.FrameType)
@@ -35,6 +37,8 @@ namespace TobyMeehan.Com.Extensions
                         break;
                 }
             }
+
+#pragma warning restore BL0006 // Do not use RenderTree types
 
             return content.ToString();
         }

@@ -1,39 +1,38 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using TobyMeehan.Sql.QueryBuilder;
 
-namespace DataAccessLibrary.Models
+namespace TobyMeehan.Com.Data.Models
 {
-    public class Download
+    [SqlName("downloads")]
+    public class Download : EntityBase
     {
-        public string Id { get; set; }
-        public string CreatorId { get; set; }
-        public User Creator => Authors.Find(user => user.Id == CreatorId);
         public string Title { get; set; }
+
         public string ShortDescription { get; set; }
+
         public string LongDescription { get; set; }
-        public List<DownloadFile> Files { get; set; }
-        public string Version { get; set; }
-        public DateTime? Updated { get; set; }
-        public List<User> Authors { get; set; }
-        public DownloadVerification Verified { get; set; }
-        public virtual int VerifiedId
+
+        public EntityCollection<DownloadFile> Files { get; set; } = new EntityCollection<DownloadFile>();
+
+        public Version Version { get; set; }
+        public string VersionString
         {
             get
             {
-                return (int)Verified;
+                return Version.ToString();
             }
             set
             {
-                Verified = (DownloadVerification)value;
+                Version = Version.Parse(value);
             }
         }
-    }
 
-    public enum DownloadVerification
-    {
-        Dangerous = -1,
-        None = 0,
-        Verified = 1
+        public DateTime? Updated { get; set; }
+
+        public EntityCollection<User> Authors { get; set; } = new EntityCollection<User>();
+
+        public DownloadVerification Verified { get; set; }
     }
 }

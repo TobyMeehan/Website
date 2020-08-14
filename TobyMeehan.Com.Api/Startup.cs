@@ -20,6 +20,7 @@ using TobyMeehan.Com.Api.Authorization;
 using TobyMeehan.Com.Api.Models;
 using TobyMeehan.Com.Api.Models.Api;
 using TobyMeehan.Com.Api.Models.OAuth;
+using TobyMeehan.Com.AspNetCore;
 using TobyMeehan.Com.AspNetCore.Authentication;
 using TobyMeehan.Com.Data.Configuration;
 using TobyMeehan.Com.Data.Models;
@@ -84,6 +85,8 @@ namespace TobyMeehan.Com.Api
                 };
             });
 
+            services.AddScopeAuthorization();
+
             services.AddAuthorization(options =>
             {
                 AuthorizationPolicy jwt = new AuthorizationPolicyBuilder(JwtBearerDefaults.AuthenticationScheme)
@@ -101,7 +104,6 @@ namespace TobyMeehan.Com.Api
             });
 
             services.AddSingleton<IAuthorizationHandler, UserAuthorizationHandler>();
-            services.AddSingleton<IAuthorizationHandler, DownloadOperationAuthorizationHandler>();
         }
 
         private IMapper ConfigureMapper()

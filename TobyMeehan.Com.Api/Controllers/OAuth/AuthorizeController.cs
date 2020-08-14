@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using TobyMeehan.Com.Api.Authorization;
 using TobyMeehan.Com.Api.Extensions;
 using TobyMeehan.Com.Api.Models;
+using TobyMeehan.Com.AspNetCore.Extensions;
 using TobyMeehan.Com.Data.Repositories;
 
 namespace TobyMeehan.Com.Api.Controllers.OAuth
@@ -52,7 +53,7 @@ namespace TobyMeehan.Com.Api.Controllers.OAuth
 
             var scopes = scope?.Split(' ').Select(x => x.ToLower()) ?? new List<string>();
 
-            if (!scopes.Any(x => Roles.Scopes.All.Contains(x)))
+            if (!scopes.Any())
             {
                 return Error(redirect_uri, nameof(scope), "No scopes were provided.");
             }

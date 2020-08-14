@@ -5,7 +5,9 @@
     Layout = "/Shared/_AuthLayout.cshtml";
     ViewData["Title"] = "Login";
 }
+
 <h1>Login</h1>
+
 <form method="post" asp-antiforgery="true">
     <div class="form-group">
         <label asp-for="@Model.Username"></label>
@@ -21,6 +23,7 @@
         <button type="submit" class="btn btn-light">Log In</button>
     </div>
 </form>
+
 <p>Don't have an account? <a href="/register" class="text-darklink">Register</a></p>
 
 @section Scripts {

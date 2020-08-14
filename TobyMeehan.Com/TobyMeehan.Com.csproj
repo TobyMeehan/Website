@@ -14,7 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\DataLibrary\DataLibrary.csproj" />
+    <ProjectReference Include="..\DataAccessLibrary\DataAccessLibrary.csproj" />
     <ProjectReference Include="..\TobyMeehan.Com.AspNetCore\TobyMeehan.Com.AspNetCore.csproj" />
   </ItemGroup>
 

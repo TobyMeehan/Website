@@ -11,7 +11,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using MySql.Data.MySqlClient;
-using TobyMeehan.Com.Authorization;
 using TobyMeehan.Com.AspNetCore;
 using TobyMeehan.Com.Data;
 using TobyMeehan.Com.Data.Sql;
@@ -91,7 +90,7 @@ namespace TobyMeehan.Com
 
             services.AddSharedCookieAuthentication(Configuration.GetSection("KeyRingPath").Value);
 
-            services.AddAuthorizationPolicies();
+            services.AddCustomAuthorization();
         }
 
         private IMapper ConfigureMapper()
@@ -101,28 +100,6 @@ namespace TobyMeehan.Com
                 cfg.CreateMap<Download, DownloadViewModel>().ReverseMap();
                 cfg.CreateMap<Application, ApplicationViewModel>().ReverseMap();
             }).CreateMapper();
-        }
-
-        private DirectoryInfo GetKeyDirectory()
-        {
-            string applicationPath = Directory.GetCurrentDirectory();
-            DirectoryInfo directoryInfo = new DirectoryInfo(applicationPath);
-            string keyRingPath = Configuration.GetSection("Keys").GetValue<string>("KeyRingPath");
-
-            do
-            {
-                directoryInfo = directoryInfo.Parent;
-
-                DirectoryInfo keyRingInfo = new DirectoryInfo(Path.Combine(directoryInfo.FullName, keyRingPath));
-
-                if (keyRingInfo.Exists)
-                {
-                    return keyRingInfo;
-                }
-            }
-            while (directoryInfo.Parent != null);
-
-            throw new Exception("Key ring path not found.");
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

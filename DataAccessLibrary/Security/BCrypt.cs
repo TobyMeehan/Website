@@ -19,7 +19,7 @@ using System.Globalization;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace DataAccessLibrary.Security
+namespace TobyMeehan.Com.Data.Security
 {
     /// <summary>BCrypt implements OpenBSD-style Blowfish password hashing
     /// using the scheme described in "A Future-Adaptable Password Scheme"

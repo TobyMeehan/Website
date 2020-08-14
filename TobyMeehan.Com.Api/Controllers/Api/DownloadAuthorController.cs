@@ -51,8 +51,7 @@ namespace TobyMeehan.Com.Api.Controllers.Api
         }
 
         [HttpDelete("users/{userid}/downloads/{downloadid}")]
-        [Authorize]
-        [Scope("downloads")]
+        [Authorize(ScopePolicies.HasDownloadsScope)]
         public async Task<IActionResult> Delete(string userid, string downloadid)
         {
             if (userid == "@me")

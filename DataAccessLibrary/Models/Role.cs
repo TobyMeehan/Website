@@ -1,13 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using TobyMeehan.Sql.QueryBuilder;
 
-namespace DataAccessLibrary.Models
+namespace TobyMeehan.Com.Data.Models
 {
-    public class Role
+    [SqlName("roles")]
+    public class Role : EntityBase
     {
-        public string Id { get; set; }
         public string Name { get; set; }
+    }
+
+    [SqlName("userroles")]
+    public class UserRole
+    {
+        public string RoleId { get; set; }
+        public string UserId { get; set; }
 
     }
 }
