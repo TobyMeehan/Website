@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Security.Claims;
 
-namespace DataAccessLibrary.Security
+namespace TobyMeehan.Com.Data.Security
 {
     public interface ITokenProvider
     {

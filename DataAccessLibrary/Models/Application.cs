@@ -1,19 +1,31 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using TobyMeehan.Sql.QueryBuilder;
 
-namespace DataAccessLibrary.Models
+namespace TobyMeehan.Com.Data.Models
 {
-    public class Application
+    [SqlName("applications")]
+    public class Application : EntityBase
     {
-        public string Id { get; set; }
         public string UserId { get; set; }
         public User Author { get; set; }
+        public string DownloadId { get; set; }
+        public Download Download { get; set; }
         public string Name { get; set; }
+        public string Description { get; set; }
+        public string IconUrl { get; set; }
         public string RedirectUri { get; set; }
         public string Secret { get; set; }
         public string Role { get; set; }
-        public Scoreboard Scoreboard { get; set; }
 
+        public bool Validate(string clientId, string secret, string redirectUri, bool ignoreSecret) => new List<bool>
+        {
+
+            Id == clientId,
+            Secret == secret || ignoreSecret,
+            RedirectUri == redirectUri
+
+        }.TrueForAll(x => x);
     }
 }

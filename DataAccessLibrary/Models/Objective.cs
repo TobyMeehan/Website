@@ -1,14 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using TobyMeehan.Sql.QueryBuilder;
 
-namespace DataAccessLibrary.Models
+namespace TobyMeehan.Com.Data.Models
 {
-    public class Objective
+    [SqlName("objectives")]
+    public class Objective : EntityBase
     {
-        public string Id { get; set; }
         public string AppId { get; set; }
         public string Name { get; set; }
-
+        public EntityCollection<Score> Scores { get; set; }
     }
 }

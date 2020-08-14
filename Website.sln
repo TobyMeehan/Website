@@ -3,12 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29411.108
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebApi", "WebApi\WebApi.csproj", "{B2ABB053-F26A-458E-B541-E8DAACF0AEB1}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataAccessLibrary", "DataAccessLibrary\DataAccessLibrary.csproj", "{140FC098-3434-414C-B277-DCCF2AF249BD}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataLibrary", "DataLibrary\DataLibrary.csproj", "{DFA446E5-7636-46E3-8A66-CE870104488D}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TobyMeehan.Com", "TobyMeehan.Com\TobyMeehan.Com.csproj", "{C1953EF6-31AD-4D82-B26A-EAB7783E2485}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TobyMeehan.Com.Api", "TobyMeehan.Com.Api\TobyMeehan.Com.Api.csproj", "{B72B2EAC-7039-413D-A129-66A427B18DF1}"
@@ -17,24 +11,14 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TobyMeehan.Com.AspNetCore",
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataAccessLibrary.Tests", "DataAccessLibrary.Tests\DataAccessLibrary.Tests.csproj", "{251791F7-1F90-4EFD-9CED-3867E789BB4C}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataAccessLibrary", "DataAccessLibrary\DataAccessLibrary.csproj", "{4D29D103-5A6E-441D-A058-568F9E8B5B34}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{B2ABB053-F26A-458E-B541-E8DAACF0AEB1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B2ABB053-F26A-458E-B541-E8DAACF0AEB1}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B2ABB053-F26A-458E-B541-E8DAACF0AEB1}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B2ABB053-F26A-458E-B541-E8DAACF0AEB1}.Release|Any CPU.Build.0 = Release|Any CPU
-		{140FC098-3434-414C-B277-DCCF2AF249BD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{140FC098-3434-414C-B277-DCCF2AF249BD}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{140FC098-3434-414C-B277-DCCF2AF249BD}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{140FC098-3434-414C-B277-DCCF2AF249BD}.Release|Any CPU.Build.0 = Release|Any CPU
-		{DFA446E5-7636-46E3-8A66-CE870104488D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{DFA446E5-7636-46E3-8A66-CE870104488D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{DFA446E5-7636-46E3-8A66-CE870104488D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{DFA446E5-7636-46E3-8A66-CE870104488D}.Release|Any CPU.Build.0 = Release|Any CPU
 		{C1953EF6-31AD-4D82-B26A-EAB7783E2485}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{C1953EF6-31AD-4D82-B26A-EAB7783E2485}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C1953EF6-31AD-4D82-B26A-EAB7783E2485}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -51,6 +35,10 @@ Global
 		{251791F7-1F90-4EFD-9CED-3867E789BB4C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{251791F7-1F90-4EFD-9CED-3867E789BB4C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{251791F7-1F90-4EFD-9CED-3867E789BB4C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4D29D103-5A6E-441D-A058-568F9E8B5B34}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4D29D103-5A6E-441D-A058-568F9E8B5B34}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4D29D103-5A6E-441D-A058-568F9E8B5B34}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4D29D103-5A6E-441D-A058-568F9E8B5B34}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,16 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using TobyMeehan.Sql.QueryBuilder;
 
-namespace DataAccessLibrary.Models
+namespace TobyMeehan.Com.Data.Models
 {
-    public class DownloadFile
+    [SqlName("downloadfiles")]
+    public class DownloadFile : EntityBase
     {
-        public string Id { get; set; }
         public string DownloadId { get; set; }
         public string Filename { get; set; }
         public string RandomName { get; set; }
-
-
+        public string Url { get; set; }
     }
 }
