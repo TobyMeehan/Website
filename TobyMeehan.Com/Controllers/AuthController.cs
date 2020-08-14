@@ -59,7 +59,7 @@ namespace TobyMeehan.Com.Controllers
                 return Redirect(ReturnUrl);
             }
 
-            return View();
+            return View(new LoginViewModel());
         }
 
         [Route("/login")]
@@ -75,7 +75,9 @@ namespace TobyMeehan.Com.Controllers
 
             if (!ModelState.IsValid)
             {
-                return View();
+                login.Password = "";
+
+                return View(login);
             }
 
             ReturnUrl ??= "/";
@@ -94,7 +96,9 @@ namespace TobyMeehan.Com.Controllers
 
                 ModelState.AddModelError(nameof(login.Password), "Invalid username and password combination.");
 
-                return View();
+                login.Password = "";
+
+                return View(login);
             }
         }
 
@@ -108,7 +112,7 @@ namespace TobyMeehan.Com.Controllers
                 return Redirect(ReturnUrl);
             }
 
-            return View();
+            return View(new RegisterViewModel());
         }
 
         [Route("/register")]
@@ -124,13 +128,20 @@ namespace TobyMeehan.Com.Controllers
 
             if (!ModelState.IsValid)
             {
-                return View();
+                register.Password = "";
+                register.ConfirmPassword = "";
+
+                return View(register);
             }
 
             if (await _users.AnyUsernameAsync(register.Username))
             {
                 ModelState.AddModelError(nameof(register.Username), "That username already exists.");
-                return View();
+
+                register.Password = "";
+                register.ConfirmPassword = "";
+
+                return View(register);
             }
 
             await _users.AddAsync(register.Username, register.Password);

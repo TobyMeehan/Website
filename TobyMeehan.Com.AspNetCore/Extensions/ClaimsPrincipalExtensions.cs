@@ -10,12 +10,12 @@ namespace TobyMeehan.Com.AspNetCore.Extensions
     {
         public static string Id(this ClaimsPrincipal user)
         {
-            return user.FindFirst(ClaimTypes.NameIdentifier).Value;
+            return user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         }
 
         public static string Username(this ClaimsPrincipal user)
         {
-            return user.FindFirst(ClaimTypes.NameIdentifier).Value;
+            return user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         }
     }
 }
