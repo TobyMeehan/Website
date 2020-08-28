@@ -6,13 +6,13 @@ using TobyMeehan.Com.Data.Models;
 
 namespace TobyMeehan.Com.Data.Repositories
 {
-    public interface ICommentRepository
+    public interface IMessageRepository
     {
-        Task<Comment> GetByIdAsync(string id);
+        Task<Message> GetByIdAsync(string id);
 
-        Task<IList<Comment>> GetByEntityAsync(string entityId);
+        Task<IList<Message>> GetByConversationAsync(string conversationId);
 
-        Task<Comment> AddAsync(string entityId, string userId, string content);
+        Task<Message> AddAsync(string conversationId, string userId, string content);
 
         Task UpdateAsync(string id, string content);
 

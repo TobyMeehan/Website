@@ -10,7 +10,17 @@ namespace TobyMeehan.Com.Data.Models
     {
         public List<T> Items { get; set; } = new List<T>();
 
-        public T this[string id] => Items.Single(i => i.Id == id);
+        public T this[string id]
+        {
+            get
+            {
+                return Items.Single(i => i.Id == id);
+            }
+            set
+            {
+                this[id] = value;
+            }
+        }
 
         public bool TryGetItem(string id, out T entity)
         {
