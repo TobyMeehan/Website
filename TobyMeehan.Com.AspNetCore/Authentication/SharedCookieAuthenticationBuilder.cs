@@ -54,14 +54,16 @@ namespace TobyMeehan.Com.AspNetCore.Authentication
             {
                 directoryInfo = directoryInfo.Parent;
 
-                attempted += $"\n{directoryInfo.FullName}";
-
                 DirectoryInfo keyRingDirectoryInfo = new DirectoryInfo(Path.Combine(directoryInfo.FullName, keyRingPath));
+                
+                attempted += $"\n{keyRingDirectoryInfo.FullName}";
 
                 if (keyRingDirectoryInfo.Exists)
                 {
                     return keyRingDirectoryInfo;
                 }
+                
+                attempted += " does not exist";
             }
             while (directoryInfo.Parent != null);
 
