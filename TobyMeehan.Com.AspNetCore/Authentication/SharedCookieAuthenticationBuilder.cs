@@ -48,9 +48,13 @@ namespace TobyMeehan.Com.AspNetCore.Authentication
         {
             DirectoryInfo directoryInfo = new DirectoryInfo(Directory.GetCurrentDirectory());
 
+            string attempted = directoryInfo.FullName;
+
             do
             {
                 directoryInfo = directoryInfo.Parent;
+
+                attempted += $"\n{directoryInfo.FullName}";
 
                 DirectoryInfo keyRingDirectoryInfo = new DirectoryInfo(Path.Combine(directoryInfo.FullName, keyRingPath));
 
@@ -61,7 +65,7 @@ namespace TobyMeehan.Com.AspNetCore.Authentication
             }
             while (directoryInfo.Parent != null);
 
-            throw new Exception("Key ring path not found.");
+            throw new Exception($"Key ring path not found. Attempted directories:\n{attempted}");
         }
     }
 }
