@@ -55,6 +55,7 @@ namespace TobyMeehan.Com.AspNetCore.Authentication
                 directoryInfo = directoryInfo.Parent;
 
                 DirectoryInfo keyRingDirectoryInfo = new DirectoryInfo(Path.Combine(directoryInfo.FullName, keyRingPath));
+                keyRingDirectoryInfo.Refresh();
                 
                 attempted += $"\n{keyRingDirectoryInfo.FullName}";
 
