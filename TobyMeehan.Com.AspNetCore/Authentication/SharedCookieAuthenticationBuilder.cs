@@ -40,32 +40,5 @@ namespace TobyMeehan.Com.AspNetCore.Authentication
         }
 
         public IServiceCollection Services { get; }
-
-        private DirectoryInfo GetKeyRingDirectoryInfo(string keyRingPath)
-        {
-            DirectoryInfo directoryInfo = new DirectoryInfo(Directory.GetCurrentDirectory());
-
-            string attempted = directoryInfo.FullName;
-
-            do
-            {
-                directoryInfo = directoryInfo.Parent;
-
-                DirectoryInfo keyRingDirectoryInfo = new DirectoryInfo(Path.Combine(directoryInfo.FullName, keyRingPath));
-                keyRingDirectoryInfo.Refresh();
-                
-                attempted += $"\n{keyRingDirectoryInfo.FullName}";
-
-                if (keyRingDirectoryInfo.Exists)
-                {
-                    return keyRingDirectoryInfo;
-                }
-                
-                attempted += " does not exist";
-            }
-            while (directoryInfo.Parent != null);
-
-            throw new Exception($"Key ring path not found. Attempted directories:\n{attempted}");
-        }
     }
 }
