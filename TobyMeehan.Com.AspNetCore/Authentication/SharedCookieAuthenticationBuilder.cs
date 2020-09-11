@@ -10,15 +10,12 @@ namespace TobyMeehan.Com.AspNetCore.Authentication
 {
     public class SharedCookieAuthenticationBuilder
     {
-        private readonly string _keyRingPath;
-
-        public SharedCookieAuthenticationBuilder(IServiceCollection services, string keyRingPath, Action<CookieAuthenticationOptions> configureOptions = null)
+        public SharedCookieAuthenticationBuilder(IServiceCollection services, string keyRingBucket, string dataProtectionObject, Action<CookieAuthenticationOptions> configureOptions = null)
         {
             Services = services;
-            _keyRingPath = keyRingPath;
 
             services.AddDataProtection()
-                .PersistKeysToFileSystem(GetKeyRingDirectoryInfo(keyRingPath))
+                .PersistKeysToGoogleCloudStorage(keyRingBucket, dataProtectionObject)
                 .SetApplicationName("App.TobyMeehan.Com");
 
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
@@ -43,32 +40,5 @@ namespace TobyMeehan.Com.AspNetCore.Authentication
         }
 
         public IServiceCollection Services { get; }
-
-        private DirectoryInfo GetKeyRingDirectoryInfo(string keyRingPath)
-        {
-            DirectoryInfo directoryInfo = new DirectoryInfo(Directory.GetCurrentDirectory());
-
-            string attempted = directoryInfo.FullName;
-
-            do
-            {
-                directoryInfo = directoryInfo.Parent;
-
-                DirectoryInfo keyRingDirectoryInfo = new DirectoryInfo(Path.Combine(directoryInfo.FullName, keyRingPath));
-                keyRingDirectoryInfo.Refresh();
-                
-                attempted += $"\n{keyRingDirectoryInfo.FullName}";
-
-                if (keyRingDirectoryInfo.Exists)
-                {
-                    return keyRingDirectoryInfo;
-                }
-                
-                attempted += " does not exist";
-            }
-            while (directoryInfo.Parent != null);
-
-            throw new Exception($"Key ring path not found. Attempted directories:\n{attempted}");
-        }
     }
 }

@@ -36,7 +36,7 @@ jobs:
         # Local directory
         localDir: ./publish/TobyMeehan.Com
         # Remote directory
-        remoteDir: /AspNetCore/httpdocs
+        remoteDir: /httpdocs
   
   webapi:
     name: Deploy Web API
@@ -47,7 +47,7 @@ jobs:
       - name: Setup .NET Core
         uses: actions/setup-dotnet@v1
         with:
-          dotnet-version: 3.1.8
+          dotnet-version: 3.1.x
       
       - name: Install Dependencies
         run: dotnet restore
@@ -69,5 +69,5 @@ jobs:
           # Local directory
           localDir: ./publish/TobyMeehan.Com
           # Remote directory
-          remoteDir: /AspNetCore/api
+          remoteDir: /api
         
