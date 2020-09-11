@@ -357,5 +357,4 @@ secrets.config
 secrets.json
 
 /TobyMeehan.Com/storage-credential.json
-
-AspNetCore.KeyRing/
+/TobyMeehan.Com.Api/storage-credential.json
