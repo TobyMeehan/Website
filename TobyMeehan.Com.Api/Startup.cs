@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using AutoMapper;
+using Google.Apis.Auth.OAuth2;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -43,7 +44,7 @@ namespace TobyMeehan.Com.Api
             services.AddDataAccessLibrary()
                 .AddSqlDatabase(() => new MySqlConnection(Configuration.GetConnectionString("Default")))
                 .AddBCryptPasswordHash()
-                .AddDefaultCloudStorage();
+                .AddGoogleCloudStorage(GoogleCredential.FromFile(Configuration.GetSection("CloudStorage").GetSection("StorageCredential").Value), options => { });
 
             var tokenProvider = new RsaTokenProvider("api.tobymeehan.com", "api.tobymeehan.com", "api.tobymeehan.com");
             services.AddSingleton<ITokenProvider>(tokenProvider);
