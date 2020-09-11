@@ -20,7 +20,7 @@ jobs:
       run: dotnet restore      
 
     - name: .NET Publish
-      run: dotnet publish ./TobyMeehan.Com -c Release -o ./publish/TobyMeehan.Com --no-restore --verbosity normal --self-contained true
+      run: dotnet publish ./TobyMeehan.Com -c Release -o ./publish/TobyMeehan.Com -r win-x64 --no-restore --verbosity normal --self-contained true
     
     - name: FTP Deploy
       uses: sebastianpopp/ftp-action@v2.0.0
@@ -53,7 +53,7 @@ jobs:
         run: dotnet restore
       
       - name: .NET Publish
-        run: dotnet publish ./TobyMeehan.Com.Api -c Release -o ./publish/TobyMeehan.Com --no-restore --verbosity normal --self-contained true
+        run: dotnet publish ./TobyMeehan.Com.Api -c Release -o ./publish/TobyMeehan.Com -r win-x64 --no-restore --verbosity normal --self-contained true
       
       - name: FTP Deploy
         uses: sebastianpopp/ftp-action@v2.0.0
