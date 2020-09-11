@@ -88,7 +88,11 @@ namespace TobyMeehan.Com
                 });
             });
 
-            services.AddSharedCookieAuthentication(Configuration.GetSection("KeyRingPath").Value);
+            var keyRingConfig = Configuration.GetSection("KeyRing");
+            string keyRingBucket = keyRingConfig.GetSection("BucketName").Value;
+            string dataProtectionObject = keyRingConfig.GetSection("DataProtection").Value;
+
+            services.AddSharedCookieAuthentication(keyRingBucket, dataProtectionObject);
 
             services.AddCustomAuthorization();
         }

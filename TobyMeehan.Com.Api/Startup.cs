@@ -58,7 +58,11 @@ namespace TobyMeehan.Com.Api
                 options.TokenValidationParameters = tokenProvider.GetValidationParameters();
             });
 
-            services.AddSharedCookieAuthentication(Configuration.GetSection("KeyRingPath").Value, options =>
+            var keyRingConfig = Configuration.GetSection("KeyRing");
+            string keyRingBucket = keyRingConfig.GetSection("BucketName").Value;
+            string dataProtectionObject = keyRingConfig.GetSection("DataProtection").Value;
+
+            services.AddSharedCookieAuthentication(keyRingBucket, dataProtectionObject, options =>
             {
                 Func<HttpContext, string> getReturnUrl = context => $"?ReturnUrl={WebUtility.UrlEncode($"{context.Request.Host}{context.Request.Path}")}";
 

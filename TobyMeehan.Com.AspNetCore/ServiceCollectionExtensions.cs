@@ -17,9 +17,9 @@ namespace TobyMeehan.Com.AspNetCore
             return new CustomAuthorizationBuilder(services);
         }
 
-        public static SharedCookieAuthenticationBuilder AddSharedCookieAuthentication(this IServiceCollection services, string keyRingPath, Action<CookieAuthenticationOptions> configureOptions = null)
+        public static SharedCookieAuthenticationBuilder AddSharedCookieAuthentication(this IServiceCollection services, string keyRingBucket, string dataProtectionObject, Action<CookieAuthenticationOptions> configureOptions = null)
         {
-            return new SharedCookieAuthenticationBuilder(services, keyRingPath, configureOptions);
+            return new SharedCookieAuthenticationBuilder(services, keyRingBucket, dataProtectionObject, configureOptions);
         }
     }
 }

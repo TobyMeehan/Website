@@ -10,15 +10,12 @@ namespace TobyMeehan.Com.AspNetCore.Authentication
 {
     public class SharedCookieAuthenticationBuilder
     {
-        private readonly string _keyRingPath;
-
-        public SharedCookieAuthenticationBuilder(IServiceCollection services, string keyRingPath, Action<CookieAuthenticationOptions> configureOptions = null)
+        public SharedCookieAuthenticationBuilder(IServiceCollection services, string keyRingBucket, string dataProtectionObject, Action<CookieAuthenticationOptions> configureOptions = null)
         {
             Services = services;
-            _keyRingPath = keyRingPath;
 
             services.AddDataProtection()
-                .PersistKeysToFileSystem(GetKeyRingDirectoryInfo(keyRingPath))
+                .PersistKeysToGoogleCloudStorage(keyRingBucket, dataProtectionObject)
                 .SetApplicationName("App.TobyMeehan.Com");
 
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
