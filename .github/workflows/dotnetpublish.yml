@@ -14,13 +14,13 @@ jobs:
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: 3.1.101
+        dotnet-version: 3.1.8
     
     - name: Install Dependencies
       run: dotnet restore      
 
     - name: .NET Publish
-      run: dotnet publish ./TobyMeehan.Com -c Release -o ./publish/TobyMeehan.Com -f netcoreapp3.1 -r win-x64 --no-restore --verbosity normal --self-contained true
+      run: dotnet publish ./TobyMeehan.Com -c Release -o ./publish/TobyMeehan.Com --no-restore --verbosity normal
     
     - name: FTP Deploy
       uses: sebastianpopp/ftp-action@v2.0.0
@@ -36,7 +36,7 @@ jobs:
         # Local directory
         localDir: ./publish/TobyMeehan.Com
         # Remote directory
-        remoteDir: /httpdocs
+        remoteDir: /AspNetCore/httpdocs
   
   webapi:
     name: Deploy Web API
@@ -47,13 +47,13 @@ jobs:
       - name: Setup .NET Core
         uses: actions/setup-dotnet@v1
         with:
-          dotnet-version: 3.1.101
+          dotnet-version: 3.1.8
       
       - name: Install Dependencies
         run: dotnet restore
       
       - name: .NET Publish
-        run: dotnet publish ./TobyMeehan.Com.Api -c Release -o ./publish/TobyMeehan.Com -f netcoreapp3.1 -r win-x64 --no-restore --verbosity normal --self-contained true
+        run: dotnet publish ./TobyMeehan.Com.Api -c Release -o ./publish/TobyMeehan.Com --no-restore --verbosity normal
       
       - name: FTP Deploy
         uses: sebastianpopp/ftp-action@v2.0.0
@@ -69,5 +69,5 @@ jobs:
           # Local directory
           localDir: ./publish/TobyMeehan.Com
           # Remote directory
-          remoteDir: /api
+          remoteDir: /AspNetCore/api
         
