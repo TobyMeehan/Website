@@ -46,7 +46,7 @@ namespace TobyMeehan.Com.Api
                 .AddBCryptPasswordHash()
                 .AddGoogleCloudStorage(GoogleCredential.FromFile(Configuration.GetSection("CloudStorage").GetSection("StorageCredential").Value), options => { });
 
-            var tokenProvider = new RsaTokenProvider("api.tobymeehan.com", "api.tobymeehan.com", "api.tobymeehan.com");
+            var tokenProvider = new RsaTokenProvider("api.tobymeehan.com", "api.tobymeehan.com", Guid.NewGuid().ToString());
             services.AddSingleton<ITokenProvider>(tokenProvider);
 
             services.AddSingleton(ConfigureMapper());
