@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,6 +21,8 @@ namespace TobyMeehan.Com.Api.Authorization
                 options.AddPolicy(HasIdentifyScope, HasIdentifyScopePolicy());
                 options.AddPolicy(HasTransactionsScope, HasTransactionsScopePolicy());
             });
+
+            services.AddSingleton<IAuthorizationHandler, ScopeAuthorizationHandler>();
         }
     }
 }
