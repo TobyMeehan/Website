@@ -1,0 +1,14 @@
+﻿@inherits NavLink
+
+<NavLink ActiveClass="@ActiveClass" AdditionalAttributes="AdditionalAttributes" Match="Match">
+    @foreach (var user in Conversation.Users)
+    {
+        <ProfilePicture User="user"></ProfilePicture>
+    }
+
+    @Conversation.Name
+</NavLink>
+
+@code {
+    [Parameter] public Conversation Conversation { get; set; }
+}

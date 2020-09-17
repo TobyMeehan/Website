@@ -1,0 +1,39 @@
+﻿@inherits LayoutComponentBase
+
+<div class="row">
+    <div class="col-3">
+        <div class="nav flex-column nav-pills" role="tablist">
+            <NavLink class="nav-link" Match="NavLinkMatch.All">New</NavLink>
+
+            @if (_conversations == null)
+            {
+                <Loading></Loading>
+            }
+            else
+            {
+                @foreach (var conversation in _conversations)
+                {
+                    <ConversationNavLink Conversation="conversation"></ConversationNavLink>
+                }
+            }
+        </div>
+    </div>
+</div>
+
+<EditForm Model="_conversationForm" OnValidSubmit="AddForm_Submit">
+    <Modal>
+        <Title>New Conversation</Title>
+        <Body>
+
+            <div class="form-group">
+                <label for="Name">Name</label>
+                <InputText class="form-control" id="Name" @bind-Value="_conversationForm.Name" />
+                <ValidationMessage For="() => _conversationForm.Name" />
+            </div>
+        </Body>
+        <Footer>
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-primary">Create</button>
+        </Footer>
+    </Modal>
+</EditForm>

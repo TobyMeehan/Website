@@ -8,12 +8,16 @@ using TobyMeehan.Sql;
 
 namespace TobyMeehan.Com.Data.Repositories
 {
-    public class SqlConversationRepository : SqlRepository<Conversation>
+    public class SqlConversationRepository : SqlRepository<Conversation>, IConversationRepository
     {
+        private readonly ISqlTable<Conversation> _table;
+        private readonly ISqlTable<ConversationUser> _userTable;
         private readonly IUserRepository _users;
 
-        public SqlConversationRepository(ISqlTable<Conversation> table, IUserRepository users) : base(table)
+        public SqlConversationRepository(ISqlTable<Conversation> table, ISqlTable<ConversationUser> userTable, IUserRepository users) : base(table)
         {
+            _table = table;
+            _userTable = userTable;
             _users = users;
         }
 
@@ -28,6 +32,30 @@ namespace TobyMeehan.Com.Data.Repositories
             }
 
             return await base.FormatAsync(values);
+        }
+
+        public async Task<Conversation> AddAsync(string name, string userId)
+        {
+            string id = Guid.NewGuid().ToString();
+
+            await _table.InsertAsync(new
+            {
+                Id = id,
+                Name = name
+            });
+
+            await _userTable.InsertAsync(new
+            {
+                ConversationId = id,
+                UserId = userId
+            });
+
+            return await GetByIdAsync(id);
+        }
+
+        public async Task<List<Conversation>> GetByUserAsync(string userId)
+        {
+            return (await SelectAsync<ConversationUser>((c, cu) => cu.UserId == userId)).ToList();
         }
     }
 }

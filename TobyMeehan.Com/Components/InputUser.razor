@@ -1,0 +1,41 @@
+﻿@inherits InputBase<User>
+
+<div class="input-group">
+    <InputText class="form-control" placeholder="Enter Username" @bind-Value="_search" />
+
+    <InputSelect TValue="User" class="custom-select" @bind-Value="Value">
+        @foreach (var user in _filteredRange)
+        {
+            <option value="@user">
+                <Username User="user"></Username>
+            </option>
+        }
+    </InputSelect>
+</div>
+
+@code {
+    [Parameter] public Func<string, IEnumerable<User>> Filter { get; set; }
+
+    protected override bool TryParseValueFromString(string value, out User result, out string validationErrorMessage)
+    {
+        validationErrorMessage = null;
+        result = Filter.Invoke(value).FirstOrDefault();
+        return result != null;
+    }
+
+    private IEnumerable<User> _filteredRange;
+
+    private string _search;
+    private string Search
+    {
+        get
+        {
+            return _search;
+        }
+        set
+        {
+            _search = value;
+            _filteredRange = Filter.Invoke(_search);
+        }
+    }
+}

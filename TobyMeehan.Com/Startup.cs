@@ -103,6 +103,7 @@ namespace TobyMeehan.Com
             {
                 cfg.CreateMap<Download, DownloadViewModel>().ReverseMap();
                 cfg.CreateMap<Application, ApplicationViewModel>().ReverseMap();
+                cfg.CreateMap<Conversation, ConversationViewModel>().ReverseMap();
             }).CreateMapper();
         }
 
