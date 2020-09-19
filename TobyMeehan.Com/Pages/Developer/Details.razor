@@ -2,10 +2,13 @@
 
 @if (_application == null)
 {
+    <Title>Developer</Title>
     <Loading></Loading>
 }
 else
 {
+    <Title>@_application.Name</Title>
+
     <AuthorizeView Resource="_application" Policy="@AuthorizationPolicies.CanEditApplication" Context="authState">
         <NotAuthorized>
             <Challenge>
