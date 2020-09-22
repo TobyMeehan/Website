@@ -23,13 +23,8 @@
                 {
                     <tr>
                         <td>
-                            <div class="row m-0">
-                                <div class="mr-1" style="width: 1.4em;">
-                                    <AppIcon Application="transaction.Application" FontSize="0.7"></AppIcon>
-                                </div>
-
-                                @transaction.Application.Name
-                            </div>
+                            <MiniAppIcon Application="transaction.Application"></MiniAppIcon>
+                            @transaction.Application.Name
                         </td>
                         <td>@transaction.Description</td>
                         <td>@transaction.Amount</td>

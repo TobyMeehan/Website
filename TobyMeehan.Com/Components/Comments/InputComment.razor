@@ -1,8 +1,8 @@
 ﻿@inherits AttributableComponentBase
 
 <div class="media @CssClass" @attributes="AdditionalAttributes">
-    <img src="@User.ProfilePictureUrl" class="mr-3" height="48" width="48" />
-
+    <UserAvatar User="User" class="avatar-medium mr-3"></UserAvatar>
+    
     <div class="media-body">
         <EditForm Model="_model" OnValidSubmit="Form_Submit">
             <DataAnnotationsValidator />

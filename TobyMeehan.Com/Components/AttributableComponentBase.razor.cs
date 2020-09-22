@@ -17,7 +17,7 @@ namespace TobyMeehan.Com.Components
             
             set
             {
-                if (value.TryGetValue("class", out object cssClass))
+                if (value.TryGetValue("class", out object cssClass) && cssClass != null)
                 {
                     CssClass = cssClass.ToString();
                 }
