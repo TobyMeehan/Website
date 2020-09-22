@@ -41,11 +41,6 @@ namespace TobyMeehan.Com.Data.Repositories
 
         public async Task<Application> AddAsync(string userId, string name, string redirectUri, bool secret)
         {
-            if ((await GetByUserAndNameAsync(userId, name)) != null)
-            {
-                throw new ArgumentException("Application with the same name has already been created by the user.", nameof(name));
-            }
-
             string id = Guid.NewGuid().ToString();
 
             await _table.InsertAsync(new
