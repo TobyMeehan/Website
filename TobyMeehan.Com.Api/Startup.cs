@@ -74,16 +74,16 @@ namespace TobyMeehan.Com.Api
 #if DEBUG
                         context.HttpContext.Response.Redirect($"https://localhost:44373/login{getReturnUrl.Invoke(context.HttpContext)}");
 #else
-                        context.HttpContext.Response.Redirect("https://tobymeehan.com/login{getReturnUrl.Invoke(context.HttpContext)}");
+                        context.HttpContext.Response.Redirect($"https://tobymeehan.com/login{getReturnUrl.Invoke(context.HttpContext)}");
 #endif
                         return Task.CompletedTask;
                     },
                     OnRedirectToAccessDenied = context =>
                     {
 #if DEBUG
-                        context.HttpContext.Response.Redirect("https://localhost:44373/login{getReturnUrl.Invoke(context.HttpContext)}");
+                        context.HttpContext.Response.Redirect($"https://localhost:44373/login{getReturnUrl.Invoke(context.HttpContext)}");
 #else
-                        context.HttpContext.Response.Redirect("https://tobymeehan.com/login{getReturnUrl.Invoke(context.HttpContext)}");
+                        context.HttpContext.Response.Redirect($"https://tobymeehan.com/login{getReturnUrl.Invoke(context.HttpContext)}");
 #endif
                         return Task.CompletedTask;
                     }
