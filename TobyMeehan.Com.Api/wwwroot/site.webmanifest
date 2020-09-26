@@ -1,0 +1,19 @@
+{
+    "name": "TobyMeehan",
+    "short_name": "TobyMeehan",
+    "icons": [
+        {
+            "src": "/android-chrome-192x192.png?v=Omrrql9OkJ",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "/android-chrome-512x512.png?v=Omrrql9OkJ",
+            "sizes": "512x512",
+            "type": "image/png"
+        }
+    ],
+    "theme_color": "#590000",
+    "background_color": "#590000",
+    "display": "standalone"
+}
