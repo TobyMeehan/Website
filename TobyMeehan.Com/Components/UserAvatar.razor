@@ -1,0 +1,11 @@
+﻿@inherits AttributableComponentBase
+
+<Avatar ImageUrl="@User.ProfilePictureUrl" Text="@User.Username" class="@CssClass" @attributes="AdditionalAttributes">
+    <Default>
+        <i class="avatar @CssClass fas fa-user-circle" @attributes="AdditionalAttributes"></i>
+    </Default>
+</Avatar>
+
+@code {
+    [Parameter] public User User { get; set; }
+}

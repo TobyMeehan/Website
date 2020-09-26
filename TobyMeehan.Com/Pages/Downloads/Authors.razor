@@ -49,7 +49,7 @@ else
                                             <UserLink User="author"></UserLink>
                                         </span>
 
-                                        <button class="btn btn-secondary" @onclick="() => RemoveUser(author)">
+                                        <button class="btn btn-secondary" disabled="@(_download.Authors.Count() < 2)" @onclick="() => RemoveUser(author)">
                                             <i class="fas fa-user-slash"></i> Leave
                                         </button>
                                     </li>

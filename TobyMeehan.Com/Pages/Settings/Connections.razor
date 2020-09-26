@@ -21,7 +21,10 @@
                 @foreach (var connection in _connections)
                 {
                     <tr>
-                        <td>@connection.Application.Name</td>
+                        <td>
+                            <MiniAppIcon Application="connection.Application"></MiniAppIcon>
+                            @connection.Application.Name
+                        </td>
                         <td><UserLink User="@connection.Application.Author"></UserLink></td>
                         <td>
                             <button class="btn btn-link text-danger p-0" @onclick="() => RevokeConnection(connection)">

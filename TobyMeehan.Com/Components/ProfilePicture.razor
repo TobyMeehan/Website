@@ -1,9 +1,0 @@
-﻿@inherits AttributableComponentBase
-
-<img src="@ProfilePictureUrl" class="rounded @CssClass" @attributes="AdditionalAttributes" />
-
-@code {
-    [Parameter] public User User { get; set; }
-
-    private string ProfilePictureUrl => User.ProfilePictureUrl ?? "/img/DefaultProfile.svg";
-}

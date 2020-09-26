@@ -22,6 +22,8 @@ namespace TobyMeehan.Com.Data.Repositories
 
         protected override async Task<IEnumerable<Transaction>> FormatAsync(IEnumerable<Transaction> values)
         {
+            values = values.ToList().Where(t => t.Sent > new DateTime(2020, 8, 6));
+
             foreach (var transaction in values)
             {
                 transaction.Application = await _applications.GetByIdAsync(transaction.AppId);

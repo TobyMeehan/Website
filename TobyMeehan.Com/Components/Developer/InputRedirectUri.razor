@@ -9,25 +9,43 @@
 </div>
 
 @code {
-    private string _scheme;
+    private string _scheme
+    {
+        get => _currentUri?.Scheme ?? "https";
+        set => _currentUri = new Uri($"{value}://{_path}");
+    }
 
     private string _path
     {
-        get
-        {
-            return $"{GetUri()?.Authority}{GetUri()?.AbsolutePath}";
-        }
+        get => $"{_currentUri?.Authority}{_currentUri?.AbsolutePath}" ?? CurrentValue;
         set
         {
-            SetCurrentValue(value);
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                CurrentValue = "";
+            }
+            else
+            {
+                _currentUri = new Uri($"{_scheme}://{value}");
+            }
         }
     }
 
-    protected override void OnInitialized()
+    private Uri _currentUri
     {
-        _scheme = GetUri()?.Scheme ?? "https";
+        get
+        {
+            if (Uri.TryCreate(CurrentValue, UriKind.Absolute, out Uri uri))
+            {
+                return uri;
+            }
 
-        base.OnInitialized();
+            return null;
+        }
+        set
+        {
+            CurrentValue = value.AbsoluteUri;
+        }
     }
 
     protected override bool TryParseValueFromString(string value, out string result, out string validationErrorMessage)
@@ -38,27 +56,5 @@
         result = uri?.AbsoluteUri ?? value;
 
         return success;
-    }
-
-    private void SetCurrentValue(string path)
-    {
-        if (path.Length > 0)
-        {
-            CurrentValue = $"{_scheme}://{path}";
-        }
-        else
-        {
-            CurrentValue = path;
-        }
-    }
-
-    private Uri GetUri()
-    {
-        if (Uri.TryCreate(CurrentValue, UriKind.Absolute, out Uri result))
-        {
-            return result;
-        }
-
-        return null;
     }
 }
