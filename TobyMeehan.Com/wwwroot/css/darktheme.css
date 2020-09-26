@@ -39,3 +39,26 @@
     .nav-tabs:not(.nav-tabs-default) .nav-link:focus, .nav-tabs:not(.nav-tabs-default) .nav-link:hover {
         border-color: #343a40;
     }
+
+.page-link:not(.page-link-default) {
+    color: #f8f9fa;
+    background-color: #343a40;
+    border-color: rgba(0,0,0,.125);
+}
+
+.page-link:not(.page-link-default):hover {
+    color: #cbd3da;
+    background-color: #1d2124;
+}
+
+.page-item.disabled .page-link:not(.page-link-default) {
+    color: #6c757d;
+    background-color: #343a40;
+    border-color: rgba(0,0,0,.125);
+}
+
+.page-item.active .page-link:not(.page-link-default) {
+    color: #343a40;
+    background-color: #f8f9fa;
+    border-color: rgba(0,0,0,.125);
+}

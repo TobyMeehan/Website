@@ -10,28 +10,34 @@
 <Card class="my-3">
     <p>Balance: @CurrentUser.Balance</p>
 
-    @foreach (var date in CurrentUser.Transactions.OrderByDescending(x => x.Sent).GroupBy(x => x.Sent.Date))
+    @if (_transactions == null)
     {
-        <Table>
-            <Head>
-                <tr>
-                    <th colspan="4" class="text-center">@date.Key.ToLongDateString()</th>
-                </tr>
-            </Head>
-            <Body>
-                @foreach (var transaction in date)
-                {
+        <Loading></Loading>
+    }
+    else
+    {
+        <Pagination Items="_transactions" Range="5" class="justify-content-center">
+            <Table>
+                <Head>
                     <tr>
-                        <td>
-                            <MiniAppIcon Application="transaction.Application"></MiniAppIcon>
-                            @transaction.Application.Name
-                        </td>
-                        <td>@transaction.Description</td>
-                        <td>@transaction.Amount</td>
-                        <td>@transaction.Sent.TimeOfDay.Hours:@transaction.Sent.TimeOfDay.Minutes</td>
+                        <th colspan="4" class="text-center">@context.Key.ToLongDateString()</th>
                     </tr>
-                }
-            </Body>
-        </Table>
+                </Head>
+                <Body>
+                    @foreach (var transaction in context)
+                    {
+                        <tr>
+                            <td>
+                                <MiniAppIcon Application="transaction.Application"></MiniAppIcon>
+                                @transaction.Application.Name
+                            </td>
+                            <td>@transaction.Description</td>
+                            <td>@transaction.Amount</td>
+                            <td>@transaction.Sent.ToShortTimeString()</td>
+                        </tr>
+                    }
+                </Body>
+            </Table>
+        </Pagination>
     }
 </Card>
