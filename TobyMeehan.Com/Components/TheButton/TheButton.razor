@@ -1,0 +1,24 @@
+﻿<div class="jumbotron py-4 text-center bg-dark">
+    <div class="mb-4">
+        <AuthorizeView>
+            <NotAuthorized>
+                <button class="btn btn-secondary btn-lg" disabled>The Button</button>
+                <p><a href="/login">Sign in</a> to use the button.</p>
+            </NotAuthorized>
+            <Authorized>
+                <button class="btn btn-secondary btn-lg" data-toggle="modal" data-target="#ButtonModal">The Button</button>
+            </Authorized>
+        </AuthorizeView>
+    </div>
+</div>
+
+<Modal id="ButtonModal">
+    <Title>The Button</Title>
+    <Body>
+        <button class="btn the-button"></button>
+    </Body>
+</Modal>
+
+@code {
+
+}
