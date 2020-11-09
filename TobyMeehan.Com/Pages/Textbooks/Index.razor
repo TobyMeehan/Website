@@ -1,0 +1,20 @@
+﻿@page "/textbooks"
+
+<h1>Textbooks</h1>
+
+<CardDeck CardsPerRow="5">
+    @foreach (var book in _textbooks)
+    {
+        <Card>
+            <img class="rounded w-100" src="@($"/img/covers/{book.Id}.jpg")" />
+
+            <h5 class="card-title">
+                <a class="stretched-link text-reset" href="@($"/textbooks/{book.Id}")">@book.Title</a>
+            </h5>
+        </Card>
+    }
+</CardDeck>
+
+@code {
+
+}
