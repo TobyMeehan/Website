@@ -35,6 +35,7 @@ using System.Security.Cryptography;
 using Microsoft.AspNetCore.DataProtection;
 using System.IO;
 using TobyMeehan.Com.AspNetCore.Authentication;
+using Org.BouncyCastle.Asn1.Cms;
 
 namespace TobyMeehan.Com
 {
@@ -62,6 +63,11 @@ namespace TobyMeehan.Com
                     options.AppIconStorageBucket = storageConfig.GetSection("AppIconBucket").Value;
                 })
                 .AddDefaultTokenProvider();
+
+            services.Configure<TheButtonOptions>(options => new TheButtonOptions
+            {
+                TimeSpan = TimeSpan.FromHours(15)
+            });
 
             services.AddSingleton(ConfigureMapper());
 

@@ -1,8 +1,10 @@
-﻿using System;
+﻿using Microsoft.Extensions.Options;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TobyMeehan.Com.Data.Configuration;
 using TobyMeehan.Com.Data.Extensions;
 using TobyMeehan.Com.Data.Models;
 using TobyMeehan.Sql;
@@ -14,12 +16,14 @@ namespace TobyMeehan.Com.Data.Repositories
         private readonly ISqlTable<ButtonPress> _table;
         private readonly IRoleRepository _roles;
         private readonly IUserRepository _users;
+        private readonly TheButtonOptions _buttonOptions;
 
-        public SqlButtonRepository(ISqlTable<ButtonPress> table, IRoleRepository roles, IUserRepository users) : base(table)
+        public SqlButtonRepository(ISqlTable<ButtonPress> table, IRoleRepository roles, IUserRepository users, IOptions<TheButtonOptions> buttonOptions) : base(table)
         {
             _table = table;
             _roles = roles;
             _users = users;
+            _buttonOptions = buttonOptions.Value;
         }
 
         public async Task AddAsync(string userId, TimeSpan buttonTimeSpan)
@@ -50,7 +54,7 @@ namespace TobyMeehan.Com.Data.Repositories
 
         public int GetButtonPercentage(int buttonSeconds)
         {
-            double totalSeconds = TimeSpan.FromHours(15).TotalSeconds;
+            double totalSeconds = _buttonOptions.TimeSpan.TotalSeconds;
 
             return (int)(((double)buttonSeconds / totalSeconds) * 100d);
         }
