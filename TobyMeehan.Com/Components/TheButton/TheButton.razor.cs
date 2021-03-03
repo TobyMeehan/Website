@@ -8,7 +8,7 @@ using System.Timers;
 using TobyMeehan.Com.Data.Models;
 using TobyMeehan.Com.Data.Repositories;
 
-namespace TobyMeehan.Com.Pages
+namespace TobyMeehan.Com.Components.TheButton
 {
     public partial class TheButton : ComponentBase, IDisposable
     {
@@ -21,8 +21,25 @@ namespace TobyMeehan.Com.Pages
 
         private Timer _timer;
         private int _secondsElapsed;
-        private int _percentageProgress => presses.GetButtonPercentage(_secondsElapsed);
+        private int _percentageProgress
+        {
+            get
+            {
+                if (_durationToStart > TimeSpan.Zero)
+                {
+                    DateTime countdownStart = new DateTime(2021, 3, 3);
+                    return (int)(((DateTime.Now - countdownStart).TotalSeconds / (_startTime - countdownStart).TotalSeconds) * 100d);
+                }
+                else
+                {
+                    return presses.GetButtonPercentage(_secondsElapsed);
+                }
+            }
+        }
+        
         private int _clickCount;
+        private DateTime _startTime => new DateTime(2021, 3, 5, 16, 0, 0);
+        private TimeSpan _durationToStart => _startTime - DateTime.Now;
 
         protected override async Task OnInitializedAsync()
         {
