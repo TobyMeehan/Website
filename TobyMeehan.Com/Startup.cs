@@ -64,9 +64,9 @@ namespace TobyMeehan.Com
                 })
                 .AddDefaultTokenProvider();
 
-            services.Configure<TheButtonOptions>(options => new TheButtonOptions
+            services.Configure<TheButtonOptions>(options =>
             {
-                TimeSpan = TimeSpan.FromHours(15)
+                options.TimeSpan = TimeSpan.FromHours(15);
             });
 
             services.AddSingleton(ConfigureMapper());
