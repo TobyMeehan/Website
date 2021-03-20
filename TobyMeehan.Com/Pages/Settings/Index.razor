@@ -26,6 +26,17 @@
                 </div>
             </div>
         </div>
+        <div class="form-group">
+            <label>Vanity URL</label>
+            <div class="row">
+                <div class="col">
+                    <input type="text" class="form-control-plaintext form-control-sm p-1" value="@($"https://tobymeehan.com/users/{CurrentUser.VanityUrl ?? CurrentUser.Id}")" readonly />
+                </div>
+                <div class="col">
+                    <button class="btn btn-primary btn-sm" data-toggle="modal" data-target="#UrlModal">Change</button>
+                </div>
+            </div>
+        </div>
 
         <hr />
 
@@ -62,6 +73,32 @@
                 <label for="Username">Username</label>
                 <InputText id="Username" class="form-control" @bind-Value="_usernameModel.Username" />
                 <ValidationMessage For="(() => _usernameModel.Username)" />
+            </div>
+
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary">Change</button>
+            </div>
+        </EditForm>
+    </Body>
+</Modal>
+
+<Modal id="UrlModal">
+    <Title>
+        Vanity URL
+    </Title>
+    <Body>
+        <EditForm Model="_urlModel" OnValidSubmit="UrlForm_Submit">
+            <DataAnnotationsValidator />
+            <ServerSideValidator @ref="_urlValidator" />
+
+            <div class="form-group">
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">https://tobymeehan.com/users/</span>
+                    </div>
+                    <InputText id="VanityUrl" class="form-control" @bind-Value="_urlModel.VanityUrl" />
+                </div>
+                <ValidationMessage For="(() => _urlModel.VanityUrl)" />
             </div>
 
             <div class="form-group">

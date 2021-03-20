@@ -47,6 +47,30 @@ namespace TobyMeehan.Com.Pages.Settings
             navigation.NavigateToRefresh();
         }
 
+        private ServerSideValidator _urlValidator;
+        private VanityUrlViewModel _urlModel = new VanityUrlViewModel();
+        private async Task UrlForm_Submit()
+        {
+            if (string.IsNullOrWhiteSpace(_urlModel.VanityUrl))
+            {
+                await users.UpdateVanityUrlAsync(CurrentUser.Id, null);
+                CurrentUser.VanityUrl = null;
+                return;
+            }
+
+            if (await users.AnyVanityUrlAsync(_urlModel.VanityUrl))
+            {
+                _urlValidator.Error(nameof(_urlModel), "That URL is unavailable.");
+
+                return;
+            }
+
+            await users.UpdateVanityUrlAsync(CurrentUser.Id, _urlModel.VanityUrl);
+
+            CurrentUser.VanityUrl = _urlModel.VanityUrl;
+            _urlModel.VanityUrl = "";
+        }
+
         private ServerSideValidator _passwordValidator;
         private ChangePasswordViewModel _passwordModel = new ChangePasswordViewModel();
         private async Task PasswordForm_Submit()
