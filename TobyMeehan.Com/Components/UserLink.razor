@@ -7,12 +7,14 @@
     }
     else
     {
-        <Username User="@User"></Username>
+        <Username User="@User" IncludeAvatar="IncludeAvatar"></Username>
     }
 </a>
 
 @code {
     [Parameter] public User User { get; set; }
+
+    [Parameter] public bool IncludeAvatar { get; set; } = true;
 
     [Parameter] public RenderFragment ChildContent { get; set; }
 

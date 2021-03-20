@@ -62,3 +62,7 @@
     background-color: #f8f9fa;
     border-color: rgba(0,0,0,.125);
 }
+
+.form-control-plaintext {
+    color: #cbd3da;
+}
