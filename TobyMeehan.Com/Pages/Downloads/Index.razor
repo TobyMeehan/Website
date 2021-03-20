@@ -2,15 +2,13 @@
 
 <Title>Downloads</Title>
 
-<h1>Downloads</h1>
+<div class="d-md-flex justify-content-between text-center text-md-left">
+    <h1>Downloads</h1>
 
-<p>Downloads are a way to share collections of files under one page. The whole system is fairly limited currently, but I do plan to add more features, including versioning and a desktop application for automatic installation of applications, which most downloads currently are.</p>
-
-<p>There is a verification system for downloads, which is mainly in place for executable files. Verified <i class="fas fa-check-circle"></i> downloads I have checked and are safe to install and run. Dangerous <i class="fas fa-exclamation-circle"></i> downloads are not safe to run, or are easy to use in a damaging way. Downloads with neither of these have either not been checked or do not quite qualify for being verified. Given the relatively low traffic I can check downloads fairly rapidly so it's probably safe to assume unmarked downloads are safe.</p>
-
-<AuthorizeView Policy="@AuthorizationPolicies.IsVerified">
-    <p><a href="/downloads/add">Create Download</a></p>
-</AuthorizeView>
+    <AuthorizeView Policy="@AuthorizationPolicies.IsVerified">
+        <a class="btn btn-primary btn-lg my-auto" href="/downloads/add">New Download</a>
+    </AuthorizeView>
+</div>
 
 <hr />
 
