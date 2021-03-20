@@ -8,7 +8,6 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using TobyMeehan.Com.Components;
-using TobyMeehan.Com.Components.Accounts;
 using TobyMeehan.Com.Data;
 using TobyMeehan.Com.Data.Extensions;
 using TobyMeehan.Com.Data.Models;
@@ -30,36 +29,38 @@ namespace TobyMeehan.Com.Pages.Settings
 
         [CascadingParameter] public User CurrentUser { get; set; }
 
-        private AccountSettingsForm _form;
-
-        private async Task UsernameForm_Submit(UsernameViewModel model)
+        private ServerSideValidator _usernameValidator;
+        private UsernameViewModel _usernameModel = new UsernameViewModel();
+        private async Task UsernameForm_Submit()
         {
-            string username = model.Username;
+            string username = _usernameModel.Username;
 
             if (await users.AnyUsernameAsync(username))
             {
-                _form.UsernameForm.InvalidUsername("That username is already in use.");
+                _usernameValidator.Error(nameof(_usernameModel.Username), "That username is already in use.");
 
                 return;
             }
 
-            await users.UpdateUsernameAsync(CurrentUser.Id, model.Username);
+            await users.UpdateUsernameAsync(CurrentUser.Id, _usernameModel.Username);
 
             navigation.NavigateToRefresh();
         }
 
-        private async Task PasswordForm_Submit(ChangePasswordViewModel model)
+        private ServerSideValidator _passwordValidator;
+        private ChangePasswordViewModel _passwordModel = new ChangePasswordViewModel();
+        private async Task PasswordForm_Submit()
         {
-            if (!(await users.AuthenticateAsync(CurrentUser.Username, model.CurrentPassword)).Success)
+            if (!(await users.AuthenticateAsync(CurrentUser.Username, _passwordModel.CurrentPassword)).Success)
             {
-                _form.PasswordForm.InvalidCurrentPassword("Incorrect current password.");
+                _passwordValidator.Error(nameof(_passwordModel.CurrentPassword), "Incorrect current password.");
 
                 return;
             }
 
-            await users.UpdatePasswordAysnc(CurrentUser.Id, model.NewPassword);
+            await users.UpdatePasswordAysnc(CurrentUser.Id, _passwordModel.NewPassword);
 
-            model = new ChangePasswordViewModel();
+            _passwordModel = new ChangePasswordViewModel();
 
             alertState.Add(new AlertModel
             {
@@ -68,18 +69,20 @@ namespace TobyMeehan.Com.Pages.Settings
             });
         }
 
-        private async Task AccountForm_Submit(PasswordViewModel model)
+        private ServerSideValidator _deleteValidator;
+        private PasswordViewModel _deleteModel = new PasswordViewModel();
+        private async Task DeleteForm_Submit()
         {
-            if (!(await users.AuthenticateAsync(CurrentUser.Username, model.Password)).Success)
+            if (!(await users.AuthenticateAsync(CurrentUser.Username, _deleteModel.Password)).Success)
             {
-                _form.AccountForm.InvalidPassword("Incorrect password.");
+                _deleteValidator.Error(nameof(_deleteModel.Password), "Incorrect password.");
 
                 return;
             }
 
             await users.DeleteAsync(CurrentUser.Id);
 
-            navigation.NavigateTo("/logout", true);
+            navigation.NavigateToLogout();
         }
 
         private readonly int _maxSize = 10 * 1024 * 1024;
@@ -104,23 +107,18 @@ namespace TobyMeehan.Com.Pages.Settings
                 await users.AddProfilePictureAsync(CurrentUser.Id, fileInfo.Name, fileInfo.Type, uploadStream);
             }
 
-            Refresh();
+            navigation.NavigateTo("/me", true);
         }
 
         private async Task RemoveProfilePicture()
         {
             await users.RemoveProfilePictureAsync(CurrentUser.Id);
-            Refresh();
+            CurrentUser.ProfilePictureUrl = null;
         }
 
         private async Task DescriptionForm_Submit()
         {
             await users.UpdateDescriptionAsync(CurrentUser.Id, CurrentUser.Description);
-        }
-
-        private void Refresh()
-        {
-            navigation.NavigateTo("/me", true);
         }
     }
 }
