@@ -36,6 +36,14 @@
     padding: 0;
 }
 
+.the-button {
+    height: 64px;
+    width: 64px;
+    background-color: red;
+    border-radius: 50%;
+
+}
+
 .button-purple {
     background-color: purple;
     color: white;
@@ -120,6 +128,13 @@ i.avatar-inline {
 
 i.avatar-medium {
     font-size: 48px;
+}
+
+.input-avatar-button {
+    position: absolute;
+    bottom: -30%;
+    right: -30%;
+    border-radius: 50%;
 }
 
 @media (min-width: 0) {

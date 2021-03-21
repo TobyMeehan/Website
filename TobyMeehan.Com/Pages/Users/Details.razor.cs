@@ -20,7 +20,7 @@ namespace TobyMeehan.Com.Pages.Users
         [Inject] private IDownloadRepository downloads { get; set; }
         [Inject] private AlertState alertState { get; set; }
 
-        [Parameter] public string Username { get; set; }
+        [Parameter] public string Url { get; set; }
 
         [CascadingParameter] public Task<AuthenticationState> AuthenticationStateTask { get; set; }
 
@@ -70,7 +70,7 @@ namespace TobyMeehan.Com.Pages.Users
 
         private async Task RefreshRoles()
         {
-            _user = await Task.Run(() => users.GetByUsernameAsync(Username));
+            _user = await Task.Run(() => users.GetByVanityUrlAsync(Url));
             _unusedRoles = (await Task.Run(roles.GetAsync))
                 .Where(x => !_user.Roles.Any(r => r == x))
                 .ToList();

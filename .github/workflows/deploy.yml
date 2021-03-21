@@ -1,0 +1,48 @@
+name: Publish
+
+on:
+  push:
+    branches: [ master ]
+  schedule:
+    - cron: '0 3 * * *'
+  workflow_dispatch:
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        project: [TobyMeehan.Com, TobyMeehan.Com.Api]
+    
+    name: Publish ${{ matrix.project }}
+    
+    steps:
+    
+    - uses: actions/checkout@v2
+    - name: Setup .NET Core
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 3.1.x
+    
+    - name: Install Dependencies
+      run: dotnet restore      
+
+    - name: .NET Publish
+      run: dotnet publish ./${{ matrix.project }} -c Release -o ./publish/${{ matrix.project }} --no-restore --verbosity normal
+    
+    - name: FTP Deploy
+      uses: sebastianpopp/ftp-action@v2.0.0
+      with:
+        # FTP host
+        host: ${{ secrets.FTP_SERVER }}
+        # FTP user
+        user: ${{ secrets.FTP_ACCOUNT_USERNAME }}
+        # FTP password
+        password: ${{ secrets.FTP_ACCOUNT_PASSWORD }}
+        # Force SSL encryption
+        forceSsl: false
+        # Local directory
+        localDir: ./publish/${{ matrix.project }}
+        # Remote directory
+        remoteDir: /${{ matrix.project }}
