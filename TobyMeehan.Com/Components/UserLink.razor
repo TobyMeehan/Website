@@ -27,6 +27,6 @@
             _href = href.ToString();
         }
 
-        _href = $"/users/{User.Username}";
+        _href = $"/users/{User.VanityUrl ?? User.Id}";
     }
 }
