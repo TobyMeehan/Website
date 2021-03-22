@@ -48,21 +48,15 @@
 
             if (lower < 0)
             {
-                higher += lower * -1;
+                higher = (Range * 2);
                 lower = 0;
             }
 
             if (higher >= Items.Count())
             {
-                lower -= higher - Items.Count();
+                lower = Items.Count() - 1 - (Range * 2);
                 higher = Items.Count() - 1;
             }
-
-            if (lower < 0)
-            {
-                lower = 0;
-            }
-
 
             for (int i = lower; i <= higher; i++)
             {
