@@ -36,6 +36,26 @@
     padding: 0;
 }
 
+.banner-casino {
+    background-image: url("/img/casino.png");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+}
+
+.casino-text {
+    background-color: rgba(52, 58, 64, 0.2);
+    border-radius: .25rem;
+    top: 60% !important;
+    display: initial;
+}
+
+@media (max-width: 576px) {
+    .casino-text {
+        display: none;
+    }
+}
+
 .the-button {
     height: 64px;
     width: 64px;
@@ -135,6 +155,15 @@ i.avatar-medium {
     bottom: -30%;
     right: -30%;
     border-radius: 50%;
+}
+
+.align-centre {
+    margin: 0;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    -ms-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
 }
 
 @media (min-width: 0) {
