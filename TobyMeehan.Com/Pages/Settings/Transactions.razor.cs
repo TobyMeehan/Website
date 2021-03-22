@@ -24,7 +24,7 @@ namespace TobyMeehan.Com.Pages.Settings
         {
             var ts = await Task.Run(async () => await transactions.GetByUserAsync(CurrentUser.Id));
 
-            _transactions = ts.OrderBy(x => x.Sent).GroupBy(x => x.Sent.Date).Reverse().ToList();
+            _transactions = ts.OrderByDescending(x => x.Sent).GroupBy(x => x.Sent.Date).ToList();
         }
     }
 }
