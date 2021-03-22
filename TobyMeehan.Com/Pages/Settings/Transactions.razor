@@ -8,15 +8,19 @@
 </Card>
 
 <Card class="my-3">
-    <p>Balance: @CurrentUser.Balance</p>
+    <p class="lead"><strong>Balance:</strong> @CurrentUser.Balance</p>
 
     @if (_transactions == null)
     {
         <Loading></Loading>
     }
+    else if (_transactions.Count <= 0)
+    {
+        <p>You have no transactions.</p>
+    }
     else
     {
-        <Pagination Items="_transactions" Range="5" class="justify-content-center">
+        <Pagination Items="_transactions" Range="2" class="justify-content-center">
             <Table>
                 <Head>
                     <tr>

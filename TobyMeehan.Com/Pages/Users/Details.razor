@@ -1,6 +1,6 @@
-﻿@page "/users/{Username}"
+﻿@page "/users/{Url}"
 
-<Title>@Username</Title>
+<Title>@_user?.Username</Title>
 
 @if (_user == null)
 {
@@ -29,11 +29,11 @@ else
     @if (_user.IsVerified())
     {
         <Card class="my-3">
-            <h3>@Username's Downloads</h3>
+            <h3>@_user.Username's Downloads</h3>
 
             @if (!_downloads.Any())
             {
-                <p>@Username has not created any downloads </p>
+                <p>@_user.Username has not created any downloads </p>
             }
             else
             {

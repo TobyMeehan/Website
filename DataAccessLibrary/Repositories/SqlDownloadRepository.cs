@@ -96,7 +96,8 @@ namespace TobyMeehan.Com.Data.Repositories
                 ShortDescription = download.ShortDescription ?? record.ShortDescription,
                 LongDescription = download.LongDescription ?? record.LongDescription,
                 download.VersionString,
-                download.Updated
+                download.Updated,
+                download.Visibility
             });
 
             return await GetByIdAsync(id);

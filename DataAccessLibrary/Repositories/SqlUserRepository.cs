@@ -164,5 +164,30 @@ namespace TobyMeehan.Com.Data.Repositories
 
             return transaction;
         }
+
+        public Task UpdateVanityUrlAsync(string id, string vanityUrl)
+        {
+            return _table.UpdateAsync(u => u.Id == id, new
+            {
+                VanityUrl = vanityUrl
+            });
+        }
+
+        public async Task<User> GetByVanityUrlAsync(string url)
+        {
+            var user = (await SelectAsync(u => u.VanityUrl == url)).SingleOrDefault();
+
+            if (user == null)
+            {
+                user = await GetByIdAsync(url);
+            }
+
+            return user;
+        }
+
+        public async Task<bool> AnyVanityUrlAsync(string vanityUrl)
+        {
+            return (await GetByVanityUrlAsync(vanityUrl)) != null;
+        }
     }
 }

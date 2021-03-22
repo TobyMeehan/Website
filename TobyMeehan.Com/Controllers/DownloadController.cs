@@ -12,16 +12,25 @@ namespace TobyMeehan.Com.Controllers
 {
     public class DownloadController : Controller
     {
+        private readonly IDownloadRepository _downloads;
         private readonly IDownloadFileRepository _files;
 
-        public DownloadController(IDownloadFileRepository files)
+        public DownloadController(IDownloadRepository downloads, IDownloadFileRepository files)
         {
+            _downloads = downloads;
             _files = files;
         }
 
         [HttpGet("/downloads/{download}/file/{filename}")]
         public async Task<IActionResult> Download(string download, string filename)
         {
+            Download dl = await _downloads.GetByIdAsync(download);
+
+            if (dl.Visibility == DownloadVisibility.Private)
+            {
+                return Redirect($"/downloads/{download}");
+            }
+
             DownloadFile file = (await _files.GetByDownloadAndFilenameAsync(download, filename)).First();
 
             return Redirect(file.Url);

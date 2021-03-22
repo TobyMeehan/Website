@@ -45,6 +45,7 @@ namespace TobyMeehan.Com.Pages.Downloads
             _download.ShortDescription = _form.ShortDescription;
             _download.LongDescription = _form.LongDescription;
             _download.Version = _form.Version;
+            _download.Visibility = _form.Visibility;
 
             await downloads.UpdateAsync(Id, _download);
             editDownloadState.Title = _form.Title;

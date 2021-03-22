@@ -14,6 +14,8 @@ namespace TobyMeehan.Com.Data.Models
 
         public string LongDescription { get; set; }
 
+        public DownloadVisibility Visibility { get; set; }
+
         public EntityCollection<DownloadFile> Files { get; set; } = new EntityCollection<DownloadFile>();
 
         public Version Version { get; set; }

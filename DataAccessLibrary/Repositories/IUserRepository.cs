@@ -20,6 +20,8 @@ namespace TobyMeehan.Com.Data.Repositories
 
         Task<User> GetByUsernameAsync(string username);
 
+        Task<User> GetByVanityUrlAsync(string url);
+
         Task<AuthenticationResult<User>> AuthenticateAsync(string username, string password);
 
         Task<User> AddAsync(string username, string password);
@@ -38,9 +40,13 @@ namespace TobyMeehan.Com.Data.Repositories
 
         Task<bool> AnyUsernameAsync(string username);
 
+        Task<bool> AnyVanityUrlAsync(string vanityUrl);
+
         Task UpdateUsernameAsync(string id, string username);
 
         Task UpdatePasswordAysnc(string id, string password);
+
+        Task UpdateVanityUrlAsync(string id, string vanityUrl);
 
         Task DeleteAsync(string id);
     }

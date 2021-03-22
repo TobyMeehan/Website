@@ -4,11 +4,34 @@
 
 <TheButton></TheButton>
 
-<h1 class="font-weight-light">www.TobyMeehan.com</h1>
+<div class="row">
+    <div class="col-md-8">
+        <div class="card mb-3 bg-dark">
+            <img src="/img/casino.png" alt="Casino" class="card-img" />
+            <div class="card-img-overlay">
+                <span class="h3 align-centre text-center p-2 casino-text">
+                    <strong class="display-4">Online Casino</strong>
+                    <br />
+                    <small>by Thomas_Huntley</small>
+                </span>
+                <a href="https://tobymeehan.com/downloads/2CemYL63puz" class="btn btn-primary btn-lg position-absolute" style="right: 5%; bottom: 5%;">
+                    Download Now
+                    <i class="fas fa-chevron-right"></i>
+                </a>
+            </div>
+        </div>
 
-<p>This site is a full stack application I have been building for 2 years. It started as basic static website when I barely knew HTML, and has grown to be (in my opinion) a pretty advanced project. I have even created an API, so that other applications can use the user accounts system I have. Most of what I do here is probably not too interesting because I mainly focus things I work on to be stuff I want to do, but you can still have a look around.</p>
+        <h1>Welcome to TobyMeehan.Com</h1>
 
-<p>The source code for everything relating to the website is available on <a href="https://github.com/TobyMeehan/Website">GitHub</a>. If you do have any issues, or have a suggestion for an improvement, please create an issue there, so I can track bugs and improvements more easily.</p>
+        <p>This website is essentially a place for me to show off cool things I've done/am able to do. The downloads section also has some interesting stuff from other people. There's not really much about me personally but I'm a developer not a blogger.</p>
 
-<h2>Technical</h2>
-<p>The whole set of applications relating to the website uses .NET Core 3, and C#. The main website is built with Blazor Server, a new Single Page Application framework for ASP.NET Core, which uses SignalR to send updates as binary between the server and browser, which means page loading is fast, and pages can be dynamically updated after they have been intially rendered. The WebApi uses a more traditional MVC design, where pages are preprocessed by the server, then sent to the browser as static pages. For more information, and details about each section of the website, see readme.md on the GitHub repo.</p>
+        <p>The main focus of this site is a complete CRUD (Create, Read, Update, Delete) structure with overlayed user accounts. This is in the form of a 'downloads' system where users can upload collections of files under a download, alongside extra features such as descriptions and versioning. The integration with users means alongside the basic operations additional checks for authorisation are needed. I have also worked with web APIs; this website features an OAuth implementation allowing third party applications to use user accounts - see the <a href="https://tobymeehan.com/downloads/2CemYL63puz">Online Casino</a>.</p>
+
+        <p>This application in its entirety has been made with ASP.NET Core 3.1. Perhaps at some point I will upgrade to .NET 5. The user interface uses Blazor Server, a relatively new framework which maintains a real-time connection with the server. While this has improved loading times, it does also appear to cause some errors at times, and webpages will sometimes stop working if the connection is lost. The code behind this is all open source on <a href="https://github.com/TobyMeehan/Website">GitHub</a>.</p>
+
+        <p>You may have noticed a big button with some colours underneath it at the top of the page. This is inspired by the <a href="https://en.wikipedia.org/wiki/The_Button_(Reddit)">social experiment</a> which took place on Reddit in 2015. However, instead of the 60-second countdown, to account for the reduced number of users, this timer lasts 15 hours. This seems to be the most popular feature of this site despite being the one I spent the least time on.</p>
+    </div>
+    <div class="col-md-4">
+        <iframe src="https://discord.com/widget?id=537341795705552896&theme=dark" width="350" height="500" allowtransparency="true" frameborder="0" sandbox="allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts" style="max-width: 100%;"></iframe>
+    </div>
+</div>

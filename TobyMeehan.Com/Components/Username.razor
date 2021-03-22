@@ -1,5 +1,8 @@
 ﻿<span class="font-weight-bold">
-    <UserAvatar User="User" class="avatar-inline"></UserAvatar>
+    @if (IncludeAvatar)
+    {
+        <UserAvatar User="User" class="avatar-inline"></UserAvatar>
+    }
 
     @User.Username
 
@@ -13,4 +16,6 @@
 
 @code {
     [Parameter] public User User { get; set; }
+
+    [Parameter] public bool IncludeAvatar { get; set; } = true;
 }
