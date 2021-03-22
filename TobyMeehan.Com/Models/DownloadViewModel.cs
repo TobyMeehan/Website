@@ -16,6 +16,8 @@ namespace TobyMeehan.Com.Models
 
         public string LongDescription { get; set; }
 
+        public DownloadVisibility Visibility { get; set; }
+
         [Required]
         public Version Version { get; set; } = new Version(1, 0, 0);
     }

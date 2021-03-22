@@ -44,11 +44,20 @@ else
                     </div>
                 </div>
 
-                <div class="form-group">
-                    <label for="Version">Version</label>
-                    <div class="col-md-10">
-                        <InputVersion @bind-Value="_form.Version" />
-                        <ValidationMessage For="() => _form.Version" />
+                <div class="form-row">
+                    <div class="form-group col-md-9">
+                        <label for="Version">Version</label>
+                        <div class="col-md-10">
+                            <InputVersion @bind-Value="_form.Version" />
+                            <ValidationMessage For="() => _form.Version" />
+                        </div>
+                    </div>
+                    <div class="form-group col-md-3">
+                        <label for="Visibility">Visibility</label>
+                        <InputSelect id="Visibility" @bind-Value="_form.Visibility" class="custom-select">
+                            <option value="@(DownloadVisibility.Public)">Public</option>
+                            <option value="@(DownloadVisibility.Unlisted)">Unlisted</option>
+                        </InputSelect>
                     </div>
                 </div>
 

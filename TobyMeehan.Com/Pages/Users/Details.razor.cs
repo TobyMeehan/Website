@@ -36,7 +36,8 @@ namespace TobyMeehan.Com.Pages.Users
         {
             await RefreshRoles();
 
-            _downloads = await Task.Run(() => downloads.GetByAuthorAsync(_user.Id));
+            var list = await Task.Run(() => downloads.GetByAuthorAsync(_user.Id));
+            _downloads = list.Where(d => d.Visibility == DownloadVisibility.Public).ToList();
 
             _context = await AuthenticationStateTask;
         }
