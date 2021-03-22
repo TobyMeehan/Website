@@ -17,7 +17,8 @@ namespace TobyMeehan.Com.Pages.Downloads
 
         protected override async Task OnInitializedAsync()
         {
-            _downloads = await Task.Run(downloads.GetAsync);
+            var list = await Task.Run(downloads.GetAsync);
+            _downloads = list.Where(d => d.Visibility == DownloadVisibility.Public).ToList();
         }
     }
 }

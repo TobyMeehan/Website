@@ -2,9 +2,26 @@
 
 <Title>@(_download?.Title ?? "Download")</Title>
 
-@if (_download == null)
+
+@if (_notFound)
+{
+    <Card class="mb-3">
+        <h1 class="font-weight-light">Not Found</h1>
+    </Card>
+
+    <p class="lead text-center">This download does not exist.</p>
+}
+else if (_download == null)
 {
     <Loading></Loading>
+}
+else if (_download.Visibility == DownloadVisibility.Private)
+{
+    <Card class="mb-3">
+        <h1 class="font-weight-light">Private Download</h1>
+    </Card>
+
+    <p class="lead text-center">This download is private.</p>
 }
 else
 {

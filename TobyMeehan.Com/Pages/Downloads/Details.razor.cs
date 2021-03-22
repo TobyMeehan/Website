@@ -29,10 +29,13 @@ namespace TobyMeehan.Com.Pages.Downloads
         private User _user;
         private IDictionary<Comment, IEnumerable<Comment>> _comments;
         private AuthenticationState _context;
+        private bool _notFound = false;
 
         protected override async Task OnInitializedAsync()
         {
             _download = await Task.Run(() => downloads.GetByIdAsync(Id));
+            _notFound = (_download == null);
+
             await ResetComments();
             _context = await AuthenticationStateTask;
 
