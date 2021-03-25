@@ -75,9 +75,9 @@ jobs:
         # FTP password
         password: ${{ secrets.FTP_ACCOUNT_PASSWORD }}
         # Remote files seperated by ; (wildcards accepted)
-        remoteFiles: "app_offline.htm"
+        remoteFiles: "${{ matrix.project }}/app_offline.htm"
         # Working directory
-        workingDir: "/${{ matrix.project }}"
+        # workingDir:
         # Ignore invalid TLS/SSL certificate (1=ignoreSSL)
         ignoreSSL: "1"
         
