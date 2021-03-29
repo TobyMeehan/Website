@@ -20,10 +20,17 @@
         }
         else
         {
-            <AuthorizeView>
+            <AuthorizeView Policy="@AuthorizationPolicies.IsVerified">
                 <NotAuthorized>
                     <button class="btn btn-secondary btn-lg" disabled>The Button</button>
-                    <p><a href="/login">Sign in</a> to use the button.</p>
+                    @if (context.User.Identity.IsAuthenticated)
+                    {
+                        <p>Your account needs to be verified to use the button.</p>
+                    }
+                    else
+                    {
+                        <p><a href="/login">Sign in</a> to use the button.</p>
+                    }
                 </NotAuthorized>
                 <Authorized>
                     <button class="btn btn-secondary btn-lg" @onclick="() => OnButtonClick(context.User.Id())">The Button</button>
