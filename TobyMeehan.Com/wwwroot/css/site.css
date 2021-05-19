@@ -56,6 +56,12 @@
     }
 }
 
+.minecraft-map {
+    border: 0;
+    width: 100%;
+    height: 100%;
+}
+
 .the-button {
     height: 64px;
     width: 64px;
