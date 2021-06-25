@@ -74,5 +74,15 @@ namespace TobyMeehan.Com.Data.CloudStorage
                 await client.DownloadObjectAsync(bucket, filename, destination);
             }
         }
+
+        public async Task<CloudFile> GetMetadataAsync(string bucket, string objectName)
+        {
+            using (StorageClient client = await StorageClient.CreateAsync(_credential))
+            {
+                var dataObject = await client.GetObjectAsync(bucket, objectName);
+
+                return new CloudFile(GetDownloadLink(dataObject), dataObject.MediaLink);
+            }
+        }
     }
 }

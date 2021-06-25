@@ -15,17 +15,31 @@ using TobyMeehan.Sql;
 
 namespace TobyMeehan.Com.Data.Repositories
 {
-    public class DownloadFileRepository : IDownloadFileRepository
+    public class DownloadFileRepository : SqlRepository<DownloadFile>, IDownloadFileRepository
     {
         private readonly ISqlTable<DownloadFile> _table;
         private readonly ICloudStorage _storage;
         private readonly CloudStorageOptions _options;
 
-        public DownloadFileRepository(ISqlTable<DownloadFile> table, ICloudStorage storage, IOptions<CloudStorageOptions> options)
+        public DownloadFileRepository(ISqlTable<DownloadFile> table, ICloudStorage storage, IOptions<CloudStorageOptions> options) : base(table)
         {
             _table = table;
             _storage = storage;
             _options = options.Value;
+        }
+
+        protected override async Task<IEnumerable<DownloadFile>> FormatAsync(IEnumerable<DownloadFile> values)
+        {
+            foreach (var file in values)
+            {
+                if (string.IsNullOrEmpty(file.MediaLink))
+                {
+                    CloudFile cf = await _storage.GetMetadataAsync(_options.DownloadStorageBucket, file.Id);
+                    file.MediaLink = cf.MediaLink;
+                }
+            }
+
+            return values;
         }
 
         public async Task<DownloadFile> AddAsync(string downloadId, string filename, Stream uploadStream, CancellationToken cancellationToken = default, IProgress<IUploadProgress> progress = null)
@@ -41,13 +55,14 @@ namespace TobyMeehan.Com.Data.Repositories
                 Id = id,
                 DownloadID = downloadId,
                 Filename = filename,
-                Url = cf.DownloadLink
+                Url = cf.DownloadLink,
+                MediaLink = cf.MediaLink
             });
 
             return (await _table.SelectByAsync(f => f.Id == id)).SingleOrDefault();
         }
 
-        public async Task DeleteAsync(string id)
+        public override async Task DeleteAsync(string id)
         {
             string bucket = _options.DownloadStorageBucket;
 
@@ -63,24 +78,19 @@ namespace TobyMeehan.Com.Data.Repositories
             return _storage.DownloadFileAsync(bucket, id, stream);
         }
 
-        public async Task<IList<DownloadFile>> GetAsync()
-        {
-            return (await _table.SelectAsync()).ToList();
-        }
-
         public async Task<IList<DownloadFile>> GetByDownloadAndFilenameAsync(string downloadId, string filename)
         {
-            return (await _table.SelectByAsync(f => f.DownloadId == downloadId && f.Filename == filename)).ToList();
+            return (await SelectAsync(f => f.DownloadId == downloadId && f.Filename == filename)).ToList();
         }
 
         public async Task<IList<DownloadFile>> GetByDownloadAsync(string downloadId)
         {
-            return (await _table.SelectByAsync(f => f.DownloadId == downloadId)).ToList();
+            return (await SelectAsync(f => f.DownloadId == downloadId)).ToList();
         }
 
         public async Task<IList<DownloadFile>> GetByFilenameAsync(string filename)
         {
-            return (await _table.SelectByAsync(f => f.Filename == filename)).ToList();
+            return (await SelectAsync(f => f.Filename == filename)).ToList();
         }
     }
 }
