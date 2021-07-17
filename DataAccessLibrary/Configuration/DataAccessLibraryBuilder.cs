@@ -1,5 +1,7 @@
 ﻿using Google.Apis.Auth.OAuth2;
 using Microsoft.Extensions.DependencyInjection;
+using SqlKata.Compilers;
+using SqlKata.Execution;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -25,6 +27,9 @@ namespace TobyMeehan.Com.Data.Configuration
         public DataAccessLibraryBuilder AddSqlDatabase(Func<IDbConnection> connectionFactory)
         {
             Services.AddSingleton(connectionFactory);
+
+            var compiler = new MySqlCompiler();
+            Services.AddSingleton<Func<QueryFactory>>(() => new QueryFactory(connectionFactory.Invoke(), compiler));
 
             Services.AddTransient<ISqlTable<User>, UserTable>();
             Services.AddTransient<ISqlTable<Application>, ApplicationTable>();
