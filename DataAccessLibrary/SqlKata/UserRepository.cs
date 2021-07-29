@@ -10,6 +10,7 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using TobyMeehan.Com.Data.CloudStorage;
+using TobyMeehan.Com.Data.Collections;
 using TobyMeehan.Com.Data.Configuration;
 using TobyMeehan.Com.Data.Models;
 using TobyMeehan.Com.Data.Repositories;
@@ -18,7 +19,7 @@ using TobyMeehan.Com.Data.Upload;
 
 namespace TobyMeehan.Com.Data.SqlKata
 {
-    public class UserRepository : IUserRepository
+    public class UserRepository : RepositoryBase<User>, IUserRepository
     {
         private readonly Func<QueryFactory> _queryFactory;
         private readonly IPasswordHash _passwordHash;
@@ -26,7 +27,7 @@ namespace TobyMeehan.Com.Data.SqlKata
         private readonly ITransactionRepository _transactions;
         private readonly CloudStorageOptions _options;
 
-        public UserRepository(Func<QueryFactory> queryFactory, IPasswordHash passwordHash, ICloudStorage cloudStorage, IOptions<CloudStorageOptions> options, ITransactionRepository transactions)
+        public UserRepository(Func<QueryFactory> queryFactory, IPasswordHash passwordHash, ICloudStorage cloudStorage, IOptions<CloudStorageOptions> options, ITransactionRepository transactions) : base(queryFactory)
         {
             _queryFactory = queryFactory;
             _passwordHash = passwordHash;
@@ -34,6 +35,20 @@ namespace TobyMeehan.Com.Data.SqlKata
             _transactions = transactions;
             _options = options.Value;
         }
+
+        protected override Query Query()
+        {
+            var userroles = new Query("userroles");
+            var roles = new Query("roles");
+
+            return base.Query()
+                .From("users")
+                .OrderBy("Username")
+                .LeftJoin(userroles.As("userroles"), j => j.On("userroles.UserId", "users.Id"))
+                .LeftJoin(roles.As("roles"), j => j.On("roles.Id", "userroles.RoleId"));
+        }
+
+
 
         public async Task<User> AddAsync(string username, string password)
         {
@@ -50,155 +65,34 @@ namespace TobyMeehan.Com.Data.SqlKata
             }
         }
 
-        public async Task AddProfilePictureAsync(string id, string filename, string contentType, Stream fileStream, CancellationToken cancellationToken = default, IProgress<IUploadProgress> progress = null)
+
+
+        public async Task<IEntityCollection<User>> GetAsync()
         {
-            CloudFile file = await _cloudStorage.UploadFileAsync(fileStream, _options.ProfilePictureStorageBucket, id, filename, contentType, cancellationToken, progress);
-
-            using (QueryFactory db = _queryFactory.Invoke())
-            {
-                await db.Query("users").Where("Id", id).UpdateAsync(new
-                {
-                    ProfilePictureUrl = file.MediaLink
-                });
-            }
-        }
-
-        public async Task AddRoleAsync(string id, string roleId)
-        {
-            using (QueryFactory db = _queryFactory.Invoke())
-            {
-                await db.Query("users").InsertAsync(new
-                {
-                    UserId = id,
-                    RoleId = roleId
-                });
-            }
-        }
-
-        public async Task<Transaction> AddTransactionAsync(string id, string appId, string description, int amount)
-        {
-            var transaction = await _transactions.AddAsync(id, appId, description, amount);
-
-            using (QueryFactory db = _queryFactory.Invoke())
-            {
-                // https://github.com/sqlkata/querybuilder/issues/159
-                await db.StatementAsync("UPDATE users SET Balance = Balance + @Amount WHERE Id = @Id", new
-                {
-                    Amount = amount,
-                    Id = id
-                });
-            }
-
-            return transaction;
-        }
-
-        public async Task<bool> AnyUsernameAsync(string username)
-        {
-            return (await GetByUsernameAsync(username)) != null;
-        }
-
-        public async Task<bool> AnyVanityUrlAsync(string vanityUrl)
-        {
-            return (await GetByVanityUrlAsync(vanityUrl)) != null;
-        }
-
-        public async Task<AuthenticationResult<User>> AuthenticateAsync(string username, string password)
-        {
-            User user = await GetByUsernameAsync(username);
-
-            if (user == null)
-            {
-                return new AuthenticationResult<User>();
-            }
-
-            if (!_passwordHash.CheckPassword(password, user?.HashedPassword))
-            {
-                return new AuthenticationResult<User>();
-            }
-
-            return new AuthenticationResult<User>(user);
-        }
-
-        public async Task DeleteAsync(string id)
-        {
-            using (QueryFactory db = _queryFactory.Invoke())
-            {
-                await db.Query("users").Where("Id", id).DeleteAsync();
-            }
-        }
-
-        private Query UserQuery() => new Query("users")
-            .Select("users.Id, " +
-            "users.Username, " +
-            "users.VanityUrl, " +
-            "users.Balance, " +
-            "users.Description" +
-            "users.ProfilePictureUrl" +
-            "roles.Id" +
-            "roles.Name")
-            .LeftJoin("userroles", "users.Id", "userroles.UserId")
-            .LeftJoin("roles", "userroles.RoleId", "roles.Id");
-
-        public async Task<IList<User>> GetAsync()
-        {
-            using (QueryFactory db = _queryFactory.Invoke())
-            {
-                return (await db.GetAsync<User>(UserQuery())).ToList();
-            }
+            return await SelectAsync();
         }
 
         public async Task<User> GetByIdAsync(string id)
         {
-            using (QueryFactory db = _queryFactory.Invoke())
-            {
-                return await db.FirstOrDefaultAsync<User>(UserQuery().Where("users.Id", id));
-            }
+            return await SelectSingleAsync(query => query.Where("Id", id));
         }
 
-        public async Task<IList<User>> GetByRoleAsync(string name)
+        public async Task<IEntityCollection<User>> GetByRoleAsync(string name)
         {
-            using (QueryFactory db = _queryFactory.Invoke())
-            {
-                return (await db.GetAsync<User>(UserQuery().Where("roles.Name", name))).ToList();
-            }
+            return await SelectAsync(query => query.Where("roles.Name", name));
         }
 
         public async Task<User> GetByUsernameAsync(string username)
         {
-            using (QueryFactory db = _queryFactory.Invoke())
-            {
-                return await db.FirstOrDefaultAsync<User>(UserQuery().Where("users.Username", username));
-            }
+            return await SelectSingleAsync(query => query.Where("Username", username));
         }
 
         public async Task<User> GetByVanityUrlAsync(string url)
         {
-            using (QueryFactory db = _queryFactory.Invoke())
-            {
-                return await db.FirstOrDefaultAsync<User>(UserQuery().Where("users.VanityUrl", url));
-            }
+            return await SelectSingleAsync(query => query.Where("VanityUrl", url));
         }
 
-        public async Task RemoveProfilePictureAsync(string id)
-        {
-            await _cloudStorage.DeleteFileAsync(_options.ProfilePictureStorageBucket, id);
 
-            using (QueryFactory db = _queryFactory.Invoke())
-            {
-                await db.Query("users").Where("users.Id", id).UpdateAsync(new
-                {
-                    ProfilePictureUrl = (string)null
-                });
-            }
-        }
-
-        public async Task RemoveRoleAsync(string id, string roleId)
-        {
-            using (QueryFactory db = _queryFactory.Invoke())
-            {
-                await db.Query("userroles").Where("UserId", id).Where("RoleId", roleId).DeleteAsync();
-            }
-        }
 
         public async Task UpdateDescriptionAsync(string id, string description)
         {
@@ -252,6 +146,121 @@ namespace TobyMeehan.Com.Data.SqlKata
                     VanityUrl = vanityUrl
                 });
             }
+        }
+
+
+
+        public async Task DeleteAsync(string id)
+        {
+            using (QueryFactory db = _queryFactory.Invoke())
+            {
+                await db.Query("users").Where("Id", id).DeleteAsync();
+            }
+        }
+
+
+
+
+        public async Task AddProfilePictureAsync(string id, string filename, string contentType, Stream fileStream, CancellationToken cancellationToken = default, IProgress<IUploadProgress> progress = null)
+        {
+            CloudFile file = await _cloudStorage.UploadFileAsync(fileStream, _options.ProfilePictureStorageBucket, id, filename, contentType, cancellationToken, progress);
+
+            using (QueryFactory db = _queryFactory.Invoke())
+            {
+                await db.Query("users").Where("Id", id).UpdateAsync(new
+                {
+                    ProfilePictureUrl = file.MediaLink
+                });
+            }
+        }
+
+        public async Task RemoveProfilePictureAsync(string id)
+        {
+            await _cloudStorage.DeleteFileAsync(_options.ProfilePictureStorageBucket, id);
+
+            using (QueryFactory db = _queryFactory.Invoke())
+            {
+                await db.Query("users").Where("users.Id", id).UpdateAsync(new
+                {
+                    ProfilePictureUrl = (string)null
+                });
+            }
+        }
+
+
+        public async Task AddRoleAsync(string id, string roleId)
+        {
+            using (QueryFactory db = _queryFactory.Invoke())
+            {
+                await db.Query("users").InsertAsync(new
+                {
+                    UserId = id,
+                    RoleId = roleId
+                });
+            }
+        }
+
+        public async Task RemoveRoleAsync(string id, string roleId)
+        {
+            using (QueryFactory db = _queryFactory.Invoke())
+            {
+                await db.Query("userroles").Where("UserId", id).Where("RoleId", roleId).DeleteAsync();
+            }
+        }
+
+
+        public async Task<Transaction> AddTransactionAsync(string id, string appId, string description, int amount)
+        {
+            var transaction = await _transactions.AddAsync(id, appId, description, amount);
+
+            using (QueryFactory db = _queryFactory.Invoke())
+            {
+                // https://github.com/sqlkata/querybuilder/issues/159
+                await db.StatementAsync("UPDATE users SET Balance = Balance + @Amount WHERE Id = @Id", new
+                {
+                    Amount = amount,
+                    Id = id
+                });
+            }
+
+            return transaction;
+        }
+
+
+
+        public async Task<bool> AnyUsernameAsync(string username)
+        {
+            using (QueryFactory db = _queryFactory.Invoke())
+            {
+                return await db.Query("users").Where("Username", username).ExistsAsync();
+            }
+        }
+
+        public async Task<bool> AnyVanityUrlAsync(string vanityUrl)
+        {
+            using (QueryFactory db = _queryFactory.Invoke())
+            {
+                return await db.Query("users").Where("VanityUrl", vanityUrl).ExistsAsync();
+            }
+        }
+
+
+
+        public async Task<AuthenticationResult<User>> AuthenticateAsync(string username, string password)
+        {
+            User user = await GetByUsernameAsync(username);
+
+            if (user == null)
+            {
+                return new AuthenticationResult<User>();
+            }
+
+            if (!_passwordHash.CheckPassword(password, user?.HashedPassword))
+            {
+                return new AuthenticationResult<User>();
+            }
+
+            return new AuthenticationResult<User>(user);
         }
     }
 }

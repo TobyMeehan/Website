@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using TobyMeehan.Com.Data.Collections;
 using TobyMeehan.Sql.QueryBuilder;
 
 namespace TobyMeehan.Com.Data.Models
@@ -15,7 +16,6 @@ namespace TobyMeehan.Com.Data.Models
         public string HashedPassword { get; set; }
         public string Description { get; set; }
         public string ProfilePictureUrl { get; set; }
-        public EntityCollection<Role> Roles { get; set; } = new EntityCollection<Role>();
-        public EntityCollection<Transaction> Transactions { get; set; } = new EntityCollection<Transaction>();
+        public IEntityCollection<Role> Roles { get; set; } = new EntityCollection<Role>();
     }
 }

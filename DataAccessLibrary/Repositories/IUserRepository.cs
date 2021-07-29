@@ -5,6 +5,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using TobyMeehan.Com.Data.Collections;
 using TobyMeehan.Com.Data.Models;
 using TobyMeehan.Com.Data.Upload;
 
@@ -12,11 +13,11 @@ namespace TobyMeehan.Com.Data.Repositories
 {
     public interface IUserRepository
     {
-        Task<IList<User>> GetAsync();
+        Task<IEntityCollection<User>> GetAsync();
 
-        Task<IList<User>> GetByRoleAsync(string name);
+        Task<IEntityCollection<User>> GetByRoleAsync(string name);
 
-        Task<IList<User>> GetByDownloadAsync(string downloadId);
+        Task<IEntityCollection<User>> GetByDownloadAsync(string downloadId);
 
         Task<User> GetByIdAsync(string id);
 
