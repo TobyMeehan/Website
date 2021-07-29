@@ -4,6 +4,7 @@ using System.IO;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using TobyMeehan.Com.Data.Collections;
 using TobyMeehan.Com.Data.Models;
 using TobyMeehan.Com.Data.Upload;
 
@@ -11,9 +12,9 @@ namespace TobyMeehan.Com.Data.Repositories
 {
     public interface IDownloadRepository
     {
-        Task<IList<Download>> GetAsync();
+        Task<IEntityCollection<Download>> GetAsync();
 
-        Task<IList<Download>> GetByAuthorAsync(string userId);
+        Task<IEntityCollection<Download>> GetByAuthorAsync(string userId);
 
         Task<Download> GetByIdAsync(string id);
 

@@ -16,6 +16,8 @@ namespace TobyMeehan.Com.Data.Repositories
 
         Task<IList<User>> GetByRoleAsync(string name);
 
+        Task<IList<User>> GetByDownloadAsync(string downloadId);
+
         Task<User> GetByIdAsync(string id);
 
         Task<User> GetByUsernameAsync(string username);
