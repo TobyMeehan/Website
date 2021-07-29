@@ -35,18 +35,28 @@ else
                         </h1>
 
                         <span class="font-weight-light d-none d-md-inline mt-2">
-                            @switch (_download.Verified)
+                            @if (_download.Visibility == DownloadVisibility.Unlisted)
                             {
-                                case DownloadVerification.Dangerous:
-                                    <span class="text-danger">
-                                        <i class="fas fa-exclamation"></i> Dangerous
-                                    </span>
-                                    break;
-                                case DownloadVerification.Verified:
-                                    <span class="text-success">
-                                        <i class="fas fa-check"></i> Verified
-                                    </span>
-                                    break;
+                                <span class="text-secondary">
+                                    <i class="fas fa-eye-slash"></i>
+                                    Unlisted
+                                </span>
+                            }
+                            else
+                            {
+                                @switch (_download.Verified)
+                                {
+                                    case DownloadVerification.Dangerous:
+                                        <span class="text-danger">
+                                            <i class="fas fa-exclamation"></i> Dangerous
+                                        </span>
+                                        break;
+                                    case DownloadVerification.Verified:
+                                        <span class="text-success">
+                                            <i class="fas fa-check"></i> Verified
+                                        </span>
+                                        break;
+                                }
                             }
                         </span>
                     </div>
