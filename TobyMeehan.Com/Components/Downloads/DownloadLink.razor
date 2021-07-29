@@ -1,13 +1,13 @@
-﻿<a class="text-reset" href="@($"/downloads/{Download.Id}")">
-    @Download.Title
-    @Verification
-</a>
+﻿<span>
+    <a class="text-reset" href="@($"/downloads/{Download.Id}")">@Download.Title</a>
 
-@code {
-    [Parameter] public Download Download { get; set; }
-
-    private RenderFragment Verification =>
-        @<span>
+    <small class="text-muted">
+        @if (Download.Visibility == DownloadVisibility.Unlisted)
+        {
+            <i class="fas fa-eye-slash"></i>
+        }
+        else
+        {
             @switch (Download.Verified)
             {
                 case DownloadVerification.Dangerous:
@@ -17,5 +17,12 @@
                     <i class="fas fa-check-circle"></i>
                     break;
             }
-        </span>;
+        }
+    </small>
+</span>
+
+
+
+@code {
+    [Parameter] public Download Download { get; set; }
 }
