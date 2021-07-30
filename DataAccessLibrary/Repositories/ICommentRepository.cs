@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using TobyMeehan.Com.Data.Collections;
 using TobyMeehan.Com.Data.Models;
 
 namespace TobyMeehan.Com.Data.Repositories
@@ -10,7 +11,7 @@ namespace TobyMeehan.Com.Data.Repositories
     {
         Task<Comment> GetByIdAsync(string id);
 
-        Task<IList<Comment>> GetByEntityAsync(string entityId);
+        Task<IEntityCollection<Comment>> GetByEntityAsync(string entityId);
 
         Task<Comment> AddAsync(string entityId, string userId, string content);
 

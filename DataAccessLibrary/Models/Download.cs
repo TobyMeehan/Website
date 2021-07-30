@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using TobyMeehan.Sql.QueryBuilder;
+using TobyMeehan.Com.Data.Collections;
 
 namespace TobyMeehan.Com.Data.Models
 {
-    [SqlName("downloads")]
     public class Download : EntityBase
     {
         public string Title { get; set; }
@@ -16,7 +15,7 @@ namespace TobyMeehan.Com.Data.Models
 
         public DownloadVisibility Visibility { get; set; }
 
-        public EntityCollection<DownloadFile> Files { get; set; } = new EntityCollection<DownloadFile>();
+        public IEntityCollection<DownloadFile> Files { get; set; } = new EntityCollection<DownloadFile>();
 
         public Version Version { get; set; }
         public string VersionString
@@ -33,7 +32,7 @@ namespace TobyMeehan.Com.Data.Models
 
         public DateTime? Updated { get; set; }
 
-        public EntityCollection<User> Authors { get; set; } = new EntityCollection<User>();
+        public IEntityCollection<User> Authors { get; set; } = new EntityCollection<User>();
 
         public DownloadVerification Verified { get; set; }
     }
