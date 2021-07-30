@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using TobyMeehan.Com.Data.Collections;
 using TobyMeehan.Com.Data.Models;
 
 namespace TobyMeehan.Com.Data.Repositories
@@ -10,7 +11,7 @@ namespace TobyMeehan.Com.Data.Repositories
     {
         Task<OAuthSession> AddAsync(string connectionId, string redirectUri, string scope, string codeChallenge, DateTime? expiry = null);
 
-        Task<IList<OAuthSession>> GetAsync();
+        Task<IEntityCollection<OAuthSession>> GetAsync();
 
         Task<OAuthSession> GetByIdAsync(string id);
 
