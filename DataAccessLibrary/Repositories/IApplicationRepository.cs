@@ -4,19 +4,20 @@ using System.IO;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using TobyMeehan.Com.Data.Collections;
 using TobyMeehan.Com.Data.Models;
 
 namespace TobyMeehan.Com.Data.Repositories
 {
     public interface IApplicationRepository
     {
-        Task<IList<Application>> GetAsync();
+        Task<IEntityCollection<Application>> GetAsync();
 
         Task<Application> GetByIdAsync(string id);
 
-        Task<IList<Application>> GetByUserAsync(string userId);
+        Task<IEntityCollection<Application>> GetByUserAsync(string userId);
 
-        Task<IList<Application>> GetByNameAsync(string name);
+        Task<IEntityCollection<Application>> GetByNameAsync(string name);
 
         Task<Application> GetByUserAndNameAsync(string userId, string name);
 
