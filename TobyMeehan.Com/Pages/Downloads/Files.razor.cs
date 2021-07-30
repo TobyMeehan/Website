@@ -75,7 +75,7 @@ namespace TobyMeehan.Com.Pages.Downloads
 
         private async Task RefreshFileList()
         {
-            _download.Files = (await downloadFiles.GetByDownloadAsync(_download.Id)).ToEntityCollection();
+            _download.Files = await downloadFiles.GetByDownloadAsync(_download.Id);
             StateHasChanged();
         }
 

@@ -17,12 +17,14 @@ namespace TobyMeehan.Com.Api.Controllers.Api
     public class TransactionController : OAuthControllerBase
     {
         private readonly IUserRepository _users;
+        private readonly ITransactionRepository _transactions;
         private readonly IMapper _mapper;
         private readonly IAuthorizationService _authorizationService;
 
-        public TransactionController(IUserRepository users, IMapper mapper, IAuthorizationService authorizationService)
+        public TransactionController(IUserRepository users, ITransactionRepository transactions, IMapper mapper, IAuthorizationService authorizationService)
         {
             _users = users;
+            _transactions = transactions;
             _mapper = mapper;
             _authorizationService = authorizationService;
         }
@@ -41,9 +43,9 @@ namespace TobyMeehan.Com.Api.Controllers.Api
                 return Forbid(new ErrorResponse("The transactions scope is required to get a user's transactions."));
             }
 
-            var user = await _users.GetByIdAsync(id);
+            var transactions = await _transactions.GetByUserAsync(id);
 
-            return Ok(_mapper.Map<List<TransactionResponse>>(user.Transactions));
+            return Ok(_mapper.Map<List<TransactionResponse>>(transactions));
         }
 
         [HttpPost]

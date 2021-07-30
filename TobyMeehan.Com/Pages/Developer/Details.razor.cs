@@ -28,15 +28,18 @@ namespace TobyMeehan.Com.Pages.Developer
         private Application _application;
         private ApplicationViewModel _model = new ApplicationViewModel();
         private ObjectiveViewModel _objectiveForm = new ObjectiveViewModel();
-        private IList<Objective> _scoreboard;
-        private IList<Download> _userDownloads;
+        private List<Objective> _scoreboard;
+        private IEnumerable<Download> _userDownloads;
         private string _iconError;
 
         protected override async Task OnInitializedAsync()
         {
             _application = await Task.Run(async () => await applications.GetByIdAsync(Id));
             _model = mapper.Map<ApplicationViewModel>(_application);
-            _scoreboard = await Task.Run(async () => await scoreboard.GetByApplicationAsync(Id));
+
+            var sb = await Task.Run(async () => await scoreboard.GetByApplicationAsync(Id));
+            _scoreboard = sb.ToList();
+
             _userDownloads = await Task.Run(async () => await downloads.GetByAuthorAsync(_application.Author.Id));
         }
 
