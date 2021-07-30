@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using TobyMeehan.Com.Data.Collections;
 using TobyMeehan.Sql.QueryBuilder;
 
 namespace TobyMeehan.Com.Data.Models
@@ -10,6 +11,6 @@ namespace TobyMeehan.Com.Data.Models
     {
         public string AppId { get; set; }
         public string Name { get; set; }
-        public EntityCollection<Score> Scores { get; set; }
+        public IEntityCollection<Score> Scores { get; set; }
     }
 }
