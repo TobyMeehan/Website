@@ -74,19 +74,21 @@ namespace TobyMeehan.Com.Data.SqlKata
 
         public async Task<User> GetByIdAsync(string id)
         {
-            return await SelectSingleAsync(query => query.Where("Id", id));
+            return await SelectSingleAsync(query => query.Where("users.Id", id));
         }
 
         public async Task<IEntityCollection<User>> GetByRoleAsync(string name)
         {
-            return await SelectAsync(query => query.Where("roles.Name", name));
+            var roles = new Query("userroles").Select("UserId").Where("Name", name);
+
+            return await SelectAsync(query => query.WhereIn("users.Id", roles));
         }
 
         public async Task<IEntityCollection<User>> GetByDownloadAsync(string downloadId)
         {
             var authors = new Query("downloadauthors").Select("UserId").Where("DownloadId", downloadId);
 
-            return await SelectAsync(query => query.WhereIn("Id", authors));
+            return await SelectAsync(query => query.WhereIn("users.Id", authors));
         }
 
         public async Task<User> GetByUsernameAsync(string username)

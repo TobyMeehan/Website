@@ -54,7 +54,7 @@ namespace TobyMeehan.Com.Data.SqlKata
 
         public async Task<Connection> GetByIdAsync(string id)
         {
-            return await SelectSingleAsync(query => query.Where("Id", id));
+            return await SelectSingleAsync(query => query.Where("connections.Id", id));
         }
 
         public async Task<IEntityCollection<Connection>> GetByUserAsync(string userId)

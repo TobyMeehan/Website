@@ -67,7 +67,7 @@ namespace TobyMeehan.Com.Data.SqlKata
 
         public async Task<Comment> GetByIdAsync(string id)
         {
-            return await SelectSingleAsync(query => query.Where("Id", id));
+            return await SelectSingleAsync(query => query.Where("comments.Id", id));
         }
 
         

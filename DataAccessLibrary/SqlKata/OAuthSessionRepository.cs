@@ -77,7 +77,7 @@ namespace TobyMeehan.Com.Data.SqlKata
 
         public async Task<OAuthSession> GetByIdAsync(string id)
         {
-            return await SelectSingleAsync(query => query.Where("Id", id));
+            return await SelectSingleAsync(query => query.Where("oauthsessions.Id", id));
         }
 
         public async Task<OAuthSession> GetByRefreshTokenAsync(string refreshToken)

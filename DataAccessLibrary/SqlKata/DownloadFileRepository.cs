@@ -81,7 +81,7 @@ namespace TobyMeehan.Com.Data.SqlKata
 
         public async Task<DownloadFile> GetByIdAsync(string id)
         {
-            return await SelectSingleAsync(query => query.Where("Id", id));
+            return await SelectSingleAsync(query => query.Where("downloadfiles.Id", id));
         }
 
 

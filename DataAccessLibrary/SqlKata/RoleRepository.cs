@@ -49,7 +49,7 @@ namespace TobyMeehan.Com.Data.SqlKata
 
         public async Task<Role> GetByIdAsync(string id)
         {
-            return await SelectSingleAsync(query => query.Where("Id", id));
+            return await SelectSingleAsync(query => query.Where("roles.Id", id));
         }
 
         public async Task<Role> GetByNameAsync(string name)

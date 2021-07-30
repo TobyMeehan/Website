@@ -66,7 +66,7 @@ namespace TobyMeehan.Com.Data.SqlKata
 
         public async Task<Objective> GetByIdAsync(string id)
         {
-            return await SelectSingleAsync(query => query.Where("Id", id));
+            return await SelectSingleAsync(query => query.Where("objectives.Id", id));
         }
 
         public async Task<IEntityCollection<Objective>> GetByApplicationAsync(string appId)

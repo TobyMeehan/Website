@@ -64,7 +64,7 @@ namespace TobyMeehan.Com.Data.SqlKata
 
         public async Task<Transaction> GetByIdAsync(string id)
         {
-            return await SelectSingleAsync(query => query.Where("Id", id));
+            return await SelectSingleAsync(query => query.Where("transactions.Id", id));
         }
 
         public async Task<IEntityCollection<Transaction>> GetByUserAsync(string userId)

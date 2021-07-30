@@ -74,12 +74,12 @@ namespace TobyMeehan.Com.Data.SqlKata
         {
             var author = new Query("downloadauthors").Select("DownloadId").Where("UserId", userId);
 
-            return await SelectAsync(query => query.WhereIn("Id", author));
+            return await SelectAsync(query => query.WhereIn("downloads.Id", author));
         }
 
         public async Task<Download> GetByIdAsync(string id)
         {
-            return await SelectSingleAsync(query => query.Where("Id", id));
+            return await SelectSingleAsync(query => query.Where("downloads.Id", id));
         }
 
 
