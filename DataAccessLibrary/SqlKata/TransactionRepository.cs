@@ -15,30 +15,26 @@ namespace TobyMeehan.Com.Data.SqlKata
     public class TransactionRepository : RepositoryBase<Transaction>, ITransactionRepository
     {
         private readonly Func<QueryFactory> _queryFactory;
-        private readonly IApplicationRepository _applications;
 
-        public TransactionRepository(Func<QueryFactory> queryFactory, IApplicationRepository applications) : base(queryFactory)
+        public TransactionRepository(Func<QueryFactory> queryFactory) : base(queryFactory)
         {
             _queryFactory = queryFactory;
-            _applications = applications;
         }
 
         protected override Query Query()
         {
+            var apps = new Query("applications");
+
             return base.Query()
                 .From("transactions")
-                .OrderByDesc("Sent");
+                .OrderByDesc("Sent")
+                .LeftJoin(apps.As("apps"), j => j.On("apps.Id", "transactions.AppId"));
         }
 
         protected override async Task<IEntityCollection<Transaction>> MapAsync(IEnumerable<Transaction> items)
         {
             // Transactions before 2020-08-06 did not record the DateTime they were sent, so are not included
             items = items.ToList().Where(t => t.Sent > new DateTime(2020, 8, 6));
-
-            foreach (var item in items)
-            {
-                item.Application = await _applications.GetByIdAsync(item.AppId);
-            }
 
             return await base.MapAsync(items);
         }
