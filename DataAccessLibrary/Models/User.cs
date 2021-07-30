@@ -2,11 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 using TobyMeehan.Com.Data.Collections;
-using TobyMeehan.Sql.QueryBuilder;
 
 namespace TobyMeehan.Com.Data.Models
 {
-    [SqlName("users")]
     public class User : EntityBase
     {
         public string Username { get; set; }

@@ -2,11 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 using TobyMeehan.Com.Data.Collections;
-using TobyMeehan.Sql.QueryBuilder;
 
 namespace TobyMeehan.Com.Data.Models
 {
-    [SqlName("downloads")]
     public class Download : EntityBase
     {
         public string Title { get; set; }
