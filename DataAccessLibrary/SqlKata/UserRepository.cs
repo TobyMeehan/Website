@@ -82,6 +82,13 @@ namespace TobyMeehan.Com.Data.SqlKata
             return await SelectAsync(query => query.Where("roles.Name", name));
         }
 
+        public async Task<IEntityCollection<User>> GetByDownloadAsync(string downloadId)
+        {
+            var authors = new Query("downloadauthors").Select("UserId").Where("DownloadId", downloadId);
+
+            return await SelectAsync(query => query.WhereIn("Id", authors));
+        }
+
         public async Task<User> GetByUsernameAsync(string username)
         {
             return await SelectSingleAsync(query => query.Where("Username", username));

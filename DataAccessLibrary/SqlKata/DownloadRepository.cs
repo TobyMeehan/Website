@@ -25,14 +25,12 @@ namespace TobyMeehan.Com.Data.SqlKata
         protected override Query Query()
         {
             var files = new Query("downloadfiles").OrderBy("Filename");
-            var authors = new Query("downloadauthors");
 
             return base.Query()
                 .From("downloads")
                 .OrderByDesc("Updated")
                 .OrderBy("Title")
-                .LeftJoin(files.As("files"), j => j.On("files.DownloadId", "downloads.Id"))
-                .LeftJoin(authors.As("authors"), j => j.On("authors.DownloadId", "downloads.Id"));
+                .LeftJoin(files.As("files"), j => j.On("files.DownloadId", "downloads.Id"));
         }
 
         protected override async Task<IEntityCollection<Download>> MapAsync(IEnumerable<Download> items)
@@ -74,7 +72,9 @@ namespace TobyMeehan.Com.Data.SqlKata
 
         public async Task<IEntityCollection<Download>> GetByAuthorAsync(string userId)
         {
-            return await SelectAsync(query => query.Where("authors.UserId", userId));
+            var author = new Query("downloadauthors").Select("DownloadId").Where("UserId", userId);
+
+            return await SelectAsync(query => query.WhereIn("Id", author));
         }
 
         public async Task<Download> GetByIdAsync(string id)
