@@ -10,8 +10,6 @@ using TobyMeehan.Com.Data.CloudStorage;
 using TobyMeehan.Com.Data.Models;
 using TobyMeehan.Com.Data.Repositories;
 using TobyMeehan.Com.Data.Security;
-using TobyMeehan.Com.Data.Sql;
-using TobyMeehan.Sql;
 
 namespace TobyMeehan.Com.Data.Configuration
 {
@@ -31,32 +29,20 @@ namespace TobyMeehan.Com.Data.Configuration
             var compiler = new MySqlCompiler();
             Services.AddSingleton<Func<QueryFactory>>(() => new QueryFactory(connectionFactory.Invoke(), compiler));
 
-            Services.AddTransient<ISqlTable<User>, UserTable>();
-            Services.AddTransient<ISqlTable<Application>, ApplicationTable>();
-            Services.AddTransient<ISqlTable<Connection>, ConnectionTable>();
-            Services.AddTransient<ISqlTable<Objective>, ScoreboardTable>();
-            Services.AddTransient<ISqlTable<Download>, DownloadTable>();
-            Services.AddTransient<ISqlTable<Conversation>, ConversationTable>();
-            Services.AddTransient(typeof(ISqlTable<>), typeof(SqlTable<>));
+            Services.AddTransient<IUserRepository, SqlKata.UserRepository>();
+            Services.AddTransient<IRoleRepository, SqlKata.RoleRepository>();
+            Services.AddTransient<ITransactionRepository, SqlKata.TransactionRepository>();
 
+            Services.AddTransient<IDownloadRepository, SqlKata.DownloadRepository>();
+            Services.AddTransient<IDownloadFileRepository, SqlKata.DownloadFileRepository>();
 
-            Services.AddTransient<IUserRepository, SqlUserRepository>();
-            Services.AddTransient<IRoleRepository, SqlRoleRepository>();
-            Services.AddTransient<ITransactionRepository, TransactionRepository>();
+            Services.AddTransient<IApplicationRepository, SqlKata.ApplicationRepository>();
+            Services.AddTransient<IConnectionRepository, SqlKata.ConnectionRepository>();
+            Services.AddTransient<IOAuthSessionRepository, SqlKata.OAuthSessionRepository>();
 
-            Services.AddTransient<IDownloadRepository, SqlDownloadRepository>();
-            Services.AddTransient<IDownloadFileRepository, DownloadFileRepository>();
+            Services.AddTransient<IScoreboardRepository, SqlKata.ScoreboardRepository>();
 
-            Services.AddTransient<IApplicationRepository, SqlApplicationRepository>();
-            Services.AddTransient<IConnectionRepository, SqlConnectionRepository>();
-            Services.AddTransient<IOAuthSessionRepository, SqlOAuthSessionRepository>();
-
-            Services.AddTransient<IScoreboardRepository, ScoreboardRepository>();
-
-            Services.AddTransient<IMessageRepository, SqlMessageRepository>();
-            Services.AddTransient<ICommentRepository, SqlCommentRepository>();
-
-            Services.AddTransient<IButtonRepository, SqlButtonRepository>();
+            Services.AddTransient<ICommentRepository, SqlKata.CommentRepository>();
 
             return this;
         }
