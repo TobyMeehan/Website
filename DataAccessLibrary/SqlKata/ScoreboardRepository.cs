@@ -24,7 +24,7 @@ namespace TobyMeehan.Com.Data.SqlKata
 
         protected override Query Query()
         {
-            var scores = new Query("scores").OrderByDesc("Value");
+            var scores = new Query("scoreboard").OrderByDesc("Value");
 
             return base.Query()
                 .From("objectives")
@@ -90,26 +90,27 @@ namespace TobyMeehan.Com.Data.SqlKata
 
         public async Task SetScoreAsync(string id, string userId, int value)
         {
-            using (QueryFactory db = _queryFactory.Invoke())
+            using QueryFactory db = _queryFactory.Invoke();
+
+            var score = await db.Query("scoreboard").Where("ObjectiveId", id).Where("UserId", userId).FirstOrDefaultAsync<Score>();
+
+            if (score == null)
             {
-                var score = await db.Query("scores").Where("ObjectiveId", id).Where("UserId", userId).FirstOrDefaultAsync<Score>();
+                score.Id = Guid.NewGuid().ToToken();
 
-                if (score == null)
+                await db.Query("scoreboard").InsertAsync(new
                 {
-                    score.Id = await db.Query("scores").InsertGetIdAsync<string>(new
-                    {
-                        Id = Guid.NewGuid().ToToken(),
-                        ObjectiveId = id,
-                        UserId = userId,
-                        Value = 0
-                    });
-                }
-
-                await db.Query("scores").Where("Id", score.Id).UpdateAsync(new
-                {
-                    Value = value
+                    score.Id,
+                    ObjectiveId = id,
+                    UserId = userId,
+                    Value = 0
                 });
             }
+
+            await db.Query("scores").Where("Id", score.Id).UpdateAsync(new
+            {
+                Value = value
+            });
         }
     }
 }
