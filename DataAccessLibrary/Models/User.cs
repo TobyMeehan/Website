@@ -14,6 +14,6 @@ namespace TobyMeehan.Com.Data.Models
         public string HashedPassword { get; set; }
         public string Description { get; set; }
         public string ProfilePictureUrl { get; set; }
-        public IEntityCollection<Role> Roles { get; set; } = new EntityCollection<Role>();
+        public IList<Role> Roles { get; set; }
     }
 }

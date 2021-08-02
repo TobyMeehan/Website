@@ -15,7 +15,7 @@ namespace TobyMeehan.Com.Data.Models
 
         public DownloadVisibility Visibility { get; set; }
 
-        public IEntityCollection<DownloadFile> Files { get; set; } = new EntityCollection<DownloadFile>();
+        public IList<DownloadFile> Files { get; set; }
 
         public Version Version { get; set; }
         public string VersionString
@@ -32,7 +32,7 @@ namespace TobyMeehan.Com.Data.Models
 
         public DateTime? Updated { get; set; }
 
-        public IEntityCollection<User> Authors { get; set; } = new EntityCollection<User>();
+        public IEntityCollection<User> Authors { get; set; }
 
         public DownloadVerification Verified { get; set; }
     }

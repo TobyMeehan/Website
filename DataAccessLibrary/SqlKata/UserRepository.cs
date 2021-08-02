@@ -45,7 +45,10 @@ namespace TobyMeehan.Com.Data.SqlKata
                 .From("users")
                 .OrderBy("Username")
                 .LeftJoin(userroles.As("userroles"), j => j.On("userroles.UserId", "users.Id"))
-                .LeftJoin(roles.As("roles"), j => j.On("roles.Id", "userroles.RoleId"));
+                .LeftJoin(roles.As("roles"), j => j.On("roles.Id", "userroles.RoleId"))
+
+                .Select("users.{Id, Username, VanityUrl, Balance, Description, ProfilePictureUrl}",
+                        "roles.Id AS Roles_Id", "roles.Name AS Roles_Name");
         }
 
 
@@ -201,7 +204,7 @@ namespace TobyMeehan.Com.Data.SqlKata
         {
             using (QueryFactory db = _queryFactory.Invoke())
             {
-                await db.Query("users").InsertAsync(new
+                await db.Query("userroles").InsertAsync(new
                 {
                     UserId = id,
                     RoleId = roleId
@@ -257,7 +260,12 @@ namespace TobyMeehan.Com.Data.SqlKata
 
         public async Task<AuthenticationResult<User>> AuthenticateAsync(string username, string password)
         {
-            User user = await GetByUsernameAsync(username);
+            User user;
+
+            using (QueryFactory db = _queryFactory.Invoke())
+            {
+                user = await db.Query("users").Where("Username", username).Select("HashedPassword").FirstOrDefaultAsync<User>();
+            }
 
             if (user == null)
             {
@@ -269,7 +277,7 @@ namespace TobyMeehan.Com.Data.SqlKata
                 return new AuthenticationResult<User>();
             }
 
-            return new AuthenticationResult<User>(user);
+            return new AuthenticationResult<User>(await GetByUsernameAsync(username));
         }
     }
 }

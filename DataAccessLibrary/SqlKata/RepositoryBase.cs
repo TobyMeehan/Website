@@ -1,4 +1,5 @@
-﻿using SqlKata;
+﻿using Slapper;
+using SqlKata;
 using SqlKata.Execution;
 using System;
 using System.Collections.Generic;
@@ -33,22 +34,23 @@ namespace TobyMeehan.Com.Data.SqlKata
         {
             using (QueryFactory db = _queryFactory.Invoke())
             {
-                Query query = Query();
+                Query query = Query().ForPage(page, perPage);
 
                 if (queryFunc != null)
                 {
                     query = queryFunc.Invoke(query);
                 }
 
-                var currentPage = await db.PaginateAsync<T>(query, page, perPage);
+                var result = await db.GetAsync(query);
+                var list = AutoMapper.MapDynamic<T>(result);
 
-                return await MapAsync(currentPage.List);
+                return await MapAsync(list);
             }
         }
 
         protected async Task<T> SelectSingleAsync(Func<Query, Query> queryFunc = null)
         {
-            var list = await SelectAsync(queryFunc, perPage: 1);
+            var list = await SelectAsync(queryFunc);
 
             return list.FirstOrDefault();
         }

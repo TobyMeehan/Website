@@ -30,7 +30,10 @@ namespace TobyMeehan.Com.Data.SqlKata
                 .From("downloads")
                 .OrderByDesc("Updated")
                 .OrderBy("Title")
-                .LeftJoin(files.As("files"), j => j.On("files.DownloadId", "downloads.Id"));
+                .LeftJoin(files.As("files"), j => j.On("files.DownloadId", "downloads.Id"))
+
+                .Select("downloads.{Id, Title, ShortDescription, LongDescription, Visibility, VersionString, Updated, Verified}",
+                        "files.Id AS Files_Id", "files.Filename AS Files_Filename", "files.Url AS Files_Url");
         }
 
         protected override async Task<IEntityCollection<Download>> MapAsync(IEnumerable<Download> items)
@@ -58,6 +61,8 @@ namespace TobyMeehan.Com.Data.SqlKata
                     VersionString = version.ToString(),
                     Updated = DateTime.Now
                 });
+
+                await AddAuthorAsync(id, userId);
 
                 return await GetByIdAsync(id);
             }

@@ -28,7 +28,10 @@ namespace TobyMeehan.Com.Data.SqlKata
             return base.Query()
                 .From("transactions")
                 .OrderByDesc("Sent")
-                .LeftJoin(apps.As("apps"), j => j.On("apps.Id", "transactions.AppId"));
+                .LeftJoin(apps.As("apps"), j => j.On("apps.Id", "transactions.AppId"))
+
+                .Select("transactions.{Id, UserId, AppId, Description, Amount, Sent}",
+                        "apps.Id AS Application_Id", "apps.UserId AS Application_UserId", "apps.Name AS Application_Name", "apps.Description AS Application_Description", "apps.IconUrl AS Application_IconUrl", "apps.RedirectUri AS Application_RedirectUri");
         }
 
         protected override async Task<IEntityCollection<Transaction>> MapAsync(IEnumerable<Transaction> items)
@@ -69,7 +72,7 @@ namespace TobyMeehan.Com.Data.SqlKata
 
         public async Task<IEntityCollection<Transaction>> GetByUserAsync(string userId)
         {
-            return await SelectAsync(query => query.Where("UserId", userId));
+            return await SelectAsync(query => query.Where("transactions.UserId", userId));
         }
     }
 }
