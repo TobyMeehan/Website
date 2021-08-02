@@ -29,7 +29,10 @@ namespace TobyMeehan.Com.Data.SqlKata
             return base.Query()
                 .From("objectives")
                 .OrderBy("Name")
-                .LeftJoin(scores.As("scores"), j => j.On("scores.ObjectiveId", "objectives.Id"));
+                .LeftJoin(scores.As("scores"), j => j.On("scores.ObjectiveId", "objectives.Id"))
+
+                .Select("objectives.{Id, AppId, Name}",
+                        "scores.Id AS Scores_Id", "scores.UserId AS Scores_UserId", "scores.Value AS Scores_Value");
         }
 
         protected override async Task<IEntityCollection<Objective>> MapAsync(IEnumerable<Objective> items)
