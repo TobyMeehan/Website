@@ -50,22 +50,24 @@ namespace TobyMeehan.Com.Data.SqlKata
 
         public async Task<Download> AddAsync(string title, string shortDescription, string longDescription, Version version, string userId)
         {
+            string id = RandomString.GeneratePseudo();
+
             using (QueryFactory db = _queryFactory.Invoke())
             {
-                string id = await db.Query("downloads").InsertGetIdAsync<string>(new
+                await db.Query("downloads").InsertAsync(new
                 {
-                    Id = RandomString.GeneratePseudo(),
+                    Id = id,
                     Title = title,
                     ShortDescription = shortDescription,
                     LongDescription = longDescription,
                     VersionString = version.ToString(),
                     Updated = DateTime.Now
                 });
-
-                await AddAuthorAsync(id, userId);
-
-                return await GetByIdAsync(id);
             }
+
+            await AddAuthorAsync(id, userId);
+
+            return await GetByIdAsync(id);
         }
 
 

@@ -46,11 +46,13 @@ namespace TobyMeehan.Com.Data.SqlKata
 
         public async Task<OAuthSession> AddAsync(string connectionId, string redirectUri, string scope, string codeChallenge, DateTime? expiry = null)
         {
+            string id = Guid.NewGuid().ToString();
+
             using (QueryFactory db = _queryFactory.Invoke())
             {
-                string id = await db.Query("oauthsessions").InsertGetIdAsync<string>(new
+                await db.Query("oauthsessions").InsertAsync(new
                 {
-                    Id = Guid.NewGuid().ToString(),
+                    Id = id,
                     ConnectionId = connectionId,
                     AuthorizationCode = Guid.NewGuid().ToToken(),
                     RedirectUri = redirectUri,
@@ -58,9 +60,9 @@ namespace TobyMeehan.Com.Data.SqlKata
                     CodeChallenge = codeChallenge,
                     Expiry = expiry ?? DateTime.Now.AddMinutes(30)
                 });
-
-                return await GetByIdAsync(id);
             }
+
+            return await GetByIdAsync(id);
         }
 
 

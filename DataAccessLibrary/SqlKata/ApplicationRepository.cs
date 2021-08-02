@@ -56,19 +56,21 @@ namespace TobyMeehan.Com.Data.SqlKata
 
         public async Task<Application> AddAsync(string userId, string name, string redirectUri, bool secret)
         {
+            string id = Guid.NewGuid().ToString();
+
             using (QueryFactory db = _queryFactory.Invoke())
             {
-                string id = await db.Query("applications").InsertGetIdAsync<string>(new
+                await db.Query("applications").InsertAsync(new
                 {
-                    Id = Guid.NewGuid().ToString(),
+                    Id = id,
                     UserId = userId,
                     Name = name,
                     RedirectUri = redirectUri,
                     Secret = secret ? Guid.NewGuid().ToToken() : null
                 });
-
-                return await GetByIdAsync(id);
             }
+
+            return await GetByIdAsync(id);
         }
 
 

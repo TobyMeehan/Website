@@ -55,17 +55,19 @@ namespace TobyMeehan.Com.Data.SqlKata
 
         public async Task<User> AddAsync(string username, string password)
         {
+            string id = Guid.NewGuid().ToString();
+
             using (QueryFactory db = _queryFactory.Invoke())
             {
-                string id = await db.Query("users").InsertGetIdAsync<string>(new
+                await db.Query("users").InsertAsync(new
                 {
-                    Id = Guid.NewGuid().ToString(),
+                    Id = id,
                     Username = username,
                     HashedPassword = _passwordHash.HashPassword(password)
                 });
-
-                return await GetByIdAsync(id);
             }
+
+            return await GetByIdAsync(id);
         }
 
 

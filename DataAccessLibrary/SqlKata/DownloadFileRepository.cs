@@ -52,9 +52,9 @@ namespace TobyMeehan.Com.Data.SqlKata
                     Filename = filename,
                     Url = cf.DownloadLink
                 });
-
-                return await GetByIdAsync(id);
             }
+
+            return await GetByIdAsync(id);
         }
 
 

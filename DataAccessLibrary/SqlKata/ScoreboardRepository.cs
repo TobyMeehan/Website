@@ -49,17 +49,19 @@ namespace TobyMeehan.Com.Data.SqlKata
 
         public async Task<Objective> AddAsync(string appId, string objectiveName)
         {
+            string id = Guid.NewGuid().ToToken();
+
             using (QueryFactory db = _queryFactory.Invoke())
             {
-                string id = await db.Query("objectives").InsertGetIdAsync<string>(new
+                await db.Query("objectives").InsertAsync(new
                 {
-                    Id = Guid.NewGuid().ToToken(),
+                    Id = id,
                     AppId = appId,
                     Name = objectiveName
                 });
-
-                return await GetByIdAsync(id);
             }
+
+            return await GetByIdAsync(id);
         }
 
 

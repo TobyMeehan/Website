@@ -44,20 +44,22 @@ namespace TobyMeehan.Com.Data.SqlKata
 
         public async Task<Transaction> AddAsync(string userId, string appId, string description, int amount)
         {
+            string id = Guid.NewGuid().ToToken();
+
             using (QueryFactory db = _queryFactory.Invoke())
             {
-                string id = await db.Query("transactions").InsertGetIdAsync<string>(new 
+                await db.Query("transactions").InsertAsync(new 
                 { 
-                    Id = Guid.NewGuid().ToToken(),
+                    Id = id,
                     UserId = userId,
                     AppId = appId,
                     Description = description,
                     Amout = amount,
                     Sent = DateTime.Now
                 });
-
-                return await GetByIdAsync(id);
             }
+
+            return await GetByIdAsync(id);
         }
 
         public async Task<IEntityCollection<Transaction>> GetAsync()

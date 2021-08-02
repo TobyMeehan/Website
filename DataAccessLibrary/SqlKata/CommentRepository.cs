@@ -43,19 +43,21 @@ namespace TobyMeehan.Com.Data.SqlKata
 
         public async Task<Comment> AddAsync(string entityId, string userId, string content)
         {
+            string id = Guid.NewGuid().ToString();
+
             using (QueryFactory db = _queryFactory.Invoke())
             {
-                string id = await db.Query("comments").InsertGetIdAsync<string>(new
+                await db.Query("comments").InsertAsync(new
                 {
-                    Id = Guid.NewGuid().ToString(),
+                    Id = id,
                     UserId = userId,
                     Content = content,
                     Sent = DateTime.Now,
                     EntityId = entityId
                 });
-
-                return await GetByIdAsync(id);
             }
+
+            return await GetByIdAsync(id);
         }
 
 
