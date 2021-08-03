@@ -21,6 +21,11 @@ namespace TobyMeehan.Com.Data.CloudStorage
             throw new NotImplementedException();
         }
 
+        public Task RenameFileAsync(string bucket, string objectName, string filename)
+        {
+            throw new NotImplementedException();
+        }
+
         public Task<CloudFile> UploadFileAsync(Stream stream, string bucket, string objectName, string filename, string contentType, CancellationToken cancellationToken = default, IProgress<IUploadProgress> progress = null)
         {
             throw new NotImplementedException();
