@@ -25,16 +25,29 @@ namespace TobyMeehan.Com.Data.SqlKata
             return new Query();
         }
 
+        private Query Query(int page, int perPage)
+        {
+            var query = Query();
+            var clause = query.Clauses.FirstOrDefault(c => c is FromClause) as FromClause;
+
+            if (clause == null)
+            {
+                return query.Limit(200);
+            }
+
+            return query.From(new Query(clause.Table).ForPage(page, perPage).As(clause.Alias));
+        }
+
         protected virtual Task<IEntityCollection<T>> MapAsync(IEnumerable<T> items) 
         {
             return Task.FromResult<IEntityCollection<T>>(new EntityCollection<T>(items));
         }
 
-        protected async Task<IEntityCollection<T>> SelectAsync(Func<Query, Query> queryFunc = null, int page = 1, int perPage = 50)
+        protected async Task<IEntityCollection<T>> SelectAsync(Func<Query, Query> queryFunc = null, int page = 1, int perPage = 200)
         {
             using (QueryFactory db = _queryFactory.Invoke())
             {
-                Query query = Query().ForPage(page, perPage);
+                Query query = Query(page, perPage);
 
                 if (queryFunc != null)
                 {
