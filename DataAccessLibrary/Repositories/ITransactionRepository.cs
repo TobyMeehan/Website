@@ -10,6 +10,7 @@ namespace TobyMeehan.Com.Data.Repositories
         Task<Transaction> AddAsync(string userId, string appId, string description, int amount);
         Task<IEntityCollection<Transaction>> GetAsync();
         Task<Transaction> GetByIdAsync(string id);
-        Task<IEntityCollection<Transaction>> GetByUserAsync(string userId);
+        Task<int> TotalPagesForUserAsync(string userId, int perPage = 15);
+        Task<IEntityCollection<Transaction>> GetByUserAsync(string userId, int page = 1, int perPage = 15);
     }
 }

@@ -72,9 +72,18 @@ namespace TobyMeehan.Com.Data.SqlKata
             return await SelectSingleAsync(query => query.Where("transactions.Id", id));
         }
 
-        public async Task<IEntityCollection<Transaction>> GetByUserAsync(string userId)
+        public async Task<IEntityCollection<Transaction>> GetByUserAsync(string userId, int page = 1, int perPage = 15)
         {
-            return await SelectAsync(query => query.Where("transactions.UserId", userId));
+            return await SelectAsync(query => query.Where("transactions.UserId", userId), page, perPage);
+        }
+        public async Task<int> TotalPagesForUserAsync(string userId, int perPage = 15)
+        {
+            using (QueryFactory db = _queryFactory.Invoke())
+            {
+                decimal count = (decimal)(await db.Query("transactions").SelectRaw("COUNT(*) AS Count").Where("UserId", userId).FirstAsync()).Count;
+
+                return (int)Math.Ceiling(perPage / count);
+            }
         }
     }
 }
