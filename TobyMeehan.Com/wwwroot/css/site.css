@@ -163,6 +163,11 @@ i.avatar-medium {
     border-radius: 50%;
 }
 
+.comment:hover {
+    background-color: #343a40;
+    border-radius: .25rem;
+}
+
 .align-centre {
     margin: 0;
     position: absolute;
