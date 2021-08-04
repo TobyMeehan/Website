@@ -1,0 +1,29 @@
+﻿@inherits LayoutComponentBase
+@layout DefaultLayout
+
+<div class="d-md-flex justify-content-between text-center text-md-left mb-3">
+    <h1>Downloads</h1>
+
+    <AuthorizeView Policy="@AuthorizationPolicies.IsVerified">
+        <a class="btn btn-primary btn-lg my-auto" href="/downloads/add">New Download</a>
+    </AuthorizeView>
+</div>
+
+<AuthorizeView Policy="@AuthorizationPolicies.IsVerified">
+    <ul class="nav nav-tabs mb-3" role="tablist">
+        <li class="nav-item">
+            <NavLink class="nav-link text-light" href="/downloads" Match="NavLinkMatch.All">
+                <i class="fas fa-home"></i>
+                Home
+            </NavLink>
+        </li>
+        <li class="nav-item">
+            <NavLink class="nav-link text-light" href="/downloads/library" Match="NavLinkMatch.All">
+                <i class="fas fa-th-list"></i>
+                Library
+            </NavLink>
+        </li>
+    </ul>
+</AuthorizeView>
+
+@Body

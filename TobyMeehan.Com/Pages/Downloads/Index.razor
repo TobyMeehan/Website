@@ -1,16 +1,8 @@
 ﻿@page "/downloads"
+@layout IndexLayout
 
 <Title>Downloads</Title>
 
-<div class="d-md-flex justify-content-between text-center text-md-left">
-    <h1>Downloads</h1>
-
-    <AuthorizeView Policy="@AuthorizationPolicies.IsVerified">
-        <a class="btn btn-primary btn-lg my-auto" href="/downloads/add">New Download</a>
-    </AuthorizeView>
-</div>
-
-<hr />
 
 @if (_downloads == null)
 {
@@ -18,10 +10,5 @@
 }
 else
 {
-    <h3>Unlisted (@_unlisted?.Count)</h3>
-    <DownloadCardDeck Downloads="_unlisted"></DownloadCardDeck>
-
-    <hr />
-
     <DownloadCardDeck Downloads="_downloads"></DownloadCardDeck>
 }

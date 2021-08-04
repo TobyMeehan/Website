@@ -15,21 +15,11 @@ namespace TobyMeehan.Com.Pages.Downloads
     {
         [Inject] private IDownloadRepository downloads { get; set; }
 
-        [CascadingParameter] public Task<AuthenticationState> AuthenticationStateTask { get; set; }
-
         private IList<Download> _downloads;
-        private IList<Download> _unlisted;
-
-        private AuthenticationState _context;
 
         protected override async Task OnInitializedAsync()
         {
-            _context = await AuthenticationStateTask;
-
             var list = await Task.Run(downloads.GetAsync);
-            var unlist = await Task.Run(() => downloads.GetByAuthorAsync(_context.User.Id()));
-
-            _unlisted = unlist.Where(d => d.Visibility == DownloadVisibility.Unlisted).ToList();
             _downloads = list.Where(d => d.Visibility == DownloadVisibility.Public).ToList();
         }
     }
