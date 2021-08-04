@@ -29,11 +29,11 @@ namespace TobyMeehan.Com.Data.CloudStorage
             return $"https://storage.googleapis.com/{obj.Bucket}/{obj.Name}";
         }
 
-        public async Task DeleteFileAsync(string bucket, string filename)
+        public async Task DeleteFileAsync(string bucket, string objectName)
         {
             using (StorageClient client = await StorageClient.CreateAsync(_credential))
             {
-                await client.DeleteObjectAsync(bucket, filename);
+                await client.DeleteObjectAsync(bucket, objectName);
             }
         }
 
@@ -67,11 +67,23 @@ namespace TobyMeehan.Com.Data.CloudStorage
             }
         }
 
-        public async Task DownloadFileAsync(string bucket, string filename, Stream destination)
+        public async Task DownloadFileAsync(string bucket, string objectName, Stream destination)
         {
             using (StorageClient client = await StorageClient.CreateAsync(_credential))
             {
-                await client.DownloadObjectAsync(bucket, filename, destination);
+                await client.DownloadObjectAsync(bucket, objectName, destination);
+            }
+        }
+
+        public async Task RenameFileAsync(string bucket, string objectName, string filename)
+        {
+            using (StorageClient client = await StorageClient.CreateAsync(_credential))
+            {
+                var dataObject = await client.GetObjectAsync(bucket, objectName);
+
+                dataObject.ContentDisposition = $"filename=\"{filename}\"";
+
+                await client.PatchObjectAsync(dataObject);
             }
         }
     }

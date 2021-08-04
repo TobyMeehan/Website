@@ -28,16 +28,18 @@ namespace TobyMeehan.Com.Data.SqlKata
 
         public async Task<Role> AddAsync(string name)
         {
+            string id = Guid.NewGuid().ToString();
+
             using (QueryFactory db = _queryFactory.Invoke())
             {
-                string id = await db.Query("roles").InsertGetIdAsync<string>(new
+                await db.Query("roles").InsertAsync(new
                 {
-                    Id = Guid.NewGuid().ToString(),
+                    Id = id,
                     Name = name
                 });
-
-                return await GetByIdAsync(id);
             }
+
+            return await GetByIdAsync(id);
         }
 
 
@@ -49,7 +51,7 @@ namespace TobyMeehan.Com.Data.SqlKata
 
         public async Task<Role> GetByIdAsync(string id)
         {
-            return await SelectSingleAsync(query => query.Where("Id", id));
+            return await SelectSingleAsync(query => query.Where("roles.Id", id));
         }
 
         public async Task<Role> GetByNameAsync(string name)

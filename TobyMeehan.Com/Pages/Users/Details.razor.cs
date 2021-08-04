@@ -71,7 +71,20 @@ namespace TobyMeehan.Com.Pages.Users
 
         private async Task RefreshRoles()
         {
-            _user = await Task.Run(() => users.GetByVanityUrlAsync(Url));
+            if (await users.AnyVanityUrlAsync(Url))
+            {
+                _user = await Task.Run(() => users.GetByVanityUrlAsync(Url));
+            }
+            else
+            {
+                _user = await Task.Run(() => users.GetByIdAsync(Url));
+            }
+
+            if (_user == null)
+            {
+                // TODO: not found
+            }
+
             _unusedRoles = (await Task.Run(roles.GetAsync))
                 .Where(x => !_user.Roles.Any(r => r == x))
                 .ToList();

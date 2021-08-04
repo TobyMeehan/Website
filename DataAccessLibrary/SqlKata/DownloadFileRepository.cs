@@ -33,7 +33,8 @@ namespace TobyMeehan.Com.Data.SqlKata
         protected override Query Query()
         {
             return base.Query()
-                .From("downloadfiles");
+                .From("downloadfiles")
+                .OrderBy("Filename");
         }
 
         public async Task<DownloadFile> AddAsync(string downloadId, string filename, Stream uploadStream, CancellationToken cancellationToken = default, IProgress<IUploadProgress> progress = null)
@@ -52,9 +53,9 @@ namespace TobyMeehan.Com.Data.SqlKata
                     Filename = filename,
                     Url = cf.DownloadLink
                 });
-
-                return await GetByIdAsync(id);
             }
+
+            return await GetByIdAsync(id);
         }
 
 
@@ -81,13 +82,30 @@ namespace TobyMeehan.Com.Data.SqlKata
 
         public async Task<DownloadFile> GetByIdAsync(string id)
         {
-            return await SelectSingleAsync(query => query.Where("Id", id));
+            return await SelectSingleAsync(query => query.Where("downloadfiles.Id", id));
+        }
+
+
+
+        public async Task UpdateFilenameAsync(string id, string filename)
+        {
+            await _storage.RenameFileAsync(_options.DownloadStorageBucket, id, filename);
+
+            using (QueryFactory db = _queryFactory.Invoke())
+            {
+                await db.Query("downloadfiles").Where("Id", id).UpdateAsync(new
+                {
+                    Filename = filename
+                });
+            }
         }
 
 
 
         public async Task DeleteAsync(string id)
         {
+            await _storage.DeleteFileAsync(_options.DownloadStorageBucket, id);
+
             using (QueryFactory db = _queryFactory.Invoke())
             {
                 await db.Query("downloadfiles").Where("Id", id).DeleteAsync();

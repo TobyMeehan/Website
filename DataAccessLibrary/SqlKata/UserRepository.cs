@@ -45,24 +45,29 @@ namespace TobyMeehan.Com.Data.SqlKata
                 .From("users")
                 .OrderBy("Username")
                 .LeftJoin(userroles.As("userroles"), j => j.On("userroles.UserId", "users.Id"))
-                .LeftJoin(roles.As("roles"), j => j.On("roles.Id", "userroles.RoleId"));
+                .LeftJoin(roles.As("roles"), j => j.On("roles.Id", "userroles.RoleId"))
+
+                .Select("users.{Id, Username, VanityUrl, Balance, Description, ProfilePictureUrl}",
+                        "roles.Id AS Roles_Id", "roles.Name AS Roles_Name");
         }
 
 
 
         public async Task<User> AddAsync(string username, string password)
         {
+            string id = Guid.NewGuid().ToString();
+
             using (QueryFactory db = _queryFactory.Invoke())
             {
-                string id = await db.Query("users").InsertGetIdAsync<string>(new
+                await db.Query("users").InsertAsync(new
                 {
-                    Id = Guid.NewGuid().ToString(),
+                    Id = id,
                     Username = username,
                     HashedPassword = _passwordHash.HashPassword(password)
                 });
-
-                return await GetByIdAsync(id);
             }
+
+            return await GetByIdAsync(id);
         }
 
 
@@ -74,19 +79,21 @@ namespace TobyMeehan.Com.Data.SqlKata
 
         public async Task<User> GetByIdAsync(string id)
         {
-            return await SelectSingleAsync(query => query.Where("Id", id));
+            return await SelectSingleAsync(query => query.Where("users.Id", id));
         }
 
         public async Task<IEntityCollection<User>> GetByRoleAsync(string name)
         {
-            return await SelectAsync(query => query.Where("roles.Name", name));
+            var roles = new Query("userroles").Select("UserId").Where("Name", name);
+
+            return await SelectAsync(query => query.WhereIn("users.Id", roles));
         }
 
         public async Task<IEntityCollection<User>> GetByDownloadAsync(string downloadId)
         {
             var authors = new Query("downloadauthors").Select("UserId").Where("DownloadId", downloadId);
 
-            return await SelectAsync(query => query.WhereIn("Id", authors));
+            return await SelectAsync(query => query.WhereIn("users.Id", authors));
         }
 
         public async Task<User> GetByUsernameAsync(string username)
@@ -199,7 +206,7 @@ namespace TobyMeehan.Com.Data.SqlKata
         {
             using (QueryFactory db = _queryFactory.Invoke())
             {
-                await db.Query("users").InsertAsync(new
+                await db.Query("userroles").InsertAsync(new
                 {
                     UserId = id,
                     RoleId = roleId
@@ -255,7 +262,12 @@ namespace TobyMeehan.Com.Data.SqlKata
 
         public async Task<AuthenticationResult<User>> AuthenticateAsync(string username, string password)
         {
-            User user = await GetByUsernameAsync(username);
+            User user;
+
+            using (QueryFactory db = _queryFactory.Invoke())
+            {
+                user = await db.Query("users").Where("Username", username).Select("HashedPassword").FirstOrDefaultAsync<User>();
+            }
 
             if (user == null)
             {
@@ -267,7 +279,7 @@ namespace TobyMeehan.Com.Data.SqlKata
                 return new AuthenticationResult<User>();
             }
 
-            return new AuthenticationResult<User>(user);
+            return new AuthenticationResult<User>(await GetByUsernameAsync(username));
         }
     }
 }

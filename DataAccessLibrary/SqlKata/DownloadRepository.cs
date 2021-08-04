@@ -30,7 +30,10 @@ namespace TobyMeehan.Com.Data.SqlKata
                 .From("downloads")
                 .OrderByDesc("Updated")
                 .OrderBy("Title")
-                .LeftJoin(files.As("files"), j => j.On("files.DownloadId", "downloads.Id"));
+                .LeftJoin(files.As("files"), j => j.On("files.DownloadId", "downloads.Id"))
+
+                .Select("downloads.{Id, Title, ShortDescription, LongDescription, Visibility, VersionString, Updated, Verified}",
+                        "files.Id AS Files_Id", "files.Filename AS Files_Filename", "files.Url AS Files_Url");
         }
 
         protected override async Task<IEntityCollection<Download>> MapAsync(IEnumerable<Download> items)
@@ -47,20 +50,24 @@ namespace TobyMeehan.Com.Data.SqlKata
 
         public async Task<Download> AddAsync(string title, string shortDescription, string longDescription, Version version, string userId)
         {
+            string id = RandomString.GeneratePseudo();
+
             using (QueryFactory db = _queryFactory.Invoke())
             {
-                string id = await db.Query("downloads").InsertGetIdAsync<string>(new
+                await db.Query("downloads").InsertAsync(new
                 {
-                    Id = RandomString.GeneratePseudo(),
+                    Id = id,
                     Title = title,
                     ShortDescription = shortDescription,
                     LongDescription = longDescription,
                     VersionString = version.ToString(),
                     Updated = DateTime.Now
                 });
-
-                return await GetByIdAsync(id);
             }
+
+            await AddAuthorAsync(id, userId);
+
+            return await GetByIdAsync(id);
         }
 
 
@@ -74,12 +81,12 @@ namespace TobyMeehan.Com.Data.SqlKata
         {
             var author = new Query("downloadauthors").Select("DownloadId").Where("UserId", userId);
 
-            return await SelectAsync(query => query.WhereIn("Id", author));
+            return await SelectAsync(query => query.WhereIn("downloads.Id", author));
         }
 
         public async Task<Download> GetByIdAsync(string id)
         {
-            return await SelectSingleAsync(query => query.Where("Id", id));
+            return await SelectSingleAsync(query => query.Where("downloads.Id", id));
         }
 
 

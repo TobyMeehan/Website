@@ -24,12 +24,15 @@ namespace TobyMeehan.Com.Data.SqlKata
 
         protected override Query Query()
         {
-            var scores = new Query("scores").OrderByDesc("Value");
+            var scores = new Query("scoreboard").OrderByDesc("Value");
 
             return base.Query()
                 .From("objectives")
                 .OrderBy("Name")
-                .LeftJoin(scores.As("scores"), j => j.On("scores.ObjectiveId", "objectives.Id"));
+                .LeftJoin(scores.As("scores"), j => j.On("scores.ObjectiveId", "objectives.Id"))
+
+                .Select("objectives.{Id, AppId, Name}",
+                        "scores.Id AS Scores_Id", "scores.UserId AS Scores_UserId", "scores.Value AS Scores_Value");
         }
 
         protected override async Task<IEntityCollection<Objective>> MapAsync(IEnumerable<Objective> items)
@@ -49,24 +52,26 @@ namespace TobyMeehan.Com.Data.SqlKata
 
         public async Task<Objective> AddAsync(string appId, string objectiveName)
         {
+            string id = Guid.NewGuid().ToToken();
+
             using (QueryFactory db = _queryFactory.Invoke())
             {
-                string id = await db.Query("objectives").InsertGetIdAsync<string>(new
+                await db.Query("objectives").InsertAsync(new
                 {
-                    Id = Guid.NewGuid().ToToken(),
+                    Id = id,
                     AppId = appId,
                     Name = objectiveName
                 });
-
-                return await GetByIdAsync(id);
             }
+
+            return await GetByIdAsync(id);
         }
 
 
 
         public async Task<Objective> GetByIdAsync(string id)
         {
-            return await SelectSingleAsync(query => query.Where("Id", id));
+            return await SelectSingleAsync(query => query.Where("objectives.Id", id));
         }
 
         public async Task<IEntityCollection<Objective>> GetByApplicationAsync(string appId)
@@ -88,26 +93,27 @@ namespace TobyMeehan.Com.Data.SqlKata
 
         public async Task SetScoreAsync(string id, string userId, int value)
         {
-            using (QueryFactory db = _queryFactory.Invoke())
+            using QueryFactory db = _queryFactory.Invoke();
+
+            var score = await db.Query("scoreboard").Where("ObjectiveId", id).Where("UserId", userId).FirstOrDefaultAsync<Score>();
+
+            if (score == null)
             {
-                var score = await db.Query("scores").Where("ObjectiveId", id).Where("UserId", userId).FirstOrDefaultAsync<Score>();
+                score.Id = Guid.NewGuid().ToToken();
 
-                if (score == null)
+                await db.Query("scoreboard").InsertAsync(new
                 {
-                    score.Id = await db.Query("scores").InsertGetIdAsync<string>(new
-                    {
-                        Id = Guid.NewGuid().ToToken(),
-                        ObjectiveId = id,
-                        UserId = userId,
-                        Value = 0
-                    });
-                }
-
-                await db.Query("scores").Where("Id", score.Id).UpdateAsync(new
-                {
-                    Value = value
+                    score.Id,
+                    ObjectiveId = id,
+                    UserId = userId,
+                    Value = 0
                 });
             }
+
+            await db.Query("scoreboard").Where("Id", score.Id).UpdateAsync(new
+            {
+                Value = value
+            });
         }
     }
 }

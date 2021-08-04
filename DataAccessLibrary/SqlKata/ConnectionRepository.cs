@@ -54,7 +54,7 @@ namespace TobyMeehan.Com.Data.SqlKata
 
         public async Task<Connection> GetByIdAsync(string id)
         {
-            return await SelectSingleAsync(query => query.Where("Id", id));
+            return await SelectSingleAsync(query => query.Where("connections.Id", id));
         }
 
         public async Task<IEntityCollection<Connection>> GetByUserAsync(string userId)
@@ -68,17 +68,19 @@ namespace TobyMeehan.Com.Data.SqlKata
 
             if (connection == null)
             {
+                string id = Guid.NewGuid().ToString();
+
                 using (QueryFactory db = _queryFactory.Invoke())
                 {
-                    string id = await db.Query("connections").InsertGetIdAsync<string>(new
+                    await db.Query("connections").InsertAsync(new
                     {
-                        Id = Guid.NewGuid().ToString(),
+                        Id = id,
                         UserId = userId,
                         AppId = appId
                     });
-
-                    connection = await GetByIdAsync(id);
                 }
+
+                connection = await GetByIdAsync(id);
             }
 
             return connection;

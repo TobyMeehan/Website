@@ -31,6 +31,14 @@ namespace TobyMeehan.Com.Pages.Settings
 
         private ServerSideValidator _usernameValidator;
         private UsernameViewModel _usernameModel = new UsernameViewModel();
+
+        protected override void OnInitialized()
+        {
+            _usernameModel.Username = CurrentUser.Username;
+
+            base.OnInitialized();
+        }
+
         private async Task UsernameForm_Submit()
         {
             string username = _usernameModel.Username;

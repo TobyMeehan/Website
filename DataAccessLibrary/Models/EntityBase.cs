@@ -8,7 +8,7 @@ namespace TobyMeehan.Com.Data.Models
 {
     public abstract class EntityBase
     {
-        public string Id { get; set; }
+        public string Id { get; set; } = "";
 
         public override bool Equals(object obj)
         {

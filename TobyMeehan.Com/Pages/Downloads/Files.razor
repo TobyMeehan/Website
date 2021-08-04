@@ -35,6 +35,7 @@ else
                                 <FileLink class="my-auto" Download="@_download.Id" Filename="@file.Filename">@file.Filename</FileLink>
                             </td>
                             <td>
+                                <button class="btn btn-sm btn-outline-primary" @onclick="() => SetRename(file)" data-toggle="modal" data-target="#RenameModal">Rename</button>
                                 <button class="btn btn-sm btn-outline-danger" @onclick="() => DeleteFile_Click(file)">Delete</button>
                             </td>
                         </tr>
@@ -70,11 +71,33 @@ else
                 </Body>
             </Table>
 
-            <table class="table table-hover table-sm">
-                <tbody>
-                    
-                </tbody>
-            </table>
+
+            <Modal id="RenameModal">
+                <Title>
+                    <i class="fas fa-pen"></i>
+                    Rename
+                </Title>
+                <Body>
+                    <EditForm Model="_filenameForm" Context="renameFormContext" OnValidSubmit="RenameFile_Submit">
+                        <DataAnnotationsValidator />
+                        <ServerSideValidator @ref="_serverSideValidator" />
+
+                        <div class="form-group">
+                            <InputFilename @bind-Value="_filenameForm.Filename" />
+                            <ValidationMessage For="() => _filenameForm.Filename" />
+                        </div>
+
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-primary">Rename</button>
+                        </div>
+
+                        <p>Due to browser caching, it may take time for users to see your new name.</p>
+
+                        <input type="hidden" @bind-value="_filenameForm.Id" />
+                    </EditForm>
+                </Body>
+            </Modal>
+
         </Authorized>
     </AuthorizeView>
 }

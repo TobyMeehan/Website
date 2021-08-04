@@ -15,11 +15,12 @@ namespace TobyMeehan.Com.Pages.Settings
 
         [CascadingParameter] public User CurrentUser { get; set; }
 
-        private IList<Connection> _connections;
+        private List<Connection> _connections;
 
         protected override async Task OnInitializedAsync()
         {
-            _connections = await Task.Run(() => connections.GetByUserAsync(CurrentUser.Id));
+            var c = await Task.Run(() => connections.GetByUserAsync(CurrentUser.Id));
+            _connections = c.ToList();
         }
 
         private async Task RevokeConnection(Connection connection)

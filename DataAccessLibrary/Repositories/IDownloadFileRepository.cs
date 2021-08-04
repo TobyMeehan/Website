@@ -26,6 +26,8 @@ namespace TobyMeehan.Com.Data.Repositories
 
         Task<DownloadFile> AddAsync(string downloadId, string filename, Stream uploadStream, CancellationToken cancellationToken = default, IProgress<IUploadProgress> progress = null);
 
+        Task UpdateFilenameAsync(string id, string filename);
+
         Task DeleteAsync(string id);
     }
 }
