@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Humanizer;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -10,7 +11,9 @@ namespace TobyMeehan.Com.Extensions
     {
         public static string UpdatedString(this Download download)
         {
-            return $"{download.Updated.Value.Day} {download.Updated.Value:MMMM} {download.Updated.Value.Year}";
+            TimeSpan? timeSpan = DateTime.Now - download.Updated;
+
+            return $"{timeSpan.Value.Humanize()} ago";
         }
     }
 }

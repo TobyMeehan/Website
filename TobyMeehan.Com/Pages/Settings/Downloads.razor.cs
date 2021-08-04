@@ -16,7 +16,7 @@ namespace TobyMeehan.Com.Pages.Settings
 
         [CascadingParameter] public User CurrentUser { get; set; }
 
-        private IList<Download> _downloads;
+        private IEnumerable<Download> _downloads;
 
         protected async override Task OnInitializedAsync()
         {

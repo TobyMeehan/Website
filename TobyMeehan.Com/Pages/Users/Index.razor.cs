@@ -12,7 +12,7 @@ namespace TobyMeehan.Com.Pages.Users
     {
         [Inject] private IUserRepository users { get; set; }
 
-        private IList<User> _users;
+        private IEnumerable<User> _users;
 
         protected override async Task OnInitializedAsync()
         {

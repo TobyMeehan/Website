@@ -16,7 +16,7 @@ namespace TobyMeehan.Com.Pages.Developer
 
         [CascadingParameter] public Task<AuthenticationState> AuthenticationStateTask { get; set; }
 
-        private IList<Application> _applications = new List<Application>();
+        private IEnumerable<Application> _applications;
 
         private AuthenticationState _context;
 
