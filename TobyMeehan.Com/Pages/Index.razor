@@ -2,23 +2,23 @@
 @layout BaseLayout
 
 <div id="index-container">
+    <nav id="index-nav" class="navbar navbar-expand-lg navbar-dark bg-darker">
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#NavbarContent" aria-controls="NavbarContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div id="NavbarContent" class="collapse navbar-collapse">
+            <DefaultNavContent></DefaultNavContent>
+            <span class="navbar-text mr-3"></span>
+            <LoginButton></LoginButton>
+        </div>
+    </nav>
+
     <div id="index-banner">
         <div id="index-intro" class="text-light">
             <h1 class="text-logo">Toby Meehan</h1>
             <p class="lead">Hi, I'm Toby, I do computery stuff and some more things...</p>
         </div>
-
-        <nav id="index-nav" class="navbar navbar-expand-lg navbar-dark bg-darker">
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#NavbarContent" aria-controls="NavbarContent" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-
-            <div id="NavbarContent" class="collapse navbar-collapse">
-                <DefaultNavContent></DefaultNavContent>
-                <span class="navbar-text mr-3"></span>
-                <LoginButton></LoginButton>
-            </div>
-        </nav>
     </div>
 
     <div class="container text-light" id="index-main">
