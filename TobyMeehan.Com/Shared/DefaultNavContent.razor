@@ -1,0 +1,21 @@
+﻿<ul class="navbar-nav">
+    <li class="nav-item">
+        <NavLink class="nav-link" href="/" Match="NavLinkMatch.All"><i class="fas fa-home"></i></NavLink>
+    </li>
+    <li class="nav-item">
+        <NavLink class="nav-link" href="/downloads" Match="NavLinkMatch.Prefix">Downloads</NavLink>
+    </li>
+    <AuthorizeView>
+        <li class="nav-item">
+            <NavLink class="nav-link" href="/developer" Match="NavLinkMatch.Prefix">Developer</NavLink>
+        </li>
+    </AuthorizeView>
+    <li class="nav-item">
+        <NavLink class="nav-link" href="https://github.com/TobyMeehan/Website">GitHub</NavLink>
+    </li>
+    <AuthorizeView Policy="@AuthorizationPolicies.IsAdmin">
+        <li class="nav-item">
+            <NavLink class="nav-link" href="/admin" Match="NavLinkMatch.All">Admin</NavLink>
+        </li>
+    </AuthorizeView>
+</ul>
