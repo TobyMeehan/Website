@@ -1,47 +1,116 @@
 ﻿@page "/"
+@layout BaseLayout
 
-<Title>Home</Title>
+<div id="index-container">
+    <nav id="index-nav" class="navbar navbar-expand-lg navbar-dark bg-darker">
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#NavbarContent" aria-controls="NavbarContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
 
-<div class="row">
+        <div id="NavbarContent" class="collapse navbar-collapse">
+            <DefaultNavContent></DefaultNavContent>
+            <span class="navbar-text mr-3"></span>
+            <LoginButton></LoginButton>
+        </div>
+    </nav>
 
-    <div class="col-md-6">
-        <a href="/minecraft/map" class="text-reset">
-            <div class="card mb-3 bg-dark">
-                <img src="/img/minecraftmap.png" alt="Minecraft Map" class="card-img" />
-                <div class="card-img-overlay">
-                    <span class="h3 align-centre text-center p-2 casino-text">
-                        <strong class="display-4">Minecraft Server</strong>
-                        <br />
-                        <small>Online Map</small>
-                    </span>
-                </div>
-            </div>
-        </a>
+    <div id="index-banner">
+        <div id="index-intro" class="text-light">
+            <h1 class="text-logo">Toby Meehan</h1>
+            <p class="lead">Hi, I'm Toby, I do computery stuff from time to time and I'm a first year at uni.</p>
+        </div>
     </div>
 
-    <div class="col-md-6">
-        <a href="https://tobymeehan.com/downloads/2CemYL63puz" class="text-reset">
-            <div class="card mb-3 bg-dark">
-                <img src="/img/casino.png" alt="Casino" class="card-img" />
-                <div class="card-img-overlay">
-                    <span class="h3 align-centre text-center p-2 casino-text">
-                        <strong class="display-4">Online Casino</strong>
-                        <br />
-                        <small>by Thomas_Huntley</small>
-                    </span>
+    <div class="container text-light" id="index-main">
+        <div id="index-socials">
+            <a href="https://discord.com/users/253552918030974977" class="text-light mx-3 text-decoration-none">
+                <i class="fab fa-discord"></i>
+            </a>
+            <a href="https://steamcommunity.com/profiles/76561198217231968/" class="text-light mx-3 text-decoration-none">
+                <i class="fab fa-steam"></i>
+            </a>
+            <a href="https://www.instagram.com/toby.meehan/" class="text-light mx-3 text-decoration-none">
+                <i class="fab fa-instagram"></i>
+            </a>
+            <a href="https://github.com/TobyMeehan" class="text-light mx-3 text-decoration-none">
+                <i class="fab fa-github"></i>
+            </a>
+        </div>
+
+        <hr />
+
+        <p>This website is essentially a place for me to show off things I've done/am able to do, the projects section below covers the best examples. The website itself has also been quite a significant undertaking from when I started it as a copy of w3schools' HTML tutorial; mind you it now looks like a clone of every other excessively bootstrap reliant web app. The main bulk of this site is the <a href="/downloads">downloads page</a> which is a full stack setup where users can upload collections of files under a download, alongside extra features such as descriptions and versioning.</p>
+
+        <p>I am currently using ASP.NET Core 3.1 for all of my <del>web</del> stuff. Perhaps at some point I should upgrade to .NET 5. This site uses Blazor Server, a relatively new single page application framework, for its UI. While it can do some flashy things it is more prone to annoying problems, and more difficult to follow a design pattern. I do have some experience with TypeScript from working with Discord bots, and PHP, though fortunately I ditched that as soon as I could.</p>
+
+        <h2 class="mb-4">Projects</h2>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="media mb-3">
+                    <img class="mr-3" src="/img/TobysBot.svg" alt="Toby's Bot Icon" />
+                    <div class="media-body">
+                        <h5 class="mt-0">Toby's Bot</h5>
+                        <p>Originally made just to experiment with Discord's bot features, Toby's Bot now primarily serves as a relatively simple music bot. I am actively working on some cool new things for this, and hope to release a public version at some point.</p>
+                        <a class="btn btn-light" href="https://github.com/TobyMeehan/TobysBot">
+                            <i class="fab fa-github"></i>
+                            TobyMeehan/TobysBot
+                        </a>
+                        <button class="btn btn-outline-light" disabled>
+                            <i class="fab fa-discord"></i>
+                            Coming Soon&trade;!
+                        </button>
+                    </div>
                 </div>
             </div>
-        </a>
-    </div>
+            <div class="col-md-6">
+                <div class="media mb-3">
+                    <img class="mr-3" src="/img/TypeQuery.svg" alt="TypeQuery Icon" />
+                    <div class="media-body">
+                        <h5 class="mt-0">TypeQuery</h5>
+                        <p>A library for .NET which generates SQL queries using strongly-typed links between C# objects and database records. It was inspired by <a href="https://github.com/sqlkata/querybuilder">SqlKata</a>, but I wasn't happy with the extensive use of strings. Ironically I have stopped working on this because in the end I found SqlKata quite practical, but what I have done is available on NuGet. I apologise for that disaster of an icon.</p>
+                        <a class="btn btn-light" href="https://github.com/TobyMeehan/TypeQuery">
+                            <i class="fab fa-github"></i>
+                            TobyMeehan/TypeQuery
+                        </a>
+                        <a class="btn btn-outline-light" href="https://www.nuget.org/packages/TypeQuery/">
+                            NuGet
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
 
+        <div class="row">
+            <div class="col-md-6">
+                <div class="media mb-3">
+                    <img class="mr-3" src="/img/ApiLogo.svg" alt="OAuth API Icon" />
+                    <div class="media-body">
+                        <h5 class="mt-0">OAuth API</h5>
+                        <p>One of my biggest projects, and also one of the most painful, the web API enables third party applications to authenticate with user accounts on this website, and read and update certain information, such as account balance. It does this using a custom implementation of OAuth 2 (as in not using a library), which is what caused quite a lot of the pain, but is quite awesome now it's working.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="media mb-3">
+                    <Avatar class="mr-3" alt="Online Casino Icon" style="height: 120px; width: 120px;" ImageUrl="/img/casino-icon.png"></Avatar>
+                    <div class="media-body">
+                        <h5 class="mt-0">Online Casino</h5>
+                        <p>Not one of mine, this was created by <a href="https://tobymeehan.com/users/theonlypersonusingvanityurls">Thomas_Huntley</a>, but uses this website's API to persist players' balance and highscores (at some point, hopefully) between sessions and devices.</p>
+                        <a class="btn btn-light" href="https://tobymeehan.com/downloads/2CemYL63puz">
+                            Download
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <h2>Contact</h2>
+
+        <p>If you need to contact me, you should probably already know how. If not, I guess you have to wait until I update this at some point with more information. My incredibly extensive and diverse set of social media accounts (GitHub and Steam are definitely social media) are listed above.</p>
+
+        <hr />
+
+        <p class="text-center">&copy; @DateTime.Now.Year Toby Meehan</p>
+    </div>
 </div>
-
-<h1>Welcome to TobyMeehan.Com</h1>
-
-<p>This website is essentially a place for me to show off cool things I've done/am able to do. The downloads section also has some interesting stuff from other people. There's not really much about me personally but I'm a developer not a blogger.</p>
-
-<p>The main focus of this site is a complete CRUD (Create, Read, Update, Delete) structure with overlayed user accounts. This is in the form of a 'downloads' system where users can upload collections of files under a download, alongside extra features such as descriptions and versioning. The integration with users means alongside the basic operations additional checks for authorisation are needed. I have also worked with web APIs; this website features an OAuth implementation allowing third party applications to use user accounts - see the <a href="https://tobymeehan.com/downloads/2CemYL63puz">Online Casino</a>.</p>
-
-<p>This application in its entirety has been made with ASP.NET Core 3.1. Perhaps at some point I will upgrade to .NET 5. The user interface uses Blazor Server, a relatively new framework which maintains a real-time connection with the server. While this has improved loading times, it does also appear to cause some errors at times, and webpages will sometimes stop working if the connection is lost. The code behind this is all open source on <a href="https://github.com/TobyMeehan/Website">GitHub</a>.</p>
-
-<p>You may have noticed a big button with some colours underneath it at the top of the page. This is inspired by the <a href="https://en.wikipedia.org/wiki/The_Button_(Reddit)">social experiment</a> which took place on Reddit in 2015. However, instead of the 60-second countdown, to account for the reduced number of users, this timer lasts 15 hours. This seems to be the most popular feature of this site despite being the one I spent the least time on.</p>
