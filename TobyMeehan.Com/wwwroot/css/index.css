@@ -31,7 +31,6 @@
 }
 
 #index-main {
-    background-color: red;
     display: flex;
     flex-flow: column;
     height: 100%;
@@ -40,13 +39,26 @@
     padding-top: .75rem;
 }
 
+    #index-main hr {
+        border: 0;
+        clear: both;
+        display: block;
+        width: 100%;
+        background-color: rgba(0,0,0,.1);
+        height: 1px;
+        margin-left: 0;
+        margin-right: 0;
+    }
+
 #index-socials {
     font-size: 2em;
     margin: auto;
 }
 
 @media (max-width: 576px) { /* xs */
-
+    #index-main {
+        border-radius: 0;
+    }
 }
 
 @media (min-width: 576px) { /* sm */
