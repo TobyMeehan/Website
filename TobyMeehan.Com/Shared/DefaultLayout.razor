@@ -4,36 +4,36 @@
 @inject ProgressTaskState taskState
 @inject AlertState alertState
 
-<div class="banner">
+<div class="container-fluid d-flex flex-column layout-background bg-800">
+    <div class="row">
+        <div class="col-sm-2"></div>
 
-    <header>
-        <DefaultNavMenu></DefaultNavMenu>
-    </header>
-
-    <div class="container-fluid" style="margin-top: 56px; margin-bottom: 56px;">
-        <div class="row">
-            <div class="col-sm-2"></div>
-
-            <main class="col-sm-8 bg-main text-light pt-3" style="min-height: calc(100vh - 112px);">
-                    <div id="blazor-error-ui" class="alert alert-danger" role="alert">
-                        Oh blast, it looks like something fucked up. You can continue using the website by <a href="" class="alert-link reload">reloading</a> the page. If you are really awesome, you can <a href="https://github.com/TobyMeehan/Website/issues/new/choose" class="alert-link">create an issue</a> so I can fix the problem.
-                    </div>
-
-                    @foreach (var alert in alertState)
-                    {
-                        <Alert Model="alert"></Alert>
-                    }
-
-                    @Body
-            </main>
-
-            <div class="col-sm-2"></div>
+        <div class="col-sm-8 p-0">
+            <div class="layout-nav-container position-relative">
+                <DefaultNavMenu></DefaultNavMenu>
+            </div>
         </div>
+
+        <div class="col-sm-2"></div>
     </div>
 
-    <footer class="container-fluid fixed-bottom bg-darker text-center text-light" style="min-height: 56px; line-height:56px;">
-        <p class="m-0">&copy; @DateTime.Now.Year Toby Meehan</p>
-    </footer>
+    <div class="row flex-grow-1">
+        <div class="col-sm-2"></div>
+
+        <div class="col-sm-8 d-flex flex-column flex-grow-1 bg-600 text-light rounded-top pt-3">
+            <main class="flex-grow-1">
+                @Body
+            </main>
+
+            <footer class="w-100">
+                <hr />
+
+                <p class="text-center">&copy; @DateTime.Now.Year Toby Meehan</p>
+            </footer>
+        </div>
+
+        <div class="col-sm-2"></div>
+    </div>
 </div>
 
 @code {

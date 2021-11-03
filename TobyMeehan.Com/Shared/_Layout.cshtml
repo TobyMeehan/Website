@@ -18,6 +18,8 @@
     <link rel="stylesheet" href="~/css/fonts.css" />
     <link rel="stylesheet" href="~/css/darktheme.css" />
     <link rel="stylesheet" href="~/css/index.css" />
+    <link rel="stylesheet" href="~/css/layout.css" />
+    <link rel="stylesheet" href="~/css/background-dark.css" />
 
     <partial name="~/Shared/_Favicons.cshtml" />
 
@@ -25,7 +27,7 @@
 
     <script src="https://kit.fontawesome.com/ea7d42651e.js" crossorigin="anonymous"></script>
 </head>
-<body class="@ViewData["BodyClass"]">
+<body class="h-100 @ViewData["BodyClass"]">
     @RenderBody()
 
     <script src="https://cdn.ckeditor.com/ckeditor5/16.0.0/classic/ckeditor.js"></script>
