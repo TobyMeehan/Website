@@ -44,6 +44,8 @@ namespace TobyMeehan.Com.Data.Configuration
 
             Services.AddTransient<ICommentRepository, SqlKata.CommentRepository>();
 
+            Services.AddTransient<ILobbyRepository, SqlKata.LobbyRepository>();
+
             return this;
         }
 
