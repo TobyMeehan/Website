@@ -2,53 +2,79 @@
 
 <div class="input-group">
     <InputText class="form-control" @bind-Value="_baseName" />
-    <div class="input-group-append">
-        <span class="input-group-text">.@_extension</span>
-    </div>
+
+    @if (_extension.Any())
+    {
+        <div class="input-group-append">
+            <span class="input-group-text">.@_extension</span>
+        </div>
+    }
+
 </div>
 
 @code {
     private string _baseName
     {
-        get => string.Join(".", CurrentValue.Split(".").SkipLast(1));
-        set => CurrentValue = $"{value}.{_extension}";
+        get
+        {
+            if (!_extension.Any())
+            {
+                return CurrentValue;
+            }
+
+            return string.Join(".", CurrentValue.Split(".").SkipLast(1));
+        }
+
+        set
+        {
+            if (_extension.Any())
+            {
+                CurrentValueAsString = $"{value}.{_extension}";
+            }
+            else
+            {
+                CurrentValueAsString = value;
+            }
+        }
     }
 
     private string _extension
     {
-        get => CurrentValue.Split(".").Last();
+        get
+        {
+            if (!CurrentValue.Contains("."))
+            {
+                return "";
+            }
+
+            return CurrentValue.Split(".").Last();
+        }
     }
 
     protected override bool TryParseValueFromString(string value, out string result, out string validationErrorMessage)
     {
         result = value;
+        validationErrorMessage = "";
 
-        List<char> invalidChars = System.IO.Path.GetInvalidFileNameChars().Union(value).ToList();
+        List<char> invalidChars = System.IO.Path.GetInvalidFileNameChars().Intersect(value).ToList();
 
-        try
+        if (string.IsNullOrWhiteSpace(value))
         {
-            System.IO.File.OpenRead(value).Close();
-        }
-        catch (ArgumentException)
-        {
-            if (value.StartsWith(" "))
-            {
-                validationErrorMessage = "Filename cannot begin with a space.";
-            }
-            else if (invalidChars.Any())
-            {
-                validationErrorMessage = $"Filename contains some of the cursed characters ({string.Join(",", invalidChars)}).";
-            }
-            else
-            {
-                validationErrorMessage = "Invalid filename.";
-            }
-
+            validationErrorMessage = "There's nothing there...";
             return false;
         }
-        catch (Exception) { }
 
-        validationErrorMessage = "";
+        if (value.EndsWith("."))
+        {
+            validationErrorMessage = "Don't worry about the dots, I've got that covered.";
+        }
+
+        if (invalidChars.Any())
+        {
+            validationErrorMessage = $"Filename contains some of the cursed characters ({string.Join(",", invalidChars)}).";
+            return false;
+        }
+
         return true;
     }
 }
