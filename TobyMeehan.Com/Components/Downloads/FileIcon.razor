@@ -143,6 +143,11 @@
 
     private string GetExtension(string filename)
     {
+        if (!filename.Contains("."))
+        {
+            return "";
+        }
+
         return filename.Substring(filename.LastIndexOf("."), filename.Length - filename.LastIndexOf("."));
     }
 }
