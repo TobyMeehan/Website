@@ -1,9 +1,11 @@
 ﻿#index-container {
     position: absolute;
-    top: 0; left: 0;
+    top: 0;
+    left: 0;
     min-height: 100vh;
     width: 100%;
     background-color: #18191C;
+    background-image: linear-gradient(100deg, #18191c, #202225);
 }
 
 #index-nav {
@@ -14,7 +16,6 @@
     padding-top: 41.67%;
     padding-bottom: 25%;
     margin-bottom: -25%;
-
     background-image: url("/img/IndexBanner.svg");
     background-repeat: no-repeat;
     background-size: 100% auto;

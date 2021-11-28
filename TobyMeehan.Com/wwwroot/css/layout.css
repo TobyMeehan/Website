@@ -1,0 +1,19 @@
+﻿.layout-background {
+    background-image: url("/img/IndexBanner.svg");
+    background-image: url("/img/IndexBanner.svg"), linear-gradient(100deg, #18191c, #202225);
+    background-size: 100% auto;
+    background-attachment: fixed;
+    background-repeat: no-repeat;
+    min-height: 100%;
+}
+
+.layout-nav-container {
+    margin: 0;
+}
+
+@media (min-width: 768px) { /* md */
+    .layout-nav-container {
+        margin-top: 50px;
+        margin-bottom: 50px;
+    }
+}
