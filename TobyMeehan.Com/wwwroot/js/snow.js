@@ -1,10 +1,5 @@
-﻿var canvas = document.getElementById("snow-canvas");
-var ctx = canvas.getContext("2d");
-var particlesOnScreen = 150;
-var particlesArray = [];
-var w, h;
-w = canvas.width = window.innerWidth;
-h = canvas.height = window.innerHeight;
+﻿var particlesOnScreen = 200;
+var canvas, ctx, particlesArray, w, h, snowInterval;
 
 function snow_random(min, max) {
     return min + Math.random() * (max - min + 1);
@@ -77,5 +72,17 @@ function updateSnowFall() {
     moveSnowFlakes();
 };
 
-setInterval(updateSnowFall, 50);
-createSnowFlakes();
+function startSnow(canvas) {
+    particlesArray = [];
+    clearInterval(snowInterval);
+    canvas = document.getElementById(canvas);
+    ctx = canvas.getContext("2d");
+    w, h;
+    w = canvas.width = window.innerWidth;
+    h = canvas.height = window.innerHeight;
+
+    snowInterval = setInterval(updateSnowFall, 18);
+    createSnowFlakes();
+};
+
+window.StartSnow = (canvas) => startSnow(canvas);
