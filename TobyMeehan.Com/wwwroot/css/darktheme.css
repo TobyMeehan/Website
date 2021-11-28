@@ -1,14 +1,4 @@
-﻿body {
-}
-
-.bg-main {
-    background-color: #18191c;
-}
-
-.bg-darker {
-    background-color: #292b2f;
-    /*background-color: #2f3136;*/
-}
+﻿
 
 .list-group-item:not(.list-group-item-default):not(.list-group-item-success):not(.list-group-item-warning):not(.list-group-item-danger):not(.list-group-item-info) {
     color: #fff;
