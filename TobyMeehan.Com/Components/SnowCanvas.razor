@@ -1,0 +1,27 @@
+﻿@if (DateTime.Now.Month == 12 || (DateTime.Now.Month == 1 && DateTime.Now.Day <= 6))
+{
+    <canvas id="@_id" class="snow-canvas"></canvas>
+}
+
+@inject JavaScript js
+
+@code {
+    string _id;
+
+    protected override void OnInitialized()
+    {
+        _id = $"xmas-{Guid.NewGuid()}";
+
+        base.OnInitialized();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await js.StartSnow(_id);
+        }
+
+        await base.OnAfterRenderAsync(firstRender);
+    }
+}
