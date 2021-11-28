@@ -20,6 +20,7 @@
     <link rel="stylesheet" href="~/css/index.css" />
     <link rel="stylesheet" href="~/css/layout.css" />
     <link rel="stylesheet" href="~/css/background-dark.css" />
+    <link rel="stylesheet" href="~/css/snow.css" />
 
     <partial name="~/Shared/_Favicons.cshtml" />
 
@@ -28,6 +29,8 @@
     <script src="https://kit.fontawesome.com/ea7d42651e.js" crossorigin="anonymous"></script>
 </head>
 <body class="h-100 @ViewData["BodyClass"]">
+    <canvas id="snow-canvas"></canvas>
+        
     @RenderBody()
 
     <script src="https://cdn.ckeditor.com/ckeditor5/16.0.0/classic/ckeditor.js"></script>
@@ -36,6 +39,12 @@
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+
+    @if (DateTime.Now.Month == 12 || (DateTime.Now.Month == 1 && DateTime.Now.Day <= 6))
+    {
+        <script src="~/js/snow.js"></script>
+    }
+
     @RenderSection("Scripts", required: false)
 </body>
 </html>
