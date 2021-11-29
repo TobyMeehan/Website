@@ -2,7 +2,7 @@
 
 <Avatar ImageUrl="@User.ProfilePictureUrl" Text="@User.Username" class="@CssClass" @attributes="AdditionalAttributes">
     <Default>
-        <i class="avatar @CssClass fas fa-user-circle" @attributes="AdditionalAttributes"></i>
+        <Avatar ImageUrl="@($"https://avatars.dicebear.com/api/identicon/{User.Username}.svg")" Text="@User.Username" class="@CssClass" @attributes="AdditionalAttributes"></Avatar>
     </Default>
 </Avatar>
 
