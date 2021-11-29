@@ -1,4 +1,4 @@
-﻿@if (DateTime.Now.Month == 12 || (DateTime.Now.Month == 1 && DateTime.Now.Day <= 6))
+﻿@if (isXmas)
 {
     <canvas id="@_id" class="snow-canvas"></canvas>
 }
@@ -7,6 +7,8 @@
 
 @code {
     string _id;
+
+    private bool isXmas => DateTime.Now.Month == 12 || (DateTime.Now.Month == 1 && DateTime.Now.Day <= 6);
 
     protected override void OnInitialized()
     {
@@ -17,7 +19,7 @@
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (firstRender)
+        if (firstRender && isXmas)
         {
             await js.StartSnow(_id);
         }
