@@ -125,6 +125,7 @@ namespace TobyMeehan.Com.Data.SqlKata
             using (QueryFactory db = _queryFactory.Invoke())
             {
                 await db.Query("applications").Where("Id", id).DeleteAsync();
+                await db.Query("connections").Where("AppId", id).DeleteAsync();
             }
         }
 
