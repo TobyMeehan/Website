@@ -35,7 +35,7 @@ namespace TobyMeehan.Com.Data.SqlKata
                 return query.Limit(200);
             }
 
-            return query.From(new Query(clause.Table).ForPage(page, perPage).As(clause.Alias));
+            return query.From(new Query(clause.Table), clause.Alias).ForPage(page, perPage);
         }
 
         protected virtual Task<IEntityCollection<T>> MapAsync(IEnumerable<T> items) 
