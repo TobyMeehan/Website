@@ -11,8 +11,6 @@ namespace TobyMeehan.Com.Data.Discord
     {
         string AuthorizeUri { get; }
 
-        Task<string> GetTokenAsync(HttpClient httpClient, string authorizationCode); // TODO: proper di of httpclient
-
-        Task<DiscordUser> AuthenticateAsync(string bearerToken);
+        Task<(DiscordToken, DiscordUser)> LoginAsync(string authorizationCode);
     }
 }
