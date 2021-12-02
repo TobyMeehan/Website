@@ -1,6 +1,17 @@
 ﻿html, body {
 }
 
+.btn-discord {
+    color: #fff;
+    background-color: #5865F2;
+    border-color: #5865F2;
+}
+
+    .btn-discord:hover {
+        background-color: #3C45A5;
+        border-color: #3C45A5;
+    }
+
 .text-darklink {
     color: #79828a;
 }

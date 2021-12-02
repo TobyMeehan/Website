@@ -97,7 +97,7 @@ namespace TobyMeehan.Com.Controllers
         }
 
         [Route("/login/discord")]
-        public IActionResult Discord(string ReturnUrl = "/")
+        public IActionResult Discord(string ReturnUrl)
         {
             var properties = new AuthenticationProperties { RedirectUri = ReturnUrl, IsPersistent = true };
 
