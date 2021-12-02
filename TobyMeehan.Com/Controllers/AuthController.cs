@@ -40,13 +40,7 @@ namespace TobyMeehan.Com.Controllers
 
             var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
 
-            var authProperties = new AuthenticationProperties
-            {
-                ExpiresUtc = DateTimeOffset.UtcNow.AddMonths(6),
-                IsPersistent = true
-            };
-
-            return HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(identity), authProperties);
+            return HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(identity), new AuthenticationProperties { IsPersistent = true });
         }
 
         [Route("/login")]
@@ -105,7 +99,14 @@ namespace TobyMeehan.Com.Controllers
         [Route("/login/discord")]
         public IActionResult Discord(string ReturnUrl = "/")
         {
-            return Challenge(new AuthenticationProperties { RedirectUri = ReturnUrl }, "Discord");
+            var properties = new AuthenticationProperties { RedirectUri = ReturnUrl, IsPersistent = true };
+
+            if (User.Identity.IsAuthenticated)
+            {
+                properties.Items.Add("UserId", User.Id());
+            }
+
+            return Challenge(properties, "Discord");
         }
 
         [Route("/register")]

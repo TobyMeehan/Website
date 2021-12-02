@@ -23,7 +23,7 @@ namespace TobyMeehan.Com.AspNetCore.Authentication
 
             AuthenticationBuilder = services.AddAuthentication(options =>
             {
-                options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
 
                 configureOptions?.Invoke(options);
             });
