@@ -63,32 +63,8 @@ namespace TobyMeehan.Com.Api
             string keyRingBucket = keyRingConfig.GetSection("BucketName").Value;
             string dataProtectionObject = keyRingConfig.GetSection("DataProtection").Value;
 
-            services.AddSharedCookieAuthentication(keyRingBucket, dataProtectionObject, options =>
-            {
-                Func<HttpContext, string> getReturnUrl = context => $"?ReturnUrl={WebUtility.UrlEncode($"{context.Request.Host}{context.Request.Path}")}";
-
-                options.Events = new CookieAuthenticationEvents
-                {
-                    OnRedirectToLogin = context =>
-                    {
-#if DEBUG
-                        context.HttpContext.Response.Redirect($"https://localhost:44373/login{getReturnUrl.Invoke(context.HttpContext)}");
-#else
-                        context.HttpContext.Response.Redirect($"https://tobymeehan.com/login{getReturnUrl.Invoke(context.HttpContext)}");
-#endif
-                        return Task.CompletedTask;
-                    },
-                    OnRedirectToAccessDenied = context =>
-                    {
-#if DEBUG
-                        context.HttpContext.Response.Redirect($"https://localhost:44373/login{getReturnUrl.Invoke(context.HttpContext)}");
-#else
-                        context.HttpContext.Response.Redirect($"https://tobymeehan.com/login{getReturnUrl.Invoke(context.HttpContext)}");
-#endif
-                        return Task.CompletedTask;
-                    }
-                };
-            });
+            services.AddDomainAuthentication(keyRingBucket, dataProtectionObject)
+                .AddRemoteCookie();
 
             services.AddScopeAuthorization();
 

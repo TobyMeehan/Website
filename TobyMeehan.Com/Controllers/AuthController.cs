@@ -102,6 +102,12 @@ namespace TobyMeehan.Com.Controllers
             }
         }
 
+        [Route("/login/discord")]
+        public IActionResult Discord(string ReturnUrl = "/")
+        {
+            return Challenge(new AuthenticationProperties { RedirectUri = ReturnUrl }, "Discord");
+        }
+
         [Route("/register")]
         public IActionResult Register(string ReturnUrl)
         {

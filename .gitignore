@@ -352,9 +352,10 @@ MigrationBackup/
 # Files containing sensitive secrets and/or connection strings
 connectionStrings.config
 connectionStrings.json
-connectionStrings.Development.json
+connectionStrings.*.json
 secrets.config
 secrets.json
+secrets.*.json
 
 /TobyMeehan.Com/storage-credential.json
 /TobyMeehan.Com.Api/storage-credential.json

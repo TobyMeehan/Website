@@ -49,9 +49,10 @@ namespace TobyMeehan.Com
         public void ConfigureServices(IServiceCollection services)
         {
             var storageConfig = Configuration.GetSection("CloudStorage");
+            var secretConfig = Configuration.GetSection("Secrets");
 
             services.AddDataAccessLibrary()
-                .AddSqlDatabase(() => new MySqlConnection(Configuration.GetConnectionString("Default")))
+                .AddSqlDatabase(() => new MySqlConnection(secretConfig.GetConnectionString("Default")))
                 .AddBCryptPasswordHash()
                 .AddGoogleCloudStorage(GoogleCredential.FromFile(storageConfig.GetSection("StorageCredential").Value), options =>
                 {
@@ -95,7 +96,15 @@ namespace TobyMeehan.Com
             string keyRingBucket = keyRingConfig.GetSection("BucketName").Value;
             string dataProtectionObject = keyRingConfig.GetSection("DataProtection").Value;
 
-            services.AddSharedCookieAuthentication(keyRingBucket, dataProtectionObject);
+            var discordConfig = secretConfig.GetSection("Discord");
+
+            services.AddDomainAuthentication(keyRingBucket, dataProtectionObject)
+                .AddLocalCookie()
+                .AddDiscord(options =>
+                {
+                    options.ClientId = discordConfig.GetSection("ClientId").Value;
+                    options.ClientSecret = discordConfig.GetSection("ClientSecret").Value;
+                });
 
             services.AddCustomAuthorization();
         }

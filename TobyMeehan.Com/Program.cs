@@ -22,11 +22,11 @@ namespace TobyMeehan.Com
                 {
                     if (hostingContext.HostingEnvironment.IsDevelopment())
                     {
-                        config.AddJsonFile("connectionStrings.Development.json");
+                        config.AddJsonFile("secrets.Development.json");
                     }
                     else
                     {
-                        config.AddJsonFile("connectionStrings.json");
+                        config.AddJsonFile("secrets.json");
                     }
                 })
                 .ConfigureWebHostDefaults(webBuilder =>
