@@ -25,9 +25,13 @@ namespace TobyMeehan.Com.Data.Repositories
 
         Task<User> GetByVanityUrlAsync(string url);
 
+        Task<User> GetByDiscordIdAsync(ulong discordId);
+
         Task<AuthenticationResult<User>> AuthenticateAsync(string username, string password);
 
         Task<User> AddAsync(string username, string password);
+
+        Task<User> AddAsync(ulong discordId, string username, string avatarUrl);
 
         Task UpdateDescriptionAsync(string id, string description);
 
@@ -38,6 +42,10 @@ namespace TobyMeehan.Com.Data.Repositories
         Task AddProfilePictureAsync(string id, string filename, string contentType, Stream fileStream, CancellationToken cancellationToken = default, IProgress<IUploadProgress> progress = null);
 
         Task RemoveProfilePictureAsync(string id);
+
+        Task AddDiscordAccountAsync(string id, ulong discordId);
+
+        Task RemoveDiscordAccountAsync(string id);
 
         Task<Transaction> AddTransactionAsync(string id, string appId, string description, int amount);
 

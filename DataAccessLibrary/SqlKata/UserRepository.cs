@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -70,6 +71,32 @@ namespace TobyMeehan.Com.Data.SqlKata
             return await GetByIdAsync(id);
         }
 
+        public async Task<User> AddAsync(ulong discordId, string username, string avatarUrl)
+        {
+            string id = Guid.NewGuid().ToString();
+
+            using (QueryFactory db = _queryFactory.Invoke())
+            {
+                await db.Query("users").InsertAsync(new
+                {
+                    Id = id,
+                    Username = username,
+                    DiscordId = discordId
+                });
+            }
+
+            var response = await WebRequest.Create(avatarUrl).GetResponseAsync();
+
+            using (Stream stream = response.GetResponseStream())
+            {
+                string filename = response.ResponseUri.IsFile ? Path.GetFileName(response.ResponseUri.LocalPath) : discordId.ToString();
+
+                await AddProfilePictureAsync(id, filename, response.ContentType, stream);
+            }
+
+            return await GetByIdAsync(id);
+        }
+
 
 
         public async Task<IEntityCollection<User>> GetAsync()
@@ -104,6 +131,11 @@ namespace TobyMeehan.Com.Data.SqlKata
         public async Task<User> GetByVanityUrlAsync(string url)
         {
             return await SelectSingleAsync(query => query.Where("VanityUrl", url));
+        }
+
+        public async Task<User> GetByDiscordIdAsync(ulong discordId)
+        {
+            return await SelectSingleAsync(query => query.Where("DiscordId", discordId));
         }
 
 
@@ -219,6 +251,36 @@ namespace TobyMeehan.Com.Data.SqlKata
             using (QueryFactory db = _queryFactory.Invoke())
             {
                 await db.Query("userroles").Where("UserId", id).Where("RoleId", roleId).DeleteAsync();
+            }
+        }
+
+
+        public async Task AddDiscordAccountAsync(string id, ulong discordId)
+        {
+            using (QueryFactory db = _queryFactory.Invoke())
+            {
+                await db.Query("users").Where("Id", id).UpdateAsync(new
+                {
+                    DiscordId = discordId
+                });
+            }
+        }
+
+        public async Task RemoveDiscordAccountAsync(string id)
+        {
+            using (QueryFactory db = _queryFactory.Invoke())
+            {
+                string hashedPassword = await db.Query("users").Where("Id", id).Select("HashedPassword").FirstAsync<string>();
+
+                if (hashedPassword is null)
+                {
+                    throw new Exception("User has no fallback authentication.");
+                }
+
+                await db.Query("users").Where("Id", id).UpdateAsync(new
+                {
+                    DiscordId = null as string
+                });
             }
         }
 
