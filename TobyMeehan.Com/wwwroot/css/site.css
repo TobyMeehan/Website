@@ -8,6 +8,7 @@
 }
 
     .btn-discord:hover {
+        color: #fff;
         background-color: #3C45A5;
         border-color: #3C45A5;
     }
@@ -23,11 +24,11 @@
 .banner {
     margin-bottom: 0;
     border-radius: 0;
-    background-image: url("/img/Banner.svg");
+    background-image: url("/img/LoginBanner.png");
     background-repeat: no-repeat;
-    background-position: center;
-    background-size: cover;
+    background-size: 100% 100%;
     padding: 0;
+    background-color: #18191c;
 }
 
 .banner-logo {

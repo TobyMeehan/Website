@@ -5,30 +5,46 @@
     ViewData["Title"] = "Register";
 }
 
-<h1>Register</h1>
-<p>Create a new account.</p>
+<div class="card-header">
+    <h1 class="text-center">Register</h1>
+</div>
 
-<form method="post" asp-antiforgery="true">
+<div class="card-body">
+    <form method="post" asp-antiforgery="true">
+        <div class="form-group">
+            <label asp-for="@Model.Username" hidden></label>
+            <input asp-for="@Model.Username" class="form-control" placeholder="Username" />
+            <span asp-validation-for="@Model.Username" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="@Model.Password" hidden></label>
+            <input asp-for="@Model.Password" class="form-control" placeholder="Password" />
+            <span asp-validation-for="@Model.Password" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="@Model.ConfirmPassword" hidden></label>
+            <input asp-for="@Model.ConfirmPassword" class="form-control" placeholder="Confirm Password" />
+            <span asp-validation-for="@Model.ConfirmPassword" class="text-danger"></span>
+        </div>
+        <div class="form-group d-flex">
+            <div class="flex-grow-1">
+                <button type="submit" class="btn btn-outline-light">Create Account</button>
+            </div>
+            <p>Already have an account? <a href="/login?ReturnUrl=@Context.Request.Query["ReturnUrl"]" class="text-darklink">Login</a></p>
+        </div>
+    </form>
+
+    <hr />
+
+    <p class="lead text-center">OR</p>
+
     <div class="form-group">
-        <label asp-for="@Model.Username"></label>
-        <input asp-for="@Model.Username" class="form-control" />
-        <span asp-validation-for="@Model.Username" class="text-danger"></span>
+        <a href="/login/discord?ReturnUrl=@Context.Request.Query["ReturnUrl"]" class="btn btn-discord btn-block">
+            Sign up with
+            <img src="~/img/full_logo_white_RGB.png" alt="Discord" style="height: 1rem;" />
+        </a>
     </div>
-    <div class="form-group">
-        <label asp-for="@Model.Password"></label>
-        <input asp-for="@Model.Password" class="form-control" />
-        <span asp-validation-for="@Model.Password" class="text-danger"></span>
-    </div>
-    <div class="form-group">
-        <label asp-for="@Model.ConfirmPassword"></label>
-        <input asp-for="@Model.ConfirmPassword" class="form-control" />
-        <span asp-validation-for="@Model.ConfirmPassword" class="text-danger"></span>
-    </div>
-    <div class="form-group">
-        <button type="submit" class="btn btn-light">Register</button>
-    </div>
-</form>
-<p>Already have an account? <a href="/login" class="text-darklink">Login</a></p>
+</div>
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
