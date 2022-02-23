@@ -3,8 +3,6 @@ name: Docker DO Publish
 on:
   push:
     branches: [ master ]
-  pull_request:
-    branches: [ master ]
 
 jobs:
 
@@ -13,6 +11,16 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+    
+    - name: GitHub Action for DigitalOcean - doctl
+      # You may pin to the exact commit or the version.
+      # uses: digitalocean/action-doctl@d36a87b1d9c7bd55c8d8434ff2a991a6ee32a448
+      uses: digitalocean/action-doctl@v2.1.0
+      with:
+        # Version of doctl to install
+        version: latest # optional, default is latest
+        # DigitalOcean API Token
+        token: ${{ secrets.DIGITALOCEAN_API_KEY }}
     
     - name: DigitalOcean Docker Image Publish
       # You may pin to the exact commit or the version.
@@ -33,6 +41,17 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+    
+    - name: GitHub Action for DigitalOcean - doctl
+      # You may pin to the exact commit or the version.
+      # uses: digitalocean/action-doctl@d36a87b1d9c7bd55c8d8434ff2a991a6ee32a448
+      uses: digitalocean/action-doctl@v2.1.0
+      with:
+        # Version of doctl to install
+        version: latest # optional, default is latest
+        # DigitalOcean API Token
+        token: ${{ secrets.DIGITALOCEAN_API_KEY }}
+    
 
     - name: DigitalOcean Docker Image Publish
       # You may pin to the exact commit or the version.
