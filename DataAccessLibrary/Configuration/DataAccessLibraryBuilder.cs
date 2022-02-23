@@ -64,6 +64,15 @@ namespace TobyMeehan.Com.Data.Configuration
             return this;
         }
 
+        public DataAccessLibraryBuilder AddSymmetricTokenProvider(Action<SymmetricTokenOptions> configureOptions)
+        {
+            Services.AddSingleton<ITokenProvider, SymmetricTokenProvider>();
+
+            Services.Configure(configureOptions);
+
+            return this;
+        }
+
         public DataAccessLibraryBuilder AddDefaultCloudStorage()
         {
             Services.AddTransient<ICloudStorage, DefaultCloudStorage>();

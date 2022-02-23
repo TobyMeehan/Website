@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Text;
 using System.Threading.Tasks;
 using AutoMapper;
 using Google.Apis.Auth.OAuth2;
@@ -15,6 +16,7 @@ using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.VisualBasic.CompilerServices;
 using MySql.Data.MySqlClient;
 using TobyMeehan.Com.Api.Authorization;
@@ -41,14 +43,32 @@ namespace TobyMeehan.Com.Api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            var cloudConfig = Configuration.GetSection("CloudStorage");
+            string storageCredential = cloudConfig.GetSection("StorageCredential").Value;
+            GoogleCredential googleCredential;
+
+            if (string.IsNullOrEmpty(storageCredential))
+            {
+                googleCredential = GoogleCredential.FromFile(cloudConfig.GetSection("StorageCredentialFile").Value);
+            }
+            else
+            {
+                googleCredential = GoogleCredential.FromJson(storageCredential);
+            }
+
+            var jwtConfig = Configuration.GetSection("Jwt");
+            
             services.AddDataAccessLibrary()
                 .AddSqlDatabase(() => new MySqlConnection(Configuration.GetConnectionString("Default")))
                 .AddBCryptPasswordHash()
-                .AddGoogleCloudStorage(GoogleCredential.FromFile(Configuration.GetSection("CloudStorage").GetSection("StorageCredential").Value), options => { });
-
-            var tokenProvider = new RsaTokenProvider("api.tobymeehan.com", "api.tobymeehan.com", Guid.NewGuid().ToString());
-            services.AddSingleton<ITokenProvider>(tokenProvider);
-
+                .AddGoogleCloudStorage(googleCredential, options => { })
+                .AddSymmetricTokenProvider(options =>
+                {
+                    options.Audience = jwtConfig["Audience"];
+                    options.Issuer = jwtConfig["Issuer"];
+                    options.Key = jwtConfig["Key"];
+                });
+            
             services.AddSingleton(ConfigureMapper());
 
             services.AddControllersWithViews();
@@ -56,7 +76,14 @@ namespace TobyMeehan.Com.Api
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
             {
                 options.RequireHttpsMetadata = false;
-                options.TokenValidationParameters = tokenProvider.GetValidationParameters();
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtConfig["Key"])),
+                    ValidAudience = jwtConfig["Audience"],
+                    ValidIssuer = jwtConfig["Issuer"],
+                    ValidateLifetime = true,
+                    ClockSkew = TimeSpan.FromSeconds(0)
+                };
             });
 
             var keyRingConfig = Configuration.GetSection("KeyRing");

@@ -49,11 +49,22 @@ namespace TobyMeehan.Com
         public void ConfigureServices(IServiceCollection services)
         {
             var storageConfig = Configuration.GetSection("CloudStorage");
+            string storageCredential = storageConfig.GetSection("StorageCredential").Value;
+            GoogleCredential googleCredential;
+
+            if (string.IsNullOrEmpty(storageCredential))
+            {
+                googleCredential = GoogleCredential.FromFile(storageConfig.GetSection("StorageCredentialFile").Value);
+            }
+            else
+            {
+                googleCredential = GoogleCredential.FromJson(storageCredential);
+            }
 
             services.AddDataAccessLibrary()
                 .AddSqlDatabase(() => new MySqlConnection(Configuration.GetConnectionString("Default")))
                 .AddBCryptPasswordHash()
-                .AddGoogleCloudStorage(GoogleCredential.FromFile(storageConfig.GetSection("StorageCredential").Value), options =>
+                .AddGoogleCloudStorage(googleCredential, options =>
                 {
                     options.DownloadStorageBucket = storageConfig.GetSection("DownloadBucket").Value;
                     options.ProfilePictureStorageBucket = storageConfig.GetSection("ProfilePictureBucket").Value;
