@@ -17,12 +17,10 @@ namespace TobyMeehan.Com.Data.Security
 
         public RsaTokenProvider(string issuer, string audience, string keyName)
         {
-            var parameters = new CspParameters
-            {
-                KeyContainerName = keyName,
-                Flags = CspProviderFlags.UseMachineKeyStore
-            };
-            var provider = new RSACryptoServiceProvider(2048, parameters);
+            var provider = new RSACryptoServiceProvider(2048);
+            
+            RSAParameters parameters = new RSAParameters();
+            provider.ImportParameters(parameters);
 
             _key = new RsaSecurityKey(provider);
 
