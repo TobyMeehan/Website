@@ -41,11 +41,24 @@ namespace TobyMeehan.Com.Api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            var cloudConfig = Configuration.GetSection("CloudStorage");
+            string storageCredential = cloudConfig.GetSection("StorageCredential").Value;
+            GoogleCredential googleCredential;
+
+            if (string.IsNullOrEmpty(storageCredential))
+            {
+                googleCredential = GoogleCredential.FromFile(cloudConfig.GetSection("StorageCredentialFile").Value);
+            }
+            else
+            {
+                googleCredential = GoogleCredential.FromJson(storageCredential);
+            }
+            
             services.AddDataAccessLibrary()
                 .AddSqlDatabase(() => new MySqlConnection(Configuration.GetConnectionString("Default")))
                 .AddBCryptPasswordHash()
-                .AddGoogleCloudStorage(GoogleCredential.FromFile(Configuration.GetSection("CloudStorage").GetSection("StorageCredential").Value), options => { });
-
+                .AddGoogleCloudStorage(googleCredential, options => { });
+            
             var tokenProvider = new RsaTokenProvider("api.tobymeehan.com", "api.tobymeehan.com", Guid.NewGuid().ToString());
             services.AddSingleton<ITokenProvider>(tokenProvider);
 
