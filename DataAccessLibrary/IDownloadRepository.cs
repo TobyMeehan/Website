@@ -10,7 +10,7 @@ public interface IDownloadRepository
 
     Task<IReadOnlyList<IDownload>> GetByAuthorAsync(Id<IUser> userId);
 
-    Task<IDownload> GetByIdAsync(string id);
+    Task<IDownload> GetByIdAsync(Id<IDownload> id);
 
     Task<IDownload> AddAsync(Action<NewDownload> download);
 
@@ -25,19 +25,19 @@ public interface IDownloadRepository
 
 public class EditDownload
 {
-    public string Title { get; set; } = null;
-    public string ShortDescription { get; set; } = null;
-    public string LongDescription { get; set; } = null;
-    public Version Version { get; set; } = null;
-    public DownloadVisibility? Visibility { get; set; } = null;
-    public DownloadVerification? Verified { get; set; } = null;
+    public string Title { get; set; }
+    public string ShortDescription { get; set; }
+    public string LongDescription { get; set; }
+    public Version Version { get; set; }
+    public DownloadVisibility Visibility { get; set; }
+    public DownloadVerification Verified { get; set; }
 }
 
 public class NewDownload
 {
-    public Id<IUser>? UserId { get; set; } = null;
-    public string Title { get; set; } = null;
-    public string ShortDescription { get; set; } = null;
-    public string LongDescription { get; set; } = null;
-    public Version Version { get; set; } = null;
+    public Id<IUser> UserId { get; set; }
+    public string Title { get; set; }
+    public string ShortDescription { get; set; }
+    public string LongDescription { get; set; }
+    public Version Version { get; set; }
 }

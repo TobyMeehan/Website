@@ -4,7 +4,6 @@ using System.IO;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using TobyMeehan.Com.Data.Models;
 using TobyMeehan.Com.Data.Upload;
 
 namespace TobyMeehan.Com.Data.CloudStorage
@@ -26,7 +25,7 @@ namespace TobyMeehan.Com.Data.CloudStorage
             throw new NotImplementedException();
         }
 
-        public Task<CloudFile> UploadFileAsync(Stream stream, string bucket, string objectName, string filename, string contentType, CancellationToken cancellationToken = default, IProgress<IUploadProgress> progress = null)
+        public Task<IFile> UploadFileAsync(Stream stream, string bucket, string objectName, string filename, string contentType, CancellationToken cancellationToken = default, IProgress<IUploadProgress> progress = null)
         {
             throw new NotImplementedException();
         }

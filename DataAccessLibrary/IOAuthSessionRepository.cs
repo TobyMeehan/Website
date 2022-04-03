@@ -20,9 +20,9 @@ public interface IOAuthSessionRepository
 
 public class NewOAuthSession
 {
-    public Id<IConnection>? ConnectionId { get; set; } = null;
-    public string RedirectUri { get; set; } = null;
+    public Id<IConnection> ConnectionId { get; set; }
+    public string RedirectUri { get; set; }
     public string Scope { get; set; } = null;
-    public string CodeChallenge { get; set; } = null;
-    public DateTime? Expiry { get; set; } = null;
+    public string CodeChallenge { get; set; }
+    public DateTime? Expiry { get; set; }
 }

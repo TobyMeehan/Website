@@ -33,6 +33,7 @@ using Microsoft.AspNetCore.DataProtection;
 using System.IO;
 using TobyMeehan.Com.AspNetCore.Authentication;
 using Org.BouncyCastle.Asn1.Cms;
+using SqlKata.Compilers;
 
 namespace TobyMeehan.Com
 {
@@ -62,7 +63,7 @@ namespace TobyMeehan.Com
             }
 
             services.AddDataAccessLibrary()
-                .AddSqlDatabase(() => new MySqlConnection(Configuration.GetConnectionString("Default")))
+                .AddSqlDatabase<MySqlCompiler>(() => new MySqlConnection(Configuration.GetConnectionString("Default")))
                 .AddBCryptPasswordHash()
                 .AddGoogleCloudStorage(googleCredential, options =>
                 {

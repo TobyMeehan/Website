@@ -6,7 +6,7 @@ namespace TobyMeehan.Com.Data;
 
 public interface IScoreboardRepository
 {
-    Task<IObjective> GetByIdAsync(string id);
+    Task<IObjective> GetByIdAsync(Id<IObjective> id);
 
     Task<IReadOnlyList<IObjective>> GetByApplicationAsync(Id<IApplication> appId);
     

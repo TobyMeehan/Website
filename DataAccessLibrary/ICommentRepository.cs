@@ -6,7 +6,7 @@ namespace TobyMeehan.Com.Data;
 
 public interface ICommentRepository
 {
-    Task<IComment> GetByIdAsync(string id);
+    Task<IComment> GetByIdAsync(Id<IComment> id);
     
     Task<IReadOnlyList<IComment>> GetByEntityAsync(string entityId);
 

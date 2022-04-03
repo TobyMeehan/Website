@@ -7,7 +7,6 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using TobyMeehan.Com.Data.Models;
 using TobyMeehan.Com.Data.Upload;
 using System.Net.Mime;
 using Google.Apis.Storage.v1.Data;
@@ -31,15 +30,14 @@ namespace TobyMeehan.Com.Data.CloudStorage
 
         public async Task DeleteFileAsync(string bucket, string objectName)
         {
-            using (StorageClient client = await StorageClient.CreateAsync(_credential))
-            {
-                await client.DeleteObjectAsync(bucket, objectName);
-            }
+            using var client = await StorageClient.CreateAsync(_credential);
+            
+            await client.DeleteObjectAsync(bucket, objectName);
         }
 
-        public async Task<CloudFile> UploadFileAsync(Stream stream, string bucket, string objectName, string filename, string contentType, CancellationToken cancellationToken = default, IProgress<IUploadProgress> progress = null)
+        public async Task<IFile> UploadFileAsync(Stream stream, string bucket, string objectName, string filename, string contentType, CancellationToken cancellationToken = default, IProgress<IUploadProgress> progress = null)
         {
-            Progress<Google.Apis.Upload.IUploadProgress> googleProgress = new Progress<Google.Apis.Upload.IUploadProgress>();
+            var googleProgress = new Progress<Google.Apis.Upload.IUploadProgress>();
 
             if (progress != null)
             {
@@ -50,41 +48,41 @@ namespace TobyMeehan.Com.Data.CloudStorage
                 };
             }
 
-            using (StorageClient client = await StorageClient.CreateAsync(_credential))
+            using var client = await StorageClient.CreateAsync(_credential);
+            var options = new UploadObjectOptions
             {
-                UploadObjectOptions options = new UploadObjectOptions
-                {
-                    ChunkSize = _chunkSize
-                };
+                ChunkSize = _chunkSize
+            };
 
-                var dataObject = await client.UploadObjectAsync(bucket, objectName, contentType, stream, options, cancellationToken, googleProgress);
+            var dataObject = await client.UploadObjectAsync(bucket, objectName, contentType, stream, options, cancellationToken, googleProgress);
 
-                dataObject.ContentDisposition = $"filename=\"{filename}\"";
+            dataObject.ContentDisposition = $"filename=\"{filename}\"";
 
-                dataObject = await client.PatchObjectAsync(dataObject);
+            dataObject = await client.PatchObjectAsync(dataObject, cancellationToken: cancellationToken);
 
-                return new CloudFile(GetDownloadLink(dataObject), dataObject.MediaLink);
-            }
+            return new CloudFile
+            {
+                DownloadLink = GetDownloadLink(dataObject),
+                MediaLink = dataObject.MediaLink
+            };
         }
 
         public async Task DownloadFileAsync(string bucket, string objectName, Stream destination)
         {
-            using (StorageClient client = await StorageClient.CreateAsync(_credential))
-            {
-                await client.DownloadObjectAsync(bucket, objectName, destination);
-            }
+            using var client = await StorageClient.CreateAsync(_credential);
+            
+            await client.DownloadObjectAsync(bucket, objectName, destination);
         }
 
         public async Task RenameFileAsync(string bucket, string objectName, string filename)
         {
-            using (StorageClient client = await StorageClient.CreateAsync(_credential))
-            {
-                var dataObject = await client.GetObjectAsync(bucket, objectName);
+            using var client = await StorageClient.CreateAsync(_credential);
+            
+            var dataObject = await client.GetObjectAsync(bucket, objectName);
 
-                dataObject.ContentDisposition = $"filename=\"{filename}\"";
+            dataObject.ContentDisposition = $"filename=\"{filename}\"";
 
-                await client.PatchObjectAsync(dataObject);
-            }
+            await client.PatchObjectAsync(dataObject);
         }
     }
 }

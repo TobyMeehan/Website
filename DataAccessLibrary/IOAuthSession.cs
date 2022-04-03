@@ -8,6 +8,7 @@ public interface IOAuthSession
 {
     Id<IOAuthSession> Id { get; }
     Id<IConnection> ConnectionId { get; }
+    IConnection Connection { get; }
     
     string AuthorizationCode { get; }
     string RedirectUri { get; }

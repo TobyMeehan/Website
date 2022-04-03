@@ -4,28 +4,25 @@ using SqlKata.Execution;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net.Mime;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using TobyMeehan.Com.Data.CloudStorage;
-using TobyMeehan.Com.Data.Collections;
 using TobyMeehan.Com.Data.Configuration;
-using TobyMeehan.Com.Data.Models;
-using TobyMeehan.Com.Data.Repositories;
+using TobyMeehan.Com.Data.Extensions;
 using TobyMeehan.Com.Data.Upload;
 
 namespace TobyMeehan.Com.Data.SqlKata
 {
-    public class DownloadFileRepository : RepositoryBase<DownloadFile>, IDownloadFileRepository
+    public class DownloadFileRepository : RepositoryBase<IDownloadFile, DownloadFile, NewDownloadFile, EditDownloadFile>, IDownloadFileRepository
     {
-        private readonly Func<QueryFactory> _queryFactory;
         private readonly ICloudStorage _storage;
         private readonly CloudStorageOptions _options;
 
-        public DownloadFileRepository(Func<QueryFactory> queryFactory, ICloudStorage storage, IOptions<CloudStorageOptions> options) : base (queryFactory)
+        public DownloadFileRepository(QueryFactory queryFactory, ICloudStorage storage, IIdGenerator idGenerator, IOptions<CloudStorageOptions> options) : base (queryFactory, idGenerator, "downloadfiles")
         {
-            _queryFactory = queryFactory;
             _storage = storage;
             _options = options.Value;
         }
@@ -33,92 +30,54 @@ namespace TobyMeehan.Com.Data.SqlKata
         protected override Query Query()
         {
             return base.Query()
-                .From("downloadfiles")
+                .From(Table)
                 .OrderBy("Filename");
         }
 
-        public async Task<DownloadFile> AddAsync(string downloadId, string filename, Stream uploadStream, CancellationToken cancellationToken = default, IProgress<IUploadProgress> progress = null)
+        protected override async Task<IReadOnlyList<IDownloadFile>> MapAsync(IEnumerable<DownloadFile> items)
         {
-            string bucket = _options.DownloadStorageBucket;
-            string id = Guid.NewGuid().ToString();
-
-            CloudFile cf = await _storage.UploadFileAsync(uploadStream, bucket, id, filename, MediaTypeNames.Application.Octet, cancellationToken, progress);
-
-            using (QueryFactory db = _queryFactory.Invoke())
+            var files = items.ToList();
+            
+            foreach (var file in files)
             {
-                await db.Query("downloadfiles").InsertAsync(new
-                {
-                    Id = id,
-                    DownloadId = downloadId,
-                    Filename = filename,
-                    Url = cf.DownloadLink
-                });
+                file.InnerFile = await _storage.GetFileAsync(_options.DownloadStorageBucket, file.Id.Value);
             }
-
-            return await GetByIdAsync(id);
+            
+            return await base.MapAsync(files);
         }
 
-
-
-        public async Task<IEntityCollection<DownloadFile>> GetAsync()
+        public async Task<IDownloadFile> AddAsync(Id<IDownload> downloadId, Action<FileUpload> configureFile, CancellationToken cancellationToken = default, IProgress<IUploadProgress> progress = null)
         {
-            return await SelectAsync();
-        }
+            var upload = configureFile.Apply(new FileUpload());
+            var bucket = _options.DownloadStorageBucket;
+            var id = GenerateId();
 
-        public async Task<IEntityCollection<DownloadFile>> GetByDownloadAndFilenameAsync(string downloadId, string filename)
-        {
-            return await SelectAsync(query => query.Where("DownloadId", downloadId).Where("Filename", filename));
-        }
-
-        public async Task<IEntityCollection<DownloadFile>> GetByDownloadAsync(string downloadId)
-        {
-            return await SelectAsync(query => query.Where("DownloadId", downloadId));
-        }
-
-        public async Task<IEntityCollection<DownloadFile>> GetByFilenameAsync(string filename)
-        {
-            return await SelectAsync(query => query.Where("Filename", filename));
-        }
-
-        public async Task<DownloadFile> GetByIdAsync(string id)
-        {
-            return await SelectSingleAsync(query => query.Where("downloadfiles.Id", id));
-        }
-
-
-
-        public async Task UpdateFilenameAsync(string id, string filename)
-        {
-            await _storage.RenameFileAsync(_options.DownloadStorageBucket, id, filename);
-
-            using (QueryFactory db = _queryFactory.Invoke())
+            var file = await _storage.UploadFileAsync(upload.UploadStream, bucket, id.Value, upload.Filename, upload.ContentType,
+                cancellationToken, progress);
+            
+            return await base.AddAsync(f =>
             {
-                await db.Query("downloadfiles").Where("Id", id).UpdateAsync(new
-                {
-                    Filename = filename
-                });
-            }
+                f.DownloadId = downloadId;
+                f.Filename = file.Filename;
+            }, id);
+        }
+        
+        public async Task<IReadOnlyList<IDownloadFile>> GetByDownloadAsync(Id<IDownload> downloadId)
+        {
+            return await SelectAsync(query => query.Where($"{Table}.DownloadId", downloadId.Value));
         }
 
-
-
-        public async Task DeleteAsync(string id)
+        public async Task<IReadOnlyList<IDownloadFile>> GetByDownloadAndFilenameAsync(Id<IDownload> downloadId, string filename)
         {
-            await _storage.DeleteFileAsync(_options.DownloadStorageBucket, id);
-
-            using (QueryFactory db = _queryFactory.Invoke())
-            {
-                await db.Query("downloadfiles").Where("Id", id).DeleteAsync();
-            }
+            return await SelectAsync(query =>
+                query.Where($"{Table}.DownloadId", downloadId.Value).Where($"{Table}.Filename", filename));
         }
 
-
-
-        public Task DownloadAsync(string id, Stream stream)
+        public async Task DownloadAsync(Id<IDownloadFile> id, Stream stream)
         {
-            string bucket = _options.DownloadStorageBucket;
+            var bucket = _options.DownloadStorageBucket;
 
-            return _storage.DownloadFileAsync(bucket, id, stream);
+            await _storage.DownloadFileAsync(bucket, id.Value, stream);
         }
     }
 }

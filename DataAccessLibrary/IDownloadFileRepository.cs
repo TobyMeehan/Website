@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-using Google.Apis.Upload;
+using TobyMeehan.Com.Data.Upload;
 
 namespace TobyMeehan.Com.Data;
 
@@ -13,11 +13,11 @@ public interface IDownloadFileRepository
 
     Task<IReadOnlyList<IDownloadFile>> GetByDownloadAndFilenameAsync(Id<IDownload> downloadId, string filename);
 
-    Task<IDownloadFile> GetByIdAsync(string id);
+    Task<IDownloadFile> GetByIdAsync(Id<IDownloadFile> id);
 
     Task DownloadAsync(Id<IDownloadFile> id, Stream stream);
 
-    Task<IDownloadFile> AddAsync(Action<NewDownloadFile> file, CancellationToken cancellationToken = default, IProgress<IUploadProgress> progress = null);
+    Task<IDownloadFile> AddAsync(Id<IDownload> downloadId, Action<FileUpload> file, CancellationToken cancellationToken = default, IProgress<IUploadProgress> progress = null);
 
     Task<IDownloadFile> UpdateAsync(Id<IDownloadFile> id, Action<EditDownloadFile> file);
 
@@ -26,12 +26,11 @@ public interface IDownloadFileRepository
 
 public class EditDownloadFile
 {
-    public string Filename { get; set; } = null;
+    public string Filename { get; set; }
 }
 
 public class NewDownloadFile
 {
-    public Id<IDownload>? DownloadId { get; set; } = null;
-    public string Filename { get; set; } = null;
-    public Stream UploadStream { get; set; } = null;
+    public Id<IDownload> DownloadId { get; set; }
+    public string Filename { get; set; }
 }

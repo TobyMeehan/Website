@@ -15,7 +15,7 @@ public interface IUserRepository
     
     Task<IReadOnlyList<IUser>> GetByDownloadAsync(Id<IDownload> downloadId);
 
-    Task<IUser> GetByIdAsync(string id);
+    Task<IUser> GetByIdAsync(Id<IUser> id);
 
     Task<IUser> GetByUsernameAsync(string username);
 

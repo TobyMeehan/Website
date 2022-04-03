@@ -2,23 +2,22 @@
 using SqlKata.Execution;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using TobyMeehan.Com.Data.Collections;
-using TobyMeehan.Com.Data.Models;
-using TobyMeehan.Com.Data.Repositories;
 
 namespace TobyMeehan.Com.Data.SqlKata
 {
-    public class ConnectionRepository : RepositoryBase<Connection>, IConnectionRepository
+    public class ConnectionRepository : RepositoryBase<IConnection, Connection>, IConnectionRepository
     {
-        private readonly Func<QueryFactory> _queryFactory;
+        private readonly IIdGenerator _idGenerator;
         private readonly IUserRepository _users;
         private readonly IApplicationRepository _applications;
+        private readonly string _table = "connections";
 
-        public ConnectionRepository(Func<QueryFactory> queryFactory, IUserRepository users, IApplicationRepository applications) : base(queryFactory)
+        public ConnectionRepository(QueryFactory queryFactory, IIdGenerator idGenerator, IUserRepository users, IApplicationRepository applications) : base(queryFactory)
         {
-            _queryFactory = queryFactory;
+            _idGenerator = idGenerator;
             _users = users;
             _applications = applications;
         }
@@ -29,71 +28,62 @@ namespace TobyMeehan.Com.Data.SqlKata
                 .From("connections");
         }
 
-        protected override async Task<IEntityCollection<Connection>> MapAsync(IEnumerable<Connection> items)
+        protected override async Task<IReadOnlyList<IConnection>> MapAsync(IEnumerable<Connection> items)
         {
-            foreach (var item in items)
+            var list = items.ToList();
+            
+            foreach (var item in list)
             {
                 item.User = await _users.GetByIdAsync(item.UserId);
                 item.Application = await _applications.GetByIdAsync(item.AppId);
             }
 
-            return await base.MapAsync(items);
+            return await base.MapAsync(list);
         }
 
-
-
-        public async Task<IEntityCollection<Connection>> GetAsync()
+        public Task<IConnection> GetByIdAsync(Id<IConnection> id)
         {
-            return await SelectAsync();
+            return SelectSingleAsync(query => query.Where($"{_table}.Id", id));
         }
 
-        public async Task<IEntityCollection<Connection>> GetByApplicationAsync(string appId)
+        public Task<IReadOnlyList<IConnection>> GetByUserAsync(Id<IUser> userId)
         {
-            return await SelectAsync(query => query.Where("AppId", appId));
+            return SelectAsync(query => query.Where($"{_table}.UserId", userId.Value));
         }
 
-        public async Task<Connection> GetByIdAsync(string id)
+        public Task<IReadOnlyList<IConnection>> GetByApplicationAsync(Id<IApplication> appId)
         {
-            return await SelectSingleAsync(query => query.Where("connections.Id", id));
+            return SelectAsync(query => query.Where($"{_table}.AppId", appId.Value));
         }
 
-        public async Task<IEntityCollection<Connection>> GetByUserAsync(string userId)
+        public async Task<IConnection> GetOrCreateAsync(Id<IUser> userId, Id<IApplication> appId)
         {
-            return await SelectAsync(query => query.Where("UserId", userId));
-        }
+            var connection = await SelectSingleAsync(query => query.Where("UserId", userId).Where("AppId", appId));
 
-        public async Task<Connection> GetOrCreateAsync(string userId, string appId)
-        {
-            Connection connection = await SelectSingleAsync(query => query.Where("UserId", userId).Where("AppId", appId));
-
-            if (connection == null)
+            if (connection is not null)
             {
-                string id = Guid.NewGuid().ToString();
-
-                using (QueryFactory db = _queryFactory.Invoke())
-                {
-                    await db.Query("connections").InsertAsync(new
-                    {
-                        Id = id,
-                        UserId = userId,
-                        AppId = appId
-                    });
-                }
-
-                connection = await GetByIdAsync(id);
+                return connection;
             }
+            
+            var id = _idGenerator.GenerateId<IConnection>();
+            await QueryFactory.Query(_table).InsertAsync(new
+            {
+                Id = id.Value,
+                UserId = userId.Value,
+                AppId = appId.Value
+            });
 
-            return connection;
+            return await GetByIdAsync(id);
         }
 
-
-
-        public async Task DeleteAsync(string id)
+        public async Task DeleteByApplicationAsync(Id<IApplication> appId)
         {
-            using (QueryFactory db = _queryFactory.Invoke())
-            {
-                await db.Query("connections").Where("Id", id).DeleteAsync();
-            }
+            await QueryFactory.Query(_table).Where("AppId", appId.Value).DeleteAsync();
+        }
+
+        public async Task DeleteAsync(Id<IConnection> id)
+        {
+            await QueryFactory.Query(_table).Where("Id", id.Value).DeleteAsync();
         }
     }
 }

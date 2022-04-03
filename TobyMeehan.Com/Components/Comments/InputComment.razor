@@ -16,7 +16,7 @@
                 <button type="submit" class="btn btn-primary">
                     @SubmitButton
                 </button>
-                <button type="reset" class="btn btn-secondary" @onclick="OnCancel.InvokeAsync">
+                <button type="reset" class="btn btn-secondary" @onclick="() => OnCancel.InvokeAsync()">
                     Cancel
                 </button>
             </div>

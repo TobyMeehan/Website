@@ -4,70 +4,25 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
-using TobyMeehan.Com.Data.Collections;
-using TobyMeehan.Com.Data.Models;
-using TobyMeehan.Com.Data.Repositories;
 
 namespace TobyMeehan.Com.Data.SqlKata
 {
-    public class RoleRepository : RepositoryBase<Role>, IRoleRepository
+    public class RoleRepository : RepositoryBase<IRole, Role, NewRole>, IRoleRepository
     {
-        private readonly Func<QueryFactory> _queryFactory;
-
-        public RoleRepository(Func<QueryFactory> queryFactory) : base (queryFactory)
+        public RoleRepository(QueryFactory queryFactory, IIdGenerator idGenerator) : base (queryFactory, idGenerator, "roles")
         {
-            _queryFactory = queryFactory;
         }
 
         protected override Query Query()
         {
             return base.Query()
-                .From("roles");
+                .From("roles")
+                .OrderBy("Name");
         }
 
-
-        public async Task<Role> AddAsync(string name)
+        public async Task<IRole> GetByNameAsync(string name)
         {
-            string id = Guid.NewGuid().ToString();
-
-            using (QueryFactory db = _queryFactory.Invoke())
-            {
-                await db.Query("roles").InsertAsync(new
-                {
-                    Id = id,
-                    Name = name
-                });
-            }
-
-            return await GetByIdAsync(id);
-        }
-
-
-
-        public async Task<IEntityCollection<Role>> GetAsync()
-        {
-            return await SelectAsync();
-        }
-
-        public async Task<Role> GetByIdAsync(string id)
-        {
-            return await SelectSingleAsync(query => query.Where("roles.Id", id));
-        }
-
-        public async Task<Role> GetByNameAsync(string name)
-        {
-            return await SelectSingleAsync(query => query.Where("Name", name));
-        }
-
-
-
-
-        public async Task DeleteAsync(string id)
-        {
-            using (QueryFactory db = _queryFactory.Invoke())
-            {
-                await db.Query("roles").Where("Id", id).DeleteAsync();
-            }
+            return await SelectSingleAsync(query => query.Where($"{Table}.Name", name));
         }
     }
 }

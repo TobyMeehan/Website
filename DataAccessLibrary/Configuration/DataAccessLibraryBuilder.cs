@@ -7,8 +7,6 @@ using System.Collections.Generic;
 using System.Data;
 using System.Text;
 using TobyMeehan.Com.Data.CloudStorage;
-using TobyMeehan.Com.Data.Models;
-using TobyMeehan.Com.Data.Repositories;
 using TobyMeehan.Com.Data.Security;
 
 namespace TobyMeehan.Com.Data.Configuration
@@ -22,12 +20,18 @@ namespace TobyMeehan.Com.Data.Configuration
 
         public IServiceCollection Services { get; set; }
 
-        public DataAccessLibraryBuilder AddSqlDatabase(Func<IDbConnection> connectionFactory)
+        public DataAccessLibraryBuilder AddSqlDatabase<TCompiler>(Func<IDbConnection> connectionFactory) where TCompiler : Compiler
         {
-            Services.AddSingleton(connectionFactory);
+            Services.AddTransient<Compiler, TCompiler>();
+            Services.AddSingleton<Func<IDbConnection>>(connectionFactory);
 
-            var compiler = new MySqlCompiler();
-            Services.AddSingleton<Func<QueryFactory>>(() => new QueryFactory(connectionFactory.Invoke(), compiler));
+            Services.AddTransient<QueryFactory>(services =>
+            {
+                var connection = services.GetService<Func<IDbConnection>>().Invoke();
+                var compiler = services.GetService<Compiler>();
+
+                return new QueryFactory(connection, compiler);
+            });
 
             Services.AddTransient<IUserRepository, SqlKata.UserRepository>();
             Services.AddTransient<IRoleRepository, SqlKata.RoleRepository>();
@@ -43,6 +47,10 @@ namespace TobyMeehan.Com.Data.Configuration
             Services.AddTransient<IScoreboardRepository, SqlKata.ScoreboardRepository>();
 
             Services.AddTransient<ICommentRepository, SqlKata.CommentRepository>();
+            
+            Slapper.AutoMapper.Configuration.TypeConverters.Add(new IdConverter());
+            
+            Slapper.AutoMapper.Configuration.TypeActivators.Add(new SqlKata.ApplicationActivator());
 
             return this;
         }

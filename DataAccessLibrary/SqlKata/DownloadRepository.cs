@@ -2,166 +2,61 @@
 using SqlKata.Execution;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using TobyMeehan.Com.Data.Collections;
-using TobyMeehan.Com.Data.Models;
-using TobyMeehan.Com.Data.Repositories;
 using TobyMeehan.Com.Data.Security;
 
 namespace TobyMeehan.Com.Data.SqlKata
 {
-    public class DownloadRepository : RepositoryBase<Download>, IDownloadRepository
+    public class DownloadRepository : RepositoryBase<IDownload, Download, NewDownload, EditDownload>, IDownloadRepository
     {
-        private readonly Func<QueryFactory> _queryFactory;
         private readonly IUserRepository _users;
+        private readonly IDownloadFileRepository _files;
 
-        public DownloadRepository(Func<QueryFactory> queryFactory, IUserRepository users) : base(queryFactory)
+        public DownloadRepository(QueryFactory queryFactory, IIdGenerator idGenerator, IUserRepository users, IDownloadFileRepository files) : base(queryFactory, idGenerator, "downloads")
         {
-            _queryFactory = queryFactory;
             _users = users;
+            _files = files;
         }
 
         protected override Query Query()
         {
-            var files = new Query("downloadfiles").OrderBy("Filename");
-
             return base.Query()
-                .From("downloads")
+                .From(Table)
                 .OrderByDesc("Updated")
-                .OrderBy("Title")
-                .LeftJoin(files.As("files"), j => j.On("files.DownloadId", "downloads.Id"))
-
-                .Select("downloads.{Id, Title, ShortDescription, LongDescription, Visibility, VersionString, Updated, Verified}",
-                        "files.Id AS Files_Id", "files.Filename AS Files_Filename", "files.Url AS Files_Url");
+                .OrderBy("Title");
         }
 
-        protected override async Task<IEntityCollection<Download>> MapAsync(IEnumerable<Download> items)
+        protected override async Task<IReadOnlyList<IDownload>> MapAsync(IEnumerable<Download> items)
         {
-            foreach (var item in items)
+            var downloads = items.ToList();
+            
+            foreach (var download in downloads)
             {
-                item.Authors = new EntityCollection<User>(await _users.GetByDownloadAsync(item.Id));
+                download.Files = await _files.GetByDownloadAsync(download.Id);
+                download.Authors = await _users.GetByDownloadAsync(download.Id);
             }
 
-            return await base.MapAsync(items);
+            return await base.MapAsync(downloads);
         }
 
-
-
-        public async Task<Download> AddAsync(string title, string shortDescription, string longDescription, Version version, string userId)
-        {
-            string id = RandomString.GeneratePseudo();
-
-            using (QueryFactory db = _queryFactory.Invoke())
-            {
-                await db.Query("downloads").InsertAsync(new
-                {
-                    Id = id,
-                    Title = title,
-                    ShortDescription = shortDescription,
-                    LongDescription = longDescription,
-                    VersionString = version.ToString(),
-                    Updated = DateTime.Now
-                });
-            }
-
-            await AddAuthorAsync(id, userId);
-
-            return await GetByIdAsync(id);
-        }
-
-
-
-        public async Task<IEntityCollection<Download>> GetAsync()
-        {
-            return await SelectAsync();
-        }
-
-        public async Task<IEntityCollection<Download>> GetByAuthorAsync(string userId)
+        public async Task<IReadOnlyList<IDownload>> GetByAuthorAsync(Id<IUser> userId)
         {
             var author = new Query("downloadauthors").Select("DownloadId").Where("UserId", userId);
 
-            return await SelectAsync(query => query.WhereIn("downloads.Id", author));
+            return await SelectAsync(query => query.WhereIn($"{Table}.Id", author));
         }
 
-        public async Task<Download> GetByIdAsync(string id)
+        public async Task AddAuthorAsync(Id<IDownload> id, Id<IUser> userId)
         {
-            return await SelectSingleAsync(query => query.Where("downloads.Id", id));
+            await QueryFactory.Query("downloadauthors").InsertAsync(new {DownloadId = id.Value, UserId = userId.Value});
         }
 
-
-
-        public async Task<Download> UpdateAsync(string id, Download download)
+        public async Task RemoveAuthorAsync(Id<IDownload> id, Id<IUser> userId)
         {
-            var record = await GetByIdAsync(id);
-
-            if (download.Version != null && download.Version > record.Version)
-            {
-                download.Updated = DateTime.Now;
-            }
-            else
-            {
-                download.Updated = record.Updated;
-                download.Version = record.Version;
-            }
-
-            using (QueryFactory db = _queryFactory.Invoke())
-            {
-                await db.Query("downloads").Where("Id", id).UpdateAsync(new
-                {
-                    Title = download.Title ?? record.Title,
-                    ShortDescription = download.ShortDescription ?? record.ShortDescription,
-                    LongDescription = download.LongDescription ?? record.LongDescription,
-                    download.VersionString,
-                    download.Updated,
-                    download.Visibility
-                });
-            }
-
-            return await GetByIdAsync(id);
-        }
-
-        public async Task VerifyAsync(string id, DownloadVerification verification)
-        {
-            using (QueryFactory db = _queryFactory.Invoke())
-            {
-                await db.Query("downloads").Where("Id", id).UpdateAsync(new
-                {
-                    Verified = verification
-                });
-            }
-        }
-
-
-
-        public async Task DeleteAsync(string id)
-        {
-            using (QueryFactory db = _queryFactory.Invoke())
-            {
-                await db.Query("downloads").Where("Id", id).DeleteAsync();
-            }
-        }
-
-
-
-        public async Task AddAuthorAsync(string id, string userId)
-        {
-            using (QueryFactory db = _queryFactory.Invoke())
-            {
-                await db.Query("downloadauthors").InsertAsync(new
-                {
-                    DownloadId = id,
-                    UserId = userId
-                });
-            }
-        }
-
-        public async Task RemoveAuthorAsync(string id, string userId)
-        {
-            using (QueryFactory db = _queryFactory.Invoke())
-            {
-                await db.Query("downloadauthors").Where("DownloadId", id).Where("UserId", userId).DeleteAsync();
-            }
+            await QueryFactory.Query("downloadauthors").Where("DownloadId", id.Value).Where("UserId", userId.Value)
+                .DeleteAsync();
         }
     }
 }
