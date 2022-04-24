@@ -22,7 +22,7 @@ jobs:
       run: npm install -g caprover
 
     - name: Caprover Deploy
-      run: caprover deploy -h '${{ secrets.CAPROVER_DOMAIN }}' --appToken ${{ secrets.CAPROVER_TOKEN_WEBSITE }} -b master
+      run: caprover deploy -b master -h '${{ secrets.CAPROVER_DOMAIN }}' -a tobymeehan-com --appToken ${{ secrets.CAPROVER_TOKEN_WEBSITE }} 
       
   deploy-api:
     runs-on: ubuntu-latest
@@ -40,4 +40,4 @@ jobs:
       run: npm install -g caprover
 
     - name: Caprover Deploy
-      run: caprover deploy -h '${{ secrets.CAPROVER_DOMAIN }}' --appToken ${{ secrets.CAPROVER_TOKEN_API }} -b master
+      run: caprover deploy -b master -h '${{ secrets.CAPROVER_DOMAIN }}' -a api --appToken ${{ secrets.CAPROVER_TOKEN_API }}
