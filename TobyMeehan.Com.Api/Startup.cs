@@ -99,7 +99,7 @@ namespace TobyMeehan.Com.Api
                     OnRedirectToLogin = context =>
                     {
 #if DEBUG
-                        context.HttpContext.Response.Redirect($"https://localhost:44373/login{getReturnUrl.Invoke(context.HttpContext)}");
+                        context.HttpContext.Response.Redirect($"https://localhost:5001/login{getReturnUrl.Invoke(context.HttpContext)}");
 #else
                         context.HttpContext.Response.Redirect($"https://tobymeehan.com/login{getReturnUrl.Invoke(context.HttpContext)}");
 #endif
@@ -108,7 +108,7 @@ namespace TobyMeehan.Com.Api
                     OnRedirectToAccessDenied = context =>
                     {
 #if DEBUG
-                        context.HttpContext.Response.Redirect($"https://localhost:44373/login{getReturnUrl.Invoke(context.HttpContext)}");
+                        context.HttpContext.Response.Redirect($"https://localhost:5001/login{getReturnUrl.Invoke(context.HttpContext)}");
 #else
                         context.HttpContext.Response.Redirect($"https://tobymeehan.com/login{getReturnUrl.Invoke(context.HttpContext)}");
 #endif

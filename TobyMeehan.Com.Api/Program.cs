@@ -20,13 +20,11 @@ namespace TobyMeehan.Com.Api
             Host.CreateDefaultBuilder(args)
                 .ConfigureAppConfiguration((hostingContext, config) =>
                 {
+                    config.AddJsonFile("connectionStrings.json", true);
+                    
                     if (hostingContext.HostingEnvironment.IsDevelopment())
                     {
                         config.AddJsonFile("connectionStrings.Development.json", true);
-                    }
-                    else
-                    {
-                        config.AddJsonFile("connectionStrings.json", true);
                     }
 
                     config.AddEnvironmentVariables("TM");
