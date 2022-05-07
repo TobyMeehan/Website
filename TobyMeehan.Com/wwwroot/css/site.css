@@ -171,6 +171,11 @@ i.avatar-medium {
     transform: translate(-50%, -50%);
 }
 
+
+.btn-sm-block {
+    width: 100%;
+}
+
 @media (min-width: 0) {
     .card-centre {
         width: 100%;
@@ -188,6 +193,10 @@ i.avatar-medium {
     .card-centre {
         width: 75%;
         height: initial;
+    }
+    
+    .btn-sm-block {
+        width: initial;
     }
 }
 

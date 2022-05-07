@@ -5,13 +5,22 @@
     <li class="nav-item">
         <NavLink class="nav-link" href="/downloads" Match="NavLinkMatch.Prefix">Downloads</NavLink>
     </li>
+    <li class="nav-item">
+        <NavLink class="nav-link" href="https://bot.tobymeehan.com">
+            <i class="fab fa-discord"></i>
+            Toby's Bot
+        </NavLink>
+    </li>
     <AuthorizeView>
         <li class="nav-item">
             <NavLink class="nav-link" href="/developer" Match="NavLinkMatch.Prefix">Developer</NavLink>
         </li>
     </AuthorizeView>
     <li class="nav-item">
-        <NavLink class="nav-link" href="https://github.com/TobyMeehan/Website">GitHub</NavLink>
+        <NavLink class="nav-link" href="https://github.com/TobyMeehan/Website">
+            <i class="fab fa-github"></i>
+            Github
+        </NavLink>
     </li>
     <AuthorizeView Policy="@AuthorizationPolicies.IsAdmin">
         <li class="nav-item">
