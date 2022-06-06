@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
+﻿using System.Linq;
 using System.Net.Mime;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using TobyMeehan.Com.Data.Models;
 using TobyMeehan.Com.Data.Repositories;
 
 namespace TobyMeehan.Com.Controllers
@@ -24,16 +20,19 @@ namespace TobyMeehan.Com.Controllers
         [HttpGet("/downloads/{download}/file/{filename}")]
         public async Task<IActionResult> Download(string download, string filename)
         {
-            Download dl = await _downloads.GetByIdAsync(download);
+            var dl = await _downloads.GetByIdAsync(download);
 
-            if (dl.Visibility == DownloadVisibility.Private)
+            if (dl.Visibility is DownloadVisibility.Private)
             {
                 return Redirect($"/downloads/{download}");
             }
 
-            DownloadFile file = (await _files.GetByDownloadAndFilenameAsync(download, filename)).First();
+            var file = (await _files.GetByDownloadAndFilenameAsync(download, filename)).First();
 
-            return Redirect(file.Url);
+            await _files.DownloadAsync(file.Id, HttpContext.Response.Body);
+
+            return File(HttpContext.Response.Body, MediaTypeNames.Application.Octet, file.Filename,
+                enableRangeProcessing: true);
         }
     }
 }
