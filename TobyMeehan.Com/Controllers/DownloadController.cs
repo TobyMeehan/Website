@@ -3,6 +3,7 @@ using System.Linq;
 using System.Net.Mime;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using TobyMeehan.Com.Data.Models;
 using TobyMeehan.Com.Data.Repositories;
 
 namespace TobyMeehan.Com.Controllers
@@ -18,8 +19,7 @@ namespace TobyMeehan.Com.Controllers
             _files = files;
         }
 
-        [HttpGet("/downloads/{download}/file/{filename}")]
-        public async Task<IActionResult> Download(string download, string filename)
+        private async Task<IActionResult> ResultAsync(string download, string filename, bool inline = false)
         {
             var dl = await _downloads.GetByIdAsync(download);
 
@@ -33,8 +33,24 @@ namespace TobyMeehan.Com.Controllers
             var file = (await _files.GetByDownloadAndFilenameAsync(download, filename)).First();
 
             await _files.DownloadAsync(file.Id, stream);
-            return File(stream.ToArray(), MimeTypes.GetMimeType(file.Filename), file.Filename,
-                enableRangeProcessing: true);
+            
+            HttpContext.Response.Headers.Add("Content-Disposition", $"{(inline ? "inline" : "attachment")};filename={file.Filename}");
+
+            return File(stream.ToArray(), MimeTypes.GetMimeType(file.Filename), enableRangeProcessing: true);
+        }
+
+        [HttpGet("/downloads/{download}/file/{filename}")]
+        public async Task<IActionResult> Download(string download, string filename)
+        {
+            return await ResultAsync(download, filename);
+        }
+
+        [HttpGet("/downloads/{download}/file/{filename}/inline")]
+        public async Task<IActionResult> DownloadInline(string download, string filename)
+        {
+            var result = await ResultAsync(download, filename, inline: true);
+
+            return result;
         }
     }
 }
