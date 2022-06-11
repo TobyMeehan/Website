@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.IO;
+using System.Linq;
 using System.Net.Mime;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
@@ -27,11 +28,12 @@ namespace TobyMeehan.Com.Controllers
                 return Redirect($"/downloads/{download}");
             }
 
+            var stream = new MemoryStream();
+            
             var file = (await _files.GetByDownloadAndFilenameAsync(download, filename)).First();
 
-            await _files.DownloadAsync(file.Id, HttpContext.Response.Body);
-
-            return File(HttpContext.Response.Body, MediaTypeNames.Application.Octet, file.Filename,
+            await _files.DownloadAsync(file.Id, stream);
+            return File(stream.ToArray(), MimeTypes.GetMimeType(file.Filename), file.Filename,
                 enableRangeProcessing: true);
         }
     }
