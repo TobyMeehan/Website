@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
+﻿using System.IO;
 using System.Linq;
 using System.Net.Mime;
 using System.Threading.Tasks;
@@ -21,19 +19,38 @@ namespace TobyMeehan.Com.Controllers
             _files = files;
         }
 
-        [HttpGet("/downloads/{download}/file/{filename}")]
-        public async Task<IActionResult> Download(string download, string filename)
+        private async Task<IActionResult> ResultAsync(string download, string filename, bool inline = false)
         {
-            Download dl = await _downloads.GetByIdAsync(download);
+            var dl = await _downloads.GetByIdAsync(download);
 
-            if (dl.Visibility == DownloadVisibility.Private)
+            if (dl.Visibility is DownloadVisibility.Private)
             {
                 return Redirect($"/downloads/{download}");
             }
 
-            DownloadFile file = (await _files.GetByDownloadAndFilenameAsync(download, filename)).First();
+            var stream = new MemoryStream();
+            
+            var file = (await _files.GetByDownloadAndFilenameAsync(download, filename)).First();
 
-            return Redirect(file.Url);
+            await _files.DownloadAsync(file.Id, stream);
+            
+            HttpContext.Response.Headers.Add("Content-Disposition", $"{(inline ? "inline" : "attachment")};filename={file.Filename}");
+
+            return File(stream.ToArray(), MimeTypes.GetMimeType(file.Filename), enableRangeProcessing: true);
+        }
+
+        [HttpGet("/downloads/{download}/file/{filename}")]
+        public async Task<IActionResult> Download(string download, string filename)
+        {
+            return await ResultAsync(download, filename);
+        }
+
+        [HttpGet("/downloads/{download}/file/{filename}/inline")]
+        public async Task<IActionResult> DownloadInline(string download, string filename)
+        {
+            var result = await ResultAsync(download, filename, inline: true);
+
+            return result;
         }
     }
 }
