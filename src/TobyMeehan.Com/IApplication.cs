@@ -23,7 +23,7 @@ public interface IApplication : IEntity<IApplication>
     /// <summary>
     /// The application's description.
     /// </summary>
-    string Description { get; }
+    string? Description { get; }
 
     /// <summary>
     /// The application's icon.
