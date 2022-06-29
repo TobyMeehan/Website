@@ -3,10 +3,7 @@
 /// <summary>
 /// A role for an application.
 /// </summary>
-public interface IApplicationRole : IEntity<IApplicationRole>, IRole<IApplication>
+public interface IApplicationRole : IRole<IApplicationRole>
 {
-    /// <summary>
-    /// The application of the role.
-    /// </summary>
-    Id<IApplication> ApplicationId { get; }
+    
 }

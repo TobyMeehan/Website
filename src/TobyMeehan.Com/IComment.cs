@@ -4,7 +4,7 @@
 /// Base entity for a comment.
 /// </summary>
 /// <typeparam name="TComment">Derived type of comment.</typeparam>
-public interface IComment<TComment> : IEntity<TComment> where TComment : IEntity<TComment>
+public interface IComment<TComment> : IEntity<TComment> where TComment : IComment<TComment>
 {
     /// <summary>
     /// The author of the comment.

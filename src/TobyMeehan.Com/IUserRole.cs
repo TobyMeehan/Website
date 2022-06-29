@@ -3,10 +3,7 @@
 /// <summary>
 /// A role for a user.
 /// </summary>
-public interface IUserRole : IEntity<IUserRole>, IRole<IUser>
+public interface IUserRole : IRole<IUserRole>
 {
-    /// <summary>
-    /// The user.
-    /// </summary>
-    Id<IUser> UserId { get; }
+    
 }
