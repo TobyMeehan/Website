@@ -9,23 +9,23 @@ public interface IUserRepository
 {
     // SELECT
 
-    Task<List<UserData>> SelectAllAsync();
+    Task<List<UserData>> SelectAllAsync(CancellationToken cancellationToken = default);
 
-    Task<List<UserData>> SelectByRoleAsync(string roleId);
+    Task<List<UserData>> SelectByRoleAsync(string roleId, CancellationToken cancellationToken = default);
 
-    Task<UserData> SelectByIdAsync(string id);
+    Task<UserData> SelectByIdAsync(string id, CancellationToken cancellationToken = default);
 
-    Task<UserData> SelectByUsernameAsync(string username);
+    Task<UserData> SelectByHandleAsync(string handle, CancellationToken cancellationToken = default);
     
     // INSERT
 
-    Task InsertAsync(UserData user);
+    Task InsertAsync(UserData user, CancellationToken cancellationToken = default);
     
     // UPDATE
 
-    Task UpdateAsync(UserData user);
+    Task UpdateAsync(UserData user, CancellationToken cancellationToken = default);
     
     // DELETE
 
-    Task DeleteAsync(string id);
+    Task DeleteAsync(string id, CancellationToken cancellationToken = default);
 }

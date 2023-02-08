@@ -6,9 +6,14 @@
 public interface IUser : IEntity<IUser>
 {
     /// <summary>
-    /// The username of the user.
+    /// The custom username of the user.
     /// </summary>
-    string Username { get; }
+    string? Name { get; }
+    
+    /// <summary>
+    /// The unique handle of the user.
+    /// </summary>
+    string Handle { get; }
     
     /// <summary>
     /// The balance of the user.
