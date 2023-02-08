@@ -2,7 +2,7 @@
 
 namespace TobyMeehan.Com.Data.Repositories.Models;
 
-public class UserData
+public class UserData : IData
 {
     [Required]
     public string Id { get; set; }

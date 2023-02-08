@@ -6,11 +6,11 @@ namespace TobyMeehan.Com.Data.SqlKata;
 
 public abstract class BaseRepository<TData>
 {
-    private readonly QueryFactory _db;
+    protected QueryFactory Db { get; }
 
     protected BaseRepository(QueryFactory db)
     {
-        _db = db;
+        Db = db;
     }
 
     protected virtual Query Query()
@@ -34,21 +34,21 @@ public abstract class BaseRepository<TData>
             : query.From(new Query(clause.Table), clause.Alias).ForPage(page, perPage);
     }
 
-    protected async Task<List<TData>> SelectAsync(Func<Query, Query>? queryFunc = null, int page = 1, int perPage = 200)
+    protected async Task<List<TData>> QueryAsync(Func<Query, Query>? queryFunc = null, int page = 1, int perPage = 200, CancellationToken cancellationToken = default)
     {
         var query = Query(queryFunc, page, perPage);
 
-        var result = await _db.GetAsync(query);
+        var result = await Db.GetAsync(query, cancellationToken: cancellationToken);
         var items = AutoMapper.MapDynamic<TData>(result);
 
         return items.ToList();
     }
 
-    protected async Task<TData> SelectSingleAsync(Func<Query, Query>? queryFunc = null)
+    protected async Task<TData> QuerySingleAsync(Func<Query, Query>? queryFunc = null, CancellationToken cancellationToken = default)
     {
         var query = Query(queryFunc, 1, 1);
 
-        dynamic result = await _db.FirstOrDefaultAsync(query);
+        var result = await Db.FirstOrDefaultAsync(query, cancellationToken: cancellationToken);
 
         return AutoMapper.MapDynamic<TData>(result);
     }
