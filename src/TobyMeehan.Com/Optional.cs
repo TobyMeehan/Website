@@ -26,4 +26,9 @@ public struct Optional<T>
     public bool IsChanged => _isChanged;
 
     public static implicit operator Optional<T>(T value) => new() {Value = value};
+
+    public static T operator |(Optional<T> option, T value)
+    {
+        return option.IsChanged ? option.Value : value;
+    }
 }
