@@ -4,7 +4,7 @@ using TobyMeehan.Com.Data.Repositories.Models;
 
 namespace TobyMeehan.Com.Data.SqlKata;
 
-public class Repository<T> : BaseRepository<T> where T : IData
+public class Repository<T> : BaseRepository<T>
 {
     protected string Table { get; }
 
@@ -19,27 +19,27 @@ public class Repository<T> : BaseRepository<T> where T : IData
             .From(Table);
     }
 
-    public async Task<List<T>> SelectAllAsync(CancellationToken cancellationToken = default)
+    public async Task<List<T>> SelectAllAsync(CancellationToken cancellationToken)
     {
         return await QueryAsync(cancellationToken: cancellationToken);
     }
 
-    public async Task<T> SelectByIdAsync(string id, CancellationToken cancellationToken = default)
+    public async Task<T> SelectByIdAsync(string id, CancellationToken cancellationToken)
     {
         return await QuerySingleAsync(query => query.Where($"{Table}.Id", id), cancellationToken: cancellationToken);
     }
 
-    public async Task InsertAsync(T data, CancellationToken cancellationToken = default)
+    public async Task InsertAsync(T data, CancellationToken cancellationToken)
     {
         await Db.Query(Table).InsertAsync(data, cancellationToken: cancellationToken);
     }
 
-    public async Task UpdateAsync(T data, CancellationToken cancellationToken = default)
+    public async Task UpdateAsync(string id, T data, CancellationToken cancellationToken)
     {
-        await Db.Query(Table).Where("Id", data.Id).UpdateAsync(data, cancellationToken: cancellationToken);
+        await Db.Query(Table).Where("Id", id).UpdateAsync(data, cancellationToken: cancellationToken);
     }
 
-    public async Task DeleteAsync(string id, CancellationToken cancellationToken = default)
+    public async Task DeleteAsync(string id, CancellationToken cancellationToken)
     {
         await Db.Query(Table).Where("Id", id).DeleteAsync(cancellationToken: cancellationToken);
     }

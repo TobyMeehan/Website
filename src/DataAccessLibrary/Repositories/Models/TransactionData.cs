@@ -1,6 +1,6 @@
 ﻿namespace TobyMeehan.Com.Data.Repositories.Models;
 
-public class TransactionData : IData
+public class TransactionData
 {
     public string Id { get; set; }
     public string UserId { get; set; }

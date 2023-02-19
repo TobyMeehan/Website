@@ -1,6 +1,6 @@
 ﻿namespace TobyMeehan.Com.Data.Repositories.Models;
 
-public class DownloadCommentData : IData
+public class DownloadCommentData
 {
     public string Id { get; set; }
     public string AuthorId { get; set; }

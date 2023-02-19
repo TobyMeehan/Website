@@ -1,6 +1,6 @@
 ﻿namespace TobyMeehan.Com.Data.Repositories.Models;
 
-public class ApplicationData : IData
+public class ApplicationData
 {
     public string Id { get; set; }
     public string AuthorId { get; set; }

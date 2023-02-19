@@ -1,6 +1,6 @@
 ﻿namespace TobyMeehan.Com.Data.Repositories.Models;
 
-public class DownloadData : IData
+public class DownloadData
 {
     public string Id { get; set; }
     public string OwnerId { get; set; }
