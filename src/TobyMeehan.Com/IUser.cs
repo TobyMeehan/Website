@@ -8,7 +8,7 @@ public interface IUser : IEntity<IUser>
     /// <summary>
     /// The custom username of the user.
     /// </summary>
-    string? Name { get; }
+    string Name { get; }
     
     /// <summary>
     /// The unique handle of the user.
@@ -24,11 +24,6 @@ public interface IUser : IEntity<IUser>
     /// The user's custom description.
     /// </summary>
     string? Description { get; }
-    
-    /// <summary>
-    /// The user's custom URL.
-    /// </summary>
-    string? CustomUrl { get; }
     
     /// <summary>
     /// The user's avatar.

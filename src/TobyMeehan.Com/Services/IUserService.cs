@@ -13,28 +13,28 @@ public interface IUserService
     /// Gets all users.
     /// </summary>
     /// <returns></returns>
-    Task<IEntityCollection<IUser>> GetAllAsync();
+    Task<IEntityCollection<IUser>> GetAllAsync(CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Gets all users with the specified role.
     /// </summary>
     /// <param name="role"></param>
     /// <returns></returns>
-    Task<IEntityCollection<IUser>> GetByRoleAsync(Id<IUserRole> role);
+    Task<IEntityCollection<IUser>> GetByRoleAsync(Id<IUserRole> role, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Gets the user with the specified ID.
     /// </summary>
     /// <param name="id"></param>
     /// <returns></returns>
-    Task<IUser> GetByIdAsync(Id<IUser> id);
+    Task<IUser> GetByIdAsync(Id<IUser> id, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Gets the user with the specified username.
     /// </summary>
-    /// <param name="username"></param>
+    /// <param name="handle"></param>
     /// <returns></returns>
-    Task<IUser> GetByUsernameAsync(string username);
+    Task<IUser> GetByHandleAsync(string handle, CancellationToken cancellationToken = default);
 
     // CREATE
 
@@ -43,7 +43,7 @@ public interface IUserService
     /// </summary>
     /// <param name="user"></param>
     /// <returns></returns>
-    Task<IUser> CreateAsync(CreateUserBuilder user);
+    Task<IUser> CreateAsync(CreateUserBuilder user, CancellationToken cancellationToken = default);
     
     // UPDATE
     
@@ -53,7 +53,7 @@ public interface IUserService
     /// <param name="id"></param>
     /// <param name="user"></param>
     /// <returns></returns>
-    Task<IUser> UpdateAsync(Id<IUser> id, UpdateUserBuilder user);
+    Task<IUser> UpdateAsync(Id<IUser> id, UpdateUserBuilder user, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Updates the protected properties of the specified user with the specified builder.
@@ -61,7 +61,7 @@ public interface IUserService
     /// <param name="id"></param>
     /// <param name="user"></param>
     /// <returns></returns>
-    Task<IUser> ProtectedUpdateAsync(Id<IUser> id, ProtectedUpdateUserBuilder user);
+    Task<IUser> ProtectedUpdateAsync(Id<IUser> id, ProtectedUpdateUserBuilder user, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Changes the specified user's balance by the specified amount.
@@ -69,7 +69,7 @@ public interface IUserService
     /// <param name="id"></param>
     /// <param name="amount"></param>
     /// <returns></returns>
-    Task UpdateBalanceAsync(Id<IUser> id, double amount);
+    Task UpdateBalanceAsync(Id<IUser> id, double amount, CancellationToken cancellationToken = default);
 
     // DELETE
     
@@ -78,5 +78,5 @@ public interface IUserService
     /// </summary>
     /// <param name="id"></param>
     /// <returns></returns>
-    Task DeleteAsync(Id<IUser> id);
+    Task DeleteAsync(Id<IUser> id, CancellationToken cancellationToken = default);
 }

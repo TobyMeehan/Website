@@ -1,0 +1,84 @@
+using TobyMeehan.Com.Builders;
+using TobyMeehan.Com.Data.Entities;
+using TobyMeehan.Com.Data.Repositories;
+using TobyMeehan.Com.Data.Repositories.Models;
+using TobyMeehan.Com.Data.Security;
+using TobyMeehan.Com.Services;
+
+namespace TobyMeehan.Com.Data.Services;
+
+public class UserService : BaseService<IUser, UserData, CreateUserBuilder>, IUserService
+{
+    private readonly IUserRepository _db;
+    private readonly IIdService _id;
+    private readonly IPasswordService _password;
+
+    public UserService(IUserRepository db, IIdService id, IPasswordService password) : base(db)
+    {
+        _db = db;
+        _id = id;
+        _password = password;
+    }
+    
+    protected override Task<IUser> MapAsync(UserData data)
+    {
+        return Task.FromResult<IUser>(new User(data.Name, data.Handle, data.Balance, data.Description));
+    }
+
+    protected override async Task<(Id<IUser>, UserData)> CreateAsync(CreateUserBuilder create)
+    {
+        var id = await _id.GenerateAsync<IUser>();
+
+        return (id, new UserData
+        {
+            Id = id.Value,
+            Handle = create.Username,
+            Name = create.Username,
+            HashedPassword = await _password.HashAsync(create.Password)
+        });
+    }
+
+    public async Task<IEntityCollection<IUser>> GetByRoleAsync(Id<IUserRole> role, CancellationToken ct)
+    {
+        var data = await _db.SelectByRoleAsync(role.Value, ct);
+
+        return await MapAsync(data);
+    }
+
+    public async Task<IUser> GetByHandleAsync(string handle, CancellationToken ct)
+    {
+        var data = await _db.SelectByHandleAsync(handle, ct);
+
+        return await MapAsync(data);
+    }
+
+    public async Task<IUser> UpdateAsync(Id<IUser> id, UpdateUserBuilder user, CancellationToken ct)
+    {
+        return await UpdateAsync(id, data =>
+        {
+            data.Description = user.Description | data.Description;
+            data.Name = user.Name | data.Name;
+        }, ct);
+    }
+
+    public async Task<IUser> ProtectedUpdateAsync(Id<IUser> id, ProtectedUpdateUserBuilder user, CancellationToken ct)
+    {
+        var hash = user.Password.IsChanged 
+            ? await _password.HashAsync(user.Password.Value) 
+            : new Optional<string>();
+
+        return await UpdateAsync(id, data =>
+        {
+            data.Handle = user.Handle | data.Handle;
+            data.HashedPassword = hash | data.HashedPassword;
+        }, ct);
+    }
+
+    public async Task UpdateBalanceAsync(Id<IUser> id, double amount, CancellationToken ct)
+    {
+        await UpdateAsync(id, user =>
+        {
+            user.Balance += amount;
+        }, ct);
+    }
+}
