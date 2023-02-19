@@ -11,15 +11,22 @@ public class UserRepository : Repository<UserData>, IUserRepository
     {
     }
 
-    public async Task<List<UserData>> SelectByRoleAsync(string roleId, CancellationToken cancellationToken = default)
+    protected override Query Query()
+    {
+        return base.Query()
+            .OrderBy("Name")
+            .Select();
+    }
+
+    public async Task<List<UserData>> SelectByRoleAsync(string roleId, CancellationToken ct)
     {
         var roles = new Query("userroles").Select("UserId").Where("Id", roleId);
 
-        return await QueryAsync(query => query.WhereIn("users.Id", roles), cancellationToken: cancellationToken);
+        return await QueryAsync(query => query.WhereIn("users.Id", roles), cancellationToken: ct);
     }
 
-    public async Task<UserData> SelectByHandleAsync(string handle, CancellationToken cancellationToken = default)
+    public async Task<UserData> SelectByHandleAsync(string handle, CancellationToken ct)
     {
-        return await QuerySingleAsync(query => query.Where("Handle", handle), cancellationToken: cancellationToken);
+        return await QuerySingleAsync(query => query.Where("Handle", handle), cancellationToken: ct);
     }
 }
