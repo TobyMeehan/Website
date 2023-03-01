@@ -19,6 +19,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TobyMeehan.Com", "src\TobyM
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataAccessLibrary", "src\DataAccessLibrary\DataAccessLibrary.csproj", "{663C3CEE-9B28-4753-8102-9397297B0260}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TobyMeehan.Com.Accounts", "src\TobyMeehan.Com.Accounts\TobyMeehan.Com.Accounts.csproj", "{304416F3-5629-42EF-917A-01F15A624A33}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -53,6 +55,10 @@ Global
 		{663C3CEE-9B28-4753-8102-9397297B0260}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{663C3CEE-9B28-4753-8102-9397297B0260}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{663C3CEE-9B28-4753-8102-9397297B0260}.Release|Any CPU.Build.0 = Release|Any CPU
+		{304416F3-5629-42EF-917A-01F15A624A33}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{304416F3-5629-42EF-917A-01F15A624A33}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{304416F3-5629-42EF-917A-01F15A624A33}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{304416F3-5629-42EF-917A-01F15A624A33}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -63,5 +69,6 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{BAB40C65-0188-4388-A9B9-2347BB0DE744} = {05732657-CD1C-4F8C-870B-F3185F8A0686}
 		{663C3CEE-9B28-4753-8102-9397297B0260} = {05732657-CD1C-4F8C-870B-F3185F8A0686}
+		{304416F3-5629-42EF-917A-01F15A624A33} = {05732657-CD1C-4F8C-870B-F3185F8A0686}
 	EndGlobalSection
 EndGlobal
