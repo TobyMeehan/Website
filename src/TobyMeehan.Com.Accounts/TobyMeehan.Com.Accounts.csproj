@@ -13,4 +13,12 @@
       </Content>
     </ItemGroup>
 
+    <ItemGroup>
+      <PackageReference Include="FluentValidation" Version="11.5.1" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\TobyMeehan.Com\TobyMeehan.Com.csproj" />
+    </ItemGroup>
+
 </Project>
