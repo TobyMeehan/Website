@@ -25,7 +25,7 @@ public class UserRepository : Repository<UserData>, IUserRepository
         return await QueryAsync(query => query.WhereIn("users.Id", roles), cancellationToken: ct);
     }
 
-    public async Task<UserData> SelectByHandleAsync(string handle, CancellationToken ct)
+    public async Task<UserData?> SelectByHandleAsync(string handle, CancellationToken ct)
     {
         return await QuerySingleAsync(query => query.Where("Handle", handle), cancellationToken: ct);
     }

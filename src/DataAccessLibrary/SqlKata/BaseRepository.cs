@@ -44,12 +44,12 @@ public abstract class BaseRepository<TData>
         return items.ToList();
     }
 
-    protected async Task<TData> QuerySingleAsync(Func<Query, Query>? queryFunc = null, CancellationToken cancellationToken = default)
+    protected async Task<TData?> QuerySingleAsync(Func<Query, Query>? queryFunc = null, CancellationToken cancellationToken = default)
     {
         var query = Query(queryFunc, 1, 1);
 
-        var result = await Db.FirstOrDefaultAsync(query, cancellationToken: cancellationToken);
+        dynamic? result = await Db.FirstOrDefaultAsync(query, cancellationToken: cancellationToken);
 
-        return AutoMapper.MapDynamic<TData>(result);
+        return result is null ? default : AutoMapper.MapDynamic<TData>(result);
     }
 }

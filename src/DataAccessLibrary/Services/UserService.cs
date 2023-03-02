@@ -20,7 +20,7 @@ public class UserService : BaseService<IUser, UserData, CreateUserBuilder>, IUse
         _password = password;
     }
     
-    protected override Task<IUser> MapAsync(UserData data)
+    protected override Task<IUser> MapperAsync(UserData data)
     {
         return Task.FromResult<IUser>(new User(data.Name, data.Handle, data.Balance, data.Description));
     }
@@ -45,11 +45,18 @@ public class UserService : BaseService<IUser, UserData, CreateUserBuilder>, IUse
         return await MapAsync(data);
     }
 
-    public async Task<IUser> GetByHandleAsync(string handle, CancellationToken ct)
+    public async Task<IUser?> GetByHandleAsync(string handle, CancellationToken ct)
     {
         var data = await _db.SelectByHandleAsync(handle, ct);
 
         return await MapAsync(data);
+    }
+
+    public async Task<bool> IsHandleUnique(string handle, CancellationToken ct)
+    {
+        var user = await _db.SelectByHandleAsync(handle, ct);
+
+        return user is null;
     }
 
     public async Task<IUser> UpdateAsync(Id<IUser> id, UpdateUserBuilder user, CancellationToken ct)

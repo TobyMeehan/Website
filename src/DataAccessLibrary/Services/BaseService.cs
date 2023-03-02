@@ -1,6 +1,8 @@
+using System.Diagnostics.CodeAnalysis;
 using TobyMeehan.Com.Data.Entities;
 using TobyMeehan.Com.Data.Repositories;
 using TobyMeehan.Com.Data.Repositories.Models;
+using TobyMeehan.Com.Exceptions;
 
 namespace TobyMeehan.Com.Data.Services;
 
@@ -33,13 +35,23 @@ public abstract class BaseService<TEntity, TData, TCreate> where TEntity : IEnti
 
         foreach (var item in data)
         {
-            collection.Add(await MapAsync(item));
+            collection.Add(await MapperAsync(item));
         }
 
         return collection;
     }
 
-    protected abstract Task<TEntity> MapAsync(TData data);
+    protected async Task<TEntity?> MapAsync(TData? data)
+    {
+        if (data is null)
+        {
+            return default;
+        }
+
+        return await MapperAsync(data);
+    }
+
+    protected abstract Task<TEntity> MapperAsync(TData data);
 
     public async Task<IEntityCollection<TEntity>> GetAllAsync(CancellationToken cancellationToken = default)
     {
@@ -48,7 +60,7 @@ public abstract class BaseService<TEntity, TData, TCreate> where TEntity : IEnti
         return await MapAsync(data);
     }
 
-    public async Task<TEntity> GetByIdAsync(Id<TEntity> id, CancellationToken cancellationToken = default)
+    public async Task<TEntity?> GetByIdAsync(Id<TEntity> id, CancellationToken cancellationToken = default)
     {
         var data = await _select.SelectByIdAsync(id.Value, cancellationToken);
 
@@ -63,18 +75,23 @@ public abstract class BaseService<TEntity, TData, TCreate> where TEntity : IEnti
 
         await _insert.InsertAsync(data, cancellationToken);
 
-        return await GetByIdAsync(id, cancellationToken);
+        return (await GetByIdAsync(id, cancellationToken))!;
     }
 
     protected async Task<TEntity> UpdateAsync(Id<TEntity> id, Action<TData> patch, CancellationToken cancellationToken)
     {
         var data = await _select.SelectByIdAsync(id.Value, cancellationToken);
 
+        if (data is null)
+        {
+            throw new EntityNotFoundException<TEntity>(id);
+        }
+        
         patch(data);
 
         await _update.UpdateAsync(id.Value, data, cancellationToken);
 
-        return await GetByIdAsync(id, cancellationToken);
+        return (await GetByIdAsync(id, cancellationToken))!;
     }
 
     public async Task DeleteAsync(Id<TEntity> id, CancellationToken cancellationToken = default)

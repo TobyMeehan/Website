@@ -34,7 +34,9 @@ public interface IUserService
     /// </summary>
     /// <param name="handle"></param>
     /// <returns></returns>
-    Task<IUser> GetByHandleAsync(string handle, CancellationToken cancellationToken = default);
+    Task<IUser?> GetByHandleAsync(string handle, CancellationToken cancellationToken = default);
+
+    Task<bool> IsHandleUnique(string handle, CancellationToken cancellationToken = default);
 
     // CREATE
 

@@ -24,7 +24,7 @@ public class Repository<T> : BaseRepository<T>
         return await QueryAsync(cancellationToken: cancellationToken);
     }
 
-    public async Task<T> SelectByIdAsync(string id, CancellationToken cancellationToken)
+    public async Task<T?> SelectByIdAsync(string id, CancellationToken cancellationToken)
     {
         return await QuerySingleAsync(query => query.Where($"{Table}.Id", id), cancellationToken: cancellationToken);
     }

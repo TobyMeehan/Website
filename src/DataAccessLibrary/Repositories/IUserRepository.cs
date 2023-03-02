@@ -9,5 +9,5 @@ public interface IUserRepository : IRepository<UserData>
 {
     Task<List<UserData>> SelectByRoleAsync(string roleId, CancellationToken cancellationToken);
 
-    Task<UserData> SelectByHandleAsync(string handle, CancellationToken cancellationToken);
+    Task<UserData?> SelectByHandleAsync(string handle, CancellationToken cancellationToken);
 }
