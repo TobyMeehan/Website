@@ -1,0 +1,60 @@
+using FluentValidation;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+using TobyMeehan.Com.Accounts.Extensions;
+using TobyMeehan.Com.Accounts.Models;
+using TobyMeehan.Com.Accounts.Services;
+using TobyMeehan.Com.Builders;
+using TobyMeehan.Com.Services;
+
+namespace TobyMeehan.Com.Accounts.Pages;
+
+public class Register : PageModel
+{
+    private readonly IValidator<RegisterFormModel> _validator;
+    private readonly IUserService _users;
+    private readonly IAuthenticationService _authentication;
+
+    public Register(IValidator<RegisterFormModel> validator, IUserService users, IAuthenticationService authentication)
+    {
+        _validator = validator;
+        _users = users;
+        _authentication = authentication;
+    }
+    
+    public IActionResult OnGet([FromQuery(Name = "ReturnUrl")] string returnUrl = "/")
+    {
+        if (HttpContext.User.Identity?.IsAuthenticated ?? false)
+        {
+            return Redirect(returnUrl);
+        }
+        
+        return Page();
+    }
+
+    [BindProperty] public RegisterFormModel Form { get; set; } = new();
+
+    public async Task<IActionResult> OnPostAsync([FromQuery(Name = "ReturnUrl")] string returnUrl = "/")
+    {
+        if (HttpContext.User.Identity?.IsAuthenticated ?? false)
+        {
+            return Redirect(returnUrl);
+        }
+        
+        var validation = await _validator.ValidateAsync(Form);
+
+        if (!validation.IsValid)
+        {
+            validation.AddToModelState(ModelState);
+            return Page();
+        }
+
+        var user = await _users.CreateAsync(new CreateUserBuilder()
+            .WithUsername(Form.Username!)
+            .WithPassword(Form.Password!));
+        
+        
+
+        return Redirect(returnUrl);
+    }
+}
