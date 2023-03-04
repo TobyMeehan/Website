@@ -27,7 +27,7 @@ public interface IUserService
     /// </summary>
     /// <param name="id"></param>
     /// <returns></returns>
-    Task<IUser> GetByIdAsync(Id<IUser> id, CancellationToken cancellationToken = default);
+    Task<IUser?> GetByIdAsync(Id<IUser> id, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Gets the user with the specified username.
@@ -36,7 +36,9 @@ public interface IUserService
     /// <returns></returns>
     Task<IUser?> GetByHandleAsync(string handle, CancellationToken cancellationToken = default);
 
-    Task<bool> IsHandleUnique(string handle, CancellationToken cancellationToken = default);
+    Task<IUser?> GetByCredentialsAsync(string handle, Password password, CancellationToken cancellationToken = default);
+
+    Task<bool> IsHandleUniqueAsync(string handle, CancellationToken cancellationToken = default);
 
     // CREATE
 

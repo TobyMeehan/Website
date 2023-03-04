@@ -4,8 +4,8 @@ namespace TobyMeehan.Com.Accounts.Models;
 
 public class LoginFormModel
 {
-    public string Handle { get; set; }
-    public string Password { get; set; }
+    public string? Handle { get; set; }
+    public string? Password { get; set; }
     
     public class Validator : AbstractValidator<LoginFormModel>
     {

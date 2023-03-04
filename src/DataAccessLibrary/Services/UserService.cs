@@ -52,7 +52,24 @@ public class UserService : BaseService<IUser, UserData, CreateUserBuilder>, IUse
         return await MapAsync(data);
     }
 
-    public async Task<bool> IsHandleUnique(string handle, CancellationToken ct)
+    public async Task<IUser?> GetByCredentialsAsync(string handle, Password password, CancellationToken ct)
+    {
+        var user = await _db.SelectByHandleAsync(handle, ct);
+
+        if (user is null)
+        {
+            return null;
+        }
+
+        if (!await _password.CheckAsync(password, user.HashedPassword))
+        {
+            return null;
+        }
+
+        return await MapAsync(user);
+    }
+
+    public async Task<bool> IsHandleUniqueAsync(string handle, CancellationToken ct)
     {
         var user = await _db.SelectByHandleAsync(handle, ct);
 
