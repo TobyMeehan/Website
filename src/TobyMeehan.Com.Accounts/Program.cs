@@ -1,7 +1,31 @@
+using FluentValidation;
+using SqlKata.Compilers;
+using TobyMeehan.Com.Accounts.Models;
+using TobyMeehan.Com.Accounts.Services;
+using TobyMeehan.Com.Data.Configuration;
+
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Configuration.AddJsonFile("secrets.json", true);
+builder.Configuration.AddJsonFile($"secrets.{builder.Environment.EnvironmentName}.json", true);
+builder.Configuration.AddEnvironmentVariables();
 
 // Add services to the container.
 builder.Services.AddRazorPages();
+
+builder.Services.AddDataAccessLibrary(builder.Configuration.GetSection("Data"))
+    .AddBase64IdGeneration()
+    .AddBCryptPasswordHash()
+    .AddPostgresDatabase()
+    .AddSqlKataRepositories<PostgresCompiler>()
+    .AddEntityServices();
+
+builder.Services.AddHttpContextAccessor();
+
+builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
+
+builder.Services.AddScoped<IValidator<LoginFormModel>, LoginFormModel.Validator>();
+builder.Services.AddScoped<IValidator<RegisterFormModel>, RegisterFormModel.Validator>();
 
 var app = builder.Build();
 

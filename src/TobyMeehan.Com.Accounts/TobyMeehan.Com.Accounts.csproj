@@ -18,6 +18,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\DataAccessLibrary\DataAccessLibrary.csproj" />
       <ProjectReference Include="..\TobyMeehan.Com\TobyMeehan.Com.csproj" />
     </ItemGroup>
 
