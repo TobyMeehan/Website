@@ -45,15 +45,13 @@ public class Register : PageModel
 
         if (!validation.IsValid)
         {
-            validation.AddToModelState(ModelState);
+            validation.AddToModelState(ModelState, nameof(Form));
             return Page();
         }
 
         var user = await _users.CreateAsync(new CreateUserBuilder()
             .WithUsername(Form.Username!)
             .WithPassword(Form.Password!));
-        
-        
 
         return Redirect(returnUrl);
     }

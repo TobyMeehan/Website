@@ -6,16 +6,20 @@
 
 <form method="post">
     <div class="mb-3 row">
-        <label for="inputUsername">Username</label>
+        <label asp-for="Form.Handle">Username</label>
         <div class="col-sm-10">
-            <input type="text" readonly class="form-control-plaintext" id="inputUsername" />
+            <input asp-for="Form.Handle" type="text" class="form-control" />
+            <span asp-validation-for="Form.Handle" class="invalid-feedback"></span>
         </div>
     </div>
     
     <div class="mb-3 row">
-        <label for="inputPassword">Password</label>
+        <label asp-for="Form.Password">Password</label>
         <div class="col-sm-10">
-            <input type="password" readonly class="form-control-plaintext" id="inputPassword" />
+            <input asp-for="Form.Password" type="password" class="form-control" />
+            <span asp-validation-for="Form.Password" class="invalid-feedback"></span>
         </div>
     </div>
+    
+    <button type="submit" class="btn btn-primary">Login</button>
 </form>

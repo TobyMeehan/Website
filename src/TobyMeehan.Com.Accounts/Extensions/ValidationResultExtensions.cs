@@ -12,4 +12,12 @@ public static class ValidationResultExtensions
             modelState.AddModelError(error.PropertyName, error.ErrorMessage);
         }
     }
+
+    public static void AddToModelState(this ValidationResult result, ModelStateDictionary modelState, string modelName)
+    {
+        foreach (var error in result.Errors)
+        {
+            modelState.AddModelError($"{modelName}.{error.PropertyName}", error.ErrorMessage);
+        }
+    }
 }
