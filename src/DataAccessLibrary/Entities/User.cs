@@ -2,7 +2,7 @@ namespace TobyMeehan.Com.Data.Entities;
 
 public class User : Entity<IUser>, IUser
 {
-    public User(string name, string handle, double balance, string? description = null, IFile? avatar = null)
+    public User(string id, string name, string handle, double balance, string? description = null, IFile? avatar = null) : base(id)
     {
         Name = name;
         Handle = handle;

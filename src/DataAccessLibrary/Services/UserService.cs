@@ -22,7 +22,7 @@ public class UserService : BaseService<IUser, UserData, CreateUserBuilder>, IUse
     
     protected override Task<IUser> MapperAsync(UserData data)
     {
-        return Task.FromResult<IUser>(new User(data.Name, data.Handle, data.Balance, data.Description));
+        return Task.FromResult<IUser>(new User(data.Id, data.Name, data.Handle, data.Balance, data.Description));
     }
 
     protected override async Task<(Id<IUser>, UserData)> CreateAsync(CreateUserBuilder create)
