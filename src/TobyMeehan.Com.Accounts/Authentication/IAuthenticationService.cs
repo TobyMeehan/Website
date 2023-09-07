@@ -1,4 +1,4 @@
-namespace TobyMeehan.Com.Accounts.Services;
+namespace TobyMeehan.Com.Accounts.Authentication;
 
 public interface IAuthenticationService
 {

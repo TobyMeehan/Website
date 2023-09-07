@@ -1,9 +1,9 @@
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using TobyMeehan.Com.Accounts.Authentication;
 using TobyMeehan.Com.Accounts.Extensions;
 using TobyMeehan.Com.Accounts.Models;
-using TobyMeehan.Com.Accounts.Services;
 using TobyMeehan.Com.Builders;
 using TobyMeehan.Com.Services;
 
@@ -52,6 +52,8 @@ public class Register : PageModel
         var user = await _users.CreateAsync(new CreateUserBuilder()
             .WithUsername(Form.Username!)
             .WithPassword(Form.Password!));
+
+        await _authentication.SignInAsync(user);
 
         return Redirect(returnUrl);
     }

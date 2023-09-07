@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using TobyMeehan.Com.Accounts.Services;
+using TobyMeehan.Com.Accounts.Authentication;
 
 namespace TobyMeehan.Com.Accounts.Pages;
 

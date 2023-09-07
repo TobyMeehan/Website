@@ -1,7 +1,7 @@
 using FluentValidation;
 using SqlKata.Compilers;
+using TobyMeehan.Com.Accounts.Authentication;
 using TobyMeehan.Com.Accounts.Models;
-using TobyMeehan.Com.Accounts.Services;
 using TobyMeehan.Com.Data.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -22,7 +22,7 @@ builder.Services.AddDataAccessLibrary(builder.Configuration.GetSection("Data"))
 
 builder.Services.AddHttpContextAccessor();
 
-builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
+builder.Services.AddCookieAuthentication();
 
 builder.Services.AddScoped<IValidator<LoginFormModel>, LoginFormModel.Validator>();
 builder.Services.AddScoped<IValidator<RegisterFormModel>, RegisterFormModel.Validator>();

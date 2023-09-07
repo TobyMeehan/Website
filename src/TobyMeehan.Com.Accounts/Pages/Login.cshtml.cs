@@ -1,9 +1,9 @@
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using TobyMeehan.Com.Accounts.Authentication;
 using TobyMeehan.Com.Accounts.Extensions;
 using TobyMeehan.Com.Accounts.Models;
-using TobyMeehan.Com.Accounts.Services;
 using TobyMeehan.Com.Services;
 
 namespace TobyMeehan.Com.Accounts.Pages;
@@ -44,7 +44,7 @@ public class Login : PageModel
 
         if (!validation.IsValid)
         {
-            validation.AddToModelState(ModelState);
+            validation.AddToModelState(ModelState, nameof(Form));
             return Page();
         }
 
@@ -54,8 +54,8 @@ public class Login : PageModel
         {
             const string message = "Username or password incorrect.";
             
-            ModelState.AddModelError(nameof(Form.Handle), message);
-            ModelState.AddModelError(nameof(Form.Password), message);
+            ModelState.AddModelError($"{nameof(Form)}.{nameof(Form.Handle)}", message);
+            ModelState.AddModelError($"{nameof(Form)}.{nameof(Form.Password)}", message);
 
             return Page();
         }

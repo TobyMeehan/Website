@@ -1,8 +1,9 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using TobyMeehan.Com.Accounts.Extensions;
 
-namespace TobyMeehan.Com.Accounts.Services;
+namespace TobyMeehan.Com.Accounts.Authentication;
 
 public class AuthenticationService : IAuthenticationService
 {
@@ -17,7 +18,7 @@ public class AuthenticationService : IAuthenticationService
     {
         if (_context is null)
         {
-            return;
+            throw new Exception("Could not access HttpContext.");
         }
         
         var identity = new ClaimsIdentity(new[] {new Claim(ClaimTypes.NameIdentifier, user.Id.Value)},
@@ -36,9 +37,11 @@ public class AuthenticationService : IAuthenticationService
     {
         if (_context is null)
         {
-            return;
+            throw new Exception("Could not access HttpContext.");
         }
 
         await _context.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
     }
+
+    public Id<IUser>? UserId => _context?.User.Id();
 }
