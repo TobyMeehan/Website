@@ -22,11 +22,11 @@ public class RegisterFormModel
 
             RuleFor(model => model.Password)
                 .NotEmpty()
-                .Length(8, 100);
+                .MinimumLength(8).WithMessage("Password must be at least 8 characters.");
 
             RuleFor(model => model.ConfirmPassword)
                 .NotEmpty()
-                .Equal(x => x.Password);
+                .Equal(x => x.Password).WithMessage("Passwords do not match.");
         }
     }
 }
