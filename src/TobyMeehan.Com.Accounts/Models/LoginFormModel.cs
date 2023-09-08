@@ -12,10 +12,10 @@ public class LoginFormModel
         public Validator()
         {
             RuleFor(model => model.Handle)
-                .NotEmpty();
+                .NotEmpty().WithMessage("Please enter your username.");
 
             RuleFor(model => model.Password)
-                .NotEmpty();
+                .NotEmpty().WithMessage("Please enter your password.");
         }
     }
 }

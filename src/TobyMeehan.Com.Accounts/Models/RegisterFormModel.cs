@@ -20,17 +20,18 @@ public class RegisterFormModel
         public Validator(IUserService users)
         {
             RuleFor(model => model.Username)
-                .NotEmpty()
-                .Length(1, 40)
-                .Matches(new Regex(@"([a-zA-Z0-9_-]+)"))
+                .NotEmpty().WithMessage("Please choose a username.")
+                .Length(1, 40).WithMessage("Username must be shorter than 40 characters.")
+                .Matches(new Regex(@"([a-zA-Z0-9_-]+)")).WithMessage("Username must only use letters, numbers, underscores _ , or dashes - .")
                 .MustAsync(users.IsHandleUniqueAsync).WithMessage("Username already taken.");
 
             RuleFor(model => model.Password)
-                .NotEmpty()
-                .MinimumLength(8).WithMessage("Password must be at least 8 characters.");
+                .NotEmpty().WithMessage("Please choose a password.")
+                .MinimumLength(8).WithMessage("Password must have at least 8 characters.")
+                .MaximumLength(100).WithMessage("Password must be shorter than 100 characters.");
 
             RuleFor(model => model.ConfirmPassword)
-                .NotEmpty()
+                .NotEmpty().WithMessage("Please confirm your password.")
                 .Equal(x => x.Password).WithMessage("Passwords do not match.");
         }
     }
