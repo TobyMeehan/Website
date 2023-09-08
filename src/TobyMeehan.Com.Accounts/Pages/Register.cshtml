@@ -10,8 +10,9 @@
     
     <div class="my-3">
         <label class="block text-md mb-1.5" asp-for="Form.Username">Username</label>
-        <input class="form-control" type="text" asp-for="Form.Username" />
-        <span class="text-sm text-negative" asp-validation-for="Form.Username"></span>
+        <input class="form-control show-valid" type="text" asp-for="Form.Username" 
+               data-val-remote-additionalfields="__RequestVerificationToken" />
+        <span class="text-sm" asp-validation-for="Form.Username"></span>
     </div>
     
     <div class="my-3">

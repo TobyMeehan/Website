@@ -31,7 +31,7 @@ public class Register : PageModel
         
         return Page();
     }
-
+    
     [BindProperty] public RegisterFormModel Form { get; set; } = new();
 
     public async Task<IActionResult> OnPostAsync([FromQuery(Name = "ReturnUrl")] string returnUrl = "/")
@@ -56,5 +56,11 @@ public class Register : PageModel
         await _authentication.SignInAsync(user);
 
         return Redirect(returnUrl);
+    }
+
+    public async Task<IActionResult> OnPostCheckUsernameAsync()
+    {
+        bool valid = await _users.IsHandleUniqueAsync(Form.Username!);
+        return new JsonResult(valid);
     }
 }

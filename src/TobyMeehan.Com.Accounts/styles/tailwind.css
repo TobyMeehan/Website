@@ -49,6 +49,19 @@ body {
     @apply border-negative;
 }
 
+.show-valid.valid {
+    @apply border;
+    @apply border-positive;
+}
+
+.field-validation-error {
+    @apply text-negative;
+}
+
+.field-validation-valid {
+    @apply text-positive;
+}
+
 .btn {
     @apply transition;
     @apply appearance-none;
