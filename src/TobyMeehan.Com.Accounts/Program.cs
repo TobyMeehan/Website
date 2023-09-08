@@ -1,4 +1,5 @@
 using FluentValidation;
+using FluentValidation.AspNetCore;
 using SqlKata.Compilers;
 using TobyMeehan.Com.Accounts.Authentication;
 using TobyMeehan.Com.Accounts.Models;
@@ -23,6 +24,8 @@ builder.Services.AddDataAccessLibrary(builder.Configuration.GetSection("Data"))
 builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddCookieAuthentication();
+
+builder.Services.AddFluentValidationClientsideAdapters();
 
 builder.Services.AddScoped<IValidator<LoginFormModel>, LoginFormModel.Validator>();
 builder.Services.AddScoped<IValidator<RegisterFormModel>, RegisterFormModel.Validator>();
