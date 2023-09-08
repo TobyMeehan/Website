@@ -14,14 +14,14 @@ public interface IApplicationService
     /// </summary>
     /// <param name="user"></param>
     /// <returns></returns>
-    Task<IEntityCollection<IApplication>> GetByUserAsync(Id<IUser> user);
+    Task<IEntityCollection<IApplication>> GetByAuthorAsync(Id<IUser> user, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Gets the application with the specified ID.
     /// </summary>
     /// <param name="id"></param>
     /// <returns></returns>
-    Task<IApplication> GetByIdAsync(Id<IApplication> id);
+    Task<IApplication?> GetByIdAsync(Id<IApplication> id, CancellationToken cancellationToken = default);
     
     // CREATE
 
@@ -30,7 +30,7 @@ public interface IApplicationService
     /// </summary>
     /// <param name="application"></param>
     /// <returns></returns>
-    Task<IApplication> CreateAsync(CreateApplicationBuilder application);
+    Task<IApplication> CreateAsync(CreateApplicationBuilder application, CancellationToken cancellationToken = default);
     
     // UPDATE
 
@@ -40,7 +40,7 @@ public interface IApplicationService
     /// <param name="id"></param>
     /// <param name="application"></param>
     /// <returns></returns>
-    Task<IApplication> UpdateAsync(Id<IApplication> id, UpdateApplicationBuilder application);
+    Task<IApplication> UpdateAsync(Id<IApplication> id, UpdateApplicationBuilder application, CancellationToken cancellationToken = default);
     
     // DELETE
 
@@ -49,7 +49,7 @@ public interface IApplicationService
     /// </summary>
     /// <param name="id"></param>
     /// <returns></returns>
-    Task DeleteAsync(Id<IApplication> id);
+    Task DeleteAsync(Id<IApplication> id, CancellationToken cancellationToken = default);
     
     // RELATIONS
 
@@ -59,12 +59,12 @@ public interface IApplicationService
     /// <param name="id"></param>
     /// <param name="uri"></param>
     /// <returns></returns>
-    Task<IRedirect> AddRedirectAsync(Id<IApplication> id, Uri uri);
+    Task<IRedirect> AddRedirectAsync(Id<IApplication> id, Uri uri, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Removes the specified redirect.
     /// </summary>
     /// <param name="redirect"></param>
     /// <returns></returns>
-    Task RemoveRedirectAsync(Id<IRedirect> redirect);
+    Task RemoveRedirectAsync(Id<IRedirect> redirect, CancellationToken cancellationToken = default);
 }

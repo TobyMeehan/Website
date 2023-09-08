@@ -1,4 +1,6 @@
-﻿namespace TobyMeehan.Com.Data.Repositories.Models;
+﻿using SqlKata;
+
+namespace TobyMeehan.Com.Data.Repositories.Models;
 
 public class ApplicationData
 {
@@ -7,5 +9,7 @@ public class ApplicationData
     public string? DownloadId { get; set; }
     public string Name { get; set; }
     public string? Description { get; set; }
-    public List<RedirectData> Redirects { get; set; }
+    
+    [Ignore]
+    public List<RedirectData> Redirects { get; set; } = new();
 }

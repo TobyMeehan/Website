@@ -13,7 +13,7 @@ public interface IApplication : IEntity<IApplication>
     /// <summary>
     /// The download associated with the application.
     /// </summary>
-    Id<IDownload> DownloadId { get; }
+    Id<IDownload>? DownloadId { get; }
     
     /// <summary>
     /// The name of the application.

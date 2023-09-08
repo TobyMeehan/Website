@@ -47,6 +47,7 @@ public class DataAccessLibraryBuilder
             new QueryFactory(services.GetRequiredService<IDbConnection>(), new TCompiler()));
         
         Services.AddTransient<IUserRepository, SqlKata.UserRepository>();
+        Services.AddTransient<IApplicationRepository, SqlKata.ApplicationRepository>();
 
         return this;
     }
@@ -54,6 +55,7 @@ public class DataAccessLibraryBuilder
     public DataAccessLibraryBuilder AddEntityServices()
     {
         Services.AddTransient<IUserService, Services.UserService>();
+        Services.AddTransient<IApplicationService, Services.ApplicationService>();
 
         return this;
     }
