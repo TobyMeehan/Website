@@ -4,33 +4,29 @@
 @model TobyMeehan.Com.Accounts.Pages.Register
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 
+<h2 class="text-3xl font-extralight mb-7 text-center">Register</h2>
+
 <form method="post">
-    <div class="mb-3 row">
-        <label asp-for="Form.Username">Username</label>
-        <div class="col-sm-10">
-            <input asp-for="Form.Username" type="text" class="form-control 
-                @(ModelState.GetFieldValidationState("Form.Username") == ModelValidationState.Invalid ? "is-invalid" : "")" />
-            <span asp-validation-for="Form.Username" class="invalid-feedback"></span>
-        </div>
+    
+    <div class="my-3">
+        <label class="block text-md mb-1.5" asp-for="Form.Username">Username</label>
+        <input class="form-control" type="text" asp-for="Form.Username" />
+        <span class="text-sm text-negative" asp-validation-for="Form.Username"></span>
     </div>
     
-    <div class="mb-3 row">
-        <label asp-for="Form.Password">Password</label>
-        <div class="col-sm-10">
-            <input asp-for="Form.Password" type="password" class="form-control
-                @(ModelState.GetFieldValidationState("Form.Password") == ModelValidationState.Invalid ? "is-invalid" : "")" />
-            <span asp-validation-for="Form.Password" class="invalid-feedback"></span>
-        </div>
+    <div class="my-3">
+        <label class="block text-md mb-1.5" asp-for="Form.Password">Password</label>
+        <input class="form-control" type="password" asp-for="Form.Password" />
+        <span class="text-sm text-negative" asp-validation-for="Form.Password"></span>
     </div>
     
-    <div class="mb-3 row">
-        <label asp-for="Form.ConfirmPassword">Confirm Password</label>
-        <div class="col-sm-10">
-            <input asp-for="Form.ConfirmPassword" type="password" class="form-control 
-                @(ModelState.GetFieldValidationState("Form.ConfirmPassword") == ModelValidationState.Invalid ? "is-invalid" : "")" />
-            <span asp-validation-for="Form.ConfirmPassword" class="invalid-feedback"></span>
-        </div>
+    <div class="my-3">
+        <label class="block text-md mb-1.5" asp-for="Form.ConfirmPassword">Confirm Password</label>
+        <input class="form-control" type="password" asp-for="Form.ConfirmPassword" />
+        <span class="text-sm text-negative" asp-validation-for="Form.ConfirmPassword"></span>
     </div>
+
+    <button type="submit" class="btn btn-primary my-3 w-full">Register</button>
     
-    <button type="submit" class="btn btn-primary">Register</button>
+    <p>Already have an account? <a class="link" asp-page="./Login">Log in</a></p>
 </form>

@@ -1,3 +1,74 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+body {
+    background: linear-gradient(-45deg, #590000, #3C003C, #000059);
+    background-size: 400% 400%;
+    animation: gradient 50s ease infinite;
+    @apply h-screen flex items-center justify-center
+}
+
+@keyframes gradient {
+    
+    0% {
+        background-position: 0 50%;
+    }
+    
+    50% {
+        background-position: 100% 50%;
+    }
+    
+    100% {
+        background-position: 0 50%;
+    }
+}
+
+.form-control {
+    @apply appearance-none;
+    
+    @apply w-full;
+    @apply py-1.5;
+    @apply px-3;
+    
+    @apply rounded;
+    
+    @apply text-lg;
+    @apply text-light;
+    
+    @apply bg-dark;
+    
+    @apply transition-colors;
+    
+    @apply focus:outline-none;
+    @apply focus:bg-deep;
+}
+
+.input-validation-error {
+    @apply border;
+    @apply border-negative;
+}
+
+.btn {
+    @apply transition;
+    @apply appearance-none;
+    
+    @apply py-1.5;
+    
+    @apply rounded;
+    
+    @apply text-lg;
+}
+
+.btn-primary {
+    @apply bg-primary;
+    @apply hover:bg-primary-hover;
+    @apply focus:bg-primary-focus;
+}
+
+.link {
+    @apply transition;
+    @apply text-link;
+    @apply hover:text-link-hover;
+    @apply hover:underline;
+}
