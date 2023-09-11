@@ -71,7 +71,7 @@ public class ApplicationService : BaseService<IApplication, ApplicationData, Cre
         {
             Id = redirectId.Value,
             ApplicationId = id.Value,
-            Uri = uri.AbsoluteUri
+            Uri = uri.OriginalString
         }, ct);
 
         return new Redirect(redirectId.Value, id.Value, uri);

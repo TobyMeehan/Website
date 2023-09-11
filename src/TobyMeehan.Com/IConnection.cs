@@ -8,10 +8,15 @@ public interface IConnection : IEntity<IConnection>
     /// <summary>
     /// The application.
     /// </summary>
-    Id<IApplication> ApplicationId { get; }
+    IApplication Application { get; }
     
     /// <summary>
     /// The user.
     /// </summary>
-    Id<IUser> UserId { get; }
+    IUser User { get; }
+    
+    /// <summary>
+    /// Whether future authorization requests should be approved automatically.
+    /// </summary>
+    bool AutoAuthorize { get; }
 }
