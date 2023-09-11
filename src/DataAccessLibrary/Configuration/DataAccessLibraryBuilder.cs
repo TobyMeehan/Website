@@ -37,7 +37,7 @@ public class DataAccessLibraryBuilder
         }
         
         Services.AddTransient<IDbConnection>(_ => new NpgsqlConnection(config.GetConnectionString("Postgres")));
-
+        
         return this;
     }
     
@@ -48,6 +48,8 @@ public class DataAccessLibraryBuilder
         
         Services.AddTransient<IUserRepository, SqlKata.UserRepository>();
         Services.AddTransient<IApplicationRepository, SqlKata.ApplicationRepository>();
+        Services.AddTransient<IConnectionRepository, SqlKata.ConnectionRepository>();
+        Services.AddTransient<ISessionRepository, SqlKata.SessionRepository>();
 
         return this;
     }
@@ -55,7 +57,10 @@ public class DataAccessLibraryBuilder
     public DataAccessLibraryBuilder AddEntityServices()
     {
         Services.AddTransient<IUserService, Services.UserService>();
+        
         Services.AddTransient<IApplicationService, Services.ApplicationService>();
+        Services.AddTransient<IConnectionService, Services.ConnectionService>();
+        Services.AddTransient<ISessionService, Services.SessionService>();
 
         return this;
     }
@@ -70,6 +75,13 @@ public class DataAccessLibraryBuilder
     public DataAccessLibraryBuilder AddBase64IdGeneration()
     {
         Services.AddTransient<IIdService, Base64GuidIdService>();
+
+        return this;
+    }
+
+    public DataAccessLibraryBuilder AddRngSecretService()
+    {
+        Services.AddSingleton<ISecretService, RandomNumberGeneratorSecretService>();
 
         return this;
     }

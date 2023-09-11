@@ -17,6 +17,7 @@ builder.Services.AddRazorPages();
 builder.Services.AddDataAccessLibrary(builder.Configuration.GetSection("Data"))
     .AddBase64IdGeneration()
     .AddBCryptPasswordHash()
+    .AddRngSecretService()
     .AddPostgresDatabase()
     .AddSqlKataRepositories<PostgresCompiler>()
     .AddEntityServices();
