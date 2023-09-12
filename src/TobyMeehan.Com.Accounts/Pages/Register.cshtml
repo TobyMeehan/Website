@@ -1,4 +1,4 @@
-@page
+@page "/register"
 @using Microsoft.AspNetCore.Mvc.ModelBinding
 @using Microsoft.AspNetCore.Mvc.TagHelpers
 @model TobyMeehan.Com.Accounts.Pages.Register
@@ -29,7 +29,8 @@
 
     <button type="submit" class="btn btn-primary my-3 w-full">Register</button>
     
-    <p>Already have an account? <a class="link" href="/login">Log in</a></p>
+    <p>Already have an account? <a class="link" asp-page="@nameof(Login)" asp-route-ReturnUrl="@Model.ReturnUrl">Log in</a></p>
+    
 </form>
 
 @section Scripts

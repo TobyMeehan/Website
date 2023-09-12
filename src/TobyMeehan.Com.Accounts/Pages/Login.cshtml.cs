@@ -20,12 +20,15 @@ public class Login : PageModel
         _users = users;
         _authentication = authentication;
     }
+
+    [FromQuery]
+    public string ReturnUrl { get; set; } = "/";
     
-    public IActionResult OnGet([FromQuery(Name = "ReturnUrl")] string returnUrl = "/")
+    public IActionResult OnGet()
     {
         if (HttpContext.User.Identity?.IsAuthenticated ?? false)
         {
-            return Redirect(returnUrl);
+            return Redirect(ReturnUrl);
         }
         
         return Page();
@@ -33,11 +36,11 @@ public class Login : PageModel
 
     [BindProperty] public LoginFormModel Form { get; set; } = new();
 
-    public async Task<IActionResult> OnPostAsync([FromQuery(Name = "ReturnUrl")] string returnUrl = "/")
+    public async Task<IActionResult> OnPostAsync()
     {
         if (HttpContext.User.Identity?.IsAuthenticated ?? false)
         {
-            return Redirect(returnUrl);
+            return Redirect(ReturnUrl);
         }
         
         var validation = await _validator.ValidateAsync(Form);
@@ -62,6 +65,6 @@ public class Login : PageModel
         
         await _authentication.SignInAsync(user);
 
-        return Redirect(returnUrl);
+        return Redirect(ReturnUrl);
     }
 }
