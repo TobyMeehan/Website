@@ -8,12 +8,16 @@ public interface ISession : IEntity<ISession>
     /// <summary>
     /// The connection (application/user) of the session.
     /// </summary>
-    Id<IConnection> ConnectionId { get; }
+    IConnection Connection { get; }
+
+    IApplication Application => Connection.Application;
+
+    IUser User => Connection.User;
     
     /// <summary>
     /// The redirect uri used by the application.
     /// </summary>
-    Id<IRedirect> RedirectId { get; }
+    IRedirect? Redirect { get; }
     
     /// <summary>
     /// The authorization code used to create the session.

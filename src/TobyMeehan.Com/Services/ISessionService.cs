@@ -11,12 +11,15 @@ public interface ISessionService
 
     Task<IEntityCollection<ISession>> GetAllAsync(CancellationToken cancellationToken = default);
 
-    Task<ISession> GetByIdAsync(Id<ISession> id, CancellationToken cancellationToken = default);
+    Task<ISession?> GetByIdAsync(Id<ISession> id, CancellationToken cancellationToken = default);
 
     Task<ISession?> GetByCodeAsync(string code, CancellationToken cancellationToken = default);
 
     Task<ISession?> RefreshAsync(string refreshToken, CancellationToken cancellationToken = default);
 
+    Task<ISession> StartAsync(Id<ISession> id, StartSessionBuilder session,
+        CancellationToken cancellationToken = default);
+    
     Task DeleteAsync(Id<ISession> id, CancellationToken cancellationToken = default);
 
     Task DeleteByConnectionAsync(Id<IConnection> connection, CancellationToken cancellationToken = default);

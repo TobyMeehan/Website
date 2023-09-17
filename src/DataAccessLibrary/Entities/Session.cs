@@ -2,10 +2,10 @@ namespace TobyMeehan.Com.Data.Entities;
 
 public class Session : Entity<ISession>, ISession
 {
-    public Session(string id, string connectionId, string redirectId, string code, IEnumerable<string> scope, string? codeChallenge, string? refreshToken, DateTime expiry) : base(id)
+    public Session(string id, IConnection connection, IRedirect? redirect, string code, IEnumerable<string> scope, string? codeChallenge, string? refreshToken, DateTime expiry) : base(id)
     {
-        ConnectionId = new Id<IConnection>(connectionId);
-        RedirectId = new Id<IRedirect>(redirectId);
+        Connection = connection;
+        Redirect = redirect;
         AuthorizationCode = code;
         Scope = scope;
         CodeChallenge = codeChallenge;
@@ -13,8 +13,8 @@ public class Session : Entity<ISession>, ISession
         Expiry = expiry;
     }
 
-    public Id<IConnection> ConnectionId { get; }
-    public Id<IRedirect> RedirectId { get; }
+    public IConnection Connection { get; }
+    public IRedirect? Redirect { get; }
     public string AuthorizationCode { get; }
     public IEnumerable<string> Scope { get; }
     public string? CodeChallenge { get; }

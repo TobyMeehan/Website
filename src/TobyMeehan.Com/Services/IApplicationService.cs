@@ -22,6 +22,14 @@ public interface IApplicationService
     /// <param name="id"></param>
     /// <returns></returns>
     Task<IApplication?> GetByIdAsync(Id<IApplication> id, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Gets the application with the specified client ID and secret. Returns null if id does not exist or secret is incorrect.
+    /// </summary>
+    /// <param name="id"></param>
+    /// <param name="secret"></param>
+    /// <returns></returns>
+    Task<IApplication?> GetByCredentialsAsync(Id<IApplication> id, Password? secret, CancellationToken cancellationToken = default);
     
     // CREATE
 

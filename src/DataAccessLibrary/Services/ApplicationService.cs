@@ -2,6 +2,7 @@ using TobyMeehan.Com.Builders;
 using TobyMeehan.Com.Data.Entities;
 using TobyMeehan.Com.Data.Repositories;
 using TobyMeehan.Com.Data.Repositories.Models;
+using TobyMeehan.Com.Data.Security;
 using TobyMeehan.Com.Services;
 
 namespace TobyMeehan.Com.Data.Services;
@@ -10,11 +11,13 @@ public class ApplicationService : BaseService<IApplication, ApplicationData, Cre
 {
     private readonly IApplicationRepository _db;
     private readonly IIdService _id;
+    private readonly IPasswordService _password;
 
-    public ApplicationService(IApplicationRepository db, IIdService id) : base(db)
+    public ApplicationService(IApplicationRepository db, IIdService id, IPasswordService password) : base(db)
     {
         _db = db;
         _id = id;
+        _password = password;
     }
 
     protected override Task<IApplication> MapperAsync(ApplicationData data)
@@ -50,6 +53,24 @@ public class ApplicationService : BaseService<IApplication, ApplicationData, Cre
         var data = await _db.SelectByAuthorAsync(user.Value, ct);
 
         return await MapAsync(data);
+    }
+
+    public async Task<IApplication?> GetByCredentialsAsync(Id<IApplication> id, Password? secret, CancellationToken ct)
+    {
+        var application = await _db.SelectByIdAsync(id.Value, ct);
+
+        if (application is null)
+        {
+            return null;
+        }
+
+        return secret switch
+        {
+            null when application.SecretHash is not null => null,
+            not null when application.SecretHash is { } hash && 
+                          !await _password.CheckAsync(secret, hash) => null,
+            _ => await MapAsync(application)
+        };
     }
 
     public async Task<IApplication> UpdateAsync(Id<IApplication> id, UpdateApplicationBuilder update,
