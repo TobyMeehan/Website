@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 
 namespace TobyMeehan.Com.Accounts.Authentication;
@@ -17,6 +18,15 @@ public static class ServiceCollectionExtensions
             });
 
         services.AddScoped<IAuthenticationService, AuthenticationService>();
+
+        return services;
+    }
+
+    public static IServiceCollection AddClientBasicAuthentication(this IServiceCollection services, Action<AuthenticationSchemeOptions>? options = null)
+    {
+        services.AddAuthentication(ClientBasicAuthenticationHandler.AuthenticationScheme)
+            .AddScheme<AuthenticationSchemeOptions, ClientBasicAuthenticationHandler>(
+                ClientBasicAuthenticationHandler.AuthenticationScheme, options);
 
         return services;
     }

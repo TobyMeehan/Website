@@ -25,6 +25,11 @@ builder.Services.AddDataAccessLibrary(builder.Configuration.GetSection("Data"))
 builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddCookieAuthentication();
+builder.Services.AddClientBasicAuthentication();
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+});
 
 builder.Services.AddFluentValidationClientsideAdapters();
 
@@ -46,6 +51,7 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapRazorPages();
