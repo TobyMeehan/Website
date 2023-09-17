@@ -1,7 +1,15 @@
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using FastEndpoints;
+using FastEndpoints.Security;
 using FluentValidation;
 using FluentValidation.AspNetCore;
+using JorgeSerrano.Json;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Http.Json;
 using SqlKata.Compilers;
 using TobyMeehan.Com.Accounts.Authentication;
+using TobyMeehan.Com.Accounts.Configuration;
 using TobyMeehan.Com.Accounts.Models;
 using TobyMeehan.Com.Data.Configuration;
 
@@ -23,6 +31,15 @@ builder.Services.AddDataAccessLibrary(builder.Configuration.GetSection("Data"))
     .AddEntityServices();
 
 builder.Services.AddHttpContextAccessor();
+
+builder.Services.Configure<AuthenticationOptions>(builder.Configuration.GetSection("Authentication"));
+builder.Services.Configure<JsonOptions>(options =>
+{
+    options.SerializerOptions.PropertyNamingPolicy = new JsonSnakeCaseNamingPolicy();
+    options.SerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
+});
+
+builder.Services.AddFastEndpoints();
 
 builder.Services.AddCookieAuthentication();
 builder.Services.AddClientBasicAuthentication();
@@ -53,6 +70,8 @@ app.UseRouting();
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.UseFastEndpoints();
 
 app.MapRazorPages();
 

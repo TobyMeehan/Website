@@ -14,8 +14,11 @@
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="FluentValidation" Version="11.5.1" />
+      <PackageReference Include="FastEndpoints" Version="5.17.1.1" />
+      <PackageReference Include="FastEndpoints.Security" Version="5.17.1.1" />
+      <PackageReference Include="FluentValidation" Version="11.7.1" />
       <PackageReference Include="FluentValidation.AspNetCore" Version="11.3.0" />
+      <PackageReference Include="JorgeSerrano.Json.JsonSnakeCaseNamingPolicy" Version="0.9.0" />
     </ItemGroup>
 
     <ItemGroup>
