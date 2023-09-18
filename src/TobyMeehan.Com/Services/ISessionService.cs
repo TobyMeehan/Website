@@ -13,7 +13,9 @@ public interface ISessionService
 
     Task<ISession?> GetByIdAsync(Id<ISession> id, CancellationToken cancellationToken = default);
 
-    Task<ISession?> RefreshAsync(string refreshToken, CancellationToken cancellationToken = default);
+    Task<ISession?> GetByRefreshTokenAsync(string refreshToken, CancellationToken cancellationToken = default);
+
+    Task<ISession> RefreshAsync(Id<ISession> id, string? scope, CancellationToken cancellationToken = default);
     
     Task DeleteAsync(Id<ISession> id, CancellationToken cancellationToken = default);
 

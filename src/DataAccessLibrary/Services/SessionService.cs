@@ -60,10 +60,31 @@ public class SessionService : BaseService<ISession, SessionData, CreateSessionBu
             Expiry = DateTime.UtcNow.AddMonths(6)
         });
     }
-    
-    public async Task<ISession?> RefreshAsync(string refreshToken, CancellationToken ct)
+
+    public async Task<ISession?> GetByRefreshTokenAsync(string refreshToken, CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+        var data = await _db.SelectByRefreshTokenAsync(refreshToken, cancellationToken);
+
+        return await MapAsync(data);
+    }
+
+    public async Task<ISession> RefreshAsync(Id<ISession> id, string? scope, CancellationToken cancellationToken)
+    {
+        var session = await GetByIdAsync(id, cancellationToken);
+
+        if (session is null)
+        {
+            throw new EntityNotFoundException<ISession>(id);
+        }
+
+        string refreshToken = await _secretService.GenerateSecretAsync(32);
+        
+        return await UpdateAsync(id, data =>
+        {
+            data.Scope = scope;
+            data.RefreshToken = refreshToken;
+            data.Expiry = DateTime.UtcNow.AddMonths(6);
+        }, cancellationToken);
     }
 
     public async Task DeleteByConnectionAsync(Id<IConnection> connection, CancellationToken ct)

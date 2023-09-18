@@ -247,7 +247,43 @@ public class TokenEndpoint : Endpoint<TokenRequest, Results<Ok<TokenResponse>, B
             AccessToken = token.AccessToken,
             TokenType = token.TokenType,
             ExpiresIn = (int) (token.Expiry - DateTime.UtcNow).TotalSeconds,
-            Scope = scope
+            Scope = string.Join(' ', session.Scope)
+        });
+    }
+
+    private async Task<Results<Ok<TokenResponse>, BadRequest<TokenErrorResponse>, UnauthorizedHttpResult>> RefreshTokenAsync(
+            string clientId, string refreshToken, string? scope, CancellationToken ct)
+    {
+        var session = await _sessions.GetByRefreshTokenAsync(refreshToken, ct);
+
+        if (session is null || clientId != session.Application.Id.Value)
+        {
+            return TypedResults.BadRequest(new TokenErrorResponse
+            {
+                Error = OAuth.Errors.InvalidGrant,
+                ErrorDescription = "Invalid refresh token"
+            });
+        }
+
+        if (scope?.Split() is { } scopes 
+            && (scopes.Except(Scope.All).Any() || scopes.Except(session.Scope).Any()))
+        {
+            return TypedResults.BadRequest(new TokenErrorResponse
+            {
+                Error = OAuth.Errors.InvalidScope
+            });
+        }
+
+        session = await _sessions.RefreshAsync(session.Id, scope, ct);
+
+        var token = await _tokens.GenerateTokenAsync(session);
+
+        return TypedResults.Ok(new TokenResponse
+        {
+            AccessToken = token.AccessToken,
+            TokenType = token.TokenType,
+            ExpiresIn = (int) (token.Expiry - DateTime.UtcNow).TotalSeconds,
+            Scope = string.Join(' ', session.Scope)
         });
     }
 }
