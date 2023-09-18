@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Http.Json;
 using SqlKata.Compilers;
 using TobyMeehan.Com.Accounts.Authentication;
 using TobyMeehan.Com.Accounts.Configuration;
+using TobyMeehan.Com.Accounts.Jwt;
 using TobyMeehan.Com.Accounts.Models;
 using TobyMeehan.Com.Data.Configuration;
 
@@ -40,6 +41,8 @@ builder.Services.Configure<JsonOptions>(options =>
 });
 
 builder.Services.AddFastEndpoints();
+
+builder.Services.AddTransient<ITokenService, FastEndpointsTokenService>();
 
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookieAuthentication()

@@ -13,12 +13,7 @@ public interface ISessionService
 
     Task<ISession?> GetByIdAsync(Id<ISession> id, CancellationToken cancellationToken = default);
 
-    Task<ISession?> GetByCodeAsync(string code, CancellationToken cancellationToken = default);
-
     Task<ISession?> RefreshAsync(string refreshToken, CancellationToken cancellationToken = default);
-
-    Task<ISession> StartAsync(Id<ISession> id, StartSessionBuilder session,
-        CancellationToken cancellationToken = default);
     
     Task DeleteAsync(Id<ISession> id, CancellationToken cancellationToken = default);
 

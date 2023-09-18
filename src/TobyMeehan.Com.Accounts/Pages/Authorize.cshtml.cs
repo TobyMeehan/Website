@@ -16,15 +16,13 @@ public class Authorize : PageModel
 {
     private readonly IApplicationService _applications;
     private readonly IUserService _users;
-    private readonly IConnectionService _connections;
-    private readonly ISessionService _sessions;
+    private readonly IDataProtectionProvider _dataProtectionProvider;
 
-    public Authorize(IApplicationService applications, IUserService users, IConnectionService connections, ISessionService sessions)
+    public Authorize(IApplicationService applications, IUserService users, IDataProtectionProvider dataProtectionProvider)
     {
         _applications = applications;
         _users = users;
-        _connections = connections;
-        _sessions = sessions;
+        _dataProtectionProvider = dataProtectionProvider;
     }
 
     public AuthorizeErrorModel? Error { get; set; }
@@ -73,7 +71,7 @@ public class Authorize : PageModel
             return (client, redirect, () => RedirectToError(redirect, OAuth.Errors.InvalidScope, null, request.State));
         }
         
-        if (request.CodeChallenge is not null && request.CodeChallengeMethod != OAuth.Transformations.S256)
+        if (request is { ResponseType: OAuth.ResponseTypes.Code, CodeChallenge: not null, CodeChallengeMethod: not OAuth.Transformations.S256 })
         {
             return (client, redirect, () => RedirectToError(redirect, OAuth.Errors.InvalidRequest, "Transform algorithm not supported", request.State));
         }
@@ -131,16 +129,23 @@ public class Authorize : PageModel
         {
             return RedirectToError(redirect, OAuth.Errors.AccessDenied, "User denied the request.", request.State);
         }
-        
-        var connection = await _connections.GetOrCreateAsync(User.Id(), validation.Client.Id, false, cancellationToken);
-        
-        var session = await _sessions.CreateAsync(new CreateSessionBuilder()
-            .WithConnection(connection.Id)
-            .WithRedirect(redirect.Id)
-            .WithScope(request.Scope)
-            .WithCodeChallenge(request.CodeChallenge), cancellationToken);
 
-        var query = new QueryBuilder {{ OAuth.Parameters.Code, session.AuthorizationCode }};
+        var protector = _dataProtectionProvider.CreateProtector("oauth");
+
+        string code = protector.Protect(JsonSerializer.Serialize(new AuthorizationCodeModel
+        {
+            ClientId = validation.Client.Id,
+            UserId = User.Id(),
+            RedirectId = redirect.Id,
+
+            RequireRedirect = validation.Client.Redirects.Count > 1,
+
+            CodeChallenge = request.CodeChallenge,
+            CodeChallengeMethod = request.CodeChallengeMethod,
+            Scope = request.Scope
+        }));
+
+        var query = new QueryBuilder {{ OAuth.Parameters.Code, code }};
 
         if (request.State is not null)
         {

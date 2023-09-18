@@ -7,5 +7,6 @@ public class AuthenticationOptions
     public class JwtOptions
     {
         public string TokenSigningKey { get; set; }
+        public TimeSpan Expiry { get; set; }
     }
 }

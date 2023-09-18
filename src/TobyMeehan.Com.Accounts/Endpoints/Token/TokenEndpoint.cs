@@ -2,14 +2,18 @@ using System.Net.Http.Headers;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.Json;
 using FastEndpoints;
 using FastEndpoints.Security;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
 using Microsoft.Net.Http.Headers;
 using TobyMeehan.Com.Accounts.Authentication;
 using TobyMeehan.Com.Accounts.Configuration;
+using TobyMeehan.Com.Accounts.Jwt;
+using TobyMeehan.Com.Accounts.Models;
 using TobyMeehan.Com.Builders;
 using TobyMeehan.Com.Services;
 
@@ -19,13 +23,17 @@ public class TokenEndpoint : Endpoint<TokenRequest, Results<Ok<TokenResponse>, B
 {
     private readonly ISessionService _sessions;
     private readonly IApplicationService _applications;
-    private readonly AuthenticationOptions _options;
+    private readonly IConnectionService _connections;
+    private readonly ITokenService _tokens;
+    private readonly IDataProtectionProvider _dataProtectionProvider;
 
-    public TokenEndpoint(ISessionService sessions, IApplicationService applications, IOptions<AuthenticationOptions> options)
+    public TokenEndpoint(ISessionService sessions, IApplicationService applications, IConnectionService connections, ITokenService tokens, IDataProtectionProvider dataProtectionProvider)
     {
         _sessions = sessions;
         _applications = applications;
-        _options = options.Value;
+        _connections = connections;
+        _tokens = tokens;
+        _dataProtectionProvider = dataProtectionProvider;
     }
     
     public override void Configure()
@@ -109,11 +117,13 @@ public class TokenEndpoint : Endpoint<TokenRequest, Results<Ok<TokenResponse>, B
     }
 
     private async Task<Results<Ok<TokenResponse>, BadRequest<TokenErrorResponse>, UnauthorizedHttpResult>> AuthorizationCodeAsync(
-        string clientId, string code, string? redirect, string? secret, string? codeVerifier, CancellationToken ct)
+        string clientId, string code, string? redirectUri, string? secret, string? codeVerifier, CancellationToken ct)
     {
-        var session = await _sessions.GetByCodeAsync(code, ct);
+        var protector = _dataProtectionProvider.CreateProtector("oauth");
+
+        var authorization = JsonSerializer.Deserialize<AuthorizationCodeModel>(protector.Unprotect(code));
         
-        if (session is null)
+        if (authorization is null)
         {
             return TypedResults.BadRequest(new TokenErrorResponse
             {
@@ -122,7 +132,7 @@ public class TokenEndpoint : Endpoint<TokenRequest, Results<Ok<TokenResponse>, B
             });
         }
 
-        if (clientId != session.Application.Id.Value)
+        if (clientId != authorization.ClientId.Value)
         {
             return TypedResults.BadRequest(new TokenErrorResponse
             {
@@ -140,8 +150,11 @@ public class TokenEndpoint : Endpoint<TokenRequest, Results<Ok<TokenResponse>, B
             });
         }
 
-        if (!string.IsNullOrEmpty(secret) &&
-            await _applications.GetByCredentialsAsync(new Id<IApplication>(clientId), secret, ct) is null)
+        var application = string.IsNullOrEmpty(secret)
+            ? await _applications.GetByIdAsync(authorization.ClientId, ct)
+            : await _applications.GetByCredentialsAsync(authorization.ClientId, secret, ct);
+        
+        if (application is null)
         {
             return TypedResults.BadRequest(new TokenErrorResponse
             {
@@ -150,7 +163,7 @@ public class TokenEndpoint : Endpoint<TokenRequest, Results<Ok<TokenResponse>, B
             });
         }
         
-        if (session.CodeChallenge is { Length: > 0 } codeChallenge && !string.IsNullOrEmpty(codeVerifier)
+        if (authorization.CodeChallenge is { Length: > 0 } codeChallenge && !string.IsNullOrEmpty(codeVerifier)
                                                        && !ValidateCodeVerifier(codeChallenge, codeVerifier))
         {
             return TypedResults.BadRequest(new TokenErrorResponse
@@ -160,7 +173,9 @@ public class TokenEndpoint : Endpoint<TokenRequest, Results<Ok<TokenResponse>, B
             });
         }
 
-        if (session.Redirect is not null && string.IsNullOrEmpty(redirect))
+        var redirect = application.Redirects[authorization.RedirectId];
+
+        if (authorization.RequireRedirect && string.IsNullOrEmpty(redirectUri))
         {
             return TypedResults.BadRequest(new TokenErrorResponse
             {
@@ -169,7 +184,7 @@ public class TokenEndpoint : Endpoint<TokenRequest, Results<Ok<TokenResponse>, B
             });
         }
 
-        if (session.Redirect?.Uri.OriginalString != redirect)
+        if (redirect?.Uri.OriginalString != redirectUri)
         {
             return TypedResults.BadRequest(new TokenErrorResponse
             {
@@ -178,32 +193,28 @@ public class TokenEndpoint : Endpoint<TokenRequest, Results<Ok<TokenResponse>, B
             });
         }
 
-        return Token(await _sessions.StartAsync(session.Id, new StartSessionBuilder().WithCanRefresh(true), ct));
+        var connection = await _connections.GetOrCreateAsync(authorization.UserId, application.Id, false, ct);
+
+        var session = await _sessions.CreateAsync(new CreateSessionBuilder()
+            .WithConnection(connection.Id)
+            .WithRedirect(authorization.RedirectId)
+            .WithScope(authorization.Scope)
+            .WithCanRefresh(true), ct);
+
+        var token = await _tokens.GenerateTokenAsync(session);
+        
+        return TypedResults.Ok(new TokenResponse
+        {
+            AccessToken = token.AccessToken,
+            TokenType = token.TokenType,
+            ExpiresIn = (int) (token.Expiry - DateTime.UtcNow).TotalSeconds,
+            RefreshToken = token.RefreshToken,
+            Scope = string.Join(' ', session.Scope)
+        });
     }
 
     private bool ValidateCodeVerifier(string codeChallenge, string codeVerifier)
     {
         return OAuth.Base64UrlEncode(SHA256.HashData(Encoding.UTF8.GetBytes(codeVerifier))) == codeChallenge;
-    }
-
-    private Ok<TokenResponse> Token(ISession session)
-    {
-        string token = JWTBearer.CreateToken(
-            signingKey: _options.Jwt.TokenSigningKey,
-            expireAt: session.Expiry,
-            audience: session.Application.Id.Value,
-            privileges: u =>
-            {
-                u["sub"] = session.User.Id.Value;
-                u["SessionId"] = session.Id.Value;
-            });
-        
-        return TypedResults.Ok(new TokenResponse
-        {
-            AccessToken = token,
-            TokenType = "Bearer",
-            ExpiresIn = (int) (session.Expiry - DateTime.UtcNow).TotalSeconds,
-            RefreshToken = session.RefreshToken
-        });
     }
 }

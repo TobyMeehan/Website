@@ -43,49 +43,27 @@ public class SessionService : BaseService<ISession, SessionData, CreateSessionBu
             redirect = connection.Application.Redirects[redirectId];
         }
         
-        return new Session(data.Id, connection, redirect, data.AuthorizationCode, data.Scope?.Split() ?? Enumerable.Empty<string>(),
-            data.CodeChallenge, data.RefreshToken, data.Expiry);
+        return new Session(data.Id, connection, redirect, data.Scope?.Split() ?? Enumerable.Empty<string>(), data.RefreshToken, data.Expiry);
     }
 
     protected override async Task<(Id<ISession>, SessionData)> CreateAsync(CreateSessionBuilder create)
     {
         var id = await _id.GenerateAsync<ISession>();
-        string code = await _secretService.GenerateSecretAsync(32);
-
+        
         return (id, new SessionData
         {
             Id = id.Value,
             ConnectionId = create.Connection.Value,
             RedirectId = create.Redirect.Value,
-            AuthorizationCode = code,
             Scope = create.Scope,
-            CodeChallenge = create.CodeChallenge,
-            RefreshToken = null,
-            Expiry = DateTime.UtcNow.AddMinutes(10)
+            RefreshToken = create.CanRefresh ? await _secretService.GenerateSecretAsync(32) : null,
+            Expiry = DateTime.UtcNow.AddMonths(6)
         });
-    }
-
-    public async Task<ISession?> GetByCodeAsync(string code, CancellationToken ct)
-    {
-        var data = await _db.SelectByCodeAsync(code, ct);
-
-        return await MapAsync(data);
     }
     
     public async Task<ISession?> RefreshAsync(string refreshToken, CancellationToken ct)
     {
         throw new NotImplementedException();
-    }
-
-    public async Task<ISession> StartAsync(Id<ISession> id, StartSessionBuilder session, CancellationToken cancellationToken = default)
-    {
-        string refreshToken = await _secretService.GenerateSecretAsync(32);
-
-        return await UpdateAsync(id, data =>
-        {
-            data.Expiry = DateTime.UtcNow.AddMonths(6);
-            data.RefreshToken = session.CanRefresh ? refreshToken : null;
-        }, cancellationToken);
     }
 
     public async Task DeleteByConnectionAsync(Id<IConnection> connection, CancellationToken ct)

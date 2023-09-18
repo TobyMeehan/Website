@@ -20,19 +20,9 @@ public interface ISession : IEntity<ISession>
     IRedirect? Redirect { get; }
     
     /// <summary>
-    /// The authorization code used to create the session.
-    /// </summary>
-    string AuthorizationCode { get; }
-    
-    /// <summary>
     /// The scope given to the application for this session.
     /// </summary>
     IEnumerable<string> Scope { get; }
-    
-    /// <summary>
-    /// The PKCE code challenge provided by the application.
-    /// </summary>
-    string? CodeChallenge { get; }
     
     /// <summary>
     /// The refresh token to be used to create a new session.

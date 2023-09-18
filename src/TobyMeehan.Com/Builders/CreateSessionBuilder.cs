@@ -11,6 +11,6 @@ public struct CreateSessionBuilder
     public CreateSessionBuilder WithScope(string? value) => this with { Scope = value };
     public string? Scope { get; set; }
 
-    public CreateSessionBuilder WithCodeChallenge(string? value) => this with { CodeChallenge = value };
-    public string? CodeChallenge { get; set; }
+    public CreateSessionBuilder WithCanRefresh(bool value) => this with { CanRefresh = value };
+    public bool CanRefresh { get; set; }
 }
