@@ -39,13 +39,13 @@ public class Authorize : PageModel
     [BindProperty] public string RequestId { get; set; } = "";
     
     public async Task<IActionResult> OnGetAsync(
-        [FromQuery(Name = "response_type")] string responseType,
-        [FromQuery(Name = "client_id")] string clientId,
-        [FromQuery(Name = "code_challenge")] string? codeChallenge,
-        [FromQuery(Name = "code_challenge_method")] string? codeChallengeMethod = null,
-        [FromQuery(Name = "redirect_uri")] string? redirectUri = null,
-        [FromQuery(Name = "scope")] string? scope = null,
-        [FromQuery(Name = "state")] string? state = null,
+        [FromQuery(Name = OAuth.Parameters.ResponseType)] string responseType,
+        [FromQuery(Name = OAuth.Parameters.ClientId)] string clientId,
+        [FromQuery(Name = OAuth.Parameters.CodeChallenge)] string? codeChallenge,
+        [FromQuery(Name = OAuth.Parameters.CodeChallengeMethod)] string? codeChallengeMethod = null,
+        [FromQuery(Name = OAuth.Parameters.RedirectUri)] string? redirectUri = null,
+        [FromQuery(Name = OAuth.Parameters.Scope)] string? scope = null,
+        [FromQuery(Name = OAuth.Parameters.State)] string? state = null,
         CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrWhiteSpace(clientId))
@@ -74,14 +74,19 @@ public class Authorize : PageModel
             return PageError("redirect_uri");
         }
 
-        if (!new[] { "code" }.Contains(responseType))
+        if (!new[] { OAuth.ResponseTypes.Code }.Contains(responseType))
         {
-            return RedirectToError(redirect, "unsupported_response_type", $"Response type {responseType} is not supported.", state);
+            return RedirectToError(redirect, OAuth.Errors.UnsupportedResponseType, $"Response type {responseType} is not supported.", state);
         }
-
+        
         if (!string.IsNullOrEmpty(scope) && scope.Split().Except(Scope.All).Any())
         {
-            return RedirectToError(redirect, "invalid_scope", null, state);
+            return RedirectToError(redirect, OAuth.Errors.InvalidScope, null, state);
+        }
+
+        if (codeChallenge is not null && codeChallengeMethod is not OAuth.Transformations.S256)
+        {
+            return RedirectToError(redirect, OAuth.Errors.InvalidRequest, "Transform algorithm not supported", state);
         }
 
         ReturnUrl = Url.Page(nameof(Authorize), new
@@ -95,7 +100,7 @@ public class Authorize : PageModel
             state
         });
         
-        if (!(User.Identity?.IsAuthenticated ?? false))
+        if (User.Identity?.IsAuthenticated is not true)
         {
             return RedirectToPage(nameof(Login), new { ReturnUrl });
         }
@@ -147,7 +152,7 @@ public class Authorize : PageModel
             return PageError("something_happened");
         }
         
-        return RedirectToError(redirect, "access_denied", "User denied the request.", request.State);
+        return RedirectToError(redirect, OAuth.Errors.AccessDenied, "User denied the request.", request.State);
     }
     
     public async Task<IActionResult> OnPostAsync(CancellationToken cancellationToken = default)
@@ -185,28 +190,28 @@ public class Authorize : PageModel
             .WithScope(request.Scope)
             .WithCodeChallenge(request.CodeChallenge), cancellationToken);
 
-        var query = new QueryBuilder {{"code", session.AuthorizationCode}};
+        var query = new QueryBuilder {{ OAuth.Parameters.Code, session.AuthorizationCode }};
 
         if (request.State is not null)
         {
-            query.Add("state", request.State);
+            query.Add(OAuth.Parameters.State, request.State);
         }
 
-        return Redirect(connection.Application.Redirects[request.RedirectId]?.Uri.OriginalString + query);
+        return Redirect(redirect.Uri.OriginalString + query);
     }
     
     private IActionResult RedirectToError(IRedirect redirect, string error, string? message, string? state)
     {
-        var query = new QueryBuilder {{"error", error}};
+        var query = new QueryBuilder {{ OAuth.Parameters.Error, error }};
         
         if (message is not null)
         {
-            query.Add("error_description", message);
+            query.Add(OAuth.Parameters.ErrorDescription, message);
         }
 
         if (state is not null)
         {
-            query.Add("state", state);
+            query.Add(OAuth.Parameters.State, state);
         }
         
         return Redirect(redirect.Uri.OriginalString + query);

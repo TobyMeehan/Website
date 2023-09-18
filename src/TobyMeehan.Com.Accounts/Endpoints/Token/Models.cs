@@ -19,6 +19,9 @@ public class TokenRequest
     
     [BindFrom(OAuth.Parameters.ClientSecret)]
     public string? ClientSecret { get; set; }
+
+    [BindFrom(OAuth.Parameters.CodeVerifier)]
+    public string? CodeVerifier { get; set; }
 }
 
 public class TokenRequestValidator : Validator<TokenRequest>

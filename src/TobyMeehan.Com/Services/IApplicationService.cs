@@ -29,7 +29,7 @@ public interface IApplicationService
     /// <param name="id"></param>
     /// <param name="secret"></param>
     /// <returns></returns>
-    Task<IApplication?> GetByCredentialsAsync(Id<IApplication> id, Password? secret, CancellationToken cancellationToken = default);
+    Task<IApplication?> GetByCredentialsAsync(Id<IApplication> id, Password secret, CancellationToken cancellationToken = default);
     
     // CREATE
 

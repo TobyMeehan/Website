@@ -41,12 +41,9 @@ builder.Services.Configure<JsonOptions>(options =>
 
 builder.Services.AddFastEndpoints();
 
-builder.Services.AddCookieAuthentication();
-builder.Services.AddClientBasicAuthentication();
-builder.Services.AddAuthentication(options =>
-{
-    options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-});
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookieAuthentication()
+    .AddClientBasicAuthentication();
 
 builder.Services.AddFluentValidationClientsideAdapters();
 

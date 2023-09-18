@@ -55,7 +55,7 @@ public class ApplicationService : BaseService<IApplication, ApplicationData, Cre
         return await MapAsync(data);
     }
 
-    public async Task<IApplication?> GetByCredentialsAsync(Id<IApplication> id, Password? secret, CancellationToken ct)
+    public async Task<IApplication?> GetByCredentialsAsync(Id<IApplication> id, Password secret, CancellationToken ct)
     {
         var application = await _db.SelectByIdAsync(id.Value, ct);
 
@@ -64,12 +64,10 @@ public class ApplicationService : BaseService<IApplication, ApplicationData, Cre
             return null;
         }
 
-        return secret switch
+        return application.SecretHash switch
         {
-            null when application.SecretHash is not null => null,
-            not null when application.SecretHash is { } hash && 
-                          !await _password.CheckAsync(secret, hash) => null,
-            _ => await MapAsync(application)
+            { } hash when await _password.CheckAsync(secret, hash) => await MapAsync(application),
+            _ => null
         };
     }
 
