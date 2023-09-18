@@ -22,6 +22,9 @@ public class TokenRequest
 
     [BindFrom(OAuth.Parameters.CodeVerifier)]
     public string? CodeVerifier { get; set; }
+    
+    [BindFrom(OAuth.Parameters.Scope)] 
+    public string? Scope { get; set; }
 }
 
 public class TokenRequestValidator : Validator<TokenRequest>

@@ -112,6 +112,8 @@ public class TokenEndpoint : Endpoint<TokenRequest, Results<Ok<TokenResponse>, B
         {
             { GrantType: OAuth.GrantTypes.AuthorizationCode, Code: { } code }
                 => await AuthorizationCodeAsync(clientId, code, req.RedirectUri, clientSecret, req.CodeVerifier, ct),
+            { GrantType: OAuth.GrantTypes.ClientCredentials }
+                => await ClientCredentialsAsync(clientId, clientSecret, req.Scope, ct),
             _ => TypedResults.BadRequest(new TokenErrorResponse { Error = OAuth.Errors.InvalidGrant })
         };
     }
@@ -216,5 +218,36 @@ public class TokenEndpoint : Endpoint<TokenRequest, Results<Ok<TokenResponse>, B
     private bool ValidateCodeVerifier(string codeChallenge, string codeVerifier)
     {
         return OAuth.Base64UrlEncode(SHA256.HashData(Encoding.UTF8.GetBytes(codeVerifier))) == codeChallenge;
+    }
+
+    private async Task<Results<Ok<TokenResponse>, BadRequest<TokenErrorResponse>, UnauthorizedHttpResult>> ClientCredentialsAsync(
+            string clientId, string? secret, string? scope, CancellationToken ct)
+    {
+        if (string.IsNullOrEmpty(secret) 
+            || await _applications.GetByCredentialsAsync(new Id<IApplication>(clientId), secret, ct) is not { } application)
+        {
+            return TypedResults.BadRequest(new TokenErrorResponse
+            {
+                Error = OAuth.Errors.InvalidClient,
+                ErrorDescription = "Client credentials invalid."
+            });
+        }
+
+        var connection = await _connections.GetOrCreateAsync(application.AuthorId, application.Id, false, ct);
+
+        var session = await _sessions.CreateAsync(new CreateSessionBuilder()
+            .WithConnection(connection.Id)
+            .WithScope(scope)
+            .WithCanRefresh(false), ct);
+
+        var token = await _tokens.GenerateTokenAsync(session);
+
+        return TypedResults.Ok(new TokenResponse
+        {
+            AccessToken = token.AccessToken,
+            TokenType = token.TokenType,
+            ExpiresIn = (int) (token.Expiry - DateTime.UtcNow).TotalSeconds,
+            Scope = scope
+        });
     }
 }

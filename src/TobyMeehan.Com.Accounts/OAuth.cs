@@ -38,6 +38,7 @@ public class OAuth
     public class GrantTypes
     {
         public const string AuthorizationCode = "authorization_code";
+        public const string ClientCredentials = "client_credentials";
     }
     
     public class Errors
