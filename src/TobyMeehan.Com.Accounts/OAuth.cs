@@ -23,6 +23,7 @@ public class OAuth
     public class ResponseTypes
     {
         public const string Code = "code";
+        public const string Token = "token";
     }
     
     public class Transformations

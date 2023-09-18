@@ -18,15 +18,13 @@ public class Authorize : PageModel
     private readonly IUserService _users;
     private readonly IConnectionService _connections;
     private readonly ISessionService _sessions;
-    private readonly IDataProtectionProvider _dataProtectionProvider;
 
-    public Authorize(IApplicationService applications, IUserService users, IConnectionService connections, ISessionService sessions, IDataProtectionProvider dataProtectionProvider)
+    public Authorize(IApplicationService applications, IUserService users, IConnectionService connections, ISessionService sessions)
     {
         _applications = applications;
         _users = users;
         _connections = connections;
         _sessions = sessions;
-        _dataProtectionProvider = dataProtectionProvider;
     }
 
     public AuthorizeErrorModel? Error { get; set; }
@@ -36,68 +34,71 @@ public class Authorize : PageModel
     public List<string> Scopes { get; set; } = new();
 
     public string? ReturnUrl { get; set; }
-    [BindProperty] public string RequestId { get; set; } = "";
-    
-    public async Task<IActionResult> OnGetAsync(
-        [FromQuery(Name = OAuth.Parameters.ResponseType)] string responseType,
-        [FromQuery(Name = OAuth.Parameters.ClientId)] string clientId,
-        [FromQuery(Name = OAuth.Parameters.CodeChallenge)] string? codeChallenge,
-        [FromQuery(Name = OAuth.Parameters.CodeChallengeMethod)] string? codeChallengeMethod = null,
-        [FromQuery(Name = OAuth.Parameters.RedirectUri)] string? redirectUri = null,
-        [FromQuery(Name = OAuth.Parameters.Scope)] string? scope = null,
-        [FromQuery(Name = OAuth.Parameters.State)] string? state = null,
-        CancellationToken cancellationToken = default)
+
+    private async Task<(IApplication? Client, IRedirect? Redirect, Func<IActionResult>? Error)> ValidateParametersAsync(
+        AuthorizeRequestModel request,
+        CancellationToken cancellationToken)
     {
-        if (string.IsNullOrWhiteSpace(clientId))
+        if (string.IsNullOrWhiteSpace(request.ClientId))
         {
-            return PageError("client_id");
+            return (null, null, () => PageError(OAuth.Parameters.ClientId));
         }
 
-        var client = await _applications.GetByIdAsync(new Id<IApplication>(clientId), cancellationToken);
+        var client = await _applications.GetByIdAsync(new Id<IApplication>(request.ClientId), cancellationToken);
 
         if (client is null)
         {
-            return PageError("client_id");
+            return (null, null, () => PageError(OAuth.Parameters.ClientId));
         }
 
-        var redirect = redirectUri switch
+        var redirect = request.RedirectUri switch
         {
             null when client.Redirects.Count == 1 => client.Redirects.Single(),
-
-            not null => client.Redirects.FirstOrDefault(x => x.Uri.OriginalString == redirectUri),
-
+            not null => client.Redirects.FirstOrDefault(x => x.Uri.OriginalString == request.RedirectUri),
             _ => null
         };
-
+        
         if (redirect is null)
         {
-            return PageError("redirect_uri");
+            return (client, null, () => PageError(OAuth.Parameters.RedirectUri));
         }
 
-        if (!new[] { OAuth.ResponseTypes.Code }.Contains(responseType))
+        if (!new[] { OAuth.ResponseTypes.Code, OAuth.ResponseTypes.Token }.Contains(request.ResponseType))
         {
-            return RedirectToError(redirect, OAuth.Errors.UnsupportedResponseType, $"Response type {responseType} is not supported.", state);
+            return (client, redirect, () => RedirectToError(redirect, OAuth.Errors.UnsupportedResponseType, null, request.State));
+        }
+
+        if (!string.IsNullOrEmpty(request.Scope) && request.Scope.Split().Except(Scope.All).Any())
+        {
+            return (client, redirect, () => RedirectToError(redirect, OAuth.Errors.InvalidScope, null, request.State));
         }
         
-        if (!string.IsNullOrEmpty(scope) && scope.Split().Except(Scope.All).Any())
+        if (request.CodeChallenge is not null && request.CodeChallengeMethod != OAuth.Transformations.S256)
         {
-            return RedirectToError(redirect, OAuth.Errors.InvalidScope, null, state);
+            return (client, redirect, () => RedirectToError(redirect, OAuth.Errors.InvalidRequest, "Transform algorithm not supported", request.State));
         }
 
-        if (codeChallenge is not null && codeChallengeMethod is not OAuth.Transformations.S256)
+        return (client, redirect, null);
+    }
+    
+    public async Task<IActionResult> OnGetAsync(AuthorizeRequestModel request, CancellationToken cancellationToken = default)
+    {
+        var validation = await ValidateParametersAsync(request, cancellationToken);
+
+        if (validation.Error is not null)
         {
-            return RedirectToError(redirect, OAuth.Errors.InvalidRequest, "Transform algorithm not supported", state);
+            return validation.Error();
         }
 
         ReturnUrl = Url.Page(nameof(Authorize), new
         {
-            response_type = responseType,
-            client_id = clientId,
-            code_challenge = codeChallenge,
-            code_challenge_method = codeChallengeMethod,
-            redirect_uri = redirectUri,
-            scope,
-            state
+            response_type = request.ResponseType,
+            client_id = request.ClientId,
+            code_challenge = request.CodeChallenge,
+            code_challenge_method = request.CodeChallengeMethod,
+            redirect_uri = request.RedirectUri,
+            scope = request.Scope,
+            state = request.State
         });
         
         if (User.Identity?.IsAuthenticated is not true)
@@ -105,84 +106,33 @@ public class Authorize : PageModel
             return RedirectToPage(nameof(Login), new { ReturnUrl });
         }
         
-        Client = client;
+        Client = validation.Client;
         Owner = await _users.GetByIdAsync(User.Id(), cancellationToken);
-        Scopes = scope is not null ? scope.Split().ToList() : new List<string>();
-
-        var protector = _dataProtectionProvider.CreateProtector("oauth");
-
-        var request = new AuthorizeRequestModel
-        {
-            ResponseType = responseType,
-            ClientId = client.Id,
-            CodeChallenge = codeChallenge,
-            CodeChallengeMethod = codeChallengeMethod,
-            RedirectId = redirect.Id,
-            Scope = scope,
-            State = state
-        };
-
-        RequestId = protector.Protect(JsonSerializer.Serialize(request));
+        Scopes = request.Scope is { } scope ? scope.Split().ToList() : new List<string>();
         
         return Page();
     }
     
-    public async Task<IActionResult> OnPostCancel()
+    public async Task<IActionResult> OnPostAsync(AuthorizeRequestModel request, [FromForm] bool cancel = false, CancellationToken cancellationToken = default)
     {
-        var protector = _dataProtectionProvider.CreateProtector("oauth");
+        var validation = await ValidateParametersAsync(request, cancellationToken);
 
-        var request = JsonSerializer.Deserialize<AuthorizeRequestModel>(protector.Unprotect(RequestId));
+        if (validation.Error is not null)
+        {
+            return validation.Error();
+        }
 
-        if (request is null)
+        if (validation.Client is null || validation.Redirect is not { } redirect)
         {
             return PageError("something_happened");
         }
 
-        var client = await _applications.GetByIdAsync(request.ClientId);
-
-        if (client is null)
+        if (cancel)
         {
-            return PageError("something_happened");
+            return RedirectToError(redirect, OAuth.Errors.AccessDenied, "User denied the request.", request.State);
         }
         
-        var redirect = client.Redirects[request.RedirectId];
-
-        if (redirect is null)
-        {
-            return PageError("something_happened");
-        }
-        
-        return RedirectToError(redirect, OAuth.Errors.AccessDenied, "User denied the request.", request.State);
-    }
-    
-    public async Task<IActionResult> OnPostAsync(CancellationToken cancellationToken = default)
-    {
-        var protector = _dataProtectionProvider.CreateProtector("oauth");
-
-        AuthorizeRequestModel? request;
-
-        try
-        {
-            request = JsonSerializer.Deserialize<AuthorizeRequestModel>(protector.Unprotect(RequestId));
-        }
-        catch (CryptographicException)
-        {
-            request = null;
-        }
-
-        if (request is null)
-        {
-            return PageError("something_happened");
-        }
-        
-        var connection = await _connections.GetOrCreateAsync(User.Id(), request.ClientId, false, cancellationToken);
-
-        var redirect = connection.Application.Redirects[request.RedirectId];
-
-        if (redirect is null)
-        {
-            return PageError("something_happened");
-        }
+        var connection = await _connections.GetOrCreateAsync(User.Id(), validation.Client.Id, false, cancellationToken);
         
         var session = await _sessions.CreateAsync(new CreateSessionBuilder()
             .WithConnection(connection.Id)
