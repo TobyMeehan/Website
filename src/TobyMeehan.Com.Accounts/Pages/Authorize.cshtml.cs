@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using TobyMeehan.Com.Accounts.Extensions;
+using TobyMeehan.Com.Accounts.Jwt;
 using TobyMeehan.Com.Accounts.Models;
 using TobyMeehan.Com.Builders;
 using TobyMeehan.Com.Services;
@@ -16,13 +17,19 @@ public class Authorize : PageModel
 {
     private readonly IApplicationService _applications;
     private readonly IUserService _users;
+    private readonly IConnectionService _connections;
+    private readonly ISessionService _sessions;
     private readonly IDataProtectionProvider _dataProtectionProvider;
+    private readonly ITokenService _tokens;
 
-    public Authorize(IApplicationService applications, IUserService users, IDataProtectionProvider dataProtectionProvider)
+    public Authorize(IApplicationService applications, IUserService users, IConnectionService connections, ISessionService sessions, IDataProtectionProvider dataProtectionProvider, ITokenService tokens)
     {
         _applications = applications;
         _users = users;
+        _connections = connections;
+        _sessions = sessions;
         _dataProtectionProvider = dataProtectionProvider;
+        _tokens = tokens;
     }
 
     public AuthorizeErrorModel? Error { get; set; }
@@ -130,15 +137,25 @@ public class Authorize : PageModel
             return RedirectToError(redirect, OAuth.Errors.AccessDenied, "User denied the request.", request.State);
         }
 
+        return request.ResponseType switch
+        {
+            OAuth.ResponseTypes.Code => AuthorizationCode(validation.Client, redirect, request),
+            OAuth.ResponseTypes.Token => await TokenAsync(validation.Client, redirect, request, cancellationToken),
+            _ => RedirectToError(redirect, OAuth.Errors.UnsupportedResponseType, null, request.State)
+        };
+    }
+
+    private IActionResult AuthorizationCode(IApplication client, IRedirect redirect, AuthorizeRequestModel request)
+    {
         var protector = _dataProtectionProvider.CreateProtector("oauth");
 
         string code = protector.Protect(JsonSerializer.Serialize(new AuthorizationCodeModel
         {
-            ClientId = validation.Client.Id,
+            ClientId = client.Id,
             UserId = User.Id(),
             RedirectId = redirect.Id,
 
-            RequireRedirect = validation.Client.Redirects.Count > 1,
+            RequireRedirect = client.Redirects.Count > 1,
 
             CodeChallenge = request.CodeChallenge,
             CodeChallengeMethod = request.CodeChallengeMethod,
@@ -153,6 +170,37 @@ public class Authorize : PageModel
         }
 
         return Redirect(redirect.Uri.OriginalString + query);
+    }
+
+    private async Task<IActionResult> TokenAsync(IApplication client, IRedirect redirect, AuthorizeRequestModel request, CancellationToken cancellationToken)
+    {
+        var connection = await _connections.GetOrCreateAsync(User.Id(), client.Id, false, cancellationToken);
+
+        var session = await _sessions.CreateAsync(new CreateSessionBuilder()
+            .WithConnection(connection.Id)
+            .WithRedirect(redirect.Id)
+            .WithScope(request.Scope)
+            .WithCanRefresh(false), cancellationToken);
+        
+        var token = await _tokens.GenerateTokenAsync(session);
+
+        int expiresIn = (int) (DateTime.UtcNow - token.Expiry).TotalSeconds;
+
+        var query = new QueryBuilder
+        {
+            { OAuth.Parameters.AccessToken, token.AccessToken },
+            { OAuth.Parameters.TokenType, token.TokenType },
+            { OAuth.Parameters.ExpiresIn, expiresIn.ToString() }
+        };
+
+        if (request.State is not null)
+        {
+            query.Add(OAuth.Parameters.State, request.State);
+        }
+
+        string url = redirect.Uri.OriginalString + query;
+
+        return Redirect(url.Replace('?', '#'));
     }
     
     private IActionResult RedirectToError(IRedirect redirect, string error, string? message, string? state)

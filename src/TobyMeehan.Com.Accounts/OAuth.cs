@@ -15,6 +15,9 @@ public class OAuth
         public const string Code = "code";
         public const string ClientSecret = "client_secret";
         public const string CodeVerifier = "code_verifier";
+        public const string AccessToken = "access_token";
+        public const string TokenType = "token_type";
+        public const string ExpiresIn = "expires_in";
         public const string Error = "error";
         public const string ErrorDescription = "error_description";
         public const string ErrorUri = "error_uri";
