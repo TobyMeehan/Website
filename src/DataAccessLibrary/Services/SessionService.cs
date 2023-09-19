@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Caching.Memory;
 using TobyMeehan.Com.Builders;
 using TobyMeehan.Com.Data.Entities;
 using TobyMeehan.Com.Data.Repositories;
@@ -15,7 +16,7 @@ public class SessionService : BaseService<ISession, SessionData, CreateSessionBu
     private readonly ISecretService _secretService;
     private readonly IConnectionService _connections;
 
-    public SessionService(ISessionRepository db, IIdService id, ISecretService secretService, IConnectionService connections) : base(db)
+    public SessionService(ISessionRepository db, IIdService id, ISecretService secretService, IConnectionService connections, IMemoryCache cache) : base(db, cache)
     {
         _db = db;
         _id = id;

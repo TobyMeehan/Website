@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Caching.Memory;
 using TobyMeehan.Com.Data.Entities;
 using TobyMeehan.Com.Data.Repositories;
 using TobyMeehan.Com.Data.Repositories.Models;
@@ -13,7 +14,7 @@ public class ConnectionService : BaseService<IConnection, ConnectionData>, IConn
     private readonly IApplicationService _applications;
     private readonly IUserService _users;
 
-    public ConnectionService(IConnectionRepository db, IIdService id, IApplicationService applications, IUserService users) : base(db)
+    public ConnectionService(IConnectionRepository db, IIdService id, IApplicationService applications, IUserService users, IMemoryCache cache) : base(db, cache)
     {
         _db = db;
         _id = id;
@@ -48,7 +49,7 @@ public class ConnectionService : BaseService<IConnection, ConnectionData>, IConn
     {
         var data = await _db.SelectByUserAsync(user.Value, ct);
 
-        return await MapAsync(data);
+        return await GetAsync(data);
     }
 
     public async Task<IConnection> GetOrCreateAsync(Id<IUser> user, Id<IApplication> application, bool autoAuthorize, CancellationToken ct)

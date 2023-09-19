@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Caching.Memory;
 using TobyMeehan.Com.Builders;
 using TobyMeehan.Com.Data.Entities;
 using TobyMeehan.Com.Data.Repositories;
@@ -13,7 +14,7 @@ public class ApplicationService : BaseService<IApplication, ApplicationData, Cre
     private readonly IIdService _id;
     private readonly IPasswordService _password;
 
-    public ApplicationService(IApplicationRepository db, IIdService id, IPasswordService password) : base(db)
+    public ApplicationService(IApplicationRepository db, IIdService id, IPasswordService password, IMemoryCache cache) : base(db, cache)
     {
         _db = db;
         _id = id;
@@ -68,7 +69,7 @@ public class ApplicationService : BaseService<IApplication, ApplicationData, Cre
     {
         var data = await _db.SelectByAuthorAsync(user.Value, ct);
 
-        return await MapAsync(data);
+        return await GetAsync(data);
     }
 
     public async Task<IApplication> UpdateAsync(Id<IApplication> id, UpdateApplicationBuilder update,

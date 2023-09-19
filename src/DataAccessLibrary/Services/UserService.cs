@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Caching.Memory;
 using TobyMeehan.Com.Builders;
 using TobyMeehan.Com.Data.Entities;
 using TobyMeehan.Com.Data.Repositories;
@@ -13,7 +14,7 @@ public class UserService : BaseService<IUser, UserData, CreateUserBuilder>, IUse
     private readonly IIdService _id;
     private readonly IPasswordService _password;
 
-    public UserService(IUserRepository db, IIdService id, IPasswordService password) : base(db)
+    public UserService(IUserRepository db, IIdService id, IPasswordService password, IMemoryCache cache) : base(db, cache)
     {
         _db = db;
         _id = id;
@@ -71,7 +72,7 @@ public class UserService : BaseService<IUser, UserData, CreateUserBuilder>, IUse
     {
         var data = await _db.SelectByRoleAsync(role.Value, ct);
 
-        return await MapAsync(data);
+        return await GetAsync(data);
     }
 
     public async Task<bool> IsHandleUniqueAsync(string handle, CancellationToken ct)
