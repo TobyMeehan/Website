@@ -20,39 +20,37 @@ public class UserService : BaseService<IUser, UserData, CreateUserBuilder>, IUse
         _password = password;
     }
     
-    protected override Task<IUser> MapperAsync(UserData data)
+    protected override Task<IUser> MapAsync(UserData data)
     {
         return Task.FromResult<IUser>(new User(data.Id, data.Name, data.Handle, data.Balance, data.Description));
     }
 
-    protected override async Task<(Id<IUser>, UserData)> CreateAsync(CreateUserBuilder create)
+    protected override async Task<UserData> CreateAsync(CreateUserBuilder create)
     {
         var id = await _id.GenerateAsync<IUser>();
 
-        return (id, new UserData
+        return new UserData
         {
             Id = id.Value,
             Handle = create.Username,
             Name = create.Username,
             HashedPassword = await _password.HashAsync(create.Password)
-        });
+        };
     }
 
-    public async Task<IEntityCollection<IUser>> GetByRoleAsync(Id<IUserRole> role, CancellationToken ct)
-    {
-        var data = await _db.SelectByRoleAsync(role.Value, ct);
-
-        return await MapAsync(data);
-    }
-
-    public async Task<IUser?> GetByHandleAsync(string handle, CancellationToken ct)
+    public async Task<IUser?> FindByHandleAsync(string handle, CancellationToken ct)
     {
         var data = await _db.SelectByHandleAsync(handle, ct);
 
+        if (data is null)
+        {
+            return null;
+        }
+        
         return await MapAsync(data);
     }
 
-    public async Task<IUser?> GetByCredentialsAsync(string handle, Password password, CancellationToken ct)
+    public async Task<IUser?> FindByCredentialsAsync(string handle, Password password, CancellationToken ct)
     {
         var user = await _db.SelectByHandleAsync(handle, ct);
 
@@ -67,6 +65,13 @@ public class UserService : BaseService<IUser, UserData, CreateUserBuilder>, IUse
         }
 
         return await MapAsync(user);
+    }
+
+    public async Task<IEntityCollection<IUser>> GetByRoleAsync(Id<IUserRole> role, CancellationToken ct)
+    {
+        var data = await _db.SelectByRoleAsync(role.Value, ct);
+
+        return await MapAsync(data);
     }
 
     public async Task<bool> IsHandleUniqueAsync(string handle, CancellationToken ct)

@@ -7,8 +7,28 @@ namespace TobyMeehan.Com.Services;
 /// </summary>
 public interface IUserService
 {
+    // FIND
+
+    Task<IUser?> FindByIdAsync(string id, CancellationToken cancellationToken = default);
+    
+    /// <summary>
+    /// Gets the user with the specified username.
+    /// </summary>
+    /// <param name="handle"></param>
+    /// <returns></returns>
+    Task<IUser?> FindByHandleAsync(string handle, CancellationToken cancellationToken = default);
+    
+    Task<IUser?> FindByCredentialsAsync(string handle, Password password, CancellationToken cancellationToken = default);
+    
     // GET
 
+    /// <summary>
+    /// Gets the user with the specified ID.
+    /// </summary>
+    /// <param name="id"></param>
+    /// <returns></returns>
+    Task<IUser> GetByIdAsync(Id<IUser> id, CancellationToken cancellationToken = default);
+    
     /// <summary>
     /// Gets all users.
     /// </summary>
@@ -21,23 +41,7 @@ public interface IUserService
     /// <param name="role"></param>
     /// <returns></returns>
     Task<IEntityCollection<IUser>> GetByRoleAsync(Id<IUserRole> role, CancellationToken cancellationToken = default);
-
-    /// <summary>
-    /// Gets the user with the specified ID.
-    /// </summary>
-    /// <param name="id"></param>
-    /// <returns></returns>
-    Task<IUser?> GetByIdAsync(Id<IUser> id, CancellationToken cancellationToken = default);
-
-    /// <summary>
-    /// Gets the user with the specified username.
-    /// </summary>
-    /// <param name="handle"></param>
-    /// <returns></returns>
-    Task<IUser?> GetByHandleAsync(string handle, CancellationToken cancellationToken = default);
-
-    Task<IUser?> GetByCredentialsAsync(string handle, Password password, CancellationToken cancellationToken = default);
-
+    
     Task<bool> IsHandleUniqueAsync(string handle, CancellationToken cancellationToken = default);
 
     // CREATE

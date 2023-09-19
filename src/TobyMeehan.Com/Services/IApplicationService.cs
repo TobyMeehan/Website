@@ -1,4 +1,5 @@
 ﻿using TobyMeehan.Com.Builders;
+using TobyMeehan.Com.Exceptions;
 
 namespace TobyMeehan.Com.Services;
 
@@ -7,29 +8,35 @@ namespace TobyMeehan.Com.Services;
 /// </summary>
 public interface IApplicationService
 {
+    // FIND
+    
+    /// <summary>
+    /// Attempts to find an application with the specified ID.
+    /// </summary>
+    /// <param name="id"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns></returns>
+    Task<IApplication?> FindByIdAsync(string id, CancellationToken cancellationToken = default);
+
+    Task<IApplication?> FindByCredentialsAsync(string id, Password secret,
+        CancellationToken cancellationToken = default);
+    
     // GET
 
     /// <summary>
     /// Gets all applications for the specified user.
     /// </summary>
     /// <param name="user"></param>
+    /// <param name="cancellationToken"></param>
     /// <returns></returns>
     Task<IEntityCollection<IApplication>> GetByAuthorAsync(Id<IUser> user, CancellationToken cancellationToken = default);
-
+    
     /// <summary>
-    /// Gets the application with the specified ID.
+    /// Gets the application with the specified ID. Throws an <see cref="EntityNotFoundException{T}"/> if the application does not exist.
     /// </summary>
     /// <param name="id"></param>
     /// <returns></returns>
-    Task<IApplication?> GetByIdAsync(Id<IApplication> id, CancellationToken cancellationToken = default);
-
-    /// <summary>
-    /// Gets the application with the specified client ID and secret. Returns null if id does not exist or secret is incorrect.
-    /// </summary>
-    /// <param name="id"></param>
-    /// <param name="secret"></param>
-    /// <returns></returns>
-    Task<IApplication?> GetByCredentialsAsync(Id<IApplication> id, Password secret, CancellationToken cancellationToken = default);
+    Task<IApplication> GetByIdAsync(Id<IApplication> id, CancellationToken cancellationToken = default);
     
     // CREATE
 

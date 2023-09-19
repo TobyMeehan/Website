@@ -21,7 +21,7 @@ public class ConnectionService : BaseService<IConnection, ConnectionData>, IConn
         _users = users;
     }
 
-    protected override async Task<IConnection> MapperAsync(ConnectionData data)
+    protected override async Task<IConnection> MapAsync(ConnectionData data)
     {
         var applicationId = new Id<IApplication>(data.ApplicationId);
         

@@ -51,7 +51,7 @@ public class ClientBasicAuthenticationHandler : AuthenticationHandler<Authentica
             return AuthenticateResult.Fail("Invalid Authorization header.");
         }
         
-        var application = await _applications.GetByCredentialsAsync(new Id<IApplication>(username), password);
+        var application = await _applications.FindByCredentialsAsync(username, password);
 
         if (application is null)
         {

@@ -2,9 +2,9 @@ namespace TobyMeehan.Com.Accounts.Models;
 
 public class AuthorizationCodeModel
 {
-    public Id<IApplication> ClientId { get; set; }
-    public Id<IUser> UserId { get; set; }
-    public Id<IRedirect> RedirectId { get; set; }
+    public string ClientId { get; set; }
+    public string UserId { get; set; }
+    public string RedirectId { get; set; }
 
     public bool RequireRedirect { get; set; }
     

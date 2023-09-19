@@ -151,9 +151,9 @@ public class Authorize : PageModel
 
         string code = protector.Protect(JsonSerializer.Serialize(new AuthorizationCodeModel
         {
-            ClientId = client.Id,
-            UserId = User.Id(),
-            RedirectId = redirect.Id,
+            ClientId = client.Id.Value,
+            UserId = User.Id().Value,
+            RedirectId = redirect.Id.Value,
 
             RequireRedirect = client.Redirects.Count > 1,
 

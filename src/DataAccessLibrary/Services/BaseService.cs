@@ -32,35 +32,41 @@ public abstract class BaseService<TEntity, TData> where TEntity : IEntity<TEntit
 
         foreach (var item in data)
         {
-            collection.Add(await MapperAsync(item));
+            collection.Add(await MapAsync(item));
         }
 
         return collection;
     }
     
-    protected async Task<TEntity?> MapAsync(TData? data)
+    protected abstract Task<TEntity> MapAsync(TData data);
+
+    public async Task<TEntity?> FindByIdAsync(string id, CancellationToken cancellationToken = default)
     {
+        var data = await _select.SelectByIdAsync(id, cancellationToken);
+
         if (data is null)
         {
             return default;
         }
 
-        return await MapperAsync(data);
+        return await MapAsync(data);
     }
     
-    protected abstract Task<TEntity> MapperAsync(TData data);
-    
+    public async Task<TEntity> GetByIdAsync(Id<TEntity> id, CancellationToken cancellationToken = default)
+    {
+        var data = await _select.SelectByIdAsync(id.Value, cancellationToken);
+
+        if (data is null)
+        {
+            throw new EntityNotFoundException<TEntity>(id);
+        }
+        
+        return await MapAsync(data);
+    }
     
     public async Task<IEntityCollection<TEntity>> GetAllAsync(CancellationToken cancellationToken = default)
     {
         var data = await _select.SelectAllAsync(cancellationToken);
-
-        return await MapAsync(data);
-    }
-
-    public async Task<TEntity?> GetByIdAsync(Id<TEntity> id, CancellationToken cancellationToken = default)
-    {
-        var data = await _select.SelectByIdAsync(id.Value, cancellationToken);
 
         return await MapAsync(data);
     }
@@ -85,8 +91,6 @@ public abstract class BaseService<TEntity, TData> where TEntity : IEntity<TEntit
     {
         await _delete.DeleteAsync(id.Value, cancellationToken);
     }
-    
-    
 }
 
 public abstract class BaseService<TEntity, TData, TCreate> : BaseService<TEntity, TData> where TEntity : IEntity<TEntity>
@@ -104,14 +108,14 @@ public abstract class BaseService<TEntity, TData, TCreate> : BaseService<TEntity
         _insert = insert;
     }    
     
-    protected abstract Task<(Id<TEntity>, TData)> CreateAsync(TCreate create);
+    protected abstract Task<TData> CreateAsync(TCreate create);
     
     public async Task<TEntity> CreateAsync(TCreate create, CancellationToken cancellationToken)
     {
-        var (id, data) = await CreateAsync(create);
+        var data = await CreateAsync(create);
 
         await _insert.InsertAsync(data, cancellationToken);
 
-        return (await GetByIdAsync(id, cancellationToken))!;
+        return await MapAsync(data);
     }
 }

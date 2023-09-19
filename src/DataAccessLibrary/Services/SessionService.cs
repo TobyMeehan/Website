@@ -23,7 +23,7 @@ public class SessionService : BaseService<ISession, SessionData, CreateSessionBu
         _connections = connections;
     }
 
-    protected override async Task<ISession> MapperAsync(SessionData data)
+    protected override async Task<ISession> MapAsync(SessionData data)
     {
         var connectionId = new Id<IConnection>(data.ConnectionId);
         
@@ -46,11 +46,11 @@ public class SessionService : BaseService<ISession, SessionData, CreateSessionBu
         return new Session(data.Id, connection, redirect, data.Scope?.Split() ?? Enumerable.Empty<string>(), data.RefreshToken, data.Expiry);
     }
 
-    protected override async Task<(Id<ISession>, SessionData)> CreateAsync(CreateSessionBuilder create)
+    protected override async Task<SessionData> CreateAsync(CreateSessionBuilder create)
     {
         var id = await _id.GenerateAsync<ISession>();
         
-        return (id, new SessionData
+        return new SessionData
         {
             Id = id.Value,
             ConnectionId = create.Connection.Value,
@@ -58,13 +58,18 @@ public class SessionService : BaseService<ISession, SessionData, CreateSessionBu
             Scope = create.Scope,
             RefreshToken = create.CanRefresh ? await _secretService.GenerateSecretAsync(32) : null,
             Expiry = DateTime.UtcNow.AddMonths(6)
-        });
+        };
     }
 
-    public async Task<ISession?> GetByRefreshTokenAsync(string refreshToken, CancellationToken cancellationToken = default)
+    public async Task<ISession?> FindByRefreshTokenAsync(string refreshToken, CancellationToken cancellationToken = default)
     {
         var data = await _db.SelectByRefreshTokenAsync(refreshToken, cancellationToken);
 
+        if (data is null)
+        {
+            return null;
+        }
+        
         return await MapAsync(data);
     }
 

@@ -1,4 +1,5 @@
 using System.Collections;
+using TobyMeehan.Com.Exceptions;
 
 namespace TobyMeehan.Com.Data.Entities;
 
@@ -23,7 +24,14 @@ public class EntityCollection<T> : IEntityCollection<T> where T : IEntity<T>
 
     public int Count => _items.Count;
 
-    public T? this[Id<T> id] => _items.ContainsKey(id) ? _items[id] : default;
+    public T this[Id<T> id] => _items.TryGetValue(id, out var entity) ? entity : throw new EntityNotFoundException<T>(id);
+
+    public T? Find(string str)
+    {
+        var id = new Id<T>(str);
+
+        return _items.TryGetValue(id, out var entity) ? entity : default;
+    }
 
     public static EntityCollection<T> Create(IEnumerable<T> items) => Create(items, x => x);
 

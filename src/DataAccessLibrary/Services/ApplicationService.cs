@@ -20,7 +20,7 @@ public class ApplicationService : BaseService<IApplication, ApplicationData, Cre
         _password = password;
     }
 
-    protected override Task<IApplication> MapperAsync(ApplicationData data)
+    protected override Task<IApplication> MapAsync(ApplicationData data)
     {
         var redirects = EntityCollection<IRedirect>.Create(data.Redirects, r =>
         {
@@ -36,28 +36,21 @@ public class ApplicationService : BaseService<IApplication, ApplicationData, Cre
             data.Description, null, redirects));
     }
     
-    protected override async Task<(Id<IApplication>, ApplicationData)> CreateAsync(CreateApplicationBuilder create)
+    protected override async Task<ApplicationData> CreateAsync(CreateApplicationBuilder create)
     {
         var id = await _id.GenerateAsync<IApplication>();
 
-        return (id, new ApplicationData
+        return new ApplicationData
         {
             Id = id.Value,
             AuthorId = create.Author.Value,
             Name = create.Name
-        });
+        };
     }
     
-    public async Task<IEntityCollection<IApplication>> GetByAuthorAsync(Id<IUser> user, CancellationToken ct)
+    public async Task<IApplication?> FindByCredentialsAsync(string id, Password secret, CancellationToken ct)
     {
-        var data = await _db.SelectByAuthorAsync(user.Value, ct);
-
-        return await MapAsync(data);
-    }
-
-    public async Task<IApplication?> GetByCredentialsAsync(Id<IApplication> id, Password secret, CancellationToken ct)
-    {
-        var application = await _db.SelectByIdAsync(id.Value, ct);
+        var application = await _db.SelectByIdAsync(id, ct);
 
         if (application is null)
         {
@@ -69,6 +62,13 @@ public class ApplicationService : BaseService<IApplication, ApplicationData, Cre
             { } hash when await _password.CheckAsync(secret, hash) => await MapAsync(application),
             _ => null
         };
+    }
+
+    public async Task<IEntityCollection<IApplication>> GetByAuthorAsync(Id<IUser> user, CancellationToken ct)
+    {
+        var data = await _db.SelectByAuthorAsync(user.Value, ct);
+
+        return await MapAsync(data);
     }
 
     public async Task<IApplication> UpdateAsync(Id<IApplication> id, UpdateApplicationBuilder update,

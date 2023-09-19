@@ -51,7 +51,7 @@ public class Login : PageModel
             return Page();
         }
 
-        var user = await _users.GetByCredentialsAsync(Form.Handle!, Form.Password!);
+        var user = await _users.FindByCredentialsAsync(Form.Handle!, Form.Password!);
 
         if (user is null)
         {

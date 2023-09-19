@@ -7,14 +7,16 @@ namespace TobyMeehan.Com.Services;
 /// </summary>
 public interface ISessionService
 {
-    Task<ISession> CreateAsync(CreateSessionBuilder session, CancellationToken cancellationToken = default);
-
+    Task<ISession?> FindByIdAsync(string id, CancellationToken cancellationToken = default);
+    
+    Task<ISession?> FindByRefreshTokenAsync(string refreshToken, CancellationToken cancellationToken = default);
+    
+    Task<ISession> GetByIdAsync(Id<ISession> id, CancellationToken cancellationToken = default);
+    
     Task<IEntityCollection<ISession>> GetAllAsync(CancellationToken cancellationToken = default);
 
-    Task<ISession?> GetByIdAsync(Id<ISession> id, CancellationToken cancellationToken = default);
-
-    Task<ISession?> GetByRefreshTokenAsync(string refreshToken, CancellationToken cancellationToken = default);
-
+    Task<ISession> CreateAsync(CreateSessionBuilder session, CancellationToken cancellationToken = default);
+    
     Task<ISession> RefreshAsync(Id<ISession> id, string? scope, CancellationToken cancellationToken = default);
     
     Task DeleteAsync(Id<ISession> id, CancellationToken cancellationToken = default);

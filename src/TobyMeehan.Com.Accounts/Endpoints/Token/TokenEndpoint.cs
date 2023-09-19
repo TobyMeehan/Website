@@ -24,14 +24,16 @@ public class TokenEndpoint : Endpoint<TokenRequest, Results<Ok<TokenResponse>, B
     private readonly ISessionService _sessions;
     private readonly IApplicationService _applications;
     private readonly IConnectionService _connections;
+    private readonly IUserService _users;
     private readonly ITokenService _tokens;
     private readonly IDataProtectionProvider _dataProtectionProvider;
 
-    public TokenEndpoint(ISessionService sessions, IApplicationService applications, IConnectionService connections, ITokenService tokens, IDataProtectionProvider dataProtectionProvider)
+    public TokenEndpoint(ISessionService sessions, IApplicationService applications, IConnectionService connections, IUserService users, ITokenService tokens, IDataProtectionProvider dataProtectionProvider)
     {
         _sessions = sessions;
         _applications = applications;
         _connections = connections;
+        _users = users;
         _tokens = tokens;
         _dataProtectionProvider = dataProtectionProvider;
     }
@@ -134,7 +136,7 @@ public class TokenEndpoint : Endpoint<TokenRequest, Results<Ok<TokenResponse>, B
             });
         }
 
-        if (clientId != authorization.ClientId.Value)
+        if (clientId != authorization.ClientId)
         {
             return TypedResults.BadRequest(new TokenErrorResponse
             {
@@ -153,8 +155,8 @@ public class TokenEndpoint : Endpoint<TokenRequest, Results<Ok<TokenResponse>, B
         }
 
         var application = string.IsNullOrEmpty(secret)
-            ? await _applications.GetByIdAsync(authorization.ClientId, ct)
-            : await _applications.GetByCredentialsAsync(authorization.ClientId, secret, ct);
+            ? await _applications.FindByIdAsync(authorization.ClientId, ct)
+            : await _applications.FindByCredentialsAsync(authorization.ClientId, secret, ct);
         
         if (application is null)
         {
@@ -162,6 +164,15 @@ public class TokenEndpoint : Endpoint<TokenRequest, Results<Ok<TokenResponse>, B
             {
                 Error = OAuth.Errors.InvalidClient,
                 ErrorDescription = "Client credentials invalid."
+            });
+        }
+
+        if (await _users.FindByIdAsync(authorization.UserId, ct) is not { } user)
+        {
+            return TypedResults.BadRequest(new TokenErrorResponse
+            {
+                Error = OAuth.Errors.InvalidGrant,
+                ErrorDescription = "Authorization code is invalid."
             });
         }
         
@@ -175,7 +186,7 @@ public class TokenEndpoint : Endpoint<TokenRequest, Results<Ok<TokenResponse>, B
             });
         }
 
-        var redirect = application.Redirects[authorization.RedirectId];
+        var redirect = application.Redirects.Find(authorization.RedirectId);
 
         if (authorization.RequireRedirect && string.IsNullOrEmpty(redirectUri))
         {
@@ -186,7 +197,7 @@ public class TokenEndpoint : Endpoint<TokenRequest, Results<Ok<TokenResponse>, B
             });
         }
 
-        if (redirect?.Uri.OriginalString != redirectUri)
+        if (redirect is null || redirect.Uri.OriginalString != redirectUri)
         {
             return TypedResults.BadRequest(new TokenErrorResponse
             {
@@ -195,11 +206,11 @@ public class TokenEndpoint : Endpoint<TokenRequest, Results<Ok<TokenResponse>, B
             });
         }
 
-        var connection = await _connections.GetOrCreateAsync(authorization.UserId, application.Id, false, ct);
+        var connection = await _connections.GetOrCreateAsync(user.Id, application.Id, false, ct);
 
         var session = await _sessions.CreateAsync(new CreateSessionBuilder()
             .WithConnection(connection.Id)
-            .WithRedirect(authorization.RedirectId)
+            .WithRedirect(redirect.Id)
             .WithScope(authorization.Scope)
             .WithCanRefresh(true), ct);
 
@@ -224,7 +235,7 @@ public class TokenEndpoint : Endpoint<TokenRequest, Results<Ok<TokenResponse>, B
             string clientId, string? secret, string? scope, CancellationToken ct)
     {
         if (string.IsNullOrEmpty(secret) 
-            || await _applications.GetByCredentialsAsync(new Id<IApplication>(clientId), secret, ct) is not { } application)
+            || await _applications.FindByCredentialsAsync(clientId, secret, ct) is not { } application)
         {
             return TypedResults.BadRequest(new TokenErrorResponse
             {
@@ -254,7 +265,7 @@ public class TokenEndpoint : Endpoint<TokenRequest, Results<Ok<TokenResponse>, B
     private async Task<Results<Ok<TokenResponse>, BadRequest<TokenErrorResponse>, UnauthorizedHttpResult>> RefreshTokenAsync(
             string clientId, string refreshToken, string? scope, CancellationToken ct)
     {
-        var session = await _sessions.GetByRefreshTokenAsync(refreshToken, ct);
+        var session = await _sessions.FindByRefreshTokenAsync(refreshToken, ct);
 
         if (session is null || clientId != session.Application.Id.Value)
         {
