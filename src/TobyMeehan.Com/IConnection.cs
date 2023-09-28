@@ -6,12 +6,12 @@
 public interface IConnection : IEntity<IConnection>
 {
     /// <summary>
-    /// The application.
+    /// The application associated with the connection.
     /// </summary>
     IApplication Application { get; }
     
     /// <summary>
-    /// The user.
+    /// The user associated with the connection.
     /// </summary>
     IUser User { get; }
     

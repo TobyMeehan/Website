@@ -1,12 +1,12 @@
 ﻿namespace TobyMeehan.Com;
 
 /// <summary>
-/// An API application.
+/// An application.
 /// </summary>
 public interface IApplication : IEntity<IApplication>
 {
     /// <summary>
-    /// The application's author.
+    /// The author of the application.
     /// </summary>
     Id<IUser> AuthorId { get; }
     
@@ -21,17 +21,17 @@ public interface IApplication : IEntity<IApplication>
     string Name { get; }
     
     /// <summary>
-    /// The application's description.
+    /// The description of the application.
     /// </summary>
     string? Description { get; }
 
     /// <summary>
-    /// The application's icon.
+    /// The icon image of the application.
     /// </summary>
     IFile? Icon { get; }
     
     /// <summary>
-    /// The application's redirect URIs.
+    /// The redirects registered by the application.
     /// </summary>
     IEntityCollection<IRedirect> Redirects { get; }
 }
