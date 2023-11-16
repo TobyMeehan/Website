@@ -1,9 +1,12 @@
-﻿namespace TobyMeehan.Com.Builders;
+﻿using TobyMeehan.Com.Models;
+using TobyMeehan.Com.Models.Application;
+
+namespace TobyMeehan.Com.Builders.Application;
 
 /// <summary>
 /// Builder structure used to update an application.
 /// </summary>
-public struct UpdateApplicationBuilder
+public struct UpdateApplicationBuilder : IUpdateApplication
 {
     /// <summary>
     /// Sets the <see cref="Download"/> property of the builder.
@@ -46,10 +49,10 @@ public struct UpdateApplicationBuilder
     /// </summary>
     /// <param name="value"></param>
     /// <returns></returns>
-    public UpdateApplicationBuilder WithIcon(FileUploadBuilder value) => this with { Icon = value };
+    public UpdateApplicationBuilder WithIcon(IFileUpload value) => this with { Icon = Optional<IFileUpload>.Of(value) };
     
     /// <summary>
     /// The new icon of the application.
     /// </summary>
-    public Optional<FileUploadBuilder> Icon { get; set; }
+    public Optional<IFileUpload> Icon { get; set; }
 }

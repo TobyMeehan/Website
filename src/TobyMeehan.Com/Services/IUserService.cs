@@ -1,4 +1,6 @@
 ﻿using TobyMeehan.Com.Builders;
+using TobyMeehan.Com.Builders.User;
+using TobyMeehan.Com.Models.User;
 
 namespace TobyMeehan.Com.Services;
 
@@ -9,16 +11,18 @@ public interface IUserService
 {
     // FIND
 
-    Task<IUser?> FindByIdAsync(string id, CancellationToken cancellationToken = default);
-    
+    Task<IUser?> FindByIdAsync(string id, QueryOptions? options = null, CancellationToken cancellationToken = default);
+
     /// <summary>
     /// Gets the user with the specified username.
     /// </summary>
-    /// <param name="handle"></param>
+    /// <param name="username"></param>
+    /// <param name="options"></param>
+    /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    Task<IUser?> FindByHandleAsync(string handle, CancellationToken cancellationToken = default);
+    Task<IUser?> FindByUsernameAsync(string username, QueryOptions? options = null, CancellationToken cancellationToken = default);
     
-    Task<IUser?> FindByCredentialsAsync(string handle, Password password, CancellationToken cancellationToken = default);
+    Task<IUser?> FindByCredentialsAsync(string username, Password password, QueryOptions? options = null, CancellationToken cancellationToken = default);
     
     // GET
 
@@ -26,23 +30,27 @@ public interface IUserService
     /// Gets the user with the specified ID.
     /// </summary>
     /// <param name="id"></param>
+    /// <param name="options"></param>
+    /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    Task<IUser> GetByIdAsync(Id<IUser> id, CancellationToken cancellationToken = default);
+    Task<IUser> GetByIdAsync(Id<IUser> id, QueryOptions? options = null, CancellationToken cancellationToken = default);
     
     /// <summary>
     /// Gets all users.
     /// </summary>
     /// <returns></returns>
-    Task<IEntityCollection<IUser>> GetAllAsync(CancellationToken cancellationToken = default);
+    IAsyncEnumerable<IUser> GetAllAsync(QueryOptions? options = null, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Gets all users with the specified role.
     /// </summary>
     /// <param name="role"></param>
+    /// <param name="options"></param>
+    /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    Task<IEntityCollection<IUser>> GetByRoleAsync(Id<IUserRole> role, CancellationToken cancellationToken = default);
+    IAsyncEnumerable<IUser> GetByRoleAsync(Id<IUserRole> role, QueryOptions? options = null, CancellationToken cancellationToken = default);
     
-    Task<bool> IsHandleUniqueAsync(string handle, CancellationToken cancellationToken = default);
+    Task<bool> IsUsernameUniqueAsync(string username, CancellationToken cancellationToken = default);
 
     // CREATE
 
@@ -50,41 +58,37 @@ public interface IUserService
     /// Creates a new user with the specified builder.
     /// </summary>
     /// <param name="user"></param>
+    /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    Task<IUser> CreateAsync(CreateUserBuilder user, CancellationToken cancellationToken = default);
+    Task<IUser> CreateAsync(ICreateUser user, CancellationToken cancellationToken = default);
     
     // UPDATE
-    
+
     /// <summary>
     /// Updates the specified user with the specified builder.
     /// </summary>
     /// <param name="id"></param>
     /// <param name="user"></param>
+    /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    Task<IUser> UpdateAsync(Id<IUser> id, UpdateUserBuilder user, CancellationToken cancellationToken = default);
-
-    /// <summary>
-    /// Updates the protected properties of the specified user with the specified builder.
-    /// </summary>
-    /// <param name="id"></param>
-    /// <param name="user"></param>
-    /// <returns></returns>
-    Task<IUser> ProtectedUpdateAsync(Id<IUser> id, ProtectedUpdateUserBuilder user, CancellationToken cancellationToken = default);
+    Task<IUser> UpdateAsync(Id<IUser> id, IUpdateUser user, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Changes the specified user's balance by the specified amount.
     /// </summary>
     /// <param name="id"></param>
     /// <param name="amount"></param>
+    /// <param name="cancellationToken"></param>
     /// <returns></returns>
     Task UpdateBalanceAsync(Id<IUser> id, double amount, CancellationToken cancellationToken = default);
 
     // DELETE
-    
+
     /// <summary>
     /// Deletes the specified user.
     /// </summary>
     /// <param name="id"></param>
+    /// <param name="cancellationToken"></param>
     /// <returns></returns>
     Task DeleteAsync(Id<IUser> id, CancellationToken cancellationToken = default);
 }

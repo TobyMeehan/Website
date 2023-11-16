@@ -1,9 +1,11 @@
-﻿namespace TobyMeehan.Com.Builders;
+﻿using TobyMeehan.Com.Models.Application;
+
+namespace TobyMeehan.Com.Builders.Application;
 
 /// <summary>
 /// Builder structure used to create a new application.
 /// </summary>
-public struct CreateApplicationBuilder
+public struct CreateApplicationBuilder : ICreateApplication
 {
     /// <summary>
     /// Sets the <see cref="Author"/> property of the builder.

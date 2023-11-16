@@ -1,9 +1,11 @@
-﻿namespace TobyMeehan.Com.Builders;
+﻿using TobyMeehan.Com.Models.User;
+
+namespace TobyMeehan.Com.Builders.User;
 
 /// <summary>
 /// Builder structure used to create a new user.
 /// </summary>
-public struct CreateUserBuilder
+public struct CreateUserBuilder : ICreateUser
 {
     /// <summary>
     /// Sets the <see cref="Username"/> property of the builder.
