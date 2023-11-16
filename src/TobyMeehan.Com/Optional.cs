@@ -90,4 +90,14 @@ public readonly struct Optional<T>
     {
         return HasValue ? Value.GetHashCode() : _hasValue.GetHashCode();
     }
+
+    public static bool operator ==(Optional<T> left, Optional<T> right)
+    {
+        return left.Equals(right);
+    }
+
+    public static bool operator !=(Optional<T> left, Optional<T> right)
+    {
+        return !(left == right);
+    }
 }
