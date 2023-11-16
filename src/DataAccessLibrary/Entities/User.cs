@@ -1,19 +1,11 @@
 namespace TobyMeehan.Com.Data.Entities;
 
-public class User : Entity<IUser>, IUser
+public class User : IUser
 {
-    public User(string id, string name, string handle, double balance, string? description = null, IFile? avatar = null) : base(id)
-    {
-        Name = name;
-        Handle = handle;
-        Balance = balance;
-        Description = description;
-        Avatar = avatar;
-    }
-    
-    public string Name { get; }
-    public string Handle { get; }
-    public double Balance { get; }
-    public string? Description { get; }
-    public IFile? Avatar { get; }
+    public required Id<IUser> Id { get; init; }
+    public required string Name { get; init; }
+    public required string Handle { get; init; }
+    public required double Balance { get; init; }
+    public string? Description { get; init; }
+    public IFile? Avatar { get; init; }
 }

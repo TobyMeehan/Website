@@ -1,13 +1,8 @@
 namespace TobyMeehan.Com.Data.Entities;
 
-public class Redirect : Entity<IRedirect>, IRedirect
+public class Redirect : IRedirect
 {
-    public Redirect(string id, string applicationId, Uri uri) : base(id)
-    {
-        ApplicationId = new Id<IApplication>(applicationId);
-        Uri = uri;
-    }
-
-    public Id<IApplication> ApplicationId { get; }
-    public Uri Uri { get; }
+    public required Id<IRedirect> Id { get; init; }
+    public required Id<IApplication> ApplicationId { get; init; }
+    public required Uri Uri { get; init; }
 }
