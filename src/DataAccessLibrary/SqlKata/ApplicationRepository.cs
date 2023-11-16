@@ -1,43 +1,64 @@
 using SqlKata;
-using SqlKata.Execution;
+using TobyMeehan.Com.Data.DataAccess;
+using TobyMeehan.Com.Data.Models;
 using TobyMeehan.Com.Data.Repositories;
-using TobyMeehan.Com.Data.Repositories.Models;
+using TobyMeehan.Com.Services;
 
 namespace TobyMeehan.Com.Data.SqlKata;
 
-public class ApplicationRepository : Repository<ApplicationData>, IApplicationRepository
+public class ApplicationRepository : Repository<ApplicationDto>, IApplicationRepository
 {
-    public ApplicationRepository(QueryFactory db) : base(db, "applications")
+    public ApplicationRepository(ISqlDataAccess db) : base(db, "applications")
     {
     }
 
     private const string Redirects = "redirects";
 
+    private readonly Query _redirects = new Query(Redirects)
+        .OrderBy("Uri");
+    
     protected override Query Query()
     {
-        var redirects = new Query(Redirects).OrderBy("Uri");
-
         return base.Query()
             .OrderBy("Name")
-            .LeftJoin(redirects.As(Redirects), j => j.On($"{Redirects}.ApplicationId", $"{Table}.Id"))
+            .LeftJoin(_redirects.As(Redirects), j => j.On($"{Redirects}.ApplicationId", $"{Table}.Id"))
 
             .Select($"{Table}.{{Id, AuthorId, DownloadId, Name, Description}}",
-                $"{Redirects}.Id AS Redirects_Id", $"{Redirects}.ApplicationId AS Redirects_ApplicationId",
+                $"{Redirects}.Id AS Redirects_Id", 
+                $"{Redirects}.ApplicationId AS Redirects_ApplicationId",
                 $"{Redirects}.Uri AS Redirects_Uri");
     }
 
-    public async Task<List<ApplicationData>> SelectByAuthorAsync(string userId, CancellationToken ct)
+    public IAsyncEnumerable<ApplicationDto> SelectByAuthorAsync(string userId, LimitStrategy? limit, CancellationToken ct)
     {
-        return await QueryAsync(query => query.Where($"{Table}.AuthorId", userId), cancellationToken: ct);
+        return Db.QueryAsync<ApplicationDto>(Query(limit)
+                .Where(Column("AuthorId"), userId),
+            cancellationToken: ct);
     }
 
-    public async Task AddRedirectAsync(RedirectData redirect, CancellationToken ct)
+    public IAsyncEnumerable<ApplicationDto> SelectByRedirectAsync(string uri, LimitStrategy? limit, CancellationToken ct)
     {
-        await Db.Query(Redirects).InsertAsync(redirect, cancellationToken: ct);
+        var redirects = _redirects
+            .Where("Uri", uri)
+            .Select("ApplicationId");
+
+        return Db.QueryAsync<ApplicationDto>(Query(limit)
+                .WhereIn(Column("Id"), redirects),
+            cancellationToken: ct);
+    }
+
+    public async Task AddRedirectAsync(RedirectDto redirect, CancellationToken ct)
+    {
+        await Db.ExecuteAsync(_redirects
+                .AsInsert(redirect), 
+            cancellationToken: ct);
     }
 
     public async Task RemoveRedirectAsync(string redirectId, CancellationToken ct)
     {
-        await Db.Query(Redirects).Where("Id", redirectId).DeleteAsync(cancellationToken: ct);
+        await Db.ExecuteAsync(_redirects
+                .AsDelete()
+                .Where("Id", redirectId), 
+            cancellationToken: ct);
     }
 }

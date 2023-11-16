@@ -1,13 +1,20 @@
-﻿using TobyMeehan.Com.Data.Repositories.Models;
+﻿using TobyMeehan.Com.Data.Models;
+using TobyMeehan.Com.Services;
 
 namespace TobyMeehan.Com.Data.Repositories;
 
 /// <summary>
 /// Database repository for users.
 /// </summary>
-public interface IUserRepository : IRepository<UserData>
+public interface IUserRepository
 {
-    Task<List<UserData>> SelectByRoleAsync(string roleId, CancellationToken cancellationToken);
+    IAsyncEnumerable<UserDto> SelectByRoleAsync(string roleId, LimitStrategy? limit, CancellationToken cancellationToken);
 
-    Task<UserData?> SelectByHandleAsync(string handle, CancellationToken cancellationToken);
+    Task<UserDto?> SelectByUsernameAsync(string username, CancellationToken cancellationToken);
+    Task<UserDto?> SelectByIdAsync(string id, CancellationToken cancellationToken);
+    IAsyncEnumerable<UserDto> SelectAllAsync(LimitStrategy? limit, CancellationToken cancellationToken);
+    Task<int> InsertAsync(UserDto user, CancellationToken cancellationToken);
+    Task<int> UpdateAsync(string id, UserDto user, CancellationToken cancellationToken);
+    Task DeleteAsync(string id, CancellationToken cancellationToken);
+    
 }

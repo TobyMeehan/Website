@@ -1,46 +1,79 @@
 using SqlKata;
 using SqlKata.Execution;
-using TobyMeehan.Com.Data.Repositories.Models;
+using TobyMeehan.Com.Data.DataAccess;
+using TobyMeehan.Com.Services;
 
 namespace TobyMeehan.Com.Data.SqlKata;
 
-public class Repository<T> : BaseRepository<T>
+public class Repository<T>
 {
+    protected ISqlDataAccess Db { get; }
     protected string Table { get; }
 
-    public Repository(QueryFactory db, string? table = null) : base(db)
+    public Repository(ISqlDataAccess db, string? table = null)
     {
+        Db = db;
         Table = table ?? typeof(T).Name;
     }
 
-    protected override Query Query()
+    protected virtual Query Query()
     {
-        return base.Query()
-            .From(Table);
+        return new Query(Table);
     }
 
-    public async Task<List<T>> SelectAllAsync(CancellationToken cancellationToken)
+    protected Query Query(LimitStrategy? limit)
     {
-        return await QueryAsync(cancellationToken: cancellationToken);
+        limit ??= new DefaultLimitStrategy();
+        
+        return Query()
+            .Offset(limit.GetOffset())
+            .Limit(limit.GetLimit());
     }
 
-    public async Task<T?> SelectByIdAsync(string id, CancellationToken cancellationToken)
+    protected string Column(string column)
     {
-        return await QuerySingleAsync(query => query.Where($"{Table}.Id", id), cancellationToken: cancellationToken);
+        return $"{Table}.{column}";
     }
 
-    public async Task InsertAsync(T data, CancellationToken cancellationToken)
+    public virtual IAsyncEnumerable<T> SelectAllAsync(LimitStrategy? limit, CancellationToken cancellationToken)
     {
-        await Db.Query(Table).InsertAsync(data, cancellationToken: cancellationToken);
+        return Db.QueryAsync<T>(Query(limit), cancellationToken);
+    }
+    
+    public virtual async Task<T?> SelectByIdAsync(string id, CancellationToken cancellationToken)
+    {
+        return await Db.SingleAsync<T>(Query()
+                .Where(Column("Id"), id), 
+            cancellationToken);
     }
 
-    public async Task UpdateAsync(string id, T data, CancellationToken cancellationToken)
+    public virtual async Task<long> CountAsync(CancellationToken cancellationToken)
     {
-        await Db.Query(Table).Where("Id", id).UpdateAsync(data, cancellationToken: cancellationToken);
+        return await Db.SingleAsync<long>(Query()
+                .AsCount(), 
+            cancellationToken: cancellationToken);
     }
 
-    public async Task DeleteAsync(string id, CancellationToken cancellationToken)
+    public virtual async Task<int> InsertAsync(T data, CancellationToken cancellationToken)
     {
-        await Db.Query(Table).Where("Id", id).DeleteAsync(cancellationToken: cancellationToken);
+        return await Db.ExecuteAsync(Query()
+                .AsInsert(data), 
+            cancellationToken);
+    }
+
+    public virtual async Task<int> UpdateAsync(string id, T data, CancellationToken cancellationToken)
+    {
+        return await Db.ExecuteAsync(Query()
+                .AsUpdate(data)
+                .Where(Column("Id"), id), 
+            cancellationToken);
+    }
+
+    public virtual async Task DeleteAsync(string id, CancellationToken cancellationToken)
+    {
+        await Db.ExecuteAsync(Query()
+                .AsDelete()
+                .Where(Column("Id"), id), 
+            cancellationToken);
     }
 }

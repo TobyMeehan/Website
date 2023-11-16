@@ -1,13 +1,15 @@
 using SqlKata;
 using SqlKata.Execution;
+using TobyMeehan.Com.Data.DataAccess;
+using TobyMeehan.Com.Data.Models;
 using TobyMeehan.Com.Data.Repositories;
-using TobyMeehan.Com.Data.Repositories.Models;
+using TobyMeehan.Com.Services;
 
 namespace TobyMeehan.Com.Data.SqlKata;
 
-public class UserRepository : Repository<UserData>, IUserRepository
+public class UserRepository : Repository<UserDto>, IUserRepository
 {
-    public UserRepository(QueryFactory db) : base(db, "users")
+    public UserRepository(ISqlDataAccess db) : base(db, "users")
     {
     }
 
@@ -18,15 +20,19 @@ public class UserRepository : Repository<UserData>, IUserRepository
             .Select();
     }
 
-    public async Task<List<UserData>> SelectByRoleAsync(string roleId, CancellationToken ct)
+    public IAsyncEnumerable<UserDto> SelectByRoleAsync(string roleId, LimitStrategy? limit, CancellationToken ct)
     {
         var roles = new Query("userroles").Select("UserId").Where("Id", roleId);
 
-        return await QueryAsync(query => query.WhereIn("users.Id", roles), cancellationToken: ct);
+        return Db.QueryAsync<UserDto>(Query(limit)
+                .WhereIn(Column("Id"), roles), 
+            cancellationToken: ct);
     }
 
-    public async Task<UserData?> SelectByHandleAsync(string handle, CancellationToken ct)
+    public async Task<UserDto?> SelectByUsernameAsync(string username, CancellationToken ct)
     {
-        return await QuerySingleAsync(query => query.Where("Handle", handle), cancellationToken: ct);
+        return await Db.SingleAsync<UserDto>(Query()
+                .Where(Column("Handle"), username), 
+            cancellationToken: ct);
     }
 }
