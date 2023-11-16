@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Npgsql;
 using SqlKata.Compilers;
 using SqlKata.Execution;
+using TobyMeehan.Com.Data.DataAccess;
 using TobyMeehan.Com.Data.Repositories;
 using TobyMeehan.Com.Data.Security;
 using TobyMeehan.Com.Data.Security.BCrypt;
@@ -27,41 +28,39 @@ public class DataAccessLibraryBuilder
     public IServiceCollection Services { get; }
     public IConfiguration? Configuration { get; }
 
-    public DataAccessLibraryBuilder AddPostgresDatabase()
+    public DataAccessLibraryBuilder AddPostgresDatabase(string connectionStringName = "Default")
     {
-        var config = Configuration?.GetSection("Postgres");
+        var config = Configuration?.GetSection("Postgres") ??
+                     throw new ConfigurationException(Configuration, "Postgres");
 
-        if (config is null)
-        {
-            throw new Exception("No Postgres configuration provided.");
-        }
+        string connectionString = config.GetConnectionString(connectionStringName) ??
+                     throw new ConfigurationException(Configuration, $"ConnectionStrings:{connectionStringName}");
+
+        Services.AddSingleton(NpgsqlDataSource.Create(connectionString));
         
-        Services.AddTransient<IDbConnection>(_ => new NpgsqlConnection(config.GetConnectionString("Postgres")));
+        Services.AddSingleton<IDbConnectionFactory, PostgresConnectionFactory>();
+        Services.AddSingleton<Compiler, PostgresCompiler>();
         
         return this;
     }
     
-    public DataAccessLibraryBuilder AddSqlKataRepositories<TCompiler>() where TCompiler : Compiler, new()
+    public DataAccessLibraryBuilder AddSqlKataRepositories()
     {
-        Services.AddTransient<QueryFactory>(services =>
-            new QueryFactory(services.GetRequiredService<IDbConnection>(), new TCompiler()));
-        
-        Services.AddTransient<IUserRepository, SqlKata.UserRepository>();
         Services.AddTransient<IApplicationRepository, SqlKata.ApplicationRepository>();
-        Services.AddTransient<IConnectionRepository, SqlKata.ConnectionRepository>();
-        Services.AddTransient<ISessionRepository, SqlKata.SessionRepository>();
-
+        Services.AddTransient<IAuthorizationRepository, SqlKata.AuthorizationRepository>();
+        Services.AddTransient<ITokenRepository, SqlKata.TokenRepository>();
+        Services.AddTransient<IUserRepository, SqlKata.UserRepository>();
+        
         return this;
     }
 
     public DataAccessLibraryBuilder AddEntityServices()
     {
+        Services.AddTransient<IApplicationService, Services.ApplicationService>();
+        Services.AddTransient<IAuthorizationService, Services.AuthorizationService>();
+        Services.AddTransient<ITokenService, Services.TokenService>();
         Services.AddTransient<IUserService, Services.UserService>();
         
-        Services.AddTransient<IApplicationService, Services.ApplicationService>();
-        Services.AddTransient<IConnectionService, Services.ConnectionService>();
-        Services.AddTransient<ISessionService, Services.SessionService>();
-
         return this;
     }
 
