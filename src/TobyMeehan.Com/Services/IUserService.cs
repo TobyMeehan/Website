@@ -1,5 +1,4 @@
-﻿using TobyMeehan.Com.Builders;
-using TobyMeehan.Com.Builders.User;
+﻿using OneOf;
 using TobyMeehan.Com.Models.User;
 
 namespace TobyMeehan.Com.Services;
@@ -9,22 +8,13 @@ namespace TobyMeehan.Com.Services;
 /// </summary>
 public interface IUserService
 {
-    // FIND
-
-    Task<IUser?> FindByIdAsync(string id, QueryOptions? options = null, CancellationToken cancellationToken = default);
-
-    /// <summary>
-    /// Gets the user with the specified username.
-    /// </summary>
-    /// <param name="username"></param>
-    /// <param name="options"></param>
-    /// <param name="cancellationToken"></param>
-    /// <returns></returns>
-    Task<IUser?> FindByUsernameAsync(string username, QueryOptions? options = null, CancellationToken cancellationToken = default);
-    
-    Task<IUser?> FindByCredentialsAsync(string username, Password password, QueryOptions? options = null, CancellationToken cancellationToken = default);
-    
     // GET
+    
+    /// <summary>
+    /// Gets all users.
+    /// </summary>
+    /// <returns></returns>
+    IAsyncEnumerable<IUser> GetAllAsync(QueryOptions? options = null, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Gets the user with the specified ID.
@@ -33,13 +23,21 @@ public interface IUserService
     /// <param name="options"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    Task<IUser> GetByIdAsync(Id<IUser> id, QueryOptions? options = null, CancellationToken cancellationToken = default);
-    
+    Task<OneOf<IUser, NotFound>> GetByIdAsync(Id<IUser> id, QueryOptions? options = null, CancellationToken cancellationToken = default);
+
     /// <summary>
-    /// Gets all users.
+    /// Gets the user with the specified username.
     /// </summary>
+    /// <param name="username"></param>
+    /// <param name="options"></param>
+    /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    IAsyncEnumerable<IUser> GetAllAsync(QueryOptions? options = null, CancellationToken cancellationToken = default);
+    Task<OneOf<IUser, NotFound>> GetByUsernameAsync(string username, QueryOptions? options = null, CancellationToken cancellationToken = default);
+    
+    Task<OneOf<IUser, InvalidCredentials, NotFound>> GetByCredentialsAsync(string username, Password password, QueryOptions? options = null, CancellationToken cancellationToken = default);
+
+    Task<OneOf<IUser, InvalidCredentials, NotFound>> GetByCredentialsAsync(Id<IUser> id, Password password,
+        QueryOptions? options = null, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Gets all users with the specified role.
@@ -71,7 +69,7 @@ public interface IUserService
     /// <param name="user"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    Task<IUser> UpdateAsync(Id<IUser> id, IUpdateUser user, CancellationToken cancellationToken = default);
+    Task<OneOf<IUser, NotFound>> UpdateAsync(Id<IUser> id, IUpdateUser user, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Changes the specified user's balance by the specified amount.
@@ -80,7 +78,7 @@ public interface IUserService
     /// <param name="amount"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    Task UpdateBalanceAsync(Id<IUser> id, double amount, CancellationToken cancellationToken = default);
+    Task<OneOf<Success, InsufficientBalance, NotFound>> UpdateBalanceAsync(Id<IUser> id, double amount, CancellationToken cancellationToken = default);
 
     // DELETE
 
@@ -90,5 +88,5 @@ public interface IUserService
     /// <param name="id"></param>
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    Task DeleteAsync(Id<IUser> id, CancellationToken cancellationToken = default);
+    Task<OneOf<Success, NotFound>> DeleteAsync(Id<IUser> id, CancellationToken cancellationToken = default);
 }

@@ -28,5 +28,5 @@ public interface ITokenRepository
     
     Task DeleteByExpirationAsync(DateTime threshold, CancellationToken cancellationToken);
     
-    Task DeleteAsync(string id, CancellationToken cancellationToken);
+    Task<int> DeleteAsync(string id, CancellationToken cancellationToken);
 }

@@ -49,5 +49,5 @@ public interface IApplicationRepository
     /// <returns></returns>
     Task RemoveRedirectAsync(string redirectId, CancellationToken cancellationToken);
 
-    Task DeleteAsync(string id, CancellationToken cancellationToken);
+    Task<int> DeleteAsync(string id, CancellationToken cancellationToken);
 }

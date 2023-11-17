@@ -1,12 +1,9 @@
-using Microsoft.Extensions.Caching.Memory;
-using TobyMeehan.Com.Builders;
-using TobyMeehan.Com.Builders.User;
+using OneOf;
 using TobyMeehan.Com.Data.Caching;
 using TobyMeehan.Com.Data.Entities;
 using TobyMeehan.Com.Data.Models;
 using TobyMeehan.Com.Data.Repositories;
 using TobyMeehan.Com.Data.Security;
-using TobyMeehan.Com.Exceptions;
 using TobyMeehan.Com.Models.User;
 using TobyMeehan.Com.Services;
 
@@ -41,22 +38,7 @@ public class UserService : BaseService<IUser, UserDto>, IUserService
         });
     }
 
-    public async Task<IUser?> FindByIdAsync(string id, QueryOptions? options = null, CancellationToken cancellationToken = default)
-    {
-        var data = Cache.Get(x => x.Id == id) ?? await _db.SelectByIdAsync(id, cancellationToken);
-
-        return await GetAsync(data);
-    }
-
-    public async Task<IUser?> FindByUsernameAsync(string username, QueryOptions? options = null, CancellationToken cancellationToken = default)
-    {
-        var data = Cache.Get(x => x.Username == username) ??
-                   await _db.SelectByUsernameAsync(username, cancellationToken);
-
-        return await GetAsync(data);
-    }
-
-    public async Task<IUser?> FindByCredentialsAsync(string username, Password password, QueryOptions? options = null,
+    public async Task<OneOf<IUser, NotFound>> GetByUsernameAsync(string username, QueryOptions? options = null,
         CancellationToken cancellationToken = default)
     {
         var data = Cache.Get(x => x.Username == username) ??
@@ -64,29 +46,65 @@ public class UserService : BaseService<IUser, UserDto>, IUserService
 
         if (data is null)
         {
-            return null;
+            return new NotFound();
+        }
+        
+        return OneOf<IUser, NotFound>.FromT0(
+            await GetAsync(data));
+    }
+
+    public async Task<OneOf<IUser, InvalidCredentials, NotFound>> GetByCredentialsAsync(string username, Password password,
+        QueryOptions? options = null,
+        CancellationToken cancellationToken = default)
+    {
+        var data = Cache.Get(x => x.Username == username) ??
+                   await _db.SelectByUsernameAsync(username, cancellationToken);
+
+        if (data is null)
+        {
+            return new NotFound();
         }
         
         if (!await _password.CheckAsync(password, data.HashedPassword))
         {
-            return null;
+            return new InvalidCredentials();
         }
 
-        return await GetAsync(data);
+        return OneOf<IUser, InvalidCredentials, NotFound>.FromT0(
+            await GetAsync(data));
     }
 
-    public async Task<IUser> GetByIdAsync(Id<IUser> id, QueryOptions? options = null, CancellationToken cancellationToken = default)
+    public async Task<OneOf<IUser, InvalidCredentials, NotFound>> GetByCredentialsAsync(Id<IUser> id, Password password, QueryOptions? options = null,
+        CancellationToken cancellationToken = default)
     {
         var data = Cache.Get(id) ?? await _db.SelectByIdAsync(id.Value, cancellationToken);
 
         if (data is null)
         {
-            throw new EntityNotFoundException<IUser>(id);
+            return new NotFound();
         }
-        
-        Cache.Set(id, data);
 
-        return await MapAsync(data);
+        if (!await _password.CheckAsync(password, data.HashedPassword))
+        {
+            return new InvalidCredentials();
+        }
+
+        return OneOf<IUser, InvalidCredentials, NotFound>.FromT0(
+            await GetAsync(data));
+    }
+
+    public async Task<OneOf<IUser, NotFound>> GetByIdAsync(Id<IUser> id, QueryOptions? options = null,
+        CancellationToken cancellationToken = default)
+    {
+        var data = Cache.Get(id) ?? await _db.SelectByIdAsync(id.Value, cancellationToken);
+
+        if (data is null)
+        {
+            return new NotFound();
+        }
+
+        return OneOf<IUser, NotFound>.FromT0(
+            await GetAsync(data));
     }
 
     public IAsyncEnumerable<IUser> GetAllAsync(QueryOptions? options = null, CancellationToken cancellationToken = default)
@@ -126,13 +144,14 @@ public class UserService : BaseService<IUser, UserDto>, IUserService
         return await MapAsync(data);
     }
 
-    public async Task<IUser> UpdateAsync(Id<IUser> id, IUpdateUser user, CancellationToken cancellationToken = default)
+    public async Task<OneOf<IUser, NotFound>> UpdateAsync(Id<IUser> id, IUpdateUser user,
+        CancellationToken cancellationToken = default)
     {
         var data = await _db.SelectByIdAsync(id.Value, cancellationToken);
 
         if (data is null)
         {
-            throw new EntityNotFoundException<IUser>(id);
+            return new NotFound();
         }
 
         data.Username = user.Username | data.Username;
@@ -147,32 +166,39 @@ public class UserService : BaseService<IUser, UserDto>, IUserService
         // TODO: avatar
 
         await _db.UpdateAsync(id.Value, data, cancellationToken);
-        
-        Cache.Set(id, data);
 
-        return await MapAsync(data);
+        return OneOf<IUser, NotFound>.FromT0(
+            await GetAsync(data));
     }
 
-    public async Task UpdateBalanceAsync(Id<IUser> id, double amount, CancellationToken cancellationToken = default)
+    public async Task<OneOf<Success, InsufficientBalance, NotFound>> UpdateBalanceAsync(Id<IUser> id, double amount,
+        CancellationToken cancellationToken = default)
     {
         var data = await _db.SelectByIdAsync(id.Value, cancellationToken);
 
         if (data is null)
         {
-            throw new EntityNotFoundException<IUser>(id);
+            return new NotFound();
         }
 
+        if (data.Balance + amount < 0)
+        {
+            return new InsufficientBalance();
+        }
+        
         data.Balance += amount;
 
         await _db.UpdateAsync(id.Value, data, cancellationToken);
 
-        Cache.Set(id, data);
+        return new Success();
     }
 
-    public async Task DeleteAsync(Id<IUser> id, CancellationToken cancellationToken = default)
+    public async Task<OneOf<Success, NotFound>> DeleteAsync(Id<IUser> id, CancellationToken cancellationToken = default)
     {
-        await _db.DeleteAsync(id.Value, cancellationToken);
+        int result = await _db.DeleteAsync(id.Value, cancellationToken);
         
         Cache.Remove(id);
+
+        return result == 1 ? new Success() : new NotFound();
     }
 }

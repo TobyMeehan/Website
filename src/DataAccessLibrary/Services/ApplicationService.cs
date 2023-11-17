@@ -1,9 +1,9 @@
+using OneOf;
 using TobyMeehan.Com.Data.Caching;
 using TobyMeehan.Com.Data.Entities;
 using TobyMeehan.Com.Data.Models;
 using TobyMeehan.Com.Data.Repositories;
 using TobyMeehan.Com.Data.Security;
-using TobyMeehan.Com.Exceptions;
 using TobyMeehan.Com.Models.Application;
 using TobyMeehan.Com.Services;
 
@@ -53,30 +53,24 @@ public class ApplicationService : BaseService<IApplication, ApplicationDto>, IAp
         });
     }
 
-
-    public async Task<IApplication?> FindByIdAsync(string id, QueryOptions? options = null, CancellationToken cancellationToken = default)
-    {
-        var data = Cache.Get(x => x.Id == id) ?? await _db.SelectByIdAsync(id, cancellationToken);
-
-        return await GetAsync(data);
-    }
-
-    public async Task<IApplication?> FindByCredentialsAsync(string id, Password secret, QueryOptions? options = null,
+    public async Task<OneOf<IApplication, InvalidCredentials, NotFound>> GetByCredentialsAsync(Id<IApplication> id, Password secret,
+        QueryOptions? options = null,
         CancellationToken cancellationToken = default)
     {
-        var data = Cache.Get(x => x.Id == id) ?? await _db.SelectByIdAsync(id, cancellationToken);
+        var data = Cache.Get(id) ?? await _db.SelectByIdAsync(id.Value, cancellationToken);
 
         if (data?.SecretHash is null)
         {
-            return null;
+            return new NotFound();
         }
 
         if (!await _password.CheckAsync(secret, data.SecretHash))
         {
-            return null;
+            return new InvalidCredentials();
         }
 
-        return await GetAsync(data);
+        return OneOf<IApplication, InvalidCredentials, NotFound>.FromT0(
+            await GetAsync(data));
     }
 
     public IAsyncEnumerable<IApplication> GetAllAsync(QueryOptions? options = null, CancellationToken cancellationToken = default)
@@ -101,18 +95,17 @@ public class ApplicationService : BaseService<IApplication, ApplicationDto>, IAp
         return GetAsync(data);
     }
 
-    public async Task<IApplication> GetByIdAsync(Id<IApplication> id, QueryOptions? options = null, CancellationToken cancellationToken = default)
+    public async Task<OneOf<IApplication, NotFound>> GetByIdAsync(Id<IApplication> id, QueryOptions? options = null, CancellationToken cancellationToken = default)
     {
         var data = Cache.Get(id) ?? await _db.SelectByIdAsync(id.Value, cancellationToken);
 
         if (data is null)
         {
-            throw new EntityNotFoundException<IApplication>(id);
+            return new NotFound();
         }
 
-        Cache.Set(id, data);
-        
-        return await MapAsync(data);
+        return OneOf<IApplication, NotFound>.FromT0(
+            await GetAsync(data));
     }
 
     public async ValueTask<long> CountAsync(CancellationToken cancellationToken = default)
@@ -133,18 +126,17 @@ public class ApplicationService : BaseService<IApplication, ApplicationDto>, IAp
 
         await _db.InsertAsync(data, cancellationToken);
 
-        Cache.Set(id, data);
-        
-        return await MapAsync(data);
+        return await GetAsync(data);
     }
 
-    public async Task<IApplication> UpdateAsync(Id<IApplication> id, IUpdateApplication application, CancellationToken cancellationToken = default)
+    public async Task<OneOf<IApplication, NotFound>> UpdateAsync(Id<IApplication> id, IUpdateApplication application,
+        CancellationToken cancellationToken = default)
     {
         var data = await _db.SelectByIdAsync(id.Value, cancellationToken);
 
         if (data is null)
         {
-            throw new EntityNotFoundException<IApplication>(id);
+            return new NotFound();
         }
 
         data.DownloadId = application.Download.MapOr(x => x?.Value, data.DownloadId);
@@ -154,19 +146,20 @@ public class ApplicationService : BaseService<IApplication, ApplicationDto>, IAp
 
         await _db.UpdateAsync(id.Value, data, cancellationToken);
 
-        Cache.Set(id, data);
-        
-        return await MapAsync(data);
+        return OneOf<IApplication, NotFound>.FromT0(
+            await GetAsync(data));
     }
 
-    public async Task DeleteAsync(Id<IApplication> id, CancellationToken cancellationToken = default)
+    public async Task<OneOf<Success, NotFound>> DeleteAsync(Id<IApplication> id, CancellationToken cancellationToken = default)
     {
-        await _db.DeleteAsync(id.Value, cancellationToken);
+        int result = await _db.DeleteAsync(id.Value, cancellationToken);
         
         Cache.Remove(id);
+
+        return result == 1 ? new Success() : new NotFound();
     }
 
-    public async Task<IRedirect> AddRedirectAsync(Id<IApplication> id, Uri uri, CancellationToken cancellationToken = default)
+    public async Task<OneOf<IRedirect, NotFound>> AddRedirectAsync(Id<IApplication> id, Uri uri, CancellationToken cancellationToken = default)
     {
         var redirectId = await _id.GenerateAsync<IRedirect>();
 
@@ -181,7 +174,8 @@ public class ApplicationService : BaseService<IApplication, ApplicationDto>, IAp
 
         Cache.Remove(id);
         
-        return MapRedirect(data);
+        return OneOf<IRedirect, NotFound>.FromT0(
+            MapRedirect(data));
     }
 
     public async Task RemoveRedirectAsync(Id<IRedirect> redirect, CancellationToken cancellationToken = default)

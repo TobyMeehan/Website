@@ -1,9 +1,8 @@
-using TobyMeehan.Com.Builders.Token;
+using OneOf;
 using TobyMeehan.Com.Data.Caching;
 using TobyMeehan.Com.Data.Entities;
 using TobyMeehan.Com.Data.Models;
 using TobyMeehan.Com.Data.Repositories;
-using TobyMeehan.Com.Exceptions;
 using TobyMeehan.Com.Models.Token;
 using TobyMeehan.Com.Services;
 
@@ -24,10 +23,14 @@ public class TokenService : BaseService<IToken, TokenDto>, ITokenService
 
     protected override async Task<IToken> MapAsync(TokenDto data)
     {
+        var authorization = await _authorizations.GetByIdAsync(new Id<IAuthorization>(data.AuthorizationId));
+        
         return new Token
         {
             Id = new Id<IToken>(data.Id),
-            Authorization = await _authorizations.FindByIdAsync(data.AuthorizationId),
+            Authorization = authorization.Match<IAuthorization?>(
+                result => result,
+                _ => null),
             Payload = data.Payload,
             ReferenceId = data.ReferenceId,
             Status = data.Status,
@@ -38,51 +41,66 @@ public class TokenService : BaseService<IToken, TokenDto>, ITokenService
         };
     }
 
-    public IAsyncEnumerable<IToken> FindByApplicationAsync(string applicationId, QueryOptions? options = null,
+    public IAsyncEnumerable<IToken> GetByApplicationAsync(Id<IApplication> application, QueryOptions? options = null,
         CancellationToken cancellationToken = default)
     {
-        var data = _db.SelectByApplicationAsync(applicationId, options?.LimitStrategy, cancellationToken);
+        var data = _db.SelectByApplicationAsync(application.Value, options?.LimitStrategy, cancellationToken);
 
         return GetAsync(data);
     }
 
-    public IAsyncEnumerable<IToken> FindByUserAsync(string userId, QueryOptions? options = null,
+    public IAsyncEnumerable<IToken> GetByUserAsync(Id<IUser> user, QueryOptions? options = null,
         CancellationToken cancellationToken = default)
     {
-        var data = _db.SelectByUserAsync(userId, options?.LimitStrategy, cancellationToken);
+        var data = _db.SelectByUserAsync(user.Value, options?.LimitStrategy, cancellationToken);
 
         return GetAsync(data);
     }
 
-    public IAsyncEnumerable<IToken> FindByApplicationAndUserAsync(string applicationId, string userId, QueryOptions? options = null,
+    public IAsyncEnumerable<IToken> GetByApplicationAndUserAsync(Id<IApplication> application, Id<IUser> user,
+        QueryOptions? options = null,
         CancellationToken cancellationToken = default)
     {
-        var data = _db.SelectByApplicationAndUserAsync(applicationId, userId, options?.LimitStrategy, cancellationToken);
+        var data = _db.SelectByApplicationAndUserAsync(application.Value, user.Value, options?.LimitStrategy, cancellationToken);
 
         return GetAsync(data);
     }
 
-    public IAsyncEnumerable<IToken> FindByAuthorizationAsync(string authorizationId, QueryOptions? options = null,
+    public IAsyncEnumerable<IToken> GetByAuthorizationAsync(Id<IAuthorization> authorization,
+        QueryOptions? options = null,
         CancellationToken cancellationToken = default)
     {
-        var data = _db.SelectByAuthorizationAsync(authorizationId, options?.LimitStrategy, cancellationToken);
+        var data = _db.SelectByAuthorizationAsync(authorization.Value, options?.LimitStrategy, cancellationToken);
 
         return GetAsync(data);
     }
 
-    public async Task<IToken?> FindByIdAsync(string id, QueryOptions? options = null, CancellationToken cancellationToken = default)
+    public async Task<OneOf<IToken, NotFound>> GetByIdAsync(Id<IToken> id, QueryOptions? options = null,
+        CancellationToken cancellationToken = default)
     {
-        var data = await _db.SelectByIdAsync(id, cancellationToken);
+        var data = await _db.SelectByIdAsync(id.Value, cancellationToken);
 
-        return await GetAsync(data);
+        if (data is null)
+        {
+            return new NotFound();
+        }
+        
+        return OneOf<IToken, NotFound>.FromT0(
+            await GetAsync(data));
     }
 
-    public async Task<IToken?> FindByReferenceIdAsync(string referenceId, QueryOptions? options = null,
+    public async Task<OneOf<IToken, NotFound>> GetByReferenceIdAsync(string referenceId, QueryOptions? options = null,
         CancellationToken cancellationToken = default)
     {
         var data = await _db.SelectByReferenceIdAsync(referenceId, cancellationToken);
 
-        return await GetAsync(data);
+        if (data is null)
+        {
+            return new NotFound();
+        }
+        
+        return OneOf<IToken, NotFound>.FromT0(
+            await GetAsync(data));
     }
 
     public IAsyncEnumerable<IToken> GetAllAsync(QueryOptions? options = null, CancellationToken cancellationToken = default)
@@ -121,13 +139,14 @@ public class TokenService : BaseService<IToken, TokenDto>, ITokenService
         return await MapAsync(data);
     }
 
-    public async Task<IToken> UpdateAsync(Id<IToken> id, IUpdateToken update, CancellationToken cancellationToken = default)
+    public async Task<OneOf<IToken, NotFound>> UpdateAsync(Id<IToken> id, IUpdateToken update,
+        CancellationToken cancellationToken = default)
     {
         var data = await _db.SelectByIdAsync(id.Value, cancellationToken);
 
         if (data is null)
         {
-            throw new EntityNotFoundException<IToken>(id);
+            return new NotFound();
         }
 
         data.Payload = update.Payload | data.Payload;
@@ -136,17 +155,18 @@ public class TokenService : BaseService<IToken, TokenDto>, ITokenService
         data.ExpiresAt = update.ExpiresAt | data.ExpiresAt;
 
         await _db.UpdateAsync(id.Value, data, cancellationToken);
-        
-        Cache.Set(id, data);
 
-        return await MapAsync(data);
+        return OneOf<IToken, NotFound>.FromT0(
+            await GetAsync(data));
     }
 
-    public async Task DeleteAsync(Id<IToken> id, CancellationToken cancellationToken = default)
+    public async Task<OneOf<Success, NotFound>> DeleteAsync(Id<IToken> id, CancellationToken cancellationToken = default)
     {
-        await _db.DeleteAsync(id.Value, cancellationToken);
+        int result = await _db.DeleteAsync(id.Value, cancellationToken);
         
         Cache.Remove(id);
+
+        return result == 1 ? new Success() : new NotFound();
     }
 
     public async Task DeleteByExpirationAsync(DateTime threshold, CancellationToken cancellationToken = default)

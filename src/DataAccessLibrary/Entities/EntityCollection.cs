@@ -1,5 +1,4 @@
 using System.Collections;
-using TobyMeehan.Com.Exceptions;
 
 namespace TobyMeehan.Com.Data.Entities;
 
@@ -24,7 +23,7 @@ public class EntityCollection<T> : IEntityCollection<T> where T : IEntity<T>
 
     public int Count => _items.Count;
 
-    public T this[Id<T> id] => _items.TryGetValue(id, out var entity) ? entity : throw new EntityNotFoundException<T>(id);
+    public T this[Id<T> id] => _items.TryGetValue(id, out var entity) ? entity : throw new InvalidOperationException();
 
     public T? Find(string str)
     {

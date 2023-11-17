@@ -69,9 +69,9 @@ public class Repository<T>
             cancellationToken);
     }
 
-    public virtual async Task DeleteAsync(string id, CancellationToken cancellationToken)
+    public virtual async Task<int> DeleteAsync(string id, CancellationToken cancellationToken)
     {
-        await Db.ExecuteAsync(Query()
+        return await Db.ExecuteAsync(Query()
                 .AsDelete()
                 .Where(Column("Id"), id), 
             cancellationToken);
