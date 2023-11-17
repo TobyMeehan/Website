@@ -1,4 +1,3 @@
-using Microsoft.Extensions.Caching.Memory;
 using TobyMeehan.Com.Data.Caching;
 
 namespace TobyMeehan.Com.Data.Services;
@@ -27,14 +26,9 @@ public abstract class BaseService<TEntity, TData> where TEntity : IEntity<TEntit
             yield return await MapAsync(item);
         }
     }
-    
-    protected async Task<TEntity?> GetAsync(TData? data)
+
+    protected async Task<TEntity> GetAsync(TData data)
     {
-        if (data is null)
-        {
-            return default;
-        }
-        
         var entity = await MapAsync(data);
 
         Cache.Set(entity.Id, data);

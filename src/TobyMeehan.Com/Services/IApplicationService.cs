@@ -1,4 +1,4 @@
-﻿using TobyMeehan.Com.Exceptions;
+﻿using OneOf;
 using TobyMeehan.Com.Models.Application;
 
 namespace TobyMeehan.Com.Services;
@@ -8,28 +8,6 @@ namespace TobyMeehan.Com.Services;
 /// </summary>
 public interface IApplicationService
 {
-    // FIND
-
-    /// <summary>
-    /// Attempts to find an application with the specified ID.
-    /// </summary>
-    /// <param name="id">The requested ID of the application, in string form.</param>
-    /// <param name="options"></param>
-    /// <param name="cancellationToken">Optional cancellation token.</param>
-    /// <returns>The <see cref="IApplication"/> with the specified ID if found, null otherwise.</returns>
-    Task<IApplication?> FindByIdAsync(string id, QueryOptions? options = null, CancellationToken cancellationToken = default);
-
-    /// <summary>
-    /// Attempts to find an application with the specified ID and secret.
-    /// </summary>
-    /// <param name="id">The ID of the application, in string form.</param>
-    /// <param name="secret">The secret to be compared with the stored hash.</param>
-    /// <param name="options"></param>
-    /// <param name="cancellationToken">Optional cancellation token.</param>
-    /// <returns></returns>
-    Task<IApplication?> FindByCredentialsAsync(string id, Password secret,
-        QueryOptions? options = null, CancellationToken cancellationToken = default);
-    
     // GET
 
     IAsyncEnumerable<IApplication> GetAllAsync(QueryOptions? options = null,
@@ -47,14 +25,25 @@ public interface IApplicationService
     IAsyncEnumerable<IApplication> GetByRedirectAsync(string uri, QueryOptions? options = null, CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Gets the application with the specified ID, throws an <see cref="EntityNotFoundException{T}"/> if the application does not exist.
+    /// Gets the application with the specified ID.
     /// </summary>
     /// <param name="id">The requested ID of the application.</param>
     /// <param name="options"></param>
     /// <param name="cancellationToken">Optional cancellation token.</param>
     /// <returns><see cref="IApplication"/> representing the application with the specified ID.</returns>
-    Task<IApplication> GetByIdAsync(Id<IApplication> id, QueryOptions? options = null, CancellationToken cancellationToken = default);
+    Task<OneOf<IApplication, NotFound>> GetByIdAsync(Id<IApplication> id, QueryOptions? options = null, CancellationToken cancellationToken = default);
 
+    /// <summary>
+    /// Attempts to find an application with the specified ID and secret.
+    /// </summary>
+    /// <param name="id">The ID of the application, in string form.</param>
+    /// <param name="secret">The secret to be compared with the stored hash.</param>
+    /// <param name="options"></param>
+    /// <param name="cancellationToken">Optional cancellation token.</param>
+    /// <returns></returns>
+    Task<OneOf<IApplication, InvalidCredentials, NotFound>> GetByCredentialsAsync(Id<IApplication> id, Password secret,
+        QueryOptions? options = null, CancellationToken cancellationToken = default);
+    
     /// <summary>
     /// Determines the number of applications that exist.
     /// </summary>
@@ -81,7 +70,7 @@ public interface IApplicationService
     /// <param name="application"><see cref="IUpdateApplication"/> with the required properties to be changed.</param>
     /// <param name="cancellationToken">Optional cancellation token.</param>
     /// <returns><see cref="IApplication"/> representing the resulting updated application.</returns>
-    Task<IApplication> UpdateAsync(Id<IApplication> id, IUpdateApplication application, CancellationToken cancellationToken = default);
+    Task<OneOf<IApplication, NotFound>> UpdateAsync(Id<IApplication> id, IUpdateApplication application, CancellationToken cancellationToken = default);
     
     // DELETE
 
@@ -91,7 +80,7 @@ public interface IApplicationService
     /// <param name="id">ID of the application to be deleted.</param>
     /// <param name="cancellationToken">Optional cancellation token.</param>
     /// <returns></returns>
-    Task DeleteAsync(Id<IApplication> id, CancellationToken cancellationToken = default);
+    Task<OneOf<Success, NotFound>> DeleteAsync(Id<IApplication> id, CancellationToken cancellationToken = default);
     
     // RELATIONS
 
@@ -102,7 +91,7 @@ public interface IApplicationService
     /// <param name="uri"><see cref="Uri"/> object representing the redirect URI to be added.</param>
     /// <param name="cancellationToken">Optional cancellation token.</param>
     /// <returns><see cref="IRedirect"/> representing the added redirect.</returns>
-    Task<IRedirect> AddRedirectAsync(Id<IApplication> id, Uri uri, CancellationToken cancellationToken = default);
+    Task<OneOf<IRedirect, NotFound>> AddRedirectAsync(Id<IApplication> id, Uri uri, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Removes the specified redirect.

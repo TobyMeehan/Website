@@ -19,5 +19,5 @@ public interface IAuthorizationRepository
     Task<long> CountAsync(CancellationToken cancellationToken);
     Task<int> InsertAsync(AuthorizationDto data, CancellationToken cancellationToken);
     Task<int> UpdateAsync(string id, AuthorizationDto data, CancellationToken cancellationToken);
-    Task DeleteAsync(string id, CancellationToken cancellationToken);
+    Task<int> DeleteAsync(string id, CancellationToken cancellationToken);
 }

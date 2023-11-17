@@ -15,6 +15,6 @@ public interface IUserRepository
     IAsyncEnumerable<UserDto> SelectAllAsync(LimitStrategy? limit, CancellationToken cancellationToken);
     Task<int> InsertAsync(UserDto user, CancellationToken cancellationToken);
     Task<int> UpdateAsync(string id, UserDto user, CancellationToken cancellationToken);
-    Task DeleteAsync(string id, CancellationToken cancellationToken);
+    Task<int> DeleteAsync(string id, CancellationToken cancellationToken);
     
 }
