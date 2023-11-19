@@ -1,9 +1,9 @@
+using System.Security.Cryptography.X509Certificates;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using TobyMeehan.Com;
 using TobyMeehan.Com.Accounts.Authentication;
-using TobyMeehan.Com.Accounts.Models;
 using TobyMeehan.Com.Accounts.Models.Authentication.Login;
 using TobyMeehan.Com.Accounts.Models.Authentication.Register;
 using TobyMeehan.Com.Accounts.Models.OpenId;
@@ -49,8 +49,12 @@ builder.Services.AddOpenIddict()
             .AllowClientCredentialsFlow()
             .AllowRefreshTokenFlow();
 
-        options.AddDevelopmentEncryptionCertificate()
-            .AddDevelopmentSigningCertificate();
+        options.AddEncryptionCertificate(new X509Certificate2(
+            builder.Configuration["OIDC:EncryptionCertificateFile"] ??
+            throw new Exception("Encryption certificate not provided.")));
+        options.AddSigningCertificate(new X509Certificate2(
+            builder.Configuration["OIDC:SigningCertificateFile"] ??
+            throw new Exception("Signing certificate not provided.")));
 
         options.UseAspNetCore()
             .EnableAuthorizationEndpointPassthrough()
