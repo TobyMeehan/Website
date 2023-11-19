@@ -29,22 +29,11 @@ public class SqlDataAccess : ISqlDataAccess
     public async IAsyncEnumerable<T> QueryAsync<T>(string sql, object parameters,
         [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
-        IAsyncEnumerable<T> result;
-        
-        try
-        {
-            await using var connection = await _connectionFactory.CreateConnectionAsync(cancellationToken);
+        await using var connection = await _connectionFactory.CreateConnectionAsync(cancellationToken);
 
-            result = QueryRowsAsync<T>(connection, sql, parameters, cancellationToken);
-        }
-        catch (NotSupportedException)
-        {
-            using var connection = _connectionFactory.CreateConnection();
+        var result = QueryRowsAsync<T>(connection, sql, parameters, cancellationToken);
 
-            result = QueryListAsync<T>(connection, sql, parameters, cancellationToken);
-        }
-
-        await foreach (var item in result.WithCancellation(cancellationToken)) 
+        await foreach (var item in result)
             yield return item;
     }
 
