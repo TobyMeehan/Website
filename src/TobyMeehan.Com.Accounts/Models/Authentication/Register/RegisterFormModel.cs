@@ -3,14 +3,13 @@ using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 using TobyMeehan.Com.Services;
 
-namespace TobyMeehan.Com.Accounts.Models;
+namespace TobyMeehan.Com.Accounts.Models.Authentication.Register;
 
 public class RegisterFormModel
 {
-    [PageRemote(
+    [Remote("CheckUsername", "Authentication", 
         ErrorMessage = "Username already taken.",
-        HttpMethod = "post",
-        PageHandler = "CheckUsername")]
+        HttpMethod = "post")]
     public string? Username { get; set; }
     public string? Password { get; set; }
     public string? ConfirmPassword { get; set; }
@@ -23,7 +22,7 @@ public class RegisterFormModel
                 .NotEmpty().WithMessage("Please choose a username.")
                 .Length(1, 40).WithMessage("Username must be shorter than 40 characters.")
                 .Matches(new Regex(@"([a-zA-Z0-9_-]+)")).WithMessage("Username must only use letters, numbers, underscores _ , or dashes - .")
-                .MustAsync(users.IsHandleUniqueAsync).WithMessage("Username already taken.");
+                .MustAsync(users.IsUsernameUniqueAsync).WithMessage("Username already taken.");
 
             RuleFor(model => model.Password)
                 .NotEmpty().WithMessage("Please choose a password.")

@@ -1,7 +1,4 @@
-@page "/register"
-@using Microsoft.AspNetCore.Mvc.ModelBinding
-@using Microsoft.AspNetCore.Mvc.TagHelpers
-@model TobyMeehan.Com.Accounts.Pages.Register
+@model TobyMeehan.Com.Accounts.Models.Authentication.Register.RegisterViewModel
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 
 <h2 class="text-3xl font-extralight mb-7 text-center">Register</h2>
@@ -29,11 +26,11 @@
 
     <button type="submit" class="btn btn-primary my-3 w-full">Register</button>
     
-    <p>Already have an account? <a class="link" asp-page="@nameof(Login)" asp-route-ReturnUrl="@Model.ReturnUrl">Log in</a></p>
+    <p>Already have an account? <a class="link" asp-controller="Authentication" asp-action="Login" asp-route-ReturnUrl="@Model.ReturnUrl">Log in</a></p>
     
 </form>
 
 @section Scripts
 {
-    <partial name="Shared/_ValidationScriptsPartial" />
+    <partial name="_ValidationScriptsPartial" />
 }
