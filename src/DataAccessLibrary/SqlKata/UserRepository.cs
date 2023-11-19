@@ -16,7 +16,7 @@ public class UserRepository : Repository<UserDto>, IUserRepository
     protected override Query Query()
     {
         return base.Query()
-            .OrderBy("Name")
+            .OrderBy("DisplayName")
             .Select();
     }
 
@@ -32,7 +32,7 @@ public class UserRepository : Repository<UserDto>, IUserRepository
     public async Task<UserDto?> SelectByUsernameAsync(string username, CancellationToken ct)
     {
         return await Db.SingleAsync<UserDto>(Query()
-                .Where(Column("Handle"), username), 
+                .Where(Column("Username"), username), 
             cancellationToken: ct);
     }
 }
