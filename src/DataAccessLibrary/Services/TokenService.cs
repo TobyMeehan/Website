@@ -35,6 +35,7 @@ public class TokenService : BaseService<IToken, TokenDto>, ITokenService
             ReferenceId = data.ReferenceId,
             Status = data.Status,
             Type = data.Type,
+            Subject = data.Subject,
             RedemptionDate = data.RedeemedAt,
             ExpiresAt = data.ExpiresAt,
             CreatedAt = data.CreatedAt
@@ -49,19 +50,19 @@ public class TokenService : BaseService<IToken, TokenDto>, ITokenService
         return GetAsync(data);
     }
 
-    public IAsyncEnumerable<IToken> GetByUserAsync(Id<IUser> user, QueryOptions? options = null,
+    public IAsyncEnumerable<IToken> GetBySubjectAsync(Id<IUser> user, QueryOptions? options = null,
         CancellationToken cancellationToken = default)
     {
-        var data = _db.SelectByUserAsync(user.Value, options?.LimitStrategy, cancellationToken);
+        var data = _db.SelectBySubjectAsync(user.Value, options?.LimitStrategy, cancellationToken);
 
         return GetAsync(data);
     }
 
-    public IAsyncEnumerable<IToken> GetByApplicationAndUserAsync(Id<IApplication> application, Id<IUser> user,
+    public IAsyncEnumerable<IToken> GetByApplicationAndSubjectAsync(Id<IApplication> application, string? subject,
         QueryOptions? options = null,
         CancellationToken cancellationToken = default)
     {
-        var data = _db.SelectByApplicationAndUserAsync(application.Value, user.Value, options?.LimitStrategy, cancellationToken);
+        var data = _db.SelectByApplicationAndSubjectAsync(application.Value, subject, options?.LimitStrategy, cancellationToken);
 
         return GetAsync(data);
     }
@@ -117,7 +118,7 @@ public class TokenService : BaseService<IToken, TokenDto>, ITokenService
 
     public async Task<IToken> CreateAsync(ICreateToken create, CancellationToken cancellationToken = default)
     {
-        var id = await _id.GenerateAsync<IToken>();
+        var id = create.Id | await _id.GenerateAsync<IToken>();
 
         var data = new TokenDto
         {
@@ -127,6 +128,7 @@ public class TokenService : BaseService<IToken, TokenDto>, ITokenService
             Payload = create.Payload,
             Status = create.Status,
             Type = create.Type,
+            Subject = create.Subject,
             RedeemedAt = create.RedeemedAt,
             ExpiresAt = create.ExpiresAt,
             CreatedAt = create.CreatedAt
@@ -149,6 +151,7 @@ public class TokenService : BaseService<IToken, TokenDto>, ITokenService
             return new NotFound();
         }
 
+        data.ReferenceId = update.ReferenceId | data.ReferenceId;
         data.Payload = update.Payload | data.Payload;
         data.Status = update.Status | data.Status;
         data.RedeemedAt = update.RedeemedAt | data.RedeemedAt;

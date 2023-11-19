@@ -13,26 +13,40 @@ public class TokenRepository : Repository<TokenDto>, ITokenRepository
     {
     }
 
+    private const string Authorizations = "authorizations";
+
+    private readonly Query _authorizations = new Query(Authorizations);
+    
+    protected override Query Query()
+    {
+        return base.Query()
+            .LeftJoin(_authorizations.As(Authorizations), j => j.On($"{Table}.AuthorizationId", $"{Authorizations}.Id"))
+
+            .Select(
+                $"{Table}.{{Id, AuthorizationId, ReferenceId, Payload, Type, Status, RedeemedAt, ExpiresAt, CreatedAt}}",
+                $"{Authorizations}.ApplicationId AS ApplicationId");
+    }
+
     public IAsyncEnumerable<TokenDto> SelectByApplicationAsync(string applicationId, LimitStrategy? limit, CancellationToken ct)
     {
         return Db.QueryAsync<TokenDto>(Query(limit)
-                .Where(Column("ApplicationId"), applicationId), 
+                .Where("ApplicationId", applicationId), 
             cancellationToken: ct);
     }
 
-    public IAsyncEnumerable<TokenDto> SelectByUserAsync(string userId, LimitStrategy? limit, CancellationToken ct)
+    public IAsyncEnumerable<TokenDto> SelectBySubjectAsync(string subject, LimitStrategy? limit, CancellationToken ct)
     {
         return Db.QueryAsync<TokenDto>(Query(limit)
-                .Where(Column("UserId"), userId), 
+                .Where(Column("Subject"), subject), 
             cancellationToken: ct);
     }
 
-    public IAsyncEnumerable<TokenDto> SelectByApplicationAndUserAsync(string applicationId, string userId, 
+    public IAsyncEnumerable<TokenDto> SelectByApplicationAndSubjectAsync(string applicationId, string? subject, 
         LimitStrategy? limit, CancellationToken ct)
     {
         return Db.QueryAsync<TokenDto>(Query(limit)
-                .Where(Column("ApplicationId"), applicationId)
-                .Where(Column("UserId"), userId),
+                .Where("ApplicationId", applicationId)
+                .Where(Column("Subject"), subject),
             cancellationToken: ct);
     }
 

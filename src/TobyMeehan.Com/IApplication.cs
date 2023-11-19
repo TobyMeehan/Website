@@ -24,6 +24,11 @@ public interface IApplication : IEntity<IApplication>
     /// The description of the application.
     /// </summary>
     string? Description { get; }
+    
+    /// <summary>
+    /// Whether the application is confidential (can be authenticated with a client secret) or public.
+    /// </summary>
+    bool HasSecret { get; }
 
     /// <summary>
     /// The icon image of the application.

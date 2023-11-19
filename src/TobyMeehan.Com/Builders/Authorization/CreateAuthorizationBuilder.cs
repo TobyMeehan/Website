@@ -4,6 +4,9 @@ namespace TobyMeehan.Com.Builders.Authorization;
 
 public struct CreateAuthorizationBuilder : ICreateAuthorization
 {
+    public CreateAuthorizationBuilder WithId(Id<IAuthorization> value) => this with { Id = value };
+    public Optional<Id<IAuthorization>> Id { get; set; }
+    
     public CreateAuthorizationBuilder WithApplication(Id<IApplication> value) => this with { Application = value };
     public Id<IApplication> Application { get; set; }
 

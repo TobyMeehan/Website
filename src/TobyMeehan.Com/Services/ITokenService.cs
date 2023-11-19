@@ -12,10 +12,10 @@ public interface ITokenService
     IAsyncEnumerable<IToken> GetByApplicationAsync(Id<IApplication> application, QueryOptions? options = null,
         CancellationToken cancellationToken = default);
 
-    IAsyncEnumerable<IToken> GetByUserAsync(Id<IUser> user, QueryOptions? options = null,
+    IAsyncEnumerable<IToken> GetBySubjectAsync(Id<IUser> user, QueryOptions? options = null,
         CancellationToken cancellationToken = default);
 
-    IAsyncEnumerable<IToken> GetByApplicationAndUserAsync(Id<IApplication> application, Id<IUser> user,
+    IAsyncEnumerable<IToken> GetByApplicationAndSubjectAsync(Id<IApplication> application, string? subject,
         QueryOptions? options = null, CancellationToken cancellationToken = default);
 
     IAsyncEnumerable<IToken> GetByAuthorizationAsync(Id<IAuthorization> authorization, QueryOptions? options = null,

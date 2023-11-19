@@ -49,6 +49,7 @@ public class ApplicationService : BaseService<IApplication, ApplicationDto>, IAp
             DownloadId = dto.DownloadId is null ? null : new Id<IDownload>(dto.DownloadId),
             Name = dto.Name,
             Description = dto.Description,
+            HasSecret = dto.SecretHash is not null,
             Redirects = redirects
         });
     }
@@ -59,12 +60,12 @@ public class ApplicationService : BaseService<IApplication, ApplicationDto>, IAp
     {
         var data = Cache.Get(id) ?? await _db.SelectByIdAsync(id.Value, cancellationToken);
 
-        if (data?.SecretHash is null)
+        if (data is null)
         {
             return new NotFound();
         }
 
-        if (!await _password.CheckAsync(secret, data.SecretHash))
+        if (data.SecretHash is { } secretHash && !await _password.CheckAsync(secret, secretHash))
         {
             return new InvalidCredentials();
         }

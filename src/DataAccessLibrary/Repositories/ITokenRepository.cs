@@ -9,9 +9,9 @@ public interface ITokenRepository
     
     IAsyncEnumerable<TokenDto> SelectByApplicationAsync(string applicationId, LimitStrategy? limit, CancellationToken cancellationToken);
 
-    IAsyncEnumerable<TokenDto> SelectByUserAsync(string userId, LimitStrategy? limit, CancellationToken cancellationToken);
+    IAsyncEnumerable<TokenDto> SelectBySubjectAsync(string subject, LimitStrategy? limit, CancellationToken cancellationToken);
 
-    IAsyncEnumerable<TokenDto> SelectByApplicationAndUserAsync(string applicationId, string userId, LimitStrategy? limit,
+    IAsyncEnumerable<TokenDto> SelectByApplicationAndSubjectAsync(string applicationId, string? subject, LimitStrategy? limit,
         CancellationToken cancellationToken);
 
     IAsyncEnumerable<TokenDto> SelectByAuthorizationAsync(string authorizationId, LimitStrategy? limit, CancellationToken cancellationToken);

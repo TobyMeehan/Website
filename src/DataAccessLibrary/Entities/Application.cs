@@ -7,6 +7,7 @@ public class Application : IApplication
     public Id<IDownload>? DownloadId { get; init; }
     public required string Name { get; init; }
     public string? Description { get; init; }
+    public required bool HasSecret { get; init; }
     public IFile? Icon { get; init; }
     public required IEntityCollection<IRedirect> Redirects { get; init; }
 }

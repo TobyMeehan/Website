@@ -4,8 +4,11 @@ namespace TobyMeehan.Com.Builders.Token;
 
 public struct UpdateTokenBuilder : IUpdateToken
 {
-    public UpdateTokenBuilder WithPayload(string value) => this with { Payload = value };
-    public Optional<string> Payload { get; set; }
+    public UpdateTokenBuilder WithReferenceId(string? value) => this with{ReferenceId = value};
+    public Optional<string?> ReferenceId { get; set; }
+    
+    public UpdateTokenBuilder WithPayload(string? value) => this with { Payload = value };
+    public Optional<string?> Payload { get; set; }
     
     public UpdateTokenBuilder WithStatus(string? value) => this with { Status = value };
     public Optional<string?> Status { get; set; }
