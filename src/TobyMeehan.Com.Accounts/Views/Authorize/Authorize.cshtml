@@ -1,0 +1,68 @@
+@using TobyMeehan.Com
+@using Microsoft.Extensions.Primitives
+@model TobyMeehan.Com.Accounts.Models.Authorize.AuthorizeViewModel
+
+<div class="text-center">
+    <h1 class="text-2xl font-light mb-1.5">Connect to <span class="font-bold">@Model.Client?.Name</span></h1>
+
+    <p class="my-1.5">A third party application wants to access your tobymeehan.com account.</p>
+
+    <p class="my-1.5 text-sm">
+        Signed in as
+        <span class="text-flash">@Model.Owner?.Handle</span>
+        <a class="link ml-0.5" asp-controller="Authentication" asp-action="Logout" asp-route-ReturnUrl="@Model.ReturnUrl">
+            Change
+        </a>
+    </p>
+
+    <hr class="my-1.5 border-flash"/>
+
+    <p class="my-1.5">This give the developer of @Model.Client?.Name permission to:</p>
+</div>
+
+<ul class="list-disc list-inside">
+    @foreach (string scope in Model.Scopes)
+    {
+        switch (scope)
+        {
+            case Scope.Identify:
+                <li>View your username, balance and roles.</li>
+                break;
+
+            case Scope.Transactions:
+                <li>Send and receive transactions.</li>
+                break;
+
+            case Scope.Downloads:
+                <li>Create and manage your downloads.</li>
+                break;
+        }
+    }
+</ul>
+
+<hr class="border-flash mt-auto"/>
+
+<div class="mb-3 leading-5 text-center">
+    <small>You can revoke access at any time using the Connections tab in your account settings.</small>
+</div>
+
+<form asp-controller="Authorize" asp-action="Authorize" method="post">
+    
+    @foreach (var parameter in Context.Request.HasFormContentType ?
+        (IEnumerable<KeyValuePair<string, StringValues>>) Context.Request.Form : Context.Request.Query)
+    {
+        <input type="hidden" name="@parameter.Key" value="@parameter.Value" />
+    }
+    
+    <div class="md:flex md:justify-between">
+        <button class="btn btn-primary px-1.5 text-md w-full md:w-auto"
+                name="submit.Authorize" type="submit" value="Yes">
+            Authorize
+        </button>
+
+        <button class="block link mt-3 md:m-0 py-1.5 w-full md:w-auto text-center"
+                name="submit.Cancel" type="submit" value="No">
+            Cancel
+        </button>
+    </div>
+</form>
