@@ -29,9 +29,9 @@ public class AuthorizationService : BaseService<IAuthorization, AuthorizationDto
     {
         var scopes = new EntityCollection<IScope>();
         
-        foreach (var scopeDto in data.Scopes)
+        foreach (string scopeId in data.Scopes.Split())
         {
-            var result = await _scopes.GetByIdAsync(new Id<IScope>(scopeDto.Id));
+            var result = await _scopes.GetByIdAsync(new Id<IScope>(scopeId));
 
             result.Switch(
                 scope => scopes.Add(scope),
@@ -106,7 +106,7 @@ public class AuthorizationService : BaseService<IAuthorization, AuthorizationDto
 
     public async Task<IAuthorization> CreateAsync(ICreateAuthorization create, CancellationToken cancellationToken = default)
     {
-        var id = await _id.GenerateAsync<IAuthorization>();
+        var id = create.Id | await _id.GenerateAsync<IAuthorization>();
 
         var data = new AuthorizationDto
         {
@@ -117,10 +117,7 @@ public class AuthorizationService : BaseService<IAuthorization, AuthorizationDto
             Status = create.Status,
             Type = create.Type,
 
-            Scopes = create.Scopes.Select(x => new AuthorizationScopeDto
-            {
-                Id = x
-            }).ToList(),
+            Scopes = string.Join(' ', create.Scopes),
 
             CreatedAt = create.CreatedAt
         };
@@ -144,13 +141,7 @@ public class AuthorizationService : BaseService<IAuthorization, AuthorizationDto
 
         data.Type = update.Type | data.Type;
         data.Status = update.Status | data.Status;
-        data.Scopes = update.Scopes.MapOr(map => 
-            map.Select(x => 
-                new AuthorizationScopeDto
-                {
-                    Id = x
-                })
-                .ToList(), data.Scopes);
+        data.Scopes = update.Scopes.MapOr(map => string.Join(' ', map), data.Scopes);
 
         await _db.UpdateAsync(id.Value, data, cancellationToken);
 

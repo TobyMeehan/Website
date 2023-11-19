@@ -8,10 +8,5 @@ public class AuthorizationDto
     public required string? Status { get; set; }
     public required string? Type { get; set; }
     public required DateTime CreatedAt { get; set; }
-    public List<AuthorizationScopeDto> Scopes { get; set; } = new();
-}
-
-public class AuthorizationScopeDto
-{
-    public required string Id { get; set; }
+    public required string Scopes { get; set; }
 }
