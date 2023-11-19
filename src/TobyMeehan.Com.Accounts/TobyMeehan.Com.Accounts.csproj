@@ -14,11 +14,12 @@
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="FastEndpoints" Version="5.17.1.1" />
-      <PackageReference Include="FastEndpoints.Security" Version="5.17.1.1" />
       <PackageReference Include="FluentValidation" Version="11.7.1" />
       <PackageReference Include="FluentValidation.AspNetCore" Version="11.3.0" />
       <PackageReference Include="JorgeSerrano.Json.JsonSnakeCaseNamingPolicy" Version="0.9.0" />
+      <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="7.0.11" />
+      <PackageReference Include="OpenIddict.AspNetCore" Version="4.10.0" />
+      <PackageReference Include="System.Linq.Async" Version="6.0.1" />
     </ItemGroup>
 
     <ItemGroup>
@@ -33,6 +34,19 @@
     <ItemGroup>
         <UpToDateCheckBuilt Include="wwwroot/css/site.css" Set="Css" />
         <UpToDateCheckBuilt Include="tailwind.config.js" Set="Css" />
+    </ItemGroup>
+    
+    <ItemGroup>
+      <_ContentIncludedByDefault Remove="Pages\Authorize.cshtml" />
+      <_ContentIncludedByDefault Remove="Pages\Error.cshtml" />
+      <_ContentIncludedByDefault Remove="Pages\Index.cshtml" />
+      <_ContentIncludedByDefault Remove="Pages\Login.cshtml" />
+      <_ContentIncludedByDefault Remove="Pages\Logout.cshtml" />
+      <_ContentIncludedByDefault Remove="Pages\Register.cshtml" />
+      <_ContentIncludedByDefault Remove="Pages\Shared\_Layout.cshtml" />
+      <_ContentIncludedByDefault Remove="Pages\Shared\_ValidationScriptsPartial.cshtml" />
+      <_ContentIncludedByDefault Remove="Pages\_ViewImports.cshtml" />
+      <_ContentIncludedByDefault Remove="Pages\_ViewStart.cshtml" />
     </ItemGroup>
     
     <Target Name="Tailwind" BeforeTargets="Build">

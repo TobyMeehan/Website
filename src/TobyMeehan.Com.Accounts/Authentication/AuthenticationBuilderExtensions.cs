@@ -20,12 +20,4 @@ public static class AuthenticationBuilderExtensions
 
         return builder;
     }
-
-    public static AuthenticationBuilder AddClientBasicAuthentication(this AuthenticationBuilder builder, Action<AuthenticationSchemeOptions>? options = null)
-    {
-        builder.AddScheme<AuthenticationSchemeOptions, ClientBasicAuthenticationHandler>(
-                ClientBasicAuthenticationHandler.AuthenticationScheme, options);
-
-        return builder;
-    }
 }

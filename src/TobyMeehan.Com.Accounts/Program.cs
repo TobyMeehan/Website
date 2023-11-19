@@ -1,17 +1,13 @@
-using System.Text.Json;
-using System.Text.Json.Serialization;
-using FastEndpoints;
-using FastEndpoints.Security;
 using FluentValidation;
 using FluentValidation.AspNetCore;
-using JorgeSerrano.Json;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Http.Json;
-using SqlKata.Compilers;
+using TobyMeehan.Com;
 using TobyMeehan.Com.Accounts.Authentication;
-using TobyMeehan.Com.Accounts.Configuration;
-using TobyMeehan.Com.Accounts.Jwt;
 using TobyMeehan.Com.Accounts.Models;
+using TobyMeehan.Com.Accounts.Models.Authentication.Login;
+using TobyMeehan.Com.Accounts.Models.Authentication.Register;
+using TobyMeehan.Com.Accounts.Models.OpenId;
+using TobyMeehan.Com.Accounts.OpenId;
 using TobyMeehan.Com.Data.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -20,33 +16,66 @@ builder.Configuration.AddJsonFile("secrets.json", true);
 builder.Configuration.AddJsonFile($"secrets.{builder.Environment.EnvironmentName}.json", true);
 builder.Configuration.AddEnvironmentVariables();
 
-// Add services to the container.
-builder.Services.AddRazorPages();
+builder.Services.AddMvc();
+
+builder.Services.AddOpenIddict()
+
+    .AddCore(options =>
+    {
+        options.AddApplicationStore<OpenIdApplicationStore>()
+            .SetDefaultApplicationEntity<OpenIdApplication>()
+            .ReplaceApplicationManager<OpenIdApplicationManager>();
+
+        options.AddAuthorizationStore<OpenIdAuthorizationStore>()
+            .SetDefaultAuthorizationEntity<OpenIdAuthorization>();
+
+        options.AddTokenStore<OpenIdTokenStore>()
+            .SetDefaultTokenEntity<OpenIdToken>();
+
+        options.AddScopeStore<OpenIdScopeStore>()
+            .SetDefaultScopeEntity<OpenIdScope>();
+    })
+
+    .AddServer(options =>
+    {
+        options.RegisterScopes(Scope.All.ToArray());
+        
+        options.SetAuthorizationEndpointUris("oauth/authorize")
+            .SetTokenEndpointUris("oauth/token")
+            .SetLogoutEndpointUris("connect/logout")
+            .SetUserinfoEndpointUris("connect/userinfo");
+
+        options.AllowAuthorizationCodeFlow()
+            .AllowClientCredentialsFlow()
+            .AllowRefreshTokenFlow();
+
+        options.AddDevelopmentEncryptionCertificate()
+            .AddDevelopmentSigningCertificate();
+
+        options.UseAspNetCore()
+            .EnableAuthorizationEndpointPassthrough()
+            .DisableTransportSecurityRequirement();
+    })
+    
+    .AddValidation(options =>
+    {
+        options.UseLocalServer();
+        options.UseAspNetCore();
+    });
 
 builder.Services.AddDataAccessLibrary(builder.Configuration.GetSection("Data"))
     .AddBase64IdGeneration()
     .AddBCryptPasswordHash()
     .AddRngSecretService()
     .AddPostgresDatabase()
-    .AddSqlKataRepositories<PostgresCompiler>()
-    .AddEntityServices();
+    .AddSqlKataRepositories()
+    .AddEntityServices()
+    .AddScopesFromConfiguration(builder.Configuration.GetSection("General:Scopes"));
 
 builder.Services.AddHttpContextAccessor();
 
-builder.Services.Configure<AuthenticationOptions>(builder.Configuration.GetSection("Authentication"));
-builder.Services.Configure<JsonOptions>(options =>
-{
-    options.SerializerOptions.PropertyNamingPolicy = new JsonSnakeCaseNamingPolicy();
-    options.SerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
-});
-
-builder.Services.AddFastEndpoints();
-
-builder.Services.AddTransient<ITokenService, FastEndpointsTokenService>();
-
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-    .AddCookieAuthentication()
-    .AddClientBasicAuthentication();
+    .AddCookieAuthentication();
 
 builder.Services.AddFluentValidationClientsideAdapters();
 
@@ -63,7 +92,7 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
@@ -71,8 +100,6 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.UseFastEndpoints();
-
-app.MapRazorPages();
+app.MapControllers();
 
 app.Run();
