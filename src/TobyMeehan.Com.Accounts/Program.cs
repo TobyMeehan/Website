@@ -2,6 +2,7 @@ using System.Security.Cryptography.X509Certificates;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.IdentityModel.Tokens;
 using TobyMeehan.Com;
 using TobyMeehan.Com.Accounts.Authentication;
 using TobyMeehan.Com.Accounts.Models.Authentication.Login;
@@ -43,18 +44,21 @@ builder.Services.AddOpenIddict()
         options.SetAuthorizationEndpointUris("oauth/authorize")
             .SetTokenEndpointUris("oauth/token")
             .SetLogoutEndpointUris("connect/logout")
-            .SetUserinfoEndpointUris("connect/userinfo");
+            .SetUserinfoEndpointUris("connect/userinfo")
+            .SetIssuer(builder.Configuration["OIDC:Issuer"] ??
+                       throw new Exception("OIDC issuer not provided."));
 
         options.AllowAuthorizationCodeFlow()
             .AllowClientCredentialsFlow()
             .AllowRefreshTokenFlow();
 
-        options.AddEncryptionCertificate(new X509Certificate2(
-            builder.Configuration["OIDC:EncryptionCertificateFile"] ??
-            throw new Exception("Encryption certificate not provided.")));
-        options.AddSigningCertificate(new X509Certificate2(
-            builder.Configuration["OIDC:SigningCertificateFile"] ??
-            throw new Exception("Signing certificate not provided.")));
+        options.AddEncryptionCertificate(new X509Certificate2(Convert.FromBase64String(
+            builder.Configuration["OIDC:EncryptionCertificate"] ??
+            throw new Exception("OIDC encryption certificate not provided."))));
+
+        options.AddSigningCertificate(new X509Certificate2(Convert.FromBase64String(
+            builder.Configuration["OIDC:SigningCertificate"] ??
+            throw new Exception("OIDC signing certificate not provided."))));
 
         options.UseAspNetCore()
             .EnableAuthorizationEndpointPassthrough()

@@ -6,8 +6,12 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddOpenIddict()
     .AddValidation(options =>
     {
-        options.SetIssuer(builder.Configuration["OIDC:AuthorizationServerHost"] ??
-                          throw new Exception("Authorization server host not provided."));
+        options.SetIssuer(builder.Configuration["OIDC:Issuer"] ??
+                          throw new Exception("OIDC issuer not provided."));
+
+        options.AddEncryptionCertificate(new X509Certificate2(Convert.FromBase64String(
+            builder.Configuration["OIDC:EncryptionCertificate"] ??
+            throw new Exception("OIDC encryption certificate not provided."))));
         
         options.UseSystemNetHttp();
         
