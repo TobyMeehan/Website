@@ -10,10 +10,12 @@ namespace TobyMeehan.Com.Accounts.OpenId;
 public class OpenIdApplicationStore : BaseApplicationStore
 {
     private readonly IApplicationService _service;
+    private readonly IScopeService _scopes;
 
-    public OpenIdApplicationStore(IApplicationService service)
+    public OpenIdApplicationStore(IApplicationService service, IScopeService scopes)
     {
         _service = service;
+        _scopes = scopes;
     }
     
     public override async ValueTask<long> CountAsync(CancellationToken cancellationToken)
@@ -80,7 +82,7 @@ public class OpenIdApplicationStore : BaseApplicationStore
             application.Redirects.Select(x => x.Uri.OriginalString).ToImmutableArray());
     }
 
-    public override ValueTask<ImmutableArray<string>> GetPermissionsAsync(OpenIdApplication application, CancellationToken cancellationToken)
+    public override async ValueTask<ImmutableArray<string>> GetPermissionsAsync(OpenIdApplication application, CancellationToken cancellationToken)
     {
         var permissions = new List<string>
         {
@@ -97,11 +99,13 @@ public class OpenIdApplicationStore : BaseApplicationStore
             OpenIddictConstants.Permissions.GrantTypes.RefreshToken,
             OpenIddictConstants.Permissions.GrantTypes.Implicit
         };
-        
-        permissions.AddRange(
-            Scope.All.Select(x => OpenIddictConstants.Permissions.Prefixes.Scope + x));
 
-        return new ValueTask<ImmutableArray<string>>(permissions.ToImmutableArray());
+        await foreach (var scope in _scopes.GetAllAsync(cancellationToken: cancellationToken))
+        {
+            permissions.Add($"{OpenIddictConstants.Permissions.Prefixes.Scope}{scope.Name}");
+        }
+
+        return permissions.ToImmutableArray();
     }
 
     public override ValueTask<ImmutableArray<string>> GetRequirementsAsync(OpenIdApplication application, CancellationToken cancellationToken)

@@ -96,6 +96,6 @@ public class OpenIdScopeStore : BaseScopeStore
             update.Description = description;
         }
 
-        await _service.UpdateAsync(update, cancellationToken);
+        await _service.UpdateAsync(scope.Id, update, cancellationToken);
     }
 }

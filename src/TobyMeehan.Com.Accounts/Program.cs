@@ -39,7 +39,7 @@ builder.Services.AddOpenIddict()
 
     .AddServer(options =>
     {
-        options.RegisterScopes(Scope.All.ToArray());
+        options.RegisterScopes(ScopeNames.GetAll(includeGroup: true).ToArray());
         
         options.SetAuthorizationEndpointUris("oauth/authorize")
             .SetTokenEndpointUris("oauth/token")
@@ -77,8 +77,7 @@ builder.Services.AddDataAccessLibrary(builder.Configuration.GetSection("Data"))
     .AddRngSecretService()
     .AddPostgresDatabase()
     .AddSqlKataRepositories()
-    .AddEntityServices()
-    .AddScopesFromConfiguration(builder.Configuration.GetSection("General:Scopes"));
+    .AddEntityServices();
 
 builder.Services.AddHttpContextAccessor();
 

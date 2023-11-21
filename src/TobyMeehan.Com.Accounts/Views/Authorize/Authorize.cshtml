@@ -1,4 +1,3 @@
-@using TobyMeehan.Com
 @using Microsoft.Extensions.Primitives
 @model TobyMeehan.Com.Accounts.Models.Authorize.AuthorizeViewModel
 
@@ -21,22 +20,9 @@
 </div>
 
 <ul class="list-disc list-inside">
-    @foreach (string scope in Model.Scopes)
+    @foreach (var scope in Model.Scopes)
     {
-        switch (scope)
-        {
-            case Scope.Identify:
-                <li>View your username, balance and roles.</li>
-                break;
-
-            case Scope.Transactions:
-                <li>Send and receive transactions.</li>
-                break;
-
-            case Scope.Downloads:
-                <li>Create and manage your downloads.</li>
-                break;
-        }
+        <li>@scope.Description</li>
     }
 </ul>
 

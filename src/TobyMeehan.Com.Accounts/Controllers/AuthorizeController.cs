@@ -5,27 +5,33 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
+using OneOf;
 using OpenIddict.Abstractions;
 using OpenIddict.Server.AspNetCore;
 using TobyMeehan.Com.Accounts.Extensions;
 using TobyMeehan.Com.Accounts.Models.Authorize;
+using TobyMeehan.Com.Results;
 using TobyMeehan.Com.Services;
+using IAuthorizationService = Microsoft.AspNetCore.Authorization.IAuthorizationService;
 
 namespace TobyMeehan.Com.Accounts.Controllers;
 
 public class AuthorizeController : Controller
 {
     private readonly IUserService _users;
-    private readonly IOpenIddictApplicationManager _applicationManager;
+    private readonly IApplicationService _applications;
+    private readonly IScopeService _scopes;
     private readonly IOpenIddictAuthorizationManager _authorizationManager;
 
     public AuthorizeController(
         IUserService users,
-        IOpenIddictApplicationManager applicationManager,
+        IApplicationService applications,
+        IScopeService scopes,
         IOpenIddictAuthorizationManager authorizationManager)
     {
         _users = users;
-        _applicationManager = applicationManager;
+        _applications = applications;
+        _scopes = scopes;
         _authorizationManager = authorizationManager;
     }
 
@@ -40,44 +46,62 @@ public class AuthorizeController : Controller
             return Challenge();
         }
 
+        // Retrieve user details from principal
+        
         var userResult = await _users.GetByIdAsync(User.Id(), cancellationToken: ct);
 
         var user = userResult.Match(
             user => user,
             notFound => throw new InvalidOperationException("Could not retrieve user details."));
 
-        object application = await _applicationManager.FindByClientIdAsync(request.ClientId ?? string.Empty, ct) ??
-                             throw new InvalidOperationException("Could not retrieve application details.");
+        // Retrieve application details from request
+        
+        var applicationResult =
+            await _applications.GetByIdAsync(new Id<IApplication>(request.ClientId!), cancellationToken: ct);
+        
+        var application = applicationResult.Match(
+            application => application,
+            notFound => throw new InvalidOperationException("Could not retrieve application details."));
 
+        // Retrieve and validate scopes from request
+        
+        var scopeResult = await ValidateScopesAsync(request.GetScopes(), user, application, ct);
+
+        var scopes = scopeResult.Match(
+            scopes => scopes,
+            forbidden => throw new InvalidOperationException("Invalid scopes in request."));
+        
+        // Get any existing permanent authorizations
+        
         var permanentAuthorizations = await GetPermanentAuthorizationsAsync(
             subject: user.Id.Value,
-            client: (await _applicationManager.GetIdAsync(application, ct))!,
-            scopes: request.GetScopes(),
+            client: application.Id.Value,
+            scopes: scopes,
             ct);
 
-        switch (await _applicationManager.GetConsentTypeAsync(application, cancellationToken: ct))
+        // Automatically authorize if application allows and/or has been authorized before
+        
+        if (permanentAuthorizations.Any() && !request.HasPrompt(OpenIddictConstants.Prompts.Consent)) 
+            // TODO: application has implicit role
         {
-            case OpenIddictConstants.ConsentTypes.Implicit:
-            case OpenIddictConstants.ConsentTypes.Explicit when permanentAuthorizations.Any() && !request.HasPrompt(OpenIddictConstants.Prompts.Consent):
-
-                return await AuthorizeAsync(
-                    subject: user.Id.Value,
-                    client: (await _applicationManager.GetIdAsync(application, ct))!,
-                    scopes: request.GetScopes(),
-                    authorization: permanentAuthorizations.LastOrDefault(),
-                    ct);
-            
-            default: return View(new AuthorizeViewModel
-            {
-                Client = new ApplicationViewModel
-                {
-                    Name = await _applicationManager.GetDisplayNameAsync(application, ct)
-                },
-                Owner = user,
-                ReturnUrl = HttpContext.Request.Path + HttpContext.Request.QueryString,
-                Scopes = request.GetScopes()
-            });
+            return await AuthorizeAsync(
+                subject: user.Id.Value,
+                client: application.Id.Value,
+                scopes: scopes,
+                authorization: permanentAuthorizations.LastOrDefault(),
+                ct);
         }
+        
+        return View(new AuthorizeViewModel
+        {
+            Client = new ApplicationViewModel
+            {
+                Name = application.Name
+            },
+            Owner = user,
+            ReturnUrl = HttpContext.Request.Path + HttpContext.Request.QueryString,
+            Scopes = scopes
+        });
     }
 
     [Authorize, FormValueRequired("submit.Authorize")]
@@ -93,19 +117,29 @@ public class AuthorizeController : Controller
             user => user,
             notFound => throw new InvalidOperationException("Could not retrieve user details."));
 
-        object application = await _applicationManager.FindByClientIdAsync(request.ClientId!, ct) ??
-                             throw new InvalidOperationException("Could not retrieve application details.");
+        var applicationResult =
+            await _applications.GetByIdAsync(new Id<IApplication>(request.ClientId!), cancellationToken: ct);
+
+        var application = applicationResult.Match(
+            application => application,
+            notFound => throw new InvalidOperationException("Could not retrieve application details."));
+
+        var scopeResult = await ValidateScopesAsync(request.GetScopes(), user, application, ct);
+        
+        var scopes = scopeResult.Match(
+            scopes => scopes,
+            forbidden => throw new InvalidOperationException("Invalid scopes in request."));
 
         var permanentAuthorizations = await GetPermanentAuthorizationsAsync(
             subject: user.Id.Value,
-            client: (await _applicationManager.GetIdAsync(application, ct))!,
-            scopes: request.GetScopes(),
+            client: application.Id.Value,
+            scopes: scopes,
             ct);
 
         return await AuthorizeAsync(
             subject: user.Id.Value,
-            client: (await _applicationManager.GetIdAsync(application, ct))!,
-            scopes: request.GetScopes(),
+            client: application.Id.Value,
+            scopes: scopes,
             authorization: permanentAuthorizations.LastOrDefault(),
             ct);
     }
@@ -117,7 +151,7 @@ public class AuthorizeController : Controller
     private async Task<List<object>> GetPermanentAuthorizationsAsync(
         string subject, 
         string client, 
-        ImmutableArray<string> scopes, 
+        IEnumerable<IScope> scopes, 
         CancellationToken ct)
     {
         return await _authorizationManager.FindAsync(
@@ -125,14 +159,44 @@ public class AuthorizeController : Controller
             client: client,
             status: OpenIddictConstants.Statuses.Valid,
             type: OpenIddictConstants.AuthorizationTypes.Permanent,
-            scopes,
+            scopes: scopes.Select(x => x.Name).ToImmutableArray(),
             cancellationToken: ct).ToListAsync(cancellationToken: ct);
+    }
+
+    private async Task<OneOf<List<IScope>, Forbidden>> ValidateScopesAsync(IEnumerable<string> names, IUser user,
+        IApplication application, CancellationToken ct)
+    {
+        var result = new List<IScope>();
+        
+        foreach (string name in names)
+        {
+            var scopeResult = await _scopes.GetByNameAsync(name, cancellationToken: ct);
+
+            var scope = scopeResult.Match(
+                scope => scope,
+                notFound => throw new InvalidOperationException($"Could not retrieve scope {name}."));
+
+            var validation = await _scopes.AuthorizeScopeAsync(scope, user, application, ct);
+
+            bool forbid = false;
+
+            validation.Switch(
+                success => result.Add(scope),
+                forbidden => forbid = true);
+
+            if (forbid)
+            {
+                return new Forbidden();
+            }
+        }
+
+        return result;
     }
     
     private async Task<IActionResult> AuthorizeAsync(
         string subject, 
         string client, 
-        ImmutableArray<string> scopes, 
+        IEnumerable<IScope> scopes, 
         object? authorization, 
         CancellationToken ct)
     {
@@ -141,9 +205,15 @@ public class AuthorizeController : Controller
             nameType: OpenIddictConstants.Claims.Name,
             roleType: OpenIddictConstants.Claims.Role);
 
-        identity.SetClaim(OpenIddictConstants.Claims.Subject, subject, OpenIddictConstants.Destinations.AccessToken);
+        identity.SetClaim(OpenIddictConstants.Claims.Subject, subject);
+        identity.SetClaim(OpenIddictConstants.Claims.ClientId, client);
 
-        identity.SetScopes(scopes);
+        identity.SetScopes(scopes.Select(x => x.Name));
+
+        identity.SetDestinations(static claim => claim.Type switch
+        {
+            _ => new[] { OpenIddictConstants.Destinations.AccessToken }
+        });
         
         authorization ??= await _authorizationManager.CreateAsync(
             identity: identity,
