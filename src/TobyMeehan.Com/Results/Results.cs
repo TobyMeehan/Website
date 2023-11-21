@@ -1,8 +1,8 @@
-namespace TobyMeehan.Com;
+namespace TobyMeehan.Com.Results;
 
 public struct Success { }
 
-public struct NotFound { }
+public struct Forbidden { }
 
 public struct InvalidCredentials { }
 
