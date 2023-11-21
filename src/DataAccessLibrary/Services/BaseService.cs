@@ -35,6 +35,12 @@ public abstract class BaseService<TEntity, TData> where TEntity : IEntity<TEntit
 
         return entity;
     }
+
+    protected async Task<T> GetAsync<T>(TData data) where T : TEntity
+    {
+        return (T) await GetAsync(data);
+    }
+    
     
     protected abstract Task<TEntity> MapAsync(TData data);
 }

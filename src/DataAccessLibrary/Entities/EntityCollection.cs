@@ -1,4 +1,6 @@
 using System.Collections;
+using OneOf;
+using TobyMeehan.Com.Results;
 
 namespace TobyMeehan.Com.Data.Entities;
 
@@ -23,7 +25,7 @@ public class EntityCollection<T> : IEntityCollection<T> where T : IEntity<T>
 
     public int Count => _items.Count;
 
-    public T this[Id<T> id] => _items.TryGetValue(id, out var entity) ? entity : throw new InvalidOperationException();
+    public OneOf<T, NotFound> this[Id<T> id] => _items.TryGetValue(id, out var entity) ? entity : new NotFound();
 
     public T? Find(string str)
     {

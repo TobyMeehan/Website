@@ -90,4 +90,10 @@ public interface IUserService
     /// <param name="cancellationToken"></param>
     /// <returns></returns>
     Task<OneOf<Success, NotFound>> DeleteAsync(Id<IUser> id, CancellationToken cancellationToken = default);
+
+    Task<OneOf<Success, NotFound>> AddRoleAsync(Id<IUser> id, Id<IUserRole> role,
+        CancellationToken cancellationToken = default);
+
+    Task<OneOf<Success, NotFound>> RemoveRoleAsync(Id<IUser> id, Id<IUserRole> role,
+        CancellationToken cancellationToken = default);
 }

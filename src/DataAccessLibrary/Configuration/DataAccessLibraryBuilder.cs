@@ -4,11 +4,9 @@ using Npgsql;
 using SqlKata.Compilers;
 using TobyMeehan.Com.Data.Caching;
 using TobyMeehan.Com.Data.DataAccess;
-using TobyMeehan.Com.Data.Entities;
 using TobyMeehan.Com.Data.Repositories;
 using TobyMeehan.Com.Data.Security;
 using TobyMeehan.Com.Data.Security.BCrypt;
-using TobyMeehan.Com.Data.Services;
 using TobyMeehan.Com.Services;
 
 namespace TobyMeehan.Com.Data.Configuration;
@@ -53,6 +51,7 @@ public class DataAccessLibraryBuilder
         Services.AddTransient<IAuthorizationRepository, SqlKata.AuthorizationRepository>();
         Services.AddTransient<ITokenRepository, SqlKata.TokenRepository>();
         Services.AddTransient<IUserRepository, SqlKata.UserRepository>();
+        Services.AddTransient<IUserRoleRepository, SqlKata.UserRoleRepository>();
 
         Services.AddSingleton(typeof(ICacheService<,>), typeof(MemoryCacheService<,>));
         
@@ -65,6 +64,7 @@ public class DataAccessLibraryBuilder
         Services.AddTransient<IAuthorizationService, Services.AuthorizationService>();
         Services.AddTransient<ITokenService, Services.TokenService>();
         Services.AddTransient<IUserService, Services.UserService>();
+        Services.AddTransient<IUserRoleService, Services.UserRoleService>();
         
         return this;
     }

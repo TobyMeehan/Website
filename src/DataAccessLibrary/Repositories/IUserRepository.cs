@@ -16,5 +16,7 @@ public interface IUserRepository
     Task<int> InsertAsync(UserDto user, CancellationToken cancellationToken);
     Task<int> UpdateAsync(string id, UserDto user, CancellationToken cancellationToken);
     Task<int> DeleteAsync(string id, CancellationToken cancellationToken);
-    
+
+    Task<int> AddRoleAsync(string id, string roleId, CancellationToken cancellationToken);
+    Task<int> RemoveRoleAsync(string id, string roleId, CancellationToken cancellationToken);
 }

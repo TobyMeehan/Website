@@ -13,18 +13,30 @@ namespace TobyMeehan.Com.Data.Services;
 public class UserService : BaseService<IUser, UserDto>, IUserService
 {
     private readonly IUserRepository _db;
+    private readonly IUserRoleService _userRoles;
     private readonly IIdService _id;
     private readonly IPasswordService _password;
 
     public UserService(
         IUserRepository db, 
+        IUserRoleService userRoles,
         IIdService id, 
         IPasswordService password, 
         ICacheService<UserDto, Id<IUser>> cache) : base(cache)
     {
         _db = db;
+        _userRoles = userRoles;
         _id = id;
         _password = password;
+    }
+
+    private static IUserRole MapRole(RoleDto role)
+    {
+        return new UserRole
+        {
+            Id = new Id<IUserRole>(role.Id),
+            Name = role.Name
+        };
     }
     
     protected override Task<IUser> MapAsync(UserDto dto)
@@ -36,6 +48,7 @@ public class UserService : BaseService<IUser, UserDto>, IUserService
             Name = dto.DisplayName,
             Description = dto.Description,
             Balance = dto.Balance,
+            Roles = EntityCollection<IUserRole>.Create(dto.Roles, MapRole)
         });
     }
 
@@ -50,8 +63,7 @@ public class UserService : BaseService<IUser, UserDto>, IUserService
             return new NotFound();
         }
         
-        return OneOf<IUser, NotFound>.FromT0(
-            await GetAsync(data));
+        return await GetAsync<User>(data);
     }
 
     public async Task<OneOf<IUser, InvalidCredentials, NotFound>> GetByCredentialsAsync(string username, Password password,
@@ -71,8 +83,7 @@ public class UserService : BaseService<IUser, UserDto>, IUserService
             return new InvalidCredentials();
         }
 
-        return OneOf<IUser, InvalidCredentials, NotFound>.FromT0(
-            await GetAsync(data));
+        return await GetAsync<User>(data);
     }
 
     public async Task<OneOf<IUser, InvalidCredentials, NotFound>> GetByCredentialsAsync(Id<IUser> id, Password password, QueryOptions? options = null,
@@ -90,8 +101,7 @@ public class UserService : BaseService<IUser, UserDto>, IUserService
             return new InvalidCredentials();
         }
 
-        return OneOf<IUser, InvalidCredentials, NotFound>.FromT0(
-            await GetAsync(data));
+        return await GetAsync<User>(data);
     }
 
     public async Task<OneOf<IUser, NotFound>> GetByIdAsync(Id<IUser> id, QueryOptions? options = null,
@@ -104,8 +114,7 @@ public class UserService : BaseService<IUser, UserDto>, IUserService
             return new NotFound();
         }
 
-        return OneOf<IUser, NotFound>.FromT0(
-            await GetAsync(data));
+        return await GetAsync<User>(data);
     }
 
     public IAsyncEnumerable<IUser> GetAllAsync(QueryOptions? options = null, CancellationToken cancellationToken = default)
@@ -117,7 +126,9 @@ public class UserService : BaseService<IUser, UserDto>, IUserService
 
     public IAsyncEnumerable<IUser> GetByRoleAsync(Id<IUserRole> role, QueryOptions? options = null, CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+        var data = _db.SelectByRoleAsync(role.Value, options?.LimitStrategy, cancellationToken);
+
+        return GetAsync(data);
     }
 
     public async Task<bool> IsUsernameUniqueAsync(string username, CancellationToken cancellationToken = default)
@@ -139,10 +150,8 @@ public class UserService : BaseService<IUser, UserDto>, IUserService
         };
 
         await _db.InsertAsync(data, cancellationToken);
-        
-        Cache.Set(id, data);
 
-        return await MapAsync(data);
+        return await GetAsync(data);
     }
 
     public async Task<OneOf<IUser, NotFound>> UpdateAsync(Id<IUser> id, IUpdateUser user,
@@ -168,8 +177,7 @@ public class UserService : BaseService<IUser, UserDto>, IUserService
 
         await _db.UpdateAsync(id.Value, data, cancellationToken);
 
-        return OneOf<IUser, NotFound>.FromT0(
-            await GetAsync(data));
+        return await GetAsync<User>(data);
     }
 
     public async Task<OneOf<Success, InsufficientBalance, NotFound>> UpdateBalanceAsync(Id<IUser> id, double amount,
@@ -201,5 +209,35 @@ public class UserService : BaseService<IUser, UserDto>, IUserService
         Cache.Remove(id);
 
         return result == 1 ? new Success() : new NotFound();
+    }
+
+    public async Task<OneOf<Success, NotFound>> AddRoleAsync(Id<IUser> id, Id<IUserRole> role, CancellationToken cancellationToken = default)
+    {
+        var roleResult = await _userRoles.GetByIdAsync(role, cancellationToken);
+
+        if (roleResult.IsNotFound())
+        {
+            return new NotFound<IUserRole>();
+        }
+
+        var user = await _db.SelectByIdAsync(id.Value, cancellationToken);
+
+        if (user is null)
+        {
+            return new NotFound<IUser>();
+        }
+
+        await _db.AddRoleAsync(id.Value, role.Value, cancellationToken);
+        
+        Cache.Remove(id);
+
+        return new Success();
+    }
+
+    public async Task<OneOf<Success, NotFound>> RemoveRoleAsync(Id<IUser> id, Id<IUserRole> role, CancellationToken cancellationToken = default)
+    {
+        int result = await _db.RemoveRoleAsync(id.Value, role.Value, cancellationToken);
+
+        return result > 0 ? new Success() : new NotFound();
     }
 }

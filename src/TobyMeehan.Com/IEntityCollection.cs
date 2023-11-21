@@ -1,4 +1,7 @@
-﻿namespace TobyMeehan.Com;
+﻿using OneOf;
+using TobyMeehan.Com.Results;
+
+namespace TobyMeehan.Com;
 
 /// <summary>
 /// Collection of entities, indexed by ID.
@@ -10,7 +13,7 @@ public interface IEntityCollection<T> : IReadOnlyCollection<T> where T : IEntity
     /// Gets the entity in the collection with the specified ID.
     /// </summary>
     /// <param name="id"></param>
-    T this[Id<T> id] { get; }
+    OneOf<T, NotFound> this[Id<T> id] { get; }
 
     /// <summary>
     /// Finds an entity in the collection with the specified ID.

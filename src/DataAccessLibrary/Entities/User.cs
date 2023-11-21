@@ -8,4 +8,5 @@ public class User : IUser
     public required double Balance { get; init; }
     public string? Description { get; init; }
     public IFile? Avatar { get; init; }
+    public required IEntityCollection<IUserRole> Roles { get; init; }
 }
