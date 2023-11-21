@@ -1,0 +1,39 @@
+using SqlKata;
+using TobyMeehan.Com.Data.DataAccess;
+using TobyMeehan.Com.Data.Models;
+using TobyMeehan.Com.Data.Repositories;
+
+namespace TobyMeehan.Com.Data.SqlKata;
+
+public class ScopeRepository : Repository<ScopeDto>, IScopeRepository
+{
+    public ScopeRepository(ISqlDataAccess db) : base(db, "scopes")
+    {
+    }
+
+    private const string UserRoles = "userroles";
+    private readonly Query _userRoles = new Query(UserRoles)
+        .OrderBy("Name");
+
+    private const string ScopeUserRoles = "scopes_userroles";
+    private readonly Query _scopeUserRoles = new Query(ScopeUserRoles);
+    
+    protected override Query Query()
+    {
+        return base.Query()
+            .OrderBy("Name")
+
+            .LeftJoin(_scopeUserRoles.As(ScopeUserRoles), j => j.On($"{ScopeUserRoles}.ScopeId", $"{Table}.Id"))
+            .LeftJoin(_userRoles.As(UserRoles), j => j.On($"{UserRoles}.Id", $"{ScopeUserRoles}.RoleId"))
+
+            .Select($"{Table}.{{Id, Name, DisplayName, Description}}",
+                $"{UserRoles}.Id AS UserRoles_Id", $"{UserRoles}.Name AS UserRoles_Name");
+    }
+
+    public async Task<ScopeDto?> SelectByNameAsync(string name, CancellationToken cancellationToken)
+    {
+        return await Db.SingleAsync<ScopeDto>(Query()
+                .Where(Column("Name"), name), 
+            cancellationToken);
+    }
+}

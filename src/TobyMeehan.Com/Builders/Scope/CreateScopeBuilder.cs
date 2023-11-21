@@ -1,6 +1,8 @@
+using TobyMeehan.Com.Models.Scope;
+
 namespace TobyMeehan.Com.Builders.Scope;
 
-public struct CreateScopeBuilder
+public struct CreateScopeBuilder : ICreateScope
 {
     public CreateScopeBuilder WithName(string value) => this with { Name = value };
     public string Name { get; set; }

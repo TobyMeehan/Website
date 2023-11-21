@@ -2,6 +2,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Npgsql;
 using SqlKata.Compilers;
+using TobyMeehan.Com.Data.Authorization;
 using TobyMeehan.Com.Data.Caching;
 using TobyMeehan.Com.Data.DataAccess;
 using TobyMeehan.Com.Data.Repositories;
@@ -49,6 +50,7 @@ public class DataAccessLibraryBuilder
     {
         Services.AddTransient<IApplicationRepository, SqlKata.ApplicationRepository>();
         Services.AddTransient<IAuthorizationRepository, SqlKata.AuthorizationRepository>();
+        Services.AddTransient<IScopeRepository, SqlKata.ScopeRepository>();
         Services.AddTransient<ITokenRepository, SqlKata.TokenRepository>();
         Services.AddTransient<IUserRepository, SqlKata.UserRepository>();
         Services.AddTransient<IUserRoleRepository, SqlKata.UserRoleRepository>();
@@ -62,6 +64,7 @@ public class DataAccessLibraryBuilder
     {
         Services.AddTransient<IApplicationService, Services.ApplicationService>();
         Services.AddTransient<IAuthorizationService, Services.AuthorizationService>();
+        Services.AddTransient<IScopeService, Services.ScopeService>();
         Services.AddTransient<ITokenService, Services.TokenService>();
         Services.AddTransient<IUserService, Services.UserService>();
         Services.AddTransient<IUserRoleService, Services.UserRoleService>();
@@ -69,12 +72,10 @@ public class DataAccessLibraryBuilder
         return this;
     }
 
-    public DataAccessLibraryBuilder AddScopesFromConfiguration(IConfiguration configuration)
+    public DataAccessLibraryBuilder AddScopeValidation()
     {
-        Services.Configure<List<ConfigurationScope>>(configuration);
+        Services.AddTransient<IScopeValidator, UserRoleScopeValidator>();
 
-        Services.AddTransient<IScopeService, ConfigurationScopeService>();
-        
         return this;
     }
 
