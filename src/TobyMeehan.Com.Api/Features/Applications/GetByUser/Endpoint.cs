@@ -20,33 +20,29 @@ public class Endpoint : Endpoint<AuthenticatedRequest, List<ApplicationResponse>
     
     public override void Configure()
     {
-        Get("/users/@me/applications");
+        Get("/users/{UserId}/applications");
         Policies(ScopeNames.Applications.Read);
     }
 
     public override async Task HandleAsync(AuthenticatedRequest req, CancellationToken ct)
     {
-        var applications = _service.GetByAuthorAsync(req.UserId, cancellationToken: ct);
-
-        var response = new List<ApplicationResponse>();
-
-        await foreach (var application in applications)
+        if (!req.TryGetUserId(out var userId))
         {
-            var authorizationResult =
-                await _authorizationService.AuthorizeAsync(User, application, OperationRequirements.Read);
-            
-            if (authorizationResult.Succeeded)
-            {
-                response.Add(new ApplicationResponse
-                {
-                    Id = application.Id.Value,
-                    AuthorId = application.AuthorId.Value,
-                    Name = application.Name,
-                    Description = application.Description
-                });
-            }
+            await SendUnauthorizedAsync(ct);
+            return;
         }
+        
+        var applications = await _service
+            .GetByAuthorAsync(userId, cancellationToken: ct)
+            .ToListAsync(ct);
 
-        await SendAsync(response, cancellation: ct);
+        await SendAsync(applications.Select(application =>
+            new ApplicationResponse
+            {
+                Id = application.Id.Value,
+                AuthorId = application.AuthorId.Value,
+                Name = application.Name,
+                Description = application.Description
+            }).ToList(), cancellation: ct);
     }
 }

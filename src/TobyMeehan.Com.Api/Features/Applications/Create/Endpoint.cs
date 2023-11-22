@@ -15,15 +15,21 @@ public class Endpoint : Endpoint<Request, ApplicationResponse>
     
     public override void Configure()
     {
-        Post("/users/@me/applications");
+        Post("/users/{UserId}/applications");
         Policies(ScopeNames.Applications.Create);
     }
 
     public override async Task HandleAsync(Request req, CancellationToken ct)
     {
+        if (!req.TryGetUserId(out var userId))
+        {
+            await SendUnauthorizedAsync(ct);
+            return;
+        }
+        
         var application = await _service.CreateAsync(new CreateApplicationBuilder()
             .WithName(req.Name)
-            .WithAuthor(req.UserId), ct);
+            .WithAuthor(userId), ct);
 
         await SendCreatedAtAsync<Get.Endpoint>(new { Id = application.Id.Value }, responseBody:
             new ApplicationResponse

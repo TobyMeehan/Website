@@ -20,41 +20,56 @@ public class Endpoint : Endpoint<Request, ApplicationResponse>
     
     public override void Configure()
     {
-        Patch("/applications/{Id}");
+        Patch("/applications/{ApplicationId}");
         Policies(ScopeNames.Applications.Update);
     }
 
     public override async Task HandleAsync(Request req, CancellationToken ct)
     {
-        var result = await _service.GetByIdAsync(new Id<IApplication>(req.Id), cancellationToken: ct);
-
-        if (!result.IsSuccess(out var application))
+        if (!req.TryGetApplicationId(out var applicationId))
         {
-            await SendNotFoundAsync(ct);
+            await SendUnauthorizedAsync(ct);
             return;
         }
 
+        var result = await _service.GetByIdAsync(applicationId, cancellationToken: ct);
+
+        await result.Match(
+            application => AuthorizeAsync(application, req, ct),
+            notFound => SendNotFoundAsync(ct));
+    }
+
+    private async Task AuthorizeAsync(IApplication application, Request req, CancellationToken ct)
+    {
         var authorizationResult =
             await _authorizationService.AuthorizeAsync(User, application, OperationRequirements.Update);
 
-        if (!authorizationResult.Succeeded)
+        if (authorizationResult.Succeeded)
         {
-            await SendForbiddenAsync(ct);
+            await UpdateAsync(application.Id, req, ct);
             return;
         }
-        
-        await _service.UpdateAsync(new Id<IApplication>(req.Id), new UpdateApplicationBuilder
-            {
-                Name = req.Name,
-                Description = req.Description
-            }, ct);
 
-        await SendAsync(new ApplicationResponse
+        await SendForbiddenAsync(ct);
+    }
+
+    private async Task UpdateAsync(Id<IApplication> id, Request req, CancellationToken ct)
+    {
+        var result = await _service.UpdateAsync(id, new UpdateApplicationBuilder
         {
-            Id = application.Id.Value,
-            AuthorId = application.AuthorId.Value,
-            Name = application.Name,
-            Description = application.Description
-        }, cancellation: ct);
+            Name = req.Name,
+            Description = req.Description
+        }, ct);
+
+        await result.Match(
+            application => SendAsync(new ApplicationResponse
+            {
+                Id = application.Id.Value,
+                Name = application.Name,
+                Description = application.Description,
+                
+                AuthorId = Optional<string>.Empty(),
+            }, cancellation: ct),
+            notFound => SendNotFoundAsync(ct));
     }
 }

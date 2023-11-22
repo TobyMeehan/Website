@@ -7,7 +7,7 @@ using IAuthorizationService = Microsoft.AspNetCore.Authorization.IAuthorizationS
 
 namespace TobyMeehan.Com.Api.Features.Applications.Get;
 
-public class Endpoint : Endpoint<IdRequest, ApplicationResponse>
+public class Endpoint : Endpoint<AuthenticatedRequest, ApplicationResponse>
 {
     private readonly IApplicationService _service;
     private readonly IAuthorizationService _authorizationService;
@@ -20,29 +20,27 @@ public class Endpoint : Endpoint<IdRequest, ApplicationResponse>
     
     public override void Configure()
     {
-        Get("/applications/{Id}");
+        Get("/applications/{ApplicationId}");
         AllowAnonymous();
     }
 
-    public override async Task HandleAsync(IdRequest req, CancellationToken ct)
+    public override async Task HandleAsync(AuthenticatedRequest req, CancellationToken ct)
     {
-        var result = await _service.GetByIdAsync(new Id<IApplication>(req.Id), cancellationToken: ct);
-
-        if (!result.IsSuccess(out var application))
+        if (!req.TryGetApplicationId(out var applicationId))
         {
-            await SendNotFoundAsync(ct);
+            await SendUnauthorizedAsync(ct);
             return;
         }
+        
+        var result = await _service.GetByIdAsync(applicationId, cancellationToken: ct);
 
-        var authorizationResult =
-            await _authorizationService.AuthorizeAsync(User, application, OperationRequirements.Read);
+        await result.Match(
+            application => GetAsync(application, ct),
+            notFound => SendNotFoundAsync(ct));
+    }
 
-        if (!authorizationResult.Succeeded)
-        {
-            await SendForbiddenAsync(ct);
-            return;
-        }
-
+    private async Task GetAsync(IApplication application, CancellationToken ct)
+    {
         await SendAsync(new ApplicationResponse
         {
             Id = application.Id.Value,

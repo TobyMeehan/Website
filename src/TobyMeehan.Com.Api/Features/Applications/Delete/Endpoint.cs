@@ -28,23 +28,31 @@ public class Endpoint : Endpoint<IdRequest>
     {
         var result = await _service.GetByIdAsync(new Id<IApplication>(req.Id), cancellationToken: ct);
 
-        if (!result.IsSuccess(out var application))
-        {
-            await SendNotFoundAsync(ct);
-            return;
-        }
-        
-        var authorizationResult = 
+        await result.Match(
+            application => AuthorizeAsync(application, ct),
+            notFound => SendNotFoundAsync(ct));
+    }
+
+    private async Task AuthorizeAsync(IApplication application, CancellationToken ct)
+    {
+        var authorizationResult =
             await _authorizationService.AuthorizeAsync(User, application, OperationRequirements.Delete);
 
-        if (!authorizationResult.Succeeded)
+        if (authorizationResult.Succeeded)
         {
-            await SendForbiddenAsync(ct);
+            await DeleteAsync(application, ct);
             return;
         }
-        
-        await _service.DeleteAsync(new Id<IApplication>(req.Id), ct);
 
-        await SendNoContentAsync(ct);
+        await SendForbiddenAsync(ct);
+    }
+
+    private async Task DeleteAsync(IApplication application, CancellationToken ct)
+    {
+        var result = await _service.DeleteAsync(application.Id, ct);
+
+        await result.Match(
+            success => SendNoContentAsync(ct),
+            notFound => SendNotFoundAsync(ct));
     }
 }
