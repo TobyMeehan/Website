@@ -1,7 +1,34 @@
 using System.Security.Cryptography.X509Certificates;
 using FastEndpoints;
+using JorgeSerrano.Json;
+using Microsoft.AspNetCore.Http.Json;
+using Microsoft.IdentityModel.Logging;
+using OpenIddict.Validation.AspNetCore;
+using TobyMeehan.Com.Api;
+using TobyMeehan.Com.Api.Security;
+using TobyMeehan.Com.Data.Configuration;
+
+IdentityModelEventSource.ShowPII = true;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Configuration.AddJsonFile("secrets.json", true);
+builder.Configuration.AddJsonFile($"secrets.{builder.Environment.EnvironmentName}.json", true);
+builder.Configuration.AddEnvironmentVariables();
+
+builder.Services.AddAuthentication(OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme);
+
+builder.Services.AddSecurityPolicies();
+
+builder.Services.AddMemoryCache();
+
+builder.Services.AddDataAccessLibrary(builder.Configuration.GetSection("Data"))
+    .AddRngSecretService()
+    .AddBCryptPasswordHash()
+    .AddBase64IdGeneration()
+    .AddPostgresDatabase()
+    .AddSqlKataRepositories()
+    .AddEntityServices();
 
 builder.Services.AddOpenIddict()
     .AddValidation(options =>
@@ -14,10 +41,8 @@ builder.Services.AddOpenIddict()
             throw new Exception("OIDC encryption certificate not provided."))));
         
         options.UseSystemNetHttp();
-        
-        options.AddEncryptionCertificate(
-            new X509Certificate2(builder.Configuration["OIDC:EncryptionCertificateFile"] ?? 
-                                 throw new Exception("Encryption certificate not provided.")));
+
+        options.UseAspNetCore();
     });
 
 builder.Services.AddFastEndpoints();

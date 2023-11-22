@@ -1,5 +1,6 @@
 using System.Collections.Immutable;
 using System.Security.Claims;
+using System.Text.Json;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
@@ -85,8 +86,8 @@ public class AuthorizeController : Controller
             // TODO: application has implicit role
         {
             return await AuthorizeAsync(
-                subject: user.Id.Value,
-                client: application.Id.Value,
+                subject: user.Id,
+                client: application.Id,
                 scopes: scopes,
                 authorization: permanentAuthorizations.LastOrDefault(),
                 ct);
@@ -137,8 +138,8 @@ public class AuthorizeController : Controller
             ct);
 
         return await AuthorizeAsync(
-            subject: user.Id.Value,
-            client: application.Id.Value,
+            subject: user.Id,
+            client: application.Id,
             scopes: scopes,
             authorization: permanentAuthorizations.LastOrDefault(),
             ct);
@@ -163,7 +164,7 @@ public class AuthorizeController : Controller
             cancellationToken: ct).ToListAsync(cancellationToken: ct);
     }
 
-    private async Task<OneOf<List<IScope>, Forbidden>> ValidateScopesAsync(IEnumerable<string> names, IUser user,
+    private async Task<OneOf<List<IScope>, Forbidden>> ValidateScopesAsync(IEnumerable<string> scopes, IUser user,
         IApplication application, CancellationToken ct)
     {
         var result = new List<IScope>();
@@ -194,8 +195,8 @@ public class AuthorizeController : Controller
     }
     
     private async Task<IActionResult> AuthorizeAsync(
-        string subject, 
-        string client, 
+        Id<IUser> subject, 
+        Id<IApplication> client, 
         IEnumerable<IScope> scopes, 
         object? authorization, 
         CancellationToken ct)
@@ -205,8 +206,10 @@ public class AuthorizeController : Controller
             nameType: OpenIddictConstants.Claims.Name,
             roleType: OpenIddictConstants.Claims.Role);
 
-        identity.SetClaim(OpenIddictConstants.Claims.Subject, subject);
-        identity.SetClaim(OpenIddictConstants.Claims.ClientId, client);
+        identity.SetClaim(OpenIddictConstants.Claims.Subject, subject.Value);
+        identity.SetClaim("subject_id_json", JsonSerializer.Serialize(subject));
+        identity.SetClaim(OpenIddictConstants.Claims.ClientId, client.Value);
+        identity.SetClaim("client_id_json", JsonSerializer.Serialize(client));
 
         identity.SetScopes(scopes.Select(x => x.Name));
 
@@ -217,8 +220,8 @@ public class AuthorizeController : Controller
         
         authorization ??= await _authorizationManager.CreateAsync(
             identity: identity,
-            subject: subject,
-            client: client,
+            subject: subject.Value,
+            client: client.Value,
             type: OpenIddictConstants.AuthorizationTypes.Permanent,
             scopes: identity.GetScopes(),
             cancellationToken: ct);

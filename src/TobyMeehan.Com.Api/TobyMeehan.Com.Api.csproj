@@ -17,6 +17,12 @@
       <PackageReference Include="FastEndpoints" Version="5.19.2" />
       <PackageReference Include="JorgeSerrano.Json.JsonSnakeCaseNamingPolicy" Version="0.9.0" />
       <PackageReference Include="OpenIddict.AspNetCore" Version="4.10.0" />
+      <PackageReference Include="System.Linq.Async" Version="6.0.1" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\DataAccessLibrary\DataAccessLibrary.csproj" />
+      <ProjectReference Include="..\TobyMeehan.Com\TobyMeehan.Com.csproj" />
     </ItemGroup>
 
 </Project>
