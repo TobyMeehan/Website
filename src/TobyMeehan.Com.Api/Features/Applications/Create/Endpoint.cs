@@ -2,7 +2,7 @@ using FastEndpoints;
 using TobyMeehan.Com.Builders.Application;
 using TobyMeehan.Com.Services;
 
-namespace TobyMeehan.Com.Api.Features.Application.Create;
+namespace TobyMeehan.Com.Api.Features.Applications.Create;
 
 public class Endpoint : Endpoint<Request, ApplicationResponse>
 {

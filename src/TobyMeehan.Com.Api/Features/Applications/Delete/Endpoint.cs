@@ -2,14 +2,12 @@ using FastEndpoints;
 using Microsoft.AspNetCore.Authorization;
 using TobyMeehan.Com.Api.Requests;
 using TobyMeehan.Com.Api.Security;
-using TobyMeehan.Com.Api.Security.Application;
-using TobyMeehan.Com.Builders.Application;
 using TobyMeehan.Com.Services;
 using IAuthorizationService = Microsoft.AspNetCore.Authorization.IAuthorizationService;
 
-namespace TobyMeehan.Com.Api.Features.Application.Update;
+namespace TobyMeehan.Com.Api.Features.Applications.Delete;
 
-public class Endpoint : Endpoint<Request, ApplicationResponse>
+public class Endpoint : Endpoint<IdRequest>
 {
     private readonly IApplicationService _service;
     private readonly IAuthorizationService _authorizationService;
@@ -22,11 +20,11 @@ public class Endpoint : Endpoint<Request, ApplicationResponse>
     
     public override void Configure()
     {
-        Patch("/applications/{Id}");
-        Policies(ScopeNames.Applications.Update);
+        Delete("/applications/{Id}");
+        Policies(ScopeNames.Applications.Delete);
     }
 
-    public override async Task HandleAsync(Request req, CancellationToken ct)
+    public override async Task HandleAsync(IdRequest req, CancellationToken ct)
     {
         var result = await _service.GetByIdAsync(new Id<IApplication>(req.Id), cancellationToken: ct);
 
@@ -35,9 +33,9 @@ public class Endpoint : Endpoint<Request, ApplicationResponse>
             await SendNotFoundAsync(ct);
             return;
         }
-
-        var authorizationResult =
-            await _authorizationService.AuthorizeAsync(User, application, OperationRequirements.Update);
+        
+        var authorizationResult = 
+            await _authorizationService.AuthorizeAsync(User, application, OperationRequirements.Delete);
 
         if (!authorizationResult.Succeeded)
         {
@@ -45,18 +43,8 @@ public class Endpoint : Endpoint<Request, ApplicationResponse>
             return;
         }
         
-        await _service.UpdateAsync(new Id<IApplication>(req.Id), new UpdateApplicationBuilder
-            {
-                Name = req.Name,
-                Description = req.Description
-            }, ct);
+        await _service.DeleteAsync(new Id<IApplication>(req.Id), ct);
 
-        await SendAsync(new ApplicationResponse
-        {
-            Id = application.Id.Value,
-            AuthorId = application.AuthorId.Value,
-            Name = application.Name,
-            Description = application.Description
-        }, cancellation: ct);
+        await SendNoContentAsync(ct);
     }
 }

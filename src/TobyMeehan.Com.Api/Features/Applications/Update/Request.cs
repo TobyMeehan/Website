@@ -1,8 +1,6 @@
-using System.Text.Json.Serialization;
-using FastEndpoints;
 using TobyMeehan.Com.Api.Requests;
 
-namespace TobyMeehan.Com.Api.Features.Application.Update;
+namespace TobyMeehan.Com.Api.Features.Applications.Update;
 
 public class Request : AuthenticatedRequest
 {

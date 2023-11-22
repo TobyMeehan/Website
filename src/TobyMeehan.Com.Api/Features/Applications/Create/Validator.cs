@@ -1,6 +1,6 @@
 using FluentValidation;
 
-namespace TobyMeehan.Com.Api.Features.Application.Create;
+namespace TobyMeehan.Com.Api.Features.Applications.Create;
 
 public class Validator : AbstractValidator<Request>
 {

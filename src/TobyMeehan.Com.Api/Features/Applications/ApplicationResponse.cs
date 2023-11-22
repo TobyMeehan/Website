@@ -1,4 +1,4 @@
-namespace TobyMeehan.Com.Api.Features.Application;
+namespace TobyMeehan.Com.Api.Features.Applications;
 
 public class ApplicationResponse
 {

@@ -5,7 +5,7 @@ using TobyMeehan.Com.Api.Security;
 using TobyMeehan.Com.Services;
 using IAuthorizationService = Microsoft.AspNetCore.Authorization.IAuthorizationService;
 
-namespace TobyMeehan.Com.Api.Features.Application.GetByUser;
+namespace TobyMeehan.Com.Api.Features.Applications.GetByUser;
 
 public class Endpoint : Endpoint<AuthenticatedRequest, List<ApplicationResponse>>
 {
