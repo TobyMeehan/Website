@@ -12,6 +12,7 @@ public partial class CreateTables
 
             .WithColumn("Username")
             .AsString(Size.Name)
+            .Unique()
             .Indexed()
 
             .WithColumn("DisplayName")
