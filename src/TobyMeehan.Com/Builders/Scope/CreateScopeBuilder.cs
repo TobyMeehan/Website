@@ -4,6 +4,9 @@ namespace TobyMeehan.Com.Builders.Scope;
 
 public struct CreateScopeBuilder : ICreateScope
 {
+    public CreateScopeBuilder WithAlias(string value) => this with { Alias = value };
+    public Optional<string> Alias { get; set; }
+    
     public CreateScopeBuilder WithName(string value) => this with { Name = value };
     public string Name { get; set; }
 

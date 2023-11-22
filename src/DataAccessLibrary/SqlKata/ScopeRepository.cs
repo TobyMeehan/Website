@@ -26,7 +26,7 @@ public class ScopeRepository : Repository<ScopeDto>, IScopeRepository
             .LeftJoin(_scopeUserRoles.As(ScopeUserRoles), j => j.On($"{ScopeUserRoles}.ScopeId", $"{Table}.Id"))
             .LeftJoin(_userRoles.As(UserRoles), j => j.On($"{UserRoles}.Id", $"{ScopeUserRoles}.RoleId"))
 
-            .Select($"{Table}.{{Id, Name, DisplayName, Description}}",
+            .Select($"{Table}.{{Id, Alias, Name, DisplayName, Description}}",
                 $"{UserRoles}.Id AS UserRoles_Id", $"{UserRoles}.Name AS UserRoles_Name");
     }
 
@@ -34,6 +34,13 @@ public class ScopeRepository : Repository<ScopeDto>, IScopeRepository
     {
         return await Db.SingleAsync<ScopeDto>(Query()
                 .Where(Column("Name"), name), 
+            cancellationToken);
+    }
+
+    public async Task<ScopeDto?> SelectByAliasAsync(string alias, CancellationToken cancellationToken)
+    {
+        return await Db.SingleAsync<ScopeDto>(Query()
+                .Where(Column("Alias"), alias),
             cancellationToken);
     }
 }

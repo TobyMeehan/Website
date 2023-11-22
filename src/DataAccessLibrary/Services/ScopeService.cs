@@ -42,6 +42,7 @@ public class ScopeService : BaseService<IScope, ScopeDto>, IScopeService
         return new Scope
         {
             Id = new Id<IScope>(data.Id),
+            Alias = data.Alias,
             Name = data.Name,
             DisplayName = data.DisplayName,
             Description = data.Description,
@@ -81,6 +82,19 @@ public class ScopeService : BaseService<IScope, ScopeDto>, IScopeService
         return await GetAsync<Scope>(data);
     }
 
+    public async Task<OneOf<IScope, NotFound>> GetByAliasAsync(string alias, QueryOptions? options = null, CancellationToken cancellationToken = default)
+    {
+        var data = Cache.Get(x => x.Alias == alias || x.Name == alias)
+                   ?? await _db.SelectByAliasAsync(alias, cancellationToken);
+
+        if (data is null)
+        {
+            return new NotFound();
+        }
+
+        return await GetAsync<Scope>(data);
+    }
+
     public async Task<long> CountAsync(CancellationToken cancellationToken = default)
     {
         return await _db.CountAsync(cancellationToken);
@@ -93,6 +107,7 @@ public class ScopeService : BaseService<IScope, ScopeDto>, IScopeService
         var data = new ScopeDto
         {
             Id = id.Value,
+            Alias = create.Alias | create.Name,
             Name = create.Name,
             DisplayName = create.DisplayName,
             Description = create.Description

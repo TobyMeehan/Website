@@ -168,13 +168,13 @@ public class AuthorizeController : Controller
     {
         var result = new List<IScope>();
         
-        foreach (string name in names)
+        foreach (string alias in scopes)
         {
-            var scopeResult = await _scopes.GetByNameAsync(name, cancellationToken: ct);
+            var scopeResult = await _scopes.GetByAliasAsync(alias, cancellationToken: ct);
 
             var scope = scopeResult.Match(
                 scope => scope,
-                notFound => throw new InvalidOperationException($"Could not retrieve scope {name}."));
+                notFound => throw new InvalidOperationException($"Could not retrieve scope {alias}."));
 
             var validation = await _scopes.AuthorizeScopeAsync(scope, user, application, ct);
 

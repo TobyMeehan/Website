@@ -14,6 +14,9 @@ public interface IScopeService
 
     Task<OneOf<IScope, NotFound>> GetByNameAsync(string name, QueryOptions? options = null, CancellationToken cancellationToken = default);
 
+    Task<OneOf<IScope, NotFound>> GetByAliasAsync(string nameOrAlias, QueryOptions? options = null,
+        CancellationToken cancellationToken = default);
+
     Task<long> CountAsync(CancellationToken cancellationToken = default);
     
     Task<IScope> CreateAsync(ICreateScope create, CancellationToken cancellationToken = default);

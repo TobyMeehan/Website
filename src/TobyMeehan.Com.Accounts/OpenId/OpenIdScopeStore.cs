@@ -44,7 +44,7 @@ public class OpenIdScopeStore : BaseScopeStore
         return new OpenIdScope
         {
             Id = scope.Id,
-            Name = scope.Name,
+            Name = scope.Alias,
             DisplayName = scope.DisplayName,
             Description = scope.Description
         };
@@ -61,7 +61,7 @@ public class OpenIdScopeStore : BaseScopeStore
 
     public override async ValueTask<OpenIdScope?> FindByNameAsync(string name, CancellationToken cancellationToken)
     {
-        var result = await _service.GetByNameAsync(name, cancellationToken: cancellationToken);
+        var result = await _service.GetByAliasAsync(name, cancellationToken: cancellationToken);
 
         return result.Match<OpenIdScope?>(
             scope => Map(scope),

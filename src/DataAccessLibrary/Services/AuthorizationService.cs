@@ -39,7 +39,7 @@ public class AuthorizationService : BaseService<IAuthorization, AuthorizationDto
                 _ => {});
         }
 
-        return new Authorization
+        return new Entities.Authorization
         {
             Id = new Id<IAuthorization>(data.Id),
             ApplicationId = new Id<IApplication>(data.ApplicationId),

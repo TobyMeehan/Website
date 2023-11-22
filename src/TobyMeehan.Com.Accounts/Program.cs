@@ -39,7 +39,7 @@ builder.Services.AddOpenIddict()
 
     .AddServer(options =>
     {
-        options.RegisterScopes(ScopeNames.GetAll(includeGroup: true).ToArray());
+        options.RegisterScopes(ScopeNames.GetAll(includeGroup: true).Append("identify").ToArray());
         
         options.SetAuthorizationEndpointUris("oauth/authorize")
             .SetTokenEndpointUris("oauth/token")

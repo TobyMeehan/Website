@@ -102,7 +102,7 @@ public class OpenIdApplicationStore : BaseApplicationStore
 
         await foreach (var scope in _scopes.GetAllAsync(cancellationToken: cancellationToken))
         {
-            permissions.Add($"{OpenIddictConstants.Permissions.Prefixes.Scope}{scope.Name}");
+            permissions.Add($"{OpenIddictConstants.Permissions.Prefixes.Scope}{scope.Alias}");
         }
 
         return permissions.ToImmutableArray();

@@ -25,7 +25,7 @@ public static class ScopeNames
     public static class Account
     {
         public const string Group = "account";
-        public const string Identify = "identify";
+        public const string Identify = $"{Group}.identify";
         public const string Username = $"{Group}.username";
         public const string Password = $"{Group}.password";
         public const string Update = $"{Group}.update";
