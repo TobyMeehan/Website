@@ -27,6 +27,12 @@ var app = builder.Build();
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.UseFastEndpoints();
+app.UseFastEndpoints(options =>
+{
+    options.Errors.UseProblemDetails();
+
+    options.Serializer.Options.PropertyNamingPolicy = new JsonSnakeCaseNamingPolicy();
+    options.Serializer.Options.Converters.Add(new OptionalConverterFactory());
+});
 
 app.Run();
