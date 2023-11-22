@@ -1,4 +1,5 @@
 using System.Security.Cryptography.X509Certificates;
+using System.Text.Json.Serialization;
 using FastEndpoints;
 using JorgeSerrano.Json;
 using Microsoft.AspNetCore.Http.Json;
@@ -57,6 +58,7 @@ app.UseFastEndpoints(options =>
     options.Errors.UseProblemDetails();
 
     options.Serializer.Options.PropertyNamingPolicy = new JsonSnakeCaseNamingPolicy();
+    options.Serializer.Options.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault;
     options.Serializer.Options.Converters.Add(new OptionalConverterFactory());
 });
 

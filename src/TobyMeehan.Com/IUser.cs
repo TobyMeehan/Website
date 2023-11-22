@@ -8,12 +8,12 @@ public interface IUser : IEntity<IUser>
     /// <summary>
     /// The custom username of the user.
     /// </summary>
-    string Name { get; }
+    string DisplayName { get; }
     
     /// <summary>
     /// The unique handle of the user.
     /// </summary>
-    string Handle { get; }
+    string Username { get; }
     
     /// <summary>
     /// The balance of the user.

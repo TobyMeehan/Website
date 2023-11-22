@@ -8,7 +8,7 @@
 
     <p class="my-1.5 text-sm">
         Signed in as
-        <span class="text-flash">@Model.Owner?.Handle</span>
+        <span class="text-flash">@Model.Owner?.Username</span>
         <a class="link ml-0.5" asp-controller="Authentication" asp-action="Logout" asp-route-ReturnUrl="@Model.ReturnUrl">
             Change
         </a>

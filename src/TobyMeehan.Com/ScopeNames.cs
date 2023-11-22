@@ -11,7 +11,6 @@ public static class ScopeNames
         }
         
         yield return Account.Identify;
-        yield return Account.Username;
         yield return Account.Password;
         yield return Account.Update;
         yield return Account.Delete;

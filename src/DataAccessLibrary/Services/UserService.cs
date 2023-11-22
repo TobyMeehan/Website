@@ -44,8 +44,8 @@ public class UserService : BaseService<IUser, UserDto>, IUserService
         return Task.FromResult<IUser>(new User
         {
             Id = new Id<IUser>(dto.Id),
-            Handle = dto.Username,
-            Name = dto.DisplayName,
+            Username = dto.Username,
+            DisplayName = dto.DisplayName,
             Description = dto.Description,
             Balance = dto.Balance,
             Roles = EntityCollection<IUserRole>.Create(dto.Roles, MapRole)
@@ -164,7 +164,10 @@ public class UserService : BaseService<IUser, UserDto>, IUserService
             return new NotFound();
         }
 
-        data.Username = user.Username | data.Username;
+        if (user.Username.HasValue && await IsUsernameUniqueAsync(user.Username.Value, cancellationToken))
+        {
+            data.Username = user.Username.Value;
+        }
         
         if (user.Password.HasValue)
         {
