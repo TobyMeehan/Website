@@ -13,5 +13,11 @@ public static class ServiceCollectionExtensions
             options.AddPolicy(ScopeNames.Applications.Update, ApplicationAuthorizationPolicies.Update);
             options.AddPolicy(ScopeNames.Applications.Delete, ApplicationAuthorizationPolicies.Delete);
         })
-        .AddSingleton<IAuthorizationHandler, ScopeAuthorizationHandler>();
+        
+        .AddSingleton<IAuthorizationHandler, ScopeAuthorizationHandler>()
+        
+        .AddSingleton<IAuthorizationHandler, ApplicationAuthorAuthorizationHandler>()
+        .AddSingleton<IAuthorizationHandler, ApplicationReadAuthorizationHandler>()
+    
+    ;
 }
