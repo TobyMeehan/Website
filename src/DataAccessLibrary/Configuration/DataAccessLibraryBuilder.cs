@@ -1,3 +1,5 @@
+using Google.Apis.Auth.OAuth2;
+using Google.Cloud.Storage.V1;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Npgsql;
@@ -8,6 +10,8 @@ using TobyMeehan.Com.Data.DataAccess;
 using TobyMeehan.Com.Data.Repositories;
 using TobyMeehan.Com.Data.Security;
 using TobyMeehan.Com.Data.Security.BCrypt;
+using TobyMeehan.Com.Data.Storage;
+using TobyMeehan.Com.Data.Storage.Google;
 using TobyMeehan.Com.Services;
 
 namespace TobyMeehan.Com.Data.Configuration;
@@ -50,6 +54,7 @@ public class DataAccessLibraryBuilder
     {
         Services.AddTransient<IApplicationRepository, SqlKata.ApplicationRepository>();
         Services.AddTransient<IAuthorizationRepository, SqlKata.AuthorizationRepository>();
+        Services.AddTransient<IAvatarRepository, SqlKata.AvatarRepository>();
         Services.AddTransient<IScopeRepository, SqlKata.ScopeRepository>();
         Services.AddTransient<ITokenRepository, SqlKata.TokenRepository>();
         Services.AddTransient<IUserRepository, SqlKata.UserRepository>();
@@ -70,6 +75,40 @@ public class DataAccessLibraryBuilder
         Services.AddTransient<IUserRoleService, Services.UserRoleService>();
         
         return this;
+    }
+
+    public DataAccessLibraryBuilder AddCloudStorage<T>() where T : class, IStorageService
+    {
+        var config = Configuration?.GetSection("Storage") ??
+                     throw new ConfigurationException(Configuration, "Storage");
+        
+        Services.AddTransient<IStorageService, T>();
+        Services.Configure<StorageOptions>(config);
+
+        Services.AddTransient<IAvatarService, StorageEnabledAvatarService>();
+        
+        return this;
+    }
+    
+    public DataAccessLibraryBuilder AddGoogleCloudStorage()
+    {
+        var credential = Configuration?.GetSection("Storage:Google") switch
+        {
+            { } configuration when configuration["CredentialJson"] is { } section =>
+                GoogleCredential.FromJson(section),
+
+            { } configuration when configuration.GetSection("Credential") is { } section =>
+                GoogleCredential.FromJsonParameters(section.Get<JsonCredentialParameters>()),
+
+            _ => throw new ConfigurationException(Configuration, "Storage:Google")
+        };
+
+        Services.AddSingleton(credential);
+        
+        Services.AddTransient(services => 
+            StorageClient.Create(services.GetRequiredService<GoogleCredential>()));
+        
+        return AddCloudStorage<GoogleStorageService>();
     }
 
     public DataAccessLibraryBuilder AddScopeValidation()
