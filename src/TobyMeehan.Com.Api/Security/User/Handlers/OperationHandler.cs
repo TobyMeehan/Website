@@ -1,9 +1,9 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authorization.Infrastructure;
 
-namespace TobyMeehan.Com.Api.Security.User;
+namespace TobyMeehan.Com.Api.Security.User.Handlers;
 
-public class UserOperationAuthorizationHandler : AuthorizationHandler<OperationAuthorizationRequirement, IUser>
+public class OperationHandler : AuthorizationHandler<OperationAuthorizationRequirement, IUser>
 {
     protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, OperationAuthorizationRequirement requirement,
         IUser resource)
@@ -13,10 +13,8 @@ public class UserOperationAuthorizationHandler : AuthorizationHandler<OperationA
             context.Succeed(requirement);
             return Task.CompletedTask;
         }
-
-        if (requirement.Name == OperationRequirements.Update.Name ||
-            requirement.Name == OperationRequirements.Delete.Name &&
-            context.User.GetSubject() == resource.Id)
+        
+        if (context.User.GetSubject() == resource.Id)
         {
             context.Succeed(requirement);
         }

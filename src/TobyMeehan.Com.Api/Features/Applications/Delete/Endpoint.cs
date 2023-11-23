@@ -21,7 +21,7 @@ public class Endpoint : Endpoint<IdRequest>
     public override void Configure()
     {
         Delete("/applications/{Id}");
-        Policies(ScopeNames.Applications.Delete);
+        Policies(PolicyNames.Application.Scope.Delete);
     }
 
     public override async Task HandleAsync(IdRequest req, CancellationToken ct)
@@ -36,7 +36,7 @@ public class Endpoint : Endpoint<IdRequest>
     private async Task AuthorizeAsync(IApplication application, CancellationToken ct)
     {
         var authorizationResult =
-            await _authorizationService.AuthorizeAsync(User, application, OperationRequirements.Delete);
+            await _authorizationService.AuthorizeAsync(User, application, PolicyNames.Application.Operation.Delete);
 
         if (authorizationResult.Succeeded)
         {

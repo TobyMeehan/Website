@@ -39,6 +39,20 @@ public class Endpoint : Endpoint<AuthenticatedRequest, ApplicationResponse>
             notFound => SendNotFoundAsync(ct));
     }
 
+    private async Task AuthorizeAsync(IApplication application, CancellationToken ct)
+    {
+        var authorizationResult =
+            await _authorizationService.AuthorizeAsync(User, application, PolicyNames.Application.Operation.Read);
+
+        if (authorizationResult.Succeeded)
+        {
+            await GetAsync(application, ct);
+            return;
+        }
+
+        await SendForbiddenAsync(ct);
+    }
+
     private async Task GetAsync(IApplication application, CancellationToken ct)
     {
         await SendAsync(new ApplicationResponse

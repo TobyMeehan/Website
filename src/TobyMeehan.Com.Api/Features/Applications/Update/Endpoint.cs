@@ -21,7 +21,7 @@ public class Endpoint : Endpoint<Request, ApplicationResponse>
     public override void Configure()
     {
         Patch("/applications/{ApplicationId}");
-        Policies(ScopeNames.Applications.Update);
+        Policies(PolicyNames.Application.Scope.Read);
     }
 
     public override async Task HandleAsync(Request req, CancellationToken ct)
@@ -42,7 +42,7 @@ public class Endpoint : Endpoint<Request, ApplicationResponse>
     private async Task AuthorizeAsync(IApplication application, Request req, CancellationToken ct)
     {
         var authorizationResult =
-            await _authorizationService.AuthorizeAsync(User, application, OperationRequirements.Update);
+            await _authorizationService.AuthorizeAsync(User, application, PolicyNames.Application.Operation.Update);
 
         if (authorizationResult.Succeeded)
         {

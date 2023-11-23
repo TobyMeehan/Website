@@ -1,9 +1,9 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authorization.Infrastructure;
 
-namespace TobyMeehan.Com.Api.Security.Application;
+namespace TobyMeehan.Com.Api.Security.Application.Handlers;
 
-public class ApplicationAuthorAuthorizationHandler : AuthorizationHandler<OperationAuthorizationRequirement, IApplication>
+public class SameAuthorUpdateDeleteHandler : AuthorizationHandler<OperationAuthorizationRequirement, IApplication>
 {
     protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, OperationAuthorizationRequirement requirement,
         IApplication resource)

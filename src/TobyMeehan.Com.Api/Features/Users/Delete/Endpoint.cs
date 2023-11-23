@@ -21,7 +21,7 @@ public class Endpoint : Endpoint<AuthenticatedRequest>
     public override void Configure()
     {
         Delete("/users/{UserId}");
-        Policies(ScopeNames.Account.Delete);
+        Policies(PolicyNames.User.Scope.Delete);
     }
 
     public override async Task HandleAsync(AuthenticatedRequest req, CancellationToken ct)
@@ -42,7 +42,7 @@ public class Endpoint : Endpoint<AuthenticatedRequest>
     public async Task AuthorizeAsync(IUser user, CancellationToken ct)
     {
         var authorizationResult = 
-            await _authorizationService.AuthorizeAsync(User, user, OperationRequirements.Delete);
+            await _authorizationService.AuthorizeAsync(User, user, PolicyNames.User.Operation.Delete);
 
         if (authorizationResult.Succeeded)
         {

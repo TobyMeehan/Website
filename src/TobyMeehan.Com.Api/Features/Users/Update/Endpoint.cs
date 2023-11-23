@@ -21,7 +21,7 @@ public class Endpoint : Endpoint<Request, UserResponse>
     public override void Configure()
     {
         Patch("/users/{UserId}");
-        Policies(ScopeNames.Account.Update);
+        Policies(PolicyNames.User.Scope.Update);
     }
 
     public override async Task HandleAsync(Request req, CancellationToken ct)
@@ -41,7 +41,7 @@ public class Endpoint : Endpoint<Request, UserResponse>
         }
 
         var authorizationResult = 
-            await _authorizationService.AuthorizeAsync(User, user, OperationRequirements.Update);
+            await _authorizationService.AuthorizeAsync(User, user, PolicyNames.User.Operation.Update);
 
         if (!authorizationResult.Succeeded)
         {

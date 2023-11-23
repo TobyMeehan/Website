@@ -1,17 +1,21 @@
 using FastEndpoints;
 using OpenIddict.Abstractions;
 using TobyMeehan.Com.Api.Requests;
+using TobyMeehan.Com.Api.Security;
 using TobyMeehan.Com.Services;
+using IAuthorizationService = Microsoft.AspNetCore.Authorization.IAuthorizationService;
 
 namespace TobyMeehan.Com.Api.Features.Users.Get;
 
 public class Endpoint : Endpoint<AuthenticatedRequest, UserResponse>
 {
     private readonly IUserService _service;
+    private readonly IAuthorizationService _authorizationService;
 
-    public Endpoint(IUserService service)
+    public Endpoint(IUserService service, IAuthorizationService authorizationService)
     {
         _service = service;
+        _authorizationService = authorizationService;
     }
     
     public override void Configure()
@@ -31,10 +35,24 @@ public class Endpoint : Endpoint<AuthenticatedRequest, UserResponse>
         var result = await _service.GetByIdAsync(userId, cancellationToken: ct);
 
         await result.Match(
-            user => GetAsync(user, ct),
+            user => AuthorizeAsync(user, ct),
             notFound => SendNotFoundAsync(ct));
     }
 
+    private async Task AuthorizeAsync(IUser user, CancellationToken ct)
+    {
+        var authorizationResult =
+            await _authorizationService.AuthorizeAsync(User, user, PolicyNames.User.Operation.Read);
+
+        if (authorizationResult.Succeeded)
+        {
+            await GetAsync(user, ct);
+            return;
+        }
+
+        await SendForbiddenAsync(ct);
+    }
+    
     private async Task GetAsync(IUser user, CancellationToken ct)
     {
         var response = new UserResponse
@@ -45,7 +63,10 @@ public class Endpoint : Endpoint<AuthenticatedRequest, UserResponse>
             Description = user.Description
         };
 
-        if (User.HasScope(ScopeNames.Account.Identify))
+        var authorizationResult =
+            await _authorizationService.AuthorizeAsync(User, null, PolicyNames.User.Scope.Identify);
+
+        if (authorizationResult.Succeeded)
         {
             response.Balance = user.Balance;
         }

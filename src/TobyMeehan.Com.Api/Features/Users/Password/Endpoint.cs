@@ -21,7 +21,7 @@ public class Endpoint : Endpoint<Request>
     public override void Configure()
     {
         Put("/users/{UserId}/password");
-        Policies(ScopeNames.Account.Password);
+        Policies(PolicyNames.User.Scope.Password);
     }
 
     public override async Task HandleAsync(Request req, CancellationToken ct)
@@ -44,7 +44,7 @@ public class Endpoint : Endpoint<Request>
     private async Task AuthorizeAsync(IUser user, Request req, CancellationToken ct)
     {
         var authorizationResult = 
-            await _authorizationService.AuthorizeAsync(User, user, OperationRequirements.Update);
+            await _authorizationService.AuthorizeAsync(User, user, PolicyNames.User.Operation.Password);
 
         if (authorizationResult.Succeeded)
         {
