@@ -9,11 +9,14 @@ public partial class CreateTables
             .WithColumn("Id")
             .AsString(Size.Id)
             .PrimaryKey()
+            
+            .WithColumn("AvatarId")
+            .AsString(Size.Id)
+            .Nullable()
 
             .WithColumn("Username")
             .AsString(Size.Name)
             .Unique()
-            .Indexed()
 
             .WithColumn("DisplayName")
             .AsString(Size.Name)

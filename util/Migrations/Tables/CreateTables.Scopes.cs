@@ -13,7 +13,6 @@ public partial class CreateTables
             .WithColumn("Alias")
             .AsString(Size.Name)
             .Unique()
-            .Indexed()
 
             .WithColumn("Name")
             .AsString(Size.Name)

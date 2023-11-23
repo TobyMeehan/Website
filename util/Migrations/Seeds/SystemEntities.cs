@@ -44,11 +44,35 @@ public class SystemEntities : Migration
         Insert.IntoTable("scopes")
             .Row(new
             {
+                Id = "account",
+                Alias = "account",
+                Name = "account",
+                DisplayName = "Account",
+                Description = "View and manage your account details."
+            })
+            .Row(new
+            {
                 Id = "account.identify",
                 Alias = "identify",
                 Name = "account.identify",
                 DisplayName = "Account Data",
-                Description = "View your username, balance and roles."
+                Description = "View your account balance and roles."
+            })
+            .Row(new
+            {
+                Id = "account.update",
+                Alias = "account.update",
+                Name = "account.update",
+                DisplayName = "Modify Account Data",
+                Description = "Modify your account details and avatars."
+            })
+            .Row(new
+            {
+                Id = "account.delete",
+                Alias = "account.delete",
+                Name = "account.delete",
+                DisplayName = "Delete Account",
+                Description = "Delete your account."
             })
             .Row(new
             {

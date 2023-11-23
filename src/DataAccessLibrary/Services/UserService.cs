@@ -1,9 +1,13 @@
+using Microsoft.Extensions.Options;
 using OneOf;
 using TobyMeehan.Com.Data.Caching;
+using TobyMeehan.Com.Data.Configuration;
 using TobyMeehan.Com.Data.Entities;
 using TobyMeehan.Com.Data.Models;
 using TobyMeehan.Com.Data.Repositories;
 using TobyMeehan.Com.Data.Security;
+using TobyMeehan.Com.Data.Storage;
+using TobyMeehan.Com.Models;
 using TobyMeehan.Com.Models.User;
 using TobyMeehan.Com.Results;
 using TobyMeehan.Com.Services;
@@ -21,7 +25,7 @@ public class UserService : BaseService<IUser, UserDto>, IUserService
         IUserRepository db, 
         IUserRoleService userRoles,
         IIdService id, 
-        IPasswordService password, 
+        IPasswordService password,
         ICacheService<UserDto, Id<IUser>> cache) : base(cache)
     {
         _db = db;
@@ -174,9 +178,9 @@ public class UserService : BaseService<IUser, UserDto>, IUserService
             data.HashedPassword = await _password.HashAsync(user.Password.Value);
         }
 
+        data.AvatarId = user.Avatar.MapOr(x => x?.Value, data.AvatarId);
         data.DisplayName = user.DisplayName | data.DisplayName;
         data.Description = user.Description | data.Description;
-        // TODO: avatar
 
         await _db.UpdateAsync(id.Value, data, cancellationToken);
 

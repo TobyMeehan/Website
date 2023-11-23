@@ -2,7 +2,6 @@ using System.Security.Cryptography.X509Certificates;
 using System.Text.Json.Serialization;
 using FastEndpoints;
 using JorgeSerrano.Json;
-using Microsoft.AspNetCore.Http.Json;
 using Microsoft.IdentityModel.Logging;
 using OpenIddict.Validation.AspNetCore;
 using TobyMeehan.Com.Api;
@@ -29,7 +28,8 @@ builder.Services.AddDataAccessLibrary(builder.Configuration.GetSection("Data"))
     .AddBase64IdGeneration()
     .AddPostgresDatabase()
     .AddSqlKataRepositories()
-    .AddEntityServices();
+    .AddEntityServices()
+    .AddGoogleCloudStorage();
 
 builder.Services.AddOpenIddict()
     .AddValidation(options =>

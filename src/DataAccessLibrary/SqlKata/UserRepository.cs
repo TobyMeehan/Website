@@ -19,6 +19,9 @@ public class UserRepository : Repository<UserDto>, IUserRepository
 
     private const string UserRoles = "users_userroles";
     private readonly Query _userRoles = new Query(UserRoles);
+
+    private const string Avatars = "avatars";
+    private readonly Query _avatars = new Query(Avatars);
     
     protected override Query Query()
     {
@@ -28,8 +31,17 @@ public class UserRepository : Repository<UserDto>, IUserRepository
             .LeftJoin(_userRoles.As(UserRoles), j => j.On($"{UserRoles}.UserId", $"{Table}.Id"))
             .LeftJoin(_roles.As(Roles), j => j.On($"{Roles}.Id", $"{UserRoles}.RoleId"))
             
-            .Select($"{Table}.{{Id, Username, DisplayName, HashedPassword, Balance, Description}}",
-                $"{Roles}.Id AS Roles_Id", $"{Roles}.Name AS Roles_Name");
+            .LeftJoin(_avatars.As(Avatars), j => j.On($"{Avatars}.Id", $"{Table}.AvatarId"))
+            
+            .Select($"{Table}.{{Id, AvatarId, Username, DisplayName, HashedPassword, Balance, Description}}",
+                $"{Roles}.Id AS Roles_Id", 
+                $"{Roles}.Name AS Roles_Name",
+                
+                $"{Avatars}.Id AS Avatar_Id", 
+                $"{Avatars}.ObjectName AS Avatar_ObjectName", 
+                $"{Avatars}.Filename AS Avatar_Filename",
+                $"{Avatars}.ContentType AS Avatar_ContentType",
+                $"{Avatars}.Size AS Avatar_Size");
     }
 
     public IAsyncEnumerable<UserDto> SelectByRoleAsync(string roleId, LimitStrategy? limit, CancellationToken ct)

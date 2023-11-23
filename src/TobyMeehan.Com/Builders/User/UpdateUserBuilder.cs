@@ -43,10 +43,10 @@ public struct UpdateUserBuilder : IUpdateUser
     /// </summary>
     /// <param name="value"></param>
     /// <returns></returns>
-    public UpdateUserBuilder WithAvatar(IFileUpload value) => this with { Avatar = Optional<IFileUpload>.Of(value) };
+    public UpdateUserBuilder WithAvatar(Id<IAvatar>? value) => this with { Avatar = value };
     
     /// <summary>
     /// The new avatar of the user.
     /// </summary>
-    public Optional<IFileUpload> Avatar { get; set; }
+    public Optional<Id<IAvatar>?> Avatar { get; set; }
 }

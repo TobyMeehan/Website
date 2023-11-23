@@ -12,5 +12,5 @@ public class ApplicationDto
     public string? SecretHash { get; set; }
     
     [Ignore]
-    public List<RedirectDto> Redirects { get; set; } = new();
+    public IReadOnlyList<RedirectDto> Redirects { get; set; } = new List<RedirectDto>();
 }

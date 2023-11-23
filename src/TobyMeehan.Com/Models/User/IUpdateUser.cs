@@ -6,5 +6,5 @@ public interface IUpdateUser
     Optional<Password> Password { get; }
     Optional<string> DisplayName { get; }
     Optional<string?> Description { get; }
-    Optional<IFileUpload> Avatar { get; }
+    Optional<Id<IAvatar>?> Avatar { get; }
 }

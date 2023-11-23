@@ -9,6 +9,7 @@ public partial class CreateTables : Migration
     {
         UpUsers();
         UpUserRoles();
+        UpAvatars();
         
         UpApplications();
         UpRedirects();
@@ -29,6 +30,7 @@ public partial class CreateTables : Migration
         DownRedirects();
         DownApplications();
         
+        DownAvatars();
         DownUserRoles();
         DownUsers();
     }
