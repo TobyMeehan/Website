@@ -40,4 +40,21 @@ public class PolicyNames
             public const string Delete = "operation.user.delete";
         }
     }
+    
+    public class Transaction
+    {
+        public class Scope
+        {
+            public const string Create = "scope.transaction.create";
+            public const string Transfer = "scope.transaction.transfer";
+            public const string Read = "scope.transaction.read";
+        }
+        
+        public class Operation
+        {
+            public const string Create = "operations.transaction.create";
+            public const string Transfer = "operations.transaction.transfer";
+            public const string Read = "operations.transaction.read";
+        }
+    }
 }

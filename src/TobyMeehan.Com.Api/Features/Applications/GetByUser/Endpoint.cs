@@ -49,7 +49,7 @@ public class Endpoint : Endpoint<AuthenticatedRequest, List<ApplicationResponse>
             notFound => SendNotFoundAsync(ct));
     }
 
-    private async Task AuthorizeAsync(IReadOnlyCollection<IApplication> applications, IUser user, CancellationToken ct)
+    private async Task AuthorizeAsync(IEnumerable<IApplication> applications, IUser user, CancellationToken ct)
     {
         var authorizationResult = 
             await _authorizationService.AuthorizeAsync(User, applications, user, PolicyNames.Application.Operation.Read);

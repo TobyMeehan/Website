@@ -44,7 +44,7 @@ public class Endpoint : Endpoint<Request, ApplicationResponse>
     private async Task AuthorizeAsync(IUser user, Request req, CancellationToken ct)
     {
         var authorizationResult =
-            await _authorizationService.AuthorizeAsync(User, user, PolicyNames.Application.Operation.Create);
+            await _authorizationService.AuthorizeAsync(User, new Resource<IApplication>(user), PolicyNames.Application.Operation.Create);
 
         if (authorizationResult.Succeeded)
         {
