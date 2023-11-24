@@ -57,6 +57,7 @@ public class DataAccessLibraryBuilder
         Services.AddTransient<IAvatarRepository, SqlKata.AvatarRepository>();
         Services.AddTransient<IScopeRepository, SqlKata.ScopeRepository>();
         Services.AddTransient<ITokenRepository, SqlKata.TokenRepository>();
+        Services.AddTransient<ITransactionRepository, SqlKata.TransactionRepository>();
         Services.AddTransient<IUserRepository, SqlKata.UserRepository>();
         Services.AddTransient<IUserRoleRepository, SqlKata.UserRoleRepository>();
 
@@ -71,6 +72,7 @@ public class DataAccessLibraryBuilder
         Services.AddTransient<IAuthorizationService, Services.AuthorizationService>();
         Services.AddTransient<IScopeService, Services.ScopeService>();
         Services.AddTransient<ITokenService, Services.TokenService>();
+        Services.AddTransient<ITransactionService, Services.TransactionService>();
         Services.AddTransient<IUserService, Services.UserService>();
         Services.AddTransient<IUserRoleService, Services.UserRoleService>();
         

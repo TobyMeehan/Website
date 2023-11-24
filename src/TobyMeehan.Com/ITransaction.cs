@@ -6,9 +6,14 @@
 public interface ITransaction : IEntity<ITransaction>
 {
     /// <summary>
-    /// The user.
+    /// The user that received the transaction.
     /// </summary>
-    Id<IUser> UserId { get; }
+    Id<IUser> RecipientId { get; }
+    
+    /// <summary>
+    /// If the transaction is a transfer, the user that sent the transfer.
+    /// </summary>
+    Id<IUser>? SenderId { get; }
     
     /// <summary>
     /// The application sending the transaction.
@@ -18,15 +23,15 @@ public interface ITransaction : IEntity<ITransaction>
     /// <summary>
     /// A description of the transaction.
     /// </summary>
-    string Description { get; }
+    string? Description { get; }
     
     /// <summary>
-    /// The amount of the transaction.
+    /// The amount credited/debited by the transaction.
     /// </summary>
     double Amount { get; }
     
     /// <summary>
-    /// The datetime the transaction was sent.
+    /// When the transaction occurred.
     /// </summary>
-    DateTimeOffset SentAt { get; }
+    DateTime SentAt { get; }
 }

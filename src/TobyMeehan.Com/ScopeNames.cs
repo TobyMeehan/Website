@@ -8,6 +8,7 @@ public static class ScopeNames
         {
             yield return Account.Group;
             yield return Applications.Group;
+            yield return Transactions.Group;
         }
         
         yield return Account.Identify;
@@ -19,13 +20,16 @@ public static class ScopeNames
         yield return Applications.Read;
         yield return Applications.Update;
         yield return Applications.Delete;
+
+        yield return Transactions.Send;
+        yield return Transactions.Transfer;
+        yield return Transactions.Read;
     }
     
     public static class Account
     {
         public const string Group = "account";
         public const string Identify = $"{Group}.identify";
-        public const string Username = $"{Group}.username";
         public const string Password = $"{Group}.password";
         public const string Update = $"{Group}.update";
         public const string Delete = $"{Group}.delete";
@@ -38,5 +42,13 @@ public static class ScopeNames
         public const string Read = $"{Group}.read";
         public const string Update = $"{Group}.update";
         public const string Delete = $"{Group}.delete";
+    }
+    
+    public static class Transactions
+    {
+        public const string Group = "transactions";
+        public const string Send = $"{Group}.send";
+        public const string Transfer = $"{Group}.transfer";
+        public const string Read = $"{Group}.read";
     }
 }
