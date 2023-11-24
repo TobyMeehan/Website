@@ -1,8 +1,10 @@
+using FluentMigrator;
+
 namespace Migrations.Tables;
 
-public partial class CreateTables
+public class Avatars : Migration
 {
-    protected void UpAvatars()
+    public override void Up()
     {
         Create.Table("avatars")
 
@@ -28,7 +30,7 @@ public partial class CreateTables
             .AsInt64();
     }
 
-    protected void DownAvatars()
+    public override void Down()
     {
         Delete.Table("avatars");
     }

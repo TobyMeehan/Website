@@ -1,8 +1,10 @@
+using FluentMigrator;
+
 namespace Migrations.Tables;
 
-public partial class CreateTables
+public class Tokens : Migration
 {
-    protected void UpTokens()
+    public override void Up()
     {
         Create.Table("tokens")
 
@@ -48,7 +50,7 @@ public partial class CreateTables
             .Nullable();
     }
 
-    protected void DownTokens()
+    public override void Down()
     {
         Delete.Table("tokens");
     }

@@ -1,8 +1,10 @@
+using FluentMigrator;
+
 namespace Migrations.Tables;
 
-public partial class CreateTables
+public class Redirects : Migration
 {
-    protected void UpRedirects()
+    public override void Up()
     {
         Create.Table("redirects")
 
@@ -20,7 +22,7 @@ public partial class CreateTables
             .Indexed();
     }
 
-    protected void DownRedirects()
+    public override void Down()
     {
         Delete.Table("redirects");
     }

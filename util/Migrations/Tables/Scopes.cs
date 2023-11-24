@@ -1,8 +1,10 @@
+using FluentMigrator;
+
 namespace Migrations.Tables;
 
-public partial class CreateTables
+public class Scopes : Migration
 {
-    protected void UpScopes()
+    public override void Up()
     {
         Create.Table("scopes")
 
@@ -37,7 +39,7 @@ public partial class CreateTables
             .ForeignKey("userroles", "Id");
     }
 
-    protected void DownScopes()
+    public override void Down()
     {
         Delete.Table("scopes_userroles");
         Delete.Table("scopes");

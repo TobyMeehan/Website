@@ -1,8 +1,10 @@
+using FluentMigrator;
+
 namespace Migrations.Tables;
 
-public partial class CreateTables
+public class Authorizations : Migration
 {
-    protected void UpAuthorizations()
+    public override void Up()
     {
         Create.Table("authorizations")
 
@@ -35,7 +37,7 @@ public partial class CreateTables
             .AsString(Size.Long);
     }
 
-    protected void DownAuthorizations()
+    public override void Down()
     {
         Delete.Table("authorizations");
     }

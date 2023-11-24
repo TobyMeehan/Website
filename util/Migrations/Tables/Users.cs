@@ -1,8 +1,10 @@
+using FluentMigrator;
+
 namespace Migrations.Tables;
 
-public partial class CreateTables
+public class Users : Migration
 {
-    protected void UpUsers()
+    public override void Up()
     {
         Create.Table("users")
 
@@ -32,7 +34,7 @@ public partial class CreateTables
             .Nullable();
     }
 
-    protected void DownUsers()
+    public override void Down()
     {
         Delete.Table("users");
     }

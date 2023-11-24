@@ -1,8 +1,10 @@
+using FluentMigrator;
+
 namespace Migrations.Tables;
 
-public partial class CreateTables
+public class Applications : Migration
 {
-    protected void UpApplications()
+    public override void Up()
     {
         Create.Table("applications")
 
@@ -31,7 +33,7 @@ public partial class CreateTables
             .Nullable();
     }
 
-    protected void DownApplications()
+    public override void Down()
     {
         Delete.Table("applications");
     }
