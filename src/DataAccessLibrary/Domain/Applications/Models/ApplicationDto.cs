@@ -12,5 +12,8 @@ public class ApplicationDto
     public byte[]? Secret { get; set; }
     
     [Ignore]
+    public IconDto? Icon { get; set; }
+    
+    [Ignore]
     public IReadOnlyList<RedirectDto> Redirects { get; set; } = new List<RedirectDto>();
 }

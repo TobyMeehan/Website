@@ -20,7 +20,7 @@ public class Endpoint : Endpoint<IdRequest>
     
     public override void Configure()
     {
-        Delete("/applications/{Id}");
+        Delete("/applications/{ApplicationId}", "/users/{UserId}/applications/{ApplicationId}");
         Policies(PolicyNames.Application.Scope.Delete);
     }
 

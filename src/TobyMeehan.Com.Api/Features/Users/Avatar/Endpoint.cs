@@ -25,6 +25,7 @@ public class Endpoint : Endpoint<Request, AvatarResponse>
         Verbs(Http.PUT, Http.DELETE);
         Routes("/users/{UserId}/avatar");
         Policies(PolicyNames.User.Scope.Update);
+        AllowFileUploads();
     }
 
     public override async Task HandleAsync(Request req, CancellationToken ct)
@@ -61,6 +62,7 @@ public class Endpoint : Endpoint<Request, AvatarResponse>
         if (HttpMethod == Http.DELETE)
         {
             await _service.UpdateAsync(user.Id, new UpdateUserBuilder().WithAvatar(null), ct);
+            await SendNoContentAsync(ct);
             return;
         }
 

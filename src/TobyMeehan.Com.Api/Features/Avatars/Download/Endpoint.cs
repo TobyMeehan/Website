@@ -1,4 +1,5 @@
 using FastEndpoints;
+using Microsoft.Net.Http.Headers;
 using TobyMeehan.Com.Api.Security;
 using TobyMeehan.Com.Api.Services.Icons;
 using TobyMeehan.Com.Services;
@@ -24,7 +25,7 @@ public class Endpoint : Endpoint<Request>
 
     public override void Configure()
     {
-        Get("/users/{UserId}/avatars/{AvatarId}/avatar{Extension}", "/users/{UserId}/avatar{Extension}");
+        Get("/users/{UserId}/avatar/{AvatarId}", "/users/{UserId}/avatar");
         AllowAnonymous();
     }
 
@@ -80,27 +81,30 @@ public class Endpoint : Endpoint<Request>
         }
 
         var contentType = avatar?.ContentType ?? MediaType.Parse("image/png");
-        
-        if (req.Extension != contentType.Extension)
-        {
-            AddError(x => x.Extension, "Avatar filename is invalid.");
-            ThrowIfAnyErrors();
-        }
 
         HttpContext.MarkResponseStart();
+        
         HttpContext.Response.StatusCode = 200;
         HttpContext.Response.ContentType = contentType.ToString();
+        
+        HttpContext.Response.Headers.ContentDisposition = new ContentDispositionHeaderValue("inline")
+        {
+            FileName = $"avatar{contentType.Extension}",
+        }.ToString();
         
         switch (avatar)
         {
             case null:
+                
                 var options = new Dictionary<string, string>
                 {
                     ["seed"] = user.Username,
                     ["backgroundColor"] = "ffffff"
                 };
                 
-                await _iconService.DownloadAsync("identicon", contentType.Extension.TrimStart('.'), options, HttpContext.Response.Body, ct);
+                await _iconService.DownloadAsync("identicon", contentType.Extension.TrimStart('.'), options, 
+                    HttpContext.Response.Body, ct);
+                
                 break;
             
             default:

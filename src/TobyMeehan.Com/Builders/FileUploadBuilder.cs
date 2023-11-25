@@ -5,7 +5,7 @@ namespace TobyMeehan.Com.Builders;
 public struct FileUploadBuilder : IFileUpload
 {
     public FileUploadBuilder WithFilename(string value) => this with { Filename = value };
-    public string? Filename { get; set; }
+    public string Filename { get; set; }
 
     public FileUploadBuilder WithContentType(MediaType value) => this with { ContentType = value };
     public MediaType ContentType { get; set; }

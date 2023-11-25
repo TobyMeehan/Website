@@ -22,7 +22,7 @@ public class Endpoint : Endpoint<Request, ApplicationResponse>
     
     public override void Configure()
     {
-        Post("/users/{UserId}/applications");
+        Post("/applications", "/users/{UserId}/applications");
         Policies(PolicyNames.Application.Scope.Create);
     }
 

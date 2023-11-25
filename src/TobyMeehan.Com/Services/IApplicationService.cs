@@ -1,4 +1,5 @@
 ﻿using OneOf;
+using TobyMeehan.Com.Models;
 using TobyMeehan.Com.Models.Application;
 using TobyMeehan.Com.Results;
 
@@ -34,6 +35,9 @@ public interface IApplicationService
     /// <returns><see cref="IApplication"/> representing the application with the specified ID.</returns>
     Task<OneOf<IApplication, NotFound>> GetByIdAsync(Id<IApplication> id, QueryOptions? options = null, CancellationToken cancellationToken = default);
 
+    Task<OneOf<IApplication, NotFound>> GetByIdAndAuthorAsync(Id<IApplication> id, Id<IUser> user,
+        QueryOptions? options = null, CancellationToken cancellationToken = default);
+
     /// <summary>
     /// Attempts to find an application with the specified ID and secret.
     /// </summary>
@@ -51,6 +55,8 @@ public interface IApplicationService
     /// <param name="cancellationToken">Optional cancellation token.</param>
     /// <returns>Number of applications in the database.</returns>
     ValueTask<long> CountAsync(CancellationToken cancellationToken = default);
+
+    Task DownloadIconAsync(IApplication application, Stream destination, CancellationToken cancellationToken = default);
     
     // CREATE
 

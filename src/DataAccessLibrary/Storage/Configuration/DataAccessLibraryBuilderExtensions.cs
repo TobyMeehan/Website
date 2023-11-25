@@ -20,13 +20,15 @@ public static class DataAccessLibraryBuilderExtensions
     }
     
     internal static DataAccessLibraryBuilder AddGoogleCloudStorage(this DataAccessLibraryBuilder builder, 
-        GoogleStorageOptions googleOptions)
+        GoogleStorageOptions googleOptions, IConfigurationSection? credentialConfig = null)
     {
         var credential = googleOptions switch
         {
-            { Credential: { } credentialConfig } => GoogleCredential.FromJsonParameters(credentialConfig
-                .Get<JsonCredentialParameters>()),
             { CredentialJson: { } json } => GoogleCredential.FromJson(json),
+            
+            _ when credentialConfig?.Exists() is true => 
+                GoogleCredential.FromJsonParameters(credentialConfig.Get<JsonCredentialParameters>()),
+            
             _ => throw new ConfigurationException<GoogleStorageOptions>(googleOptions, "No Google credential provided.")
         };
 

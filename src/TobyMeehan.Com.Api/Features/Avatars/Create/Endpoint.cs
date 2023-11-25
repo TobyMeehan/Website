@@ -64,6 +64,7 @@ public class Endpoint : Endpoint<Request, AvatarResponse>
                 .WithUser(user.Id)
             
                 .WithFile(new FileUploadBuilder()
+                    .WithFilename(req.Avatar.FileName)
                     .WithContentType(MediaType.Parse(req.Avatar.ContentType))
                     .WithSize(req.Avatar.Length)
                     .WithStream(req.Avatar.OpenReadStream())), 

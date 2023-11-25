@@ -20,7 +20,7 @@ public class Endpoint : Endpoint<Request, ApplicationResponse>
     
     public override void Configure()
     {
-        Patch("/applications/{ApplicationId}");
+        Patch("/applications/{ApplicationId}", "/users/{UserId}/applications/{ApplicationId}");
         Policies(PolicyNames.Application.Scope.Read);
     }
 

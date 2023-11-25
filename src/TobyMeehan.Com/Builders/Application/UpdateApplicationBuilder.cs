@@ -49,10 +49,10 @@ public struct UpdateApplicationBuilder : IUpdateApplication
     /// </summary>
     /// <param name="value"></param>
     /// <returns></returns>
-    public UpdateApplicationBuilder WithIcon(IFileUpload value) => this with { Icon = Optional<IFileUpload>.Of(value) };
+    public UpdateApplicationBuilder WithIcon(IFileUpload? value) => this with { Icon = Optional<IFileUpload?>.Of(value) };
     
     /// <summary>
     /// The new icon of the application.
     /// </summary>
-    public Optional<IFileUpload> Icon { get; set; }
+    public Optional<IFileUpload?> Icon { get; set; }
 }

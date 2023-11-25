@@ -17,6 +17,9 @@ public class M300 : Avatars { }
 [Migration(400)]
 public class M400 : Applications { }
 
+[Migration(1000)]
+public class M1000 : ApplicationIcons { }
+
 [Migration(500)]
 public class M500 : Redirects { }
 

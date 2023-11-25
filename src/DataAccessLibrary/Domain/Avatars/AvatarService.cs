@@ -90,7 +90,7 @@ public class AvatarService : BaseService<IAvatar, AvatarDto>, IAvatarService
             Id = id.Value,
             UserId = avatar.User.Value,
             ObjectName = storageObject.ObjectName,
-            Filename = $"{id.Value}{avatar.File.ContentType.Extension}",
+            Filename = avatar.File.Filename,
             ContentType = avatar.File.ContentType.ToString(),
             Size = avatar.File.Size
         };

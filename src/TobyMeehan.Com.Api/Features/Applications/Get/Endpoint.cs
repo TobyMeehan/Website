@@ -20,7 +20,7 @@ public class Endpoint : Endpoint<AuthenticatedRequest, ApplicationResponse>
     
     public override void Configure()
     {
-        Get("/applications/{ApplicationId}");
+        Get("/applications/{ApplicationId}", "/users/{UserId}/applications/{ApplicationId}");
         AllowAnonymous();
     }
 

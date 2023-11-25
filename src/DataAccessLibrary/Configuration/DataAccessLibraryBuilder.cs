@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using SqlKata.Compilers;
 using TobyMeehan.Com.Data.Authorization;
 using TobyMeehan.Com.Data.Caching;
@@ -63,7 +64,7 @@ public class DataAccessLibraryBuilder
                         googleStorageConfig.Get<GoogleStorageOptions>() is { } googleStorageOptions)
                     {
                         Services.Configure<GoogleStorageOptions>(googleStorageConfig);
-                        this.AddGoogleCloudStorage(googleStorageOptions);
+                        this.AddGoogleCloudStorage(googleStorageOptions, googleStorageConfig.GetSection("Credential"));
                     }
                     
                     break;
@@ -106,6 +107,7 @@ public class DataAccessLibraryBuilder
         Services.AddTransient<IStorageService, T>();
 
         Services.AddTransient<IAvatarService, StorageEnabledAvatarService>();
+        Services.AddTransient<IApplicationService, StorageEnabledApplicationService>();
         
         return this;
     }
@@ -128,6 +130,8 @@ public class DataAccessLibraryBuilder
     public DataAccessLibraryBuilder AddSqlKataRepositories()
     {
         Services.AddTransient<IApplicationRepository, ApplicationRepository>();
+        Services.AddTransient<IIconRepository, IconRepository>();
+        
         Services.AddTransient<IAuthorizationRepository, AuthorizationRepository>();
         Services.AddTransient<IAvatarRepository, AvatarRepository>();
         Services.AddTransient<IScopeRepository, ScopeRepository>();
@@ -145,14 +149,14 @@ public class DataAccessLibraryBuilder
         
         Services.AddTransient<IScopeValidator, UserRoleScopeValidator>();
         
-        Services.AddTransient<IApplicationService, ApplicationService>();
-        Services.AddTransient<IAuthorizationService, AuthorizationService>();
-        Services.AddTransient<IAvatarService, AvatarService>();
-        Services.AddTransient<IScopeService, ScopeService>();
-        Services.AddTransient<ITokenService, TokenService>();
-        Services.AddTransient<ITransactionService, TransactionService>();
-        Services.AddTransient<IUserService, UserService>();
-        Services.AddTransient<IUserRoleService, UserRoleService>();
+        Services.TryAddTransient<IApplicationService, ApplicationService>();
+        Services.TryAddTransient<IAuthorizationService, AuthorizationService>();
+        Services.TryAddTransient<IAvatarService, AvatarService>();
+        Services.TryAddTransient<IScopeService, ScopeService>();
+        Services.TryAddTransient<ITokenService, TokenService>();
+        Services.TryAddTransient<ITransactionService, TransactionService>();
+        Services.TryAddTransient<IUserService, UserService>();
+        Services.TryAddTransient<IUserRoleService, UserRoleService>();
         
         Services.AddSingleton(typeof(ICacheService<,>), typeof(MemoryCacheService<,>));
         

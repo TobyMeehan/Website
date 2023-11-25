@@ -1,6 +1,5 @@
 using Microsoft.Extensions.Options;
 using TobyMeehan.Com.Data.Caching;
-using TobyMeehan.Com.Data.Configuration;
 using TobyMeehan.Com.Data.Domain.Avatars;
 using TobyMeehan.Com.Data.Domain.Avatars.Models;
 using TobyMeehan.Com.Data.Domain.Avatars.Repositories;
@@ -12,7 +11,7 @@ namespace TobyMeehan.Com.Data.Storage;
 public class StorageEnabledAvatarService : AvatarService
 {
     private readonly IStorageService _storage;
-    private readonly StorageOptions _storageOptions;
+    private readonly AvatarStorageOptions _storageOptions;
     
     public StorageEnabledAvatarService(
         IAvatarRepository db,
@@ -22,23 +21,23 @@ public class StorageEnabledAvatarService : AvatarService
         ICacheService<AvatarDto, Id<IAvatar>> cache) : base(db, id, cache)
     {
         _storage = storage;
-        _storageOptions = storageOptions.Value;
+        _storageOptions = storageOptions.Value.Avatars;
     }
 
     protected override async Task<StorageObject> UploadFileAsync(IFileUpload file, CancellationToken cancellationToken)
     {
-        return await _storage.UploadAsync(_storageOptions.Avatars.Bucket, file.ContentType,
+        return await _storage.UploadAsync(_storageOptions.Bucket, file.ContentType,
             file.Stream, cancellationToken);
     }
 
     protected override async Task DownloadFileAsync(Guid objectName, Stream destination, CancellationToken cancellationToken)
     {
-        await _storage.DownloadAsync(_storageOptions.Avatars.Bucket, objectName, destination,
+        await _storage.DownloadAsync(_storageOptions.Bucket, objectName, destination,
             cancellationToken: cancellationToken);
     }
 
     protected override async Task DeleteFileAsync(Guid objectName, CancellationToken cancellationToken)
     {
-        await _storage.DeleteAsync(_storageOptions.Avatars.Bucket, objectName, cancellationToken);
+        await _storage.DeleteAsync(_storageOptions.Bucket, objectName, cancellationToken);
     }
 }
