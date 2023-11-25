@@ -67,6 +67,8 @@ public class UserRoleService : BaseService<IUserRole, RoleDto>, IUserRoleService
     {
         int result = await _db.DeleteAsync(id.Value, cancellationToken);
 
+        Cache.Remove(id);
+        
         return result > 0 ? new Success() : new NotFound();
     }
 }
