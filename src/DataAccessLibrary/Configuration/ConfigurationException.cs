@@ -5,14 +5,12 @@ namespace TobyMeehan.Com.Data.Configuration;
 /// <summary>
 /// Exception thrown when application configuration is invalid or missing.
 /// </summary>
-public class ConfigurationException : Exception
+public class ConfigurationException<TOptions> : Exception
 {
-    public IConfiguration? Configuration { get; }
-    public string SectionName { get; }
+    public TOptions Options { get; }
 
-    public ConfigurationException(IConfiguration? configuration, string sectionName) : base ($"Expected section {sectionName}.")
+    public ConfigurationException(TOptions options, string message) : base(message)
     {
-        Configuration = configuration;
-        SectionName = sectionName;
+        Options = options;
     }
 }

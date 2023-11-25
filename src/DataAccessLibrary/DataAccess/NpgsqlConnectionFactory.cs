@@ -4,11 +4,11 @@ using Npgsql;
 
 namespace TobyMeehan.Com.Data.DataAccess;
 
-public class PostgresConnectionFactory : IDbConnectionFactory
+public class NpgsqlConnectionFactory : IDbConnectionFactory
 {
     private readonly NpgsqlDataSource _dataSource;
 
-    public PostgresConnectionFactory(NpgsqlDataSource dataSource)
+    public NpgsqlConnectionFactory(NpgsqlDataSource dataSource)
     {
         _dataSource = dataSource;
     }

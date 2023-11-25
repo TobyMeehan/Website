@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Options;
 using OneOf;
 using TobyMeehan.Com.Data.Caching;
 using TobyMeehan.Com.Data.Domain.Avatars.Models;
@@ -15,18 +16,21 @@ public class UserService : BaseService<IUser, UserDto>, IUserService
 {
     private readonly IUserRepository _db;
     private readonly IUserRoleService _userRoles;
+    private readonly UserOptions _options;
     private readonly IIdService _id;
     private readonly IPasswordService _password;
 
     public UserService(
         IUserRepository db, 
         IUserRoleService userRoles,
+        IOptions<UserOptions> options,
         IIdService id, 
         IPasswordService password,
         ICacheService<UserDto, Id<IUser>> cache) : base(cache)
     {
         _db = db;
         _userRoles = userRoles;
+        _options = options.Value;
         _id = id;
         _password = password;
     }
@@ -160,7 +164,7 @@ public class UserService : BaseService<IUser, UserDto>, IUserService
             Username = user.Username,
             HashedPassword = await _password.HashAsync(user.Password),
             DisplayName = user.Username,
-            Balance = 1000 // TODO: configuration option
+            Balance = _options.DefaultBalance
         };
 
         await _db.InsertAsync(data, cancellationToken);

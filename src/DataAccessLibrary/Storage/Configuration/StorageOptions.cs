@@ -1,4 +1,4 @@
-namespace TobyMeehan.Com.Data.Configuration;
+namespace TobyMeehan.Com.Data.Storage.Configuration;
 
 public class StorageOptions
 {

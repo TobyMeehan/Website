@@ -7,6 +7,7 @@ using SqlKata.Compilers;
 using TobyMeehan.Com.Data.Authorization;
 using TobyMeehan.Com.Data.Caching;
 using TobyMeehan.Com.Data.DataAccess;
+using TobyMeehan.Com.Data.DataAccess.Configuration;
 using TobyMeehan.Com.Data.Domain.Applications;
 using TobyMeehan.Com.Data.Domain.Applications.Repositories;
 using TobyMeehan.Com.Data.Domain.Authorizations;
@@ -26,6 +27,7 @@ using TobyMeehan.Com.Data.Domain.Users.Repositories;
 using TobyMeehan.Com.Data.Security;
 using TobyMeehan.Com.Data.Security.BCrypt;
 using TobyMeehan.Com.Data.Storage;
+using TobyMeehan.Com.Data.Storage.Configuration;
 using TobyMeehan.Com.Data.Storage.Google;
 using TobyMeehan.Com.Services;
 
@@ -41,26 +43,60 @@ public class DataAccessLibraryBuilder
     public DataAccessLibraryBuilder(IServiceCollection services, IConfiguration configuration)
     {
         Services = services;
-        Configuration = configuration;
+        
+        Configure(configuration);
     }
     
     public IServiceCollection Services { get; }
-    public IConfiguration? Configuration { get; }
 
-    public DataAccessLibraryBuilder AddPostgresDatabase(string connectionStringName = "Default")
+    private void Configure(IConfiguration configuration)
     {
-        var config = Configuration?.GetSection("Postgres") ??
-                     throw new ConfigurationException(Configuration, "Postgres");
+        if (configuration.GetSection("Postgres") is { } postgresConfig && 
+            postgresConfig.Get<PostgresOptions>() is { } postgresOptions)
+        {
+            Services.Configure<PostgresOptions>(postgresConfig);
+            this.AddPostgresDatabase(postgresOptions);
+        }
 
-        string connectionString = config.GetConnectionString(connectionStringName) ??
-                     throw new ConfigurationException(Configuration, $"ConnectionStrings:{connectionStringName}");
+        if (configuration.GetSection("Storage") is { } storageConfig &&
+            storageConfig.Get<StorageOptions>() is { } storageOptions)
+        {
+            Services.Configure<StorageOptions>(storageConfig);
 
-        Services.AddSingleton(NpgsqlDataSource.Create(connectionString));
-        
-        Services.AddSingleton<IDbConnectionFactory, PostgresConnectionFactory>();
-        Services.AddSingleton<Compiler, PostgresCompiler>();
-        
-        Services.AddTransient<ISqlDataAccess, SqlDataAccess>();
+            if (storageConfig.GetSection("Google") is { } googleStorageConfig &&
+                googleStorageConfig.Get<GoogleStorageOptions>() is { } googleStorageOptions)
+            {
+                Services.Configure<GoogleStorageOptions>(googleStorageConfig);
+                this.AddGoogleCloudStorage(storageOptions, googleStorageOptions);
+            }
+        }
+
+        if (configuration.GetSection("Domain:Users") is { } usersConfig &&
+            usersConfig.Get<UserOptions>() is { } userOptions)
+        {
+            Services.Configure<UserOptions>(usersConfig);
+        }
+    }
+
+    public DataAccessLibraryBuilder AddDatabase<TDbConnectionFactory, TCompiler, TSqlDataAccess>() 
+        where TDbConnectionFactory : class, IDbConnectionFactory 
+        where TCompiler : Compiler
+        where TSqlDataAccess : class, ISqlDataAccess
+    {
+        Services.AddSingleton<IDbConnectionFactory, TDbConnectionFactory>();
+        Services.AddSingleton<Compiler, TCompiler>();
+
+        Services.AddTransient<ISqlDataAccess, TSqlDataAccess>();
+
+        return this;
+    }
+    
+    public DataAccessLibraryBuilder AddCloudStorage<T>(StorageOptions options) 
+        where T : class, IStorageService
+    {
+        Services.AddTransient<IStorageService, T>();
+
+        Services.AddTransient<IAvatarService, StorageEnabledAvatarService>();
         
         return this;
     }
@@ -75,8 +111,6 @@ public class DataAccessLibraryBuilder
         Services.AddTransient<ITransactionRepository, TransactionRepository>();
         Services.AddTransient<IUserRepository, UserRepository>();
         Services.AddTransient<IUserRoleRepository, UserRoleRepository>();
-
-        Services.AddSingleton(typeof(ICacheService<,>), typeof(MemoryCacheService<,>));
         
         return this;
     }
@@ -92,41 +126,9 @@ public class DataAccessLibraryBuilder
         Services.AddTransient<IUserService, UserService>();
         Services.AddTransient<IUserRoleService, UserRoleService>();
         
-        return this;
-    }
-
-    public DataAccessLibraryBuilder AddCloudStorage<T>() where T : class, IStorageService
-    {
-        var config = Configuration?.GetSection("Storage") ??
-                     throw new ConfigurationException(Configuration, "Storage");
-        
-        Services.AddTransient<IStorageService, T>();
-        Services.Configure<StorageOptions>(config);
-
-        Services.AddTransient<IAvatarService, StorageEnabledAvatarService>();
+        Services.AddSingleton(typeof(ICacheService<,>), typeof(MemoryCacheService<,>));
         
         return this;
-    }
-    
-    public DataAccessLibraryBuilder AddGoogleCloudStorage()
-    {
-        var credential = Configuration?.GetSection("Storage:Google") switch
-        {
-            { } configuration when configuration["CredentialJson"] is { } section =>
-                GoogleCredential.FromJson(section),
-
-            { } configuration when configuration.GetSection("Credential") is { } section =>
-                GoogleCredential.FromJsonParameters(section.Get<JsonCredentialParameters>()),
-
-            _ => throw new ConfigurationException(Configuration, "Storage:Google")
-        };
-
-        Services.AddSingleton(credential);
-        
-        Services.AddTransient(services => 
-            StorageClient.Create(services.GetRequiredService<GoogleCredential>()));
-        
-        return AddCloudStorage<GoogleStorageService>();
     }
 
     public DataAccessLibraryBuilder AddScopeValidation()

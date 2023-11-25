@@ -4,6 +4,7 @@ using TobyMeehan.Com.Data.Configuration;
 using TobyMeehan.Com.Data.Domain.Avatars;
 using TobyMeehan.Com.Data.Domain.Avatars.Models;
 using TobyMeehan.Com.Data.Domain.Avatars.Repositories;
+using TobyMeehan.Com.Data.Storage.Configuration;
 using TobyMeehan.Com.Models;
 
 namespace TobyMeehan.Com.Data.Storage;
