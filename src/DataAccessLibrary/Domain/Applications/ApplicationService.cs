@@ -48,7 +48,7 @@ public class ApplicationService : BaseService<IApplication, ApplicationDto>, IAp
 
         var redirects = EntityCollection<IRedirect>.Create(dto.Redirects, MapRedirect);
 
-        return Task.FromResult<IApplication>(new Application
+        var application = new Application
         {
             Id = id,
             AuthorId = new Id<IUser>(dto.AuthorId),
@@ -57,7 +57,19 @@ public class ApplicationService : BaseService<IApplication, ApplicationDto>, IAp
             Description = dto.Description,
             HasSecret = dto.Secret is not null,
             Redirects = redirects
-        });
+        };
+
+        if (dto.Icon is not null)
+        {
+            application.Icon = new Icon
+            {
+                Filename = dto.Icon.Filename,
+                ContentType = MediaType.Parse(dto.Icon.ContentType),
+                Size = dto.Icon.Size
+            };
+        }
+        
+        return Task.FromResult<IApplication>(application);
     }
 
     public async Task<OneOf<IApplication, NotFound>> GetByIdAndAuthorAsync(Id<IApplication> id, Id<IUser> user, QueryOptions? options = null, CancellationToken cancellationToken = default)

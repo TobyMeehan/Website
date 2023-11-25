@@ -15,17 +15,27 @@ public class ApplicationRepository : Repository<ApplicationDto>, IApplicationRep
 
     private readonly Query _redirects = new Query(Redirects)
         .OrderBy("Uri");
+
+    private const string Icons = "applicationicons";
+
+    private readonly Query _icons = new Query(Icons);
     
     protected override Query Query()
     {
         return base.Query()
             .OrderBy("Name")
             .LeftJoin(_redirects.As(Redirects), j => j.On($"{Redirects}.ApplicationId", $"{Table}.Id"))
-
+            .LeftJoin(_icons.As(Icons), j => j.On($"{Icons}.ApplicationId", $"{Table}.Id"))
+            
             .Select($"{Table}.{{Id, AuthorId, DownloadId, Name, Description, Secret}}",
                 $"{Redirects}.Id AS Redirects_Id", 
                 $"{Redirects}.ApplicationId AS Redirects_ApplicationId",
-                $"{Redirects}.Uri AS Redirects_Uri");
+                $"{Redirects}.Uri AS Redirects_Uri",
+                
+                $"{Icons}.Filename AS Icon_Filename",
+                $"{Icons}.ObjectName AS Icon_ObjectName",
+                $"{Icons}.ContentType AS Icon_ContentType",
+                $"{Icons}.Size AS Icon_Size");
     }
 
     public IAsyncEnumerable<ApplicationDto> SelectByAuthorAsync(string userId, LimitStrategy? limit, CancellationToken ct)
