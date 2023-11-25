@@ -13,7 +13,7 @@ public class SameAuthorCreateHandler : AuthorizationHandler<OperationAuthorizati
             return Task.CompletedTask;
         }
 
-        if (context.User.GetSubject() == resource.User.Id)
+        if (context.User.GetSubject() == resource.User.Id.Value)
         {
             context.Succeed(requirement);
         }

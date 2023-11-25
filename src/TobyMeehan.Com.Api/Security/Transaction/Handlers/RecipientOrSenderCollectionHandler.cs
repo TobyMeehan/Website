@@ -9,7 +9,7 @@ public class RecipientOrSenderCollectionHandler : CollectionAuthorizationHandler
     protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, OperationAuthorizationRequirement requirement,
         IUser collector)
     {
-        if (context.User.GetSubject() == collector.Id)
+        if (context.User.GetSubject() == collector.Id.Value)
         {
             context.Succeed(requirement);
         }

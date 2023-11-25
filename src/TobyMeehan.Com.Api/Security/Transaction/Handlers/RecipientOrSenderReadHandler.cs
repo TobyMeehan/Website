@@ -8,8 +8,8 @@ public class RecipientOrSenderReadHandler : AuthorizationHandler<OperationAuthor
     protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, OperationAuthorizationRequirement requirement,
         ITransaction resource)
     {
-        if (context.User.GetSubject() == resource.RecipientId ||
-            context.User.GetSubject() == resource.SenderId)
+        if (context.User.GetSubject() == resource.RecipientId.Value ||
+            context.User.GetSubject() == resource.SenderId?.Value)
         {
             context.Succeed(requirement);
         }

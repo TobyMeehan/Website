@@ -10,7 +10,7 @@ public class SameAuthorCollectionHandler : CollectionAuthorizationHandler<Operat
         IUser collector)
     {
         if (requirement.Name == OperationRequirements.Read.Name && 
-            context.User.GetSubject() == collector.Id)
+            context.User.GetSubject() == collector.Id.Value)
         {
             context.Succeed(requirement);
         }

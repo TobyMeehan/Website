@@ -14,7 +14,7 @@ public class OperationHandler : AuthorizationHandler<OperationAuthorizationRequi
             return Task.CompletedTask;
         }
         
-        if (context.User.GetSubject() == resource.Id)
+        if (context.User.GetSubject() == resource.Id.Value)
         {
             context.Succeed(requirement);
         }

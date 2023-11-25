@@ -14,7 +14,7 @@ public class SameAuthorUpdateDeleteHandler : AuthorizationHandler<OperationAutho
             return Task.CompletedTask;
         }
         
-        if (context.User.GetSubject() == resource.AuthorId)
+        if (context.User.GetSubject() == resource.AuthorId.Value)
         {
             context.Succeed(requirement);
         }
