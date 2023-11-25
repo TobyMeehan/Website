@@ -28,8 +28,8 @@ public class Applications : Migration
             .AsString(Size.Medium)
             .Nullable()
             
-            .WithColumn("SecretHash")
-            .AsString(Size.Short)
+            .WithColumn("Secret")
+            .AsBinary(Size.Short)
             .Nullable();
     }
 

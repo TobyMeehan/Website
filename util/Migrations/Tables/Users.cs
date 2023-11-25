@@ -23,8 +23,8 @@ public class Users : Migration
             .WithColumn("DisplayName")
             .AsString(Size.Name)
 
-            .WithColumn("HashedPassword")
-            .AsString(Size.Short)
+            .WithColumn("Password")
+            .AsBinary(Size.Short)
 
             .WithColumn("Balance")
             .AsDouble()
@@ -36,6 +36,10 @@ public class Users : Migration
 
     public override void Down()
     {
+        Delete.FromTable("transactions")
+            .Row(new { UserId = "system" })
+            .Row(new {RecipientId = "system"});
+        
         Delete.Table("users");
     }
 }

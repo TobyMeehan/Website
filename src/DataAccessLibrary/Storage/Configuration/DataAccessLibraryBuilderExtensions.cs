@@ -11,20 +11,15 @@ namespace TobyMeehan.Com.Data.Storage.Configuration;
 public static class DataAccessLibraryBuilderExtensions
 {
     public static DataAccessLibraryBuilder AddGoogleCloudStorage(this DataAccessLibraryBuilder builder,
-        Action<StorageOptions> configureStorage,
         Action<GoogleStorageOptions> configureGoogle)
     {
-        var storageOptions = new StorageOptions();
-        configureStorage(storageOptions);
-        
         var googleOptions = new GoogleStorageOptions();
         configureGoogle(googleOptions);
 
-        return AddGoogleCloudStorage(builder, storageOptions, googleOptions);
+        return AddGoogleCloudStorage(builder, googleOptions);
     }
     
     internal static DataAccessLibraryBuilder AddGoogleCloudStorage(this DataAccessLibraryBuilder builder, 
-        StorageOptions storageOptions, 
         GoogleStorageOptions googleOptions)
     {
         var credential = googleOptions switch
@@ -40,6 +35,6 @@ public static class DataAccessLibraryBuilderExtensions
         builder. Services.AddTransient(services => 
             StorageClient.Create(services.GetRequiredService<GoogleCredential>()));
         
-        return builder.AddCloudStorage<GoogleStorageService>(storageOptions);
+        return builder.AddCloudStorage<GoogleStorageService>();
     }
 }

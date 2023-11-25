@@ -6,6 +6,7 @@ using TobyMeehan.Com.Data.Domain.UserRoles.Models;
 using TobyMeehan.Com.Data.Domain.Users.Models;
 using TobyMeehan.Com.Data.Domain.Users.Repositories;
 using TobyMeehan.Com.Data.Security;
+using TobyMeehan.Com.Data.Security.Passwords;
 using TobyMeehan.Com.Models.User;
 using TobyMeehan.Com.Results;
 using TobyMeehan.Com.Services;
@@ -21,10 +22,10 @@ public class UserService : BaseService<IUser, UserDto>, IUserService
     private readonly IPasswordService _password;
 
     public UserService(
-        IUserRepository db, 
+        IUserRepository db,
         IUserRoleService userRoles,
         IOptions<UserOptions> options,
-        IIdService id, 
+        IIdService id,
         IPasswordService password,
         ICacheService<UserDto, Id<IUser>> cache) : base(cache)
     {
@@ -43,7 +44,7 @@ public class UserService : BaseService<IUser, UserDto>, IUserService
             Name = role.Name
         };
     }
-    
+
     protected override Task<IUser> MapAsync(UserDto dto)
     {
         var user = new User
@@ -66,7 +67,7 @@ public class UserService : BaseService<IUser, UserDto>, IUserService
                 Size = avatar.Size
             };
         }
-        
+
         return Task.FromResult<IUser>(user);
     }
 
@@ -80,11 +81,12 @@ public class UserService : BaseService<IUser, UserDto>, IUserService
         {
             return new NotFound();
         }
-        
+
         return await GetAsync<User>(data);
     }
 
-    public async Task<OneOf<IUser, InvalidCredentials, NotFound>> GetByCredentialsAsync(string username, Password password,
+    public async Task<OneOf<IUser, InvalidCredentials, NotFound>> GetByCredentialsAsync(string username,
+        Password password,
         QueryOptions? options = null,
         CancellationToken cancellationToken = default)
     {
@@ -95,16 +97,23 @@ public class UserService : BaseService<IUser, UserDto>, IUserService
         {
             return new NotFound();
         }
-        
-        if (!await _password.CheckAsync(password, data.HashedPassword))
+
+        switch (await _password.CheckAsync(password, data.Password))
         {
-            return new InvalidCredentials();
+            case { Succeeded: true, Rehash: { HasValue: true, Value: { } rehash } }:
+                data.Password = rehash;
+                await _db.UpdateAsync(data.Id, data, cancellationToken);
+                break;
+
+            case { Succeeded: false }:
+                return new InvalidCredentials();
         }
 
         return await GetAsync<User>(data);
     }
 
-    public async Task<OneOf<IUser, InvalidCredentials, NotFound>> GetByCredentialsAsync(Id<IUser> id, Password password, QueryOptions? options = null,
+    public async Task<OneOf<IUser, InvalidCredentials, NotFound>> GetByCredentialsAsync(Id<IUser> id, Password password,
+        QueryOptions? options = null,
         CancellationToken cancellationToken = default)
     {
         var data = Cache.Get(id) ?? await _db.SelectByIdAsync(id.Value, cancellationToken);
@@ -114,9 +123,15 @@ public class UserService : BaseService<IUser, UserDto>, IUserService
             return new NotFound();
         }
 
-        if (!await _password.CheckAsync(password, data.HashedPassword))
+        switch (await _password.CheckAsync(password, data.Password))
         {
-            return new InvalidCredentials();
+            case { Succeeded: true, Rehash: { HasValue: true, Value: { } rehash } }:
+                data.Password = rehash;
+                await _db.UpdateAsync(data.Id, data, cancellationToken);
+                break;
+
+            case { Succeeded: false }:
+                return new InvalidCredentials();
         }
 
         return await GetAsync<User>(data);
@@ -135,14 +150,16 @@ public class UserService : BaseService<IUser, UserDto>, IUserService
         return await GetAsync<User>(data);
     }
 
-    public IAsyncEnumerable<IUser> GetAllAsync(QueryOptions? options = null, CancellationToken cancellationToken = default)
+    public IAsyncEnumerable<IUser> GetAllAsync(QueryOptions? options = null,
+        CancellationToken cancellationToken = default)
     {
         var data = _db.SelectAllAsync(options?.LimitStrategy, cancellationToken);
 
         return GetAsync(data);
     }
 
-    public IAsyncEnumerable<IUser> GetByRoleAsync(Id<IUserRole> role, QueryOptions? options = null, CancellationToken cancellationToken = default)
+    public IAsyncEnumerable<IUser> GetByRoleAsync(Id<IUserRole> role, QueryOptions? options = null,
+        CancellationToken cancellationToken = default)
     {
         var data = _db.SelectByRoleAsync(role.Value, options?.LimitStrategy, cancellationToken);
 
@@ -162,7 +179,7 @@ public class UserService : BaseService<IUser, UserDto>, IUserService
         {
             Id = id.Value,
             Username = user.Username,
-            HashedPassword = await _password.HashAsync(user.Password),
+            Password = await _password.HashAsync(user.Password),
             DisplayName = user.Username,
             Balance = _options.DefaultBalance
         };
@@ -186,10 +203,10 @@ public class UserService : BaseService<IUser, UserDto>, IUserService
         {
             data.Username = user.Username.Value;
         }
-        
+
         if (user.Password.HasValue)
         {
-            data.HashedPassword = await _password.HashAsync(user.Password.Value);
+            data.Password = await _password.HashAsync(user.Password.Value);
         }
 
         data.AvatarId = user.Avatar.MapOr(x => x?.Value, data.AvatarId);
@@ -215,7 +232,7 @@ public class UserService : BaseService<IUser, UserDto>, IUserService
         {
             return new InsufficientBalance();
         }
-        
+
         data.Balance += amount;
 
         await _db.UpdateAsync(id.Value, data, cancellationToken);
@@ -226,13 +243,14 @@ public class UserService : BaseService<IUser, UserDto>, IUserService
     public async Task<OneOf<Success, NotFound>> DeleteAsync(Id<IUser> id, CancellationToken cancellationToken = default)
     {
         int result = await _db.DeleteAsync(id.Value, cancellationToken);
-        
+
         Cache.Remove(id);
 
         return result == 1 ? new Success() : new NotFound();
     }
 
-    public async Task<OneOf<Success, NotFound>> AddRoleAsync(Id<IUser> id, Id<IUserRole> role, CancellationToken cancellationToken = default)
+    public async Task<OneOf<Success, NotFound>> AddRoleAsync(Id<IUser> id, Id<IUserRole> role,
+        CancellationToken cancellationToken = default)
     {
         var roleResult = await _userRoles.GetByIdAsync(role, cancellationToken);
 
@@ -249,13 +267,14 @@ public class UserService : BaseService<IUser, UserDto>, IUserService
         }
 
         await _db.AddRoleAsync(id.Value, role.Value, cancellationToken);
-        
+
         Cache.Remove(id);
 
         return new Success();
     }
 
-    public async Task<OneOf<Success, NotFound>> RemoveRoleAsync(Id<IUser> id, Id<IUserRole> role, CancellationToken cancellationToken = default)
+    public async Task<OneOf<Success, NotFound>> RemoveRoleAsync(Id<IUser> id, Id<IUserRole> role,
+        CancellationToken cancellationToken = default)
     {
         int result = await _db.RemoveRoleAsync(id.Value, role.Value, cancellationToken);
 

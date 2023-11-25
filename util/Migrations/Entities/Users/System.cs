@@ -9,7 +9,7 @@ public class System : EntityMigration<User>
         Id = "system",
         Username = "System",
         DisplayName = "System",
-        HashedPassword = "password",
+        Password = Convert.FromBase64String("password"),
         Balance = double.MaxValue,
         Description = "System User"
     }) { }

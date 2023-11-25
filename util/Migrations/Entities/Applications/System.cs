@@ -18,6 +18,7 @@ public class System : EntityMigration<Application>
     {
         Delete.FromTable("tokens").AllRows();
         Delete.FromTable("authorizations").AllRows();
+        Delete.FromTable("transactions").Row(new { ApplicationId = "system" });
         
         base.Down();
     }

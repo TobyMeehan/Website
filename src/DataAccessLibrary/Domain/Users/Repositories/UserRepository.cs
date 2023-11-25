@@ -32,7 +32,7 @@ public class UserRepository : Repository<UserDto>, IUserRepository
             
             .LeftJoin(_avatars.As(Avatars), j => j.On($"{Avatars}.Id", $"{Table}.AvatarId"))
             
-            .Select($"{Table}.{{Id, AvatarId, Username, DisplayName, HashedPassword, Balance, Description}}",
+            .Select($"{Table}.{{Id, AvatarId, Username, DisplayName, Password, Balance, Description}}",
                 $"{Roles}.Id AS Roles_Id", 
                 $"{Roles}.Name AS Roles_Name",
                 

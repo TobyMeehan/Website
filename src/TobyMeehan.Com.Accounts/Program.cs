@@ -10,6 +10,7 @@ using TobyMeehan.Com.Accounts.Models.Authentication.Register;
 using TobyMeehan.Com.Accounts.Models.OpenId;
 using TobyMeehan.Com.Accounts.OpenId;
 using TobyMeehan.Com.Data.Configuration;
+using TobyMeehan.Com.Data.Security.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -72,10 +73,7 @@ builder.Services.AddOpenIddict()
     });
 
 builder.Services.AddDataAccessLibrary(builder.Configuration.GetSection("Data"))
-    .AddBase64IdGeneration()
-    .AddBCryptPasswordHash()
-    .AddRngSecretService()
-    .AddPostgresDatabase()
+    .AddAspNetCoreDataProtection()
     .AddSqlKataRepositories()
     .AddEntityServices();
 

@@ -9,7 +9,7 @@ public class ApplicationDto
     public string? DownloadId { get; set; }
     public required string Name { get; set; }
     public string? Description { get; set; }
-    public string? SecretHash { get; set; }
+    public byte[]? Secret { get; set; }
     
     [Ignore]
     public IReadOnlyList<RedirectDto> Redirects { get; set; } = new List<RedirectDto>();

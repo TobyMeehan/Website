@@ -8,6 +8,7 @@ using TobyMeehan.Com.Api;
 using TobyMeehan.Com.Api.Security;
 using TobyMeehan.Com.Api.Services.Icons;
 using TobyMeehan.Com.Data.Configuration;
+using TobyMeehan.Com.Data.Security.Configuration;
 
 IdentityModelEventSource.ShowPII = true;
 
@@ -24,13 +25,9 @@ builder.Services.AddSecurityPolicies();
 builder.Services.AddMemoryCache();
 
 builder.Services.AddDataAccessLibrary(builder.Configuration.GetSection("Data"))
-    .AddRngSecretService()
-    .AddBCryptPasswordHash()
-    .AddBase64IdGeneration()
-    .AddPostgresDatabase()
+    .AddAspNetCoreDataProtection()
     .AddSqlKataRepositories()
-    .AddEntityServices()
-    .AddGoogleCloudStorage();
+    .AddEntityServices();
 
 builder.Services.AddHttpClient();
 builder.Services.AddScoped<IIconService, DefaultIconService>();

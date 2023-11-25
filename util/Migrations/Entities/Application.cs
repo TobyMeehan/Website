@@ -7,5 +7,5 @@ public class Application
     public string? DownloadId { get; set; }
     public required string Name { get; set; }
     public string? Description { get; set; }
-    public string? SecretHash { get; set; }
+    public byte[]? Secret { get; set; }
 }

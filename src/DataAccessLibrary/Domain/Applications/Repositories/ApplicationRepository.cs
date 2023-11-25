@@ -22,7 +22,7 @@ public class ApplicationRepository : Repository<ApplicationDto>, IApplicationRep
             .OrderBy("Name")
             .LeftJoin(_redirects.As(Redirects), j => j.On($"{Redirects}.ApplicationId", $"{Table}.Id"))
 
-            .Select($"{Table}.{{Id, AuthorId, DownloadId, Name, Description}}",
+            .Select($"{Table}.{{Id, AuthorId, DownloadId, Name, Description, Secret}}",
                 $"{Redirects}.Id AS Redirects_Id", 
                 $"{Redirects}.ApplicationId AS Redirects_ApplicationId",
                 $"{Redirects}.Uri AS Redirects_Uri");

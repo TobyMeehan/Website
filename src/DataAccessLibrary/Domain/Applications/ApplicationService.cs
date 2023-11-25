@@ -3,6 +3,7 @@ using TobyMeehan.Com.Data.Caching;
 using TobyMeehan.Com.Data.Domain.Applications.Models;
 using TobyMeehan.Com.Data.Domain.Applications.Repositories;
 using TobyMeehan.Com.Data.Security;
+using TobyMeehan.Com.Data.Security.Passwords;
 using TobyMeehan.Com.Models.Application;
 using TobyMeehan.Com.Results;
 using TobyMeehan.Com.Services;
@@ -49,7 +50,7 @@ public class ApplicationService : BaseService<IApplication, ApplicationDto>, IAp
             DownloadId = dto.DownloadId is null ? null : new Id<IDownload>(dto.DownloadId),
             Name = dto.Name,
             Description = dto.Description,
-            HasSecret = dto.SecretHash is not null,
+            HasSecret = dto.Secret is not null,
             Redirects = redirects
         });
     }
@@ -65,10 +66,17 @@ public class ApplicationService : BaseService<IApplication, ApplicationDto>, IAp
             return new NotFound();
         }
 
-        if (data.SecretHash is { } secretHash && !await _password.CheckAsync(secret, secretHash))
-        {
-            return new InvalidCredentials();
-        }
+        if (data.Secret is { } secretHash)
+            switch (await _password.CheckAsync(secret, secretHash))
+            {
+                case {Succeeded: true, Rehash: {HasValue: true, Value: {} rehash}}:
+                    data.Secret = rehash;
+                    await _db.UpdateAsync(data.Id, data, cancellationToken);
+                    break;
+                
+                case {Succeeded: false}:
+                    return new InvalidCredentials();
+            }
 
         return OneOf<IApplication, InvalidCredentials, NotFound>.FromT0(
             await GetAsync(data));

@@ -3,7 +3,7 @@ using System.Text;
 
 namespace TobyMeehan.Com.Data.Security;
 
-public class RandomNumberGeneratorSecretService : ISecretService
+public class RandomNumberGeneratorSecretService
 {
     private static readonly char[] _chars =
         "qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM1234567890".ToCharArray();
