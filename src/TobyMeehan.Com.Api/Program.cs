@@ -6,6 +6,7 @@ using Microsoft.IdentityModel.Logging;
 using OpenIddict.Validation.AspNetCore;
 using TobyMeehan.Com.Api;
 using TobyMeehan.Com.Api.Security;
+using TobyMeehan.Com.Api.Services.Icons;
 using TobyMeehan.Com.Data.Configuration;
 
 IdentityModelEventSource.ShowPII = true;
@@ -30,6 +31,9 @@ builder.Services.AddDataAccessLibrary(builder.Configuration.GetSection("Data"))
     .AddSqlKataRepositories()
     .AddEntityServices()
     .AddGoogleCloudStorage();
+
+builder.Services.AddHttpClient();
+builder.Services.AddScoped<IIconService, DefaultIconService>();
 
 builder.Services.AddOpenIddict()
     .AddValidation(options =>

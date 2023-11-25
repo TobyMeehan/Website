@@ -6,10 +6,12 @@ namespace TobyMeehan.Com.Services;
 
 public interface IAvatarService
 {
-    Task<OneOf<IAvatar, NotFound>> GetByIdAsync(Id<IAvatar> id, QueryOptions? options = null,
+    Task<OneOf<IAvatar, NotFound>> GetByIdAndUserAsync(Id<IAvatar> id, Id<IUser> user, QueryOptions? options = null,
         CancellationToken cancellationToken = default);
     IAsyncEnumerable<IAvatar> GetByUserAsync(Id<IUser> user, QueryOptions? options = null,
         CancellationToken cancellationToken = default);
+
+    Task DownloadAsync(IAvatar avatar, Stream destination, CancellationToken cancellationToken = default);
 
     Task<IAvatar> CreateAsync(ICreateAvatar avatar, CancellationToken cancellationToken = default);
     Task DeleteByUserAsync(Id<IUser> user, CancellationToken cancellationToken = default);

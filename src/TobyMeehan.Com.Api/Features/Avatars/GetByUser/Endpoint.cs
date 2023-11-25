@@ -62,7 +62,9 @@ public class Endpoint : Endpoint<AuthenticatedRequest, List<AvatarResponse>>
         
         await SendAsync(avatars.Select(avatar => new AvatarResponse
         {
-            Id = avatar.Id.Value
+            Id = avatar.Id.Value,
+            UserId = user.Id.Value,
+            ContentType = avatar.ContentType
         }).ToList(), cancellation: ct);
     }
 }

@@ -70,6 +70,7 @@ public class DataAccessLibraryBuilder
     {
         Services.AddTransient<IApplicationService, Services.ApplicationService>();
         Services.AddTransient<IAuthorizationService, Services.AuthorizationService>();
+        Services.AddTransient<IAvatarService, Services.AvatarService>();
         Services.AddTransient<IScopeService, Services.ScopeService>();
         Services.AddTransient<ITokenService, Services.TokenService>();
         Services.AddTransient<ITransactionService, Services.TransactionService>();

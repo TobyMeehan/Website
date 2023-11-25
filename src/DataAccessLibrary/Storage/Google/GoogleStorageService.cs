@@ -17,13 +17,25 @@ public class GoogleStorageService : IStorageService
     {
         var objectName = Guid.NewGuid();
         
-        var @object = await _client.UploadObjectAsync(bucket, objectName.ToString(), mediaType.ToString(), source, 
+        var storageObject = await _client.UploadObjectAsync(bucket, objectName.ToString(), mediaType.ToString(), source, 
             cancellationToken: cancellationToken);
         
         return new StorageObject
         {
             ObjectName = objectName,
-            Size = unchecked((long) (@object.Size ?? 0))
+            Size = unchecked((long) (storageObject.Size ?? 0))
+        };
+    }
+
+    public async Task<StorageObject> DownloadAsync(string bucket, Guid objectName, Stream destination, CancellationToken cancellationToken)
+    {
+        var storageObject = await _client.DownloadObjectAsync(bucket, objectName.ToString(), destination,
+            cancellationToken: cancellationToken);
+
+        return new StorageObject
+        {
+            ObjectName = objectName,
+            Size = unchecked((long) (storageObject.Size ?? 0))
         };
     }
 

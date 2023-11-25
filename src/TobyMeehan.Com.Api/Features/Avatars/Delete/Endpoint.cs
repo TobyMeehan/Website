@@ -1,11 +1,12 @@
 using FastEndpoints;
 using TobyMeehan.Com.Api.Security;
+using TobyMeehan.Com.Builders.User;
 using TobyMeehan.Com.Services;
 using IAuthorizationService = Microsoft.AspNetCore.Authorization.IAuthorizationService;
 
-namespace TobyMeehan.Com.Api.Features.Avatars.Get;
+namespace TobyMeehan.Com.Api.Features.Avatars.Delete;
 
-public class Endpoint : Endpoint<Request, AvatarResponse>
+public class Endpoint : Endpoint<Request>
 {
     private readonly IAvatarService _service;
     private readonly IUserService _users;
@@ -17,11 +18,11 @@ public class Endpoint : Endpoint<Request, AvatarResponse>
         _users = users;
         _authorizationService = authorizationService;
     }
-    
+
     public override void Configure()
     {
-        Get("/users/{UserId}/avatars/{AvatarId}");
-        Policies(PolicyNames.User.Scope.Identify);
+        Delete("/users/{UserId}/avatars/{AvatarId}");
+        Policies(PolicyNames.User.Scope.Update);
     }
 
     public override async Task HandleAsync(Request req, CancellationToken ct)
@@ -42,28 +43,33 @@ public class Endpoint : Endpoint<Request, AvatarResponse>
     private async Task AuthorizeAsync(IUser user, Request req, CancellationToken ct)
     {
         var authorizationResult =
-            await _authorizationService.AuthorizeAsync(User, user, PolicyNames.User.Operation.Identify);
+            await _authorizationService.AuthorizeAsync(User, user, PolicyNames.User.Operation.Update);
 
         if (authorizationResult.Succeeded)
         {
-            await GetAsync(user, req, ct);
+            await DeleteAsync(user, req, ct);
             return;
         }
 
         await SendForbiddenAsync(ct);
     }
 
-    private async Task GetAsync(IUser user, Request req, CancellationToken ct)
+    private async Task DeleteAsync(IUser user, Request req, CancellationToken ct)
     {
-        var result = await _service.GetByIdAndUserAsync(new Id<IAvatar>(req.AvatarId), user.Id, cancellationToken: ct);
+        var result = 
+            await _service.GetByIdAndUserAsync(new Id<IAvatar>(req.AvatarId), user.Id, cancellationToken: ct);
 
         await result.Match(
-            avatar => SendAsync(new AvatarResponse
+            async avatar =>
             {
-                Id = avatar.Id.Value,
-                UserId = user.Id.Value,
-                ContentType = avatar.ContentType
-            }, cancellation: ct),
+                if (avatar.Id == user.Avatar?.Id)
+                {
+                    await _users.UpdateAsync(user.Id, new UpdateUserBuilder().WithAvatar(null), ct);
+                }
+
+                await _service.DeleteAsync(avatar.Id, ct);
+                await SendNoContentAsync(ct);
+            },
             notFound => SendNotFoundAsync(ct));
     }
 }

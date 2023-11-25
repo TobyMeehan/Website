@@ -28,7 +28,7 @@ public interface IUser : IEntity<IUser>
     /// <summary>
     /// The user's avatar.
     /// </summary>
-    IFile? Avatar { get; }
+    IAvatar? Avatar { get; }
     
     /// <summary>
     /// The user's roles.

@@ -45,7 +45,7 @@ public class UserService : BaseService<IUser, UserDto>, IUserService
     
     protected override Task<IUser> MapAsync(UserDto dto)
     {
-        return Task.FromResult<IUser>(new User
+        var user = new User
         {
             Id = new Id<IUser>(dto.Id),
             Username = dto.Username,
@@ -53,7 +53,20 @@ public class UserService : BaseService<IUser, UserDto>, IUserService
             Description = dto.Description,
             Balance = dto.Balance,
             Roles = EntityCollection<IUserRole>.Create(dto.Roles, MapRole)
-        });
+        };
+
+        if (dto.Avatar is { } avatar)
+        {
+            user.Avatar = new Avatar
+            {
+                Id = new Id<IAvatar>(avatar.Id),
+                Filename = avatar.Filename,
+                ContentType = MediaType.Parse(avatar.ContentType),
+                Size = avatar.Size
+            };
+        }
+        
+        return Task.FromResult<IUser>(user);
     }
 
     public async Task<OneOf<IUser, NotFound>> GetByUsernameAsync(string username, QueryOptions? options = null,

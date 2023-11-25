@@ -2,6 +2,7 @@ using FastEndpoints;
 using TobyMeehan.Com.Api.Security;
 using TobyMeehan.Com.Builders;
 using TobyMeehan.Com.Builders.Avatar;
+using TobyMeehan.Com.Builders.User;
 using TobyMeehan.Com.Services;
 using IAuthorizationService = Microsoft.AspNetCore.Authorization.IAuthorizationService;
 
@@ -69,10 +70,18 @@ public class Endpoint : Endpoint<Request, AvatarResponse>
             
             cancellationToken: ct);
 
+        if (user.Avatar is null)
+        {
+            await _users.UpdateAsync(user.Id, new UpdateUserBuilder()
+                .WithAvatar(avatar.Id), ct);
+        }
+        
         await SendCreatedAtAsync<Get.Endpoint>(new { UserId = user.Id, Id = avatar.Id.Value }, responseBody:
             new AvatarResponse
             {
-                Id = avatar.Id.Value
+                Id = avatar.Id.Value,
+                UserId = user.Id.Value,
+                ContentType = avatar.ContentType
             }, cancellation: ct);
     }
 }
