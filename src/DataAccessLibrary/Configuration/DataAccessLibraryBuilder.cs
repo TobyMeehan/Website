@@ -7,7 +7,22 @@ using SqlKata.Compilers;
 using TobyMeehan.Com.Data.Authorization;
 using TobyMeehan.Com.Data.Caching;
 using TobyMeehan.Com.Data.DataAccess;
-using TobyMeehan.Com.Data.Repositories;
+using TobyMeehan.Com.Data.Domain.Applications;
+using TobyMeehan.Com.Data.Domain.Applications.Repositories;
+using TobyMeehan.Com.Data.Domain.Authorizations;
+using TobyMeehan.Com.Data.Domain.Authorizations.Repositories;
+using TobyMeehan.Com.Data.Domain.Avatars;
+using TobyMeehan.Com.Data.Domain.Avatars.Repositories;
+using TobyMeehan.Com.Data.Domain.Scopes;
+using TobyMeehan.Com.Data.Domain.Scopes.Repositories;
+using TobyMeehan.Com.Data.Domain.Tokens;
+using TobyMeehan.Com.Data.Domain.Tokens.Repositories;
+using TobyMeehan.Com.Data.Domain.Transactions;
+using TobyMeehan.Com.Data.Domain.Transactions.Repositories;
+using TobyMeehan.Com.Data.Domain.UserRoles;
+using TobyMeehan.Com.Data.Domain.UserRoles.Repositories;
+using TobyMeehan.Com.Data.Domain.Users;
+using TobyMeehan.Com.Data.Domain.Users.Repositories;
 using TobyMeehan.Com.Data.Security;
 using TobyMeehan.Com.Data.Security.BCrypt;
 using TobyMeehan.Com.Data.Storage;
@@ -52,14 +67,14 @@ public class DataAccessLibraryBuilder
     
     public DataAccessLibraryBuilder AddSqlKataRepositories()
     {
-        Services.AddTransient<IApplicationRepository, SqlKata.ApplicationRepository>();
-        Services.AddTransient<IAuthorizationRepository, SqlKata.AuthorizationRepository>();
-        Services.AddTransient<IAvatarRepository, SqlKata.AvatarRepository>();
-        Services.AddTransient<IScopeRepository, SqlKata.ScopeRepository>();
-        Services.AddTransient<ITokenRepository, SqlKata.TokenRepository>();
-        Services.AddTransient<ITransactionRepository, SqlKata.TransactionRepository>();
-        Services.AddTransient<IUserRepository, SqlKata.UserRepository>();
-        Services.AddTransient<IUserRoleRepository, SqlKata.UserRoleRepository>();
+        Services.AddTransient<IApplicationRepository, ApplicationRepository>();
+        Services.AddTransient<IAuthorizationRepository, AuthorizationRepository>();
+        Services.AddTransient<IAvatarRepository, AvatarRepository>();
+        Services.AddTransient<IScopeRepository, ScopeRepository>();
+        Services.AddTransient<ITokenRepository, TokenRepository>();
+        Services.AddTransient<ITransactionRepository, TransactionRepository>();
+        Services.AddTransient<IUserRepository, UserRepository>();
+        Services.AddTransient<IUserRoleRepository, UserRoleRepository>();
 
         Services.AddSingleton(typeof(ICacheService<,>), typeof(MemoryCacheService<,>));
         
@@ -68,14 +83,14 @@ public class DataAccessLibraryBuilder
 
     public DataAccessLibraryBuilder AddEntityServices()
     {
-        Services.AddTransient<IApplicationService, Services.ApplicationService>();
-        Services.AddTransient<IAuthorizationService, Services.AuthorizationService>();
-        Services.AddTransient<IAvatarService, Services.AvatarService>();
-        Services.AddTransient<IScopeService, Services.ScopeService>();
-        Services.AddTransient<ITokenService, Services.TokenService>();
-        Services.AddTransient<ITransactionService, Services.TransactionService>();
-        Services.AddTransient<IUserService, Services.UserService>();
-        Services.AddTransient<IUserRoleService, Services.UserRoleService>();
+        Services.AddTransient<IApplicationService, ApplicationService>();
+        Services.AddTransient<IAuthorizationService, AuthorizationService>();
+        Services.AddTransient<IAvatarService, AvatarService>();
+        Services.AddTransient<IScopeService, ScopeService>();
+        Services.AddTransient<ITokenService, TokenService>();
+        Services.AddTransient<ITransactionService, TransactionService>();
+        Services.AddTransient<IUserService, UserService>();
+        Services.AddTransient<IUserRoleService, UserRoleService>();
         
         return this;
     }

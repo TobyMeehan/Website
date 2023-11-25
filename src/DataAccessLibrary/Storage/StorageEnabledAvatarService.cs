@@ -1,9 +1,9 @@
 using Microsoft.Extensions.Options;
 using TobyMeehan.Com.Data.Caching;
 using TobyMeehan.Com.Data.Configuration;
-using TobyMeehan.Com.Data.Models;
-using TobyMeehan.Com.Data.Repositories;
-using TobyMeehan.Com.Data.Services;
+using TobyMeehan.Com.Data.Domain.Avatars;
+using TobyMeehan.Com.Data.Domain.Avatars.Models;
+using TobyMeehan.Com.Data.Domain.Avatars.Repositories;
 using TobyMeehan.Com.Models;
 
 namespace TobyMeehan.Com.Data.Storage;
