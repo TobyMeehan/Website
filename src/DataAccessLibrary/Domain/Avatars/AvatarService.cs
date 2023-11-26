@@ -10,7 +10,7 @@ using TobyMeehan.Com.Services;
 
 namespace TobyMeehan.Com.Data.Domain.Avatars;
 
-public class AvatarService : BaseService<IAvatar, AvatarDto>, IAvatarService
+public class AvatarService : BaseService<Avatar, IAvatar, AvatarDto>, IAvatarService
 {
     private readonly IAvatarRepository _db;
     private readonly IIdService _id;
@@ -25,7 +25,7 @@ public class AvatarService : BaseService<IAvatar, AvatarDto>, IAvatarService
         _id = id;
     }
 
-    protected override async Task<IAvatar> MapAsync(AvatarDto data)
+    protected override async Task<Avatar> MapAsync(AvatarDto data)
     {
         return new Avatar
         {
@@ -51,7 +51,7 @@ public class AvatarService : BaseService<IAvatar, AvatarDto>, IAvatarService
             return new NotFound();
         }
 
-        return await GetAsync<Avatar>(data);
+        return await GetAsync(data);
     }
 
     public IAsyncEnumerable<IAvatar> GetByUserAsync(Id<IUser> user, QueryOptions? options = null, CancellationToken cancellationToken = default)
@@ -97,7 +97,7 @@ public class AvatarService : BaseService<IAvatar, AvatarDto>, IAvatarService
 
         await _db.InsertAsync(data, cancellationToken);
 
-        return await GetAsync<Avatar>(data);
+        return await GetAsync(data);
     }
     
     protected virtual Task<StorageObject> UploadFileAsync(IFileUpload avatar, CancellationToken cancellationToken)

@@ -10,7 +10,7 @@ using TobyMeehan.Com.Services;
 
 namespace TobyMeehan.Com.Data.Domain.Scopes;
 
-public class ScopeService : BaseService<IScope, ScopeDto>, IScopeService
+public class ScopeService : BaseService<Scope, IScope, ScopeDto>, IScopeService
 {
     private readonly IScopeRepository _db;
     private readonly IIdService _id;
@@ -36,7 +36,7 @@ public class ScopeService : BaseService<IScope, ScopeDto>, IScopeService
         };
     }
     
-    protected override async Task<IScope> MapAsync(ScopeDto data)
+    protected override async Task<Scope> MapAsync(ScopeDto data)
     {
         return new Scope
         {
@@ -66,7 +66,7 @@ public class ScopeService : BaseService<IScope, ScopeDto>, IScopeService
             return new NotFound();
         }
 
-        return await GetAsync<Scope>(data);
+        return await GetAsync(data);
     }
 
     public async Task<OneOf<IScope, NotFound>> GetByNameAsync(string name, QueryOptions? options = null, CancellationToken cancellationToken = default)
@@ -78,7 +78,7 @@ public class ScopeService : BaseService<IScope, ScopeDto>, IScopeService
             return new NotFound();
         }
 
-        return await GetAsync<Scope>(data);
+        return await GetAsync(data);
     }
 
     public async Task<OneOf<IScope, NotFound>> GetByAliasAsync(string alias, QueryOptions? options = null, CancellationToken cancellationToken = default)
@@ -91,7 +91,7 @@ public class ScopeService : BaseService<IScope, ScopeDto>, IScopeService
             return new NotFound();
         }
 
-        return await GetAsync<Scope>(data);
+        return await GetAsync(data);
     }
 
     public async Task<long> CountAsync(CancellationToken cancellationToken = default)
@@ -114,7 +114,7 @@ public class ScopeService : BaseService<IScope, ScopeDto>, IScopeService
 
         await _db.InsertAsync(data, cancellationToken);
 
-        return await GetAsync<Scope>(data);
+        return await GetAsync(data);
     }
 
     public async Task<OneOf<IScope, NotFound>> UpdateAsync(Id<IScope> id, IUpdateScope update, CancellationToken cancellationToken = default)
@@ -131,7 +131,7 @@ public class ScopeService : BaseService<IScope, ScopeDto>, IScopeService
 
         await _db.UpdateAsync(id.Value, data, cancellationToken);
 
-        return await GetAsync<Scope>(data);
+        return await GetAsync(data);
     }
 
     public async Task<OneOf<Success, NotFound>> DeleteAsync(Id<IScope> id, CancellationToken cancellationToken = default)

@@ -11,7 +11,7 @@ using Transaction = TobyMeehan.Com.Data.Domain.Transactions.Models.Transaction;
 
 namespace TobyMeehan.Com.Data.Domain.Transactions;
 
-public class TransactionService : BaseService<ITransaction, TransactionDto>, ITransactionService
+public class TransactionService : BaseService<Transaction, ITransaction, TransactionDto>, ITransactionService
 {
     private readonly ITransactionRepository _db;
     private readonly IUserRepository _userRepo;
@@ -28,7 +28,7 @@ public class TransactionService : BaseService<ITransaction, TransactionDto>, ITr
         _id = id;
     }
 
-    protected override async Task<ITransaction> MapAsync(TransactionDto data)
+    protected override async Task<Transaction> MapAsync(TransactionDto data)
     {
         return new Transaction
         {
@@ -58,7 +58,7 @@ public class TransactionService : BaseService<ITransaction, TransactionDto>, ITr
             return new NotFound();
         }
 
-        return await GetAsync<Transaction>(data);
+        return await GetAsync(data);
     }
 
     public async Task<OneOf<ITransaction, InsufficientBalance, NotFound>> CreateAsync(ICreateTransaction transaction, CancellationToken cancellationToken = default)
@@ -97,7 +97,7 @@ public class TransactionService : BaseService<ITransaction, TransactionDto>, ITr
             scope.Complete();
         }
 
-        return await GetAsync<Transaction>(data);
+        return await GetAsync(data);
     }
 
     public async Task<OneOf<ITransaction, InsufficientBalance, NotFound>> CreateTransferAsync(ICreateTransfer transfer, CancellationToken cancellationToken = default)
@@ -140,6 +140,6 @@ public class TransactionService : BaseService<ITransaction, TransactionDto>, ITr
             scope.Complete();
         }
         
-        return await GetAsync<Transaction>(data);
+        return await GetAsync(data);
     }
 }

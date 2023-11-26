@@ -8,7 +8,7 @@ using TobyMeehan.Com.Services;
 
 namespace TobyMeehan.Com.Data.Domain.Tokens;
 
-public class TokenService : BaseService<IToken, TokenDto>, ITokenService
+public class TokenService : BaseService<Token, IToken, TokenDto>, ITokenService
 {
     private readonly ITokenRepository _db;
     private readonly IAuthorizationService _authorizations;
@@ -21,7 +21,7 @@ public class TokenService : BaseService<IToken, TokenDto>, ITokenService
         _id = id;
     }
 
-    protected override async Task<IToken> MapAsync(TokenDto data)
+    protected override async Task<Token> MapAsync(TokenDto data)
     {
         var authorization = await _authorizations.GetByIdAsync(new Id<IAuthorization>(data.AuthorizationId));
         
@@ -86,8 +86,7 @@ public class TokenService : BaseService<IToken, TokenDto>, ITokenService
             return new NotFound();
         }
         
-        return OneOf<IToken, NotFound>.FromT0(
-            await GetAsync(data));
+        return await GetAsync(data);
     }
 
     public async Task<OneOf<IToken, NotFound>> GetByReferenceIdAsync(string referenceId, QueryOptions? options = null,
@@ -99,9 +98,8 @@ public class TokenService : BaseService<IToken, TokenDto>, ITokenService
         {
             return new NotFound();
         }
-        
-        return OneOf<IToken, NotFound>.FromT0(
-            await GetAsync(data));
+
+        return await GetAsync(data);
     }
 
     public IAsyncEnumerable<IToken> GetAllAsync(QueryOptions? options = null, CancellationToken cancellationToken = default)
@@ -136,9 +134,7 @@ public class TokenService : BaseService<IToken, TokenDto>, ITokenService
 
         await _db.InsertAsync(data, cancellationToken);
 
-        Cache.Set(id, data);
-
-        return await MapAsync(data);
+        return await GetAsync(data);
     }
 
     public async Task<OneOf<IToken, NotFound>> UpdateAsync(Id<IToken> id, IUpdateToken update,
@@ -159,8 +155,7 @@ public class TokenService : BaseService<IToken, TokenDto>, ITokenService
 
         await _db.UpdateAsync(id.Value, data, cancellationToken);
 
-        return OneOf<IToken, NotFound>.FromT0(
-            await GetAsync(data));
+        return await GetAsync(data);
     }
 
     public async Task<OneOf<Success, NotFound>> DeleteAsync(Id<IToken> id, CancellationToken cancellationToken = default)

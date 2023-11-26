@@ -8,7 +8,7 @@ using TobyMeehan.Com.Services;
 
 namespace TobyMeehan.Com.Data.Domain.Authorizations;
 
-public class AuthorizationService : BaseService<IAuthorization, AuthorizationDto>, IAuthorizationService
+public class AuthorizationService : BaseService<Models.Authorization, IAuthorization, AuthorizationDto>, IAuthorizationService
 {
     private readonly IAuthorizationRepository _db;
     private readonly IScopeService _scopes;
@@ -25,7 +25,7 @@ public class AuthorizationService : BaseService<IAuthorization, AuthorizationDto
         _id = id;
     }
 
-    protected override async Task<IAuthorization> MapAsync(AuthorizationDto data)
+    protected override async Task<Models.Authorization> MapAsync(AuthorizationDto data)
     {
         var scopes = new EntityCollection<IScope>();
         
@@ -87,9 +87,8 @@ public class AuthorizationService : BaseService<IAuthorization, AuthorizationDto
         {
             return new NotFound();
         }
-        
-        return OneOf<IAuthorization, NotFound>.FromT0(
-            await GetAsync(data));
+
+        return await GetAsync(data);
     }
 
     public IAsyncEnumerable<IAuthorization> GetAllAsync(QueryOptions? options = null, CancellationToken cancellationToken = default)
@@ -123,10 +122,8 @@ public class AuthorizationService : BaseService<IAuthorization, AuthorizationDto
         };
 
         await _db.InsertAsync(data, cancellationToken);
-        
-        Cache.Set(id, data);
 
-        return await MapAsync(data);
+        return await GetAsync(data);
     }
 
     public async Task<OneOf<IAuthorization, NotFound>> UpdateAsync(Id<IAuthorization> id, IUpdateAuthorization update,
@@ -145,8 +142,7 @@ public class AuthorizationService : BaseService<IAuthorization, AuthorizationDto
 
         await _db.UpdateAsync(id.Value, data, cancellationToken);
 
-        return OneOf<IAuthorization, NotFound>.FromT0(
-            await GetAsync(data));
+        return await GetAsync(data);
     }
 
     public async Task<OneOf<Success, NotFound>> DeleteAsync(Id<IAuthorization> id,

@@ -8,7 +8,7 @@ using TobyMeehan.Com.Services;
 
 namespace TobyMeehan.Com.Data.Domain.UserRoles;
 
-public class UserRoleService : BaseService<IUserRole, RoleDto>, IUserRoleService
+public class UserRoleService : BaseService<UserRole, IUserRole, RoleDto>, IUserRoleService
 {
     private readonly IUserRoleRepository _db;
     private readonly IIdService _id;
@@ -19,7 +19,7 @@ public class UserRoleService : BaseService<IUserRole, RoleDto>, IUserRoleService
         _id = id;
     }
 
-    protected override async Task<IUserRole> MapAsync(RoleDto data)
+    protected override async Task<UserRole> MapAsync(RoleDto data)
     {
         return new UserRole
         {
@@ -44,7 +44,7 @@ public class UserRoleService : BaseService<IUserRole, RoleDto>, IUserRoleService
             return new NotFound();
         }
 
-        return await GetAsync<UserRole>(data);
+        return await GetAsync(data);
     }
 
     public async Task<IUserRole> CreateAsync(ICreateRole role, CancellationToken cancellationToken = default)

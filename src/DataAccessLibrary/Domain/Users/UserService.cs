@@ -13,7 +13,7 @@ using TobyMeehan.Com.Services;
 
 namespace TobyMeehan.Com.Data.Domain.Users;
 
-public class UserService : BaseService<IUser, UserDto>, IUserService
+public class UserService : BaseService<User, IUser, UserDto>, IUserService
 {
     private readonly IUserRepository _db;
     private readonly IUserRoleService _userRoles;
@@ -45,7 +45,7 @@ public class UserService : BaseService<IUser, UserDto>, IUserService
         };
     }
 
-    protected override Task<IUser> MapAsync(UserDto dto)
+    protected override Task<User> MapAsync(UserDto dto)
     {
         var user = new User
         {
@@ -68,7 +68,7 @@ public class UserService : BaseService<IUser, UserDto>, IUserService
             };
         }
 
-        return Task.FromResult<IUser>(user);
+        return Task.FromResult(user);
     }
 
     public async Task<OneOf<IUser, NotFound>> GetByUsernameAsync(string username, QueryOptions? options = null,
@@ -82,7 +82,7 @@ public class UserService : BaseService<IUser, UserDto>, IUserService
             return new NotFound();
         }
 
-        return await GetAsync<User>(data);
+        return await GetAsync(data);
     }
 
     public async Task<OneOf<IUser, InvalidCredentials, NotFound>> GetByCredentialsAsync(string username,
@@ -109,7 +109,7 @@ public class UserService : BaseService<IUser, UserDto>, IUserService
                 return new InvalidCredentials();
         }
 
-        return await GetAsync<User>(data);
+        return await GetAsync(data);
     }
 
     public async Task<OneOf<IUser, InvalidCredentials, NotFound>> GetByCredentialsAsync(Id<IUser> id, Password password,
@@ -134,7 +134,7 @@ public class UserService : BaseService<IUser, UserDto>, IUserService
                 return new InvalidCredentials();
         }
 
-        return await GetAsync<User>(data);
+        return await GetAsync(data);
     }
 
     public async Task<OneOf<IUser, NotFound>> GetByIdAsync(Id<IUser> id, QueryOptions? options = null,
@@ -147,7 +147,7 @@ public class UserService : BaseService<IUser, UserDto>, IUserService
             return new NotFound();
         }
 
-        return await GetAsync<User>(data);
+        return await GetAsync(data);
     }
 
     public IAsyncEnumerable<IUser> GetAllAsync(QueryOptions? options = null,
@@ -215,7 +215,7 @@ public class UserService : BaseService<IUser, UserDto>, IUserService
 
         await _db.UpdateAsync(id.Value, data, cancellationToken);
 
-        return await GetAsync<User>(data);
+        return await GetAsync(data);
     }
 
     public async Task<OneOf<Success, InsufficientBalance, NotFound>> UpdateBalanceAsync(Id<IUser> id, double amount,

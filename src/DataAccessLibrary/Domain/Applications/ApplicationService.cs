@@ -12,7 +12,7 @@ using TobyMeehan.Com.Services;
 
 namespace TobyMeehan.Com.Data.Domain.Applications;
 
-public class ApplicationService : BaseService<IApplication, ApplicationDto>, IApplicationService
+public class ApplicationService : BaseService<Application, IApplication, ApplicationDto>, IApplicationService
 {
     private readonly IApplicationRepository _db;
     private readonly IIconRepository _iconRepo;
@@ -42,7 +42,7 @@ public class ApplicationService : BaseService<IApplication, ApplicationDto>, IAp
         };
     }
 
-    protected override Task<IApplication> MapAsync(ApplicationDto dto)
+    protected override Task<Application> MapAsync(ApplicationDto dto)
     {
         var id = new Id<IApplication>(dto.Id);
 
@@ -69,7 +69,7 @@ public class ApplicationService : BaseService<IApplication, ApplicationDto>, IAp
             };
         }
         
-        return Task.FromResult<IApplication>(application);
+        return Task.FromResult(application);
     }
 
     public async Task<OneOf<IApplication, NotFound>> GetByIdAndAuthorAsync(Id<IApplication> id, Id<IUser> user, QueryOptions? options = null, CancellationToken cancellationToken = default)
@@ -86,7 +86,7 @@ public class ApplicationService : BaseService<IApplication, ApplicationDto>, IAp
             return new NotFound();
         }
 
-        return await GetAsync<Application>(data);
+        return await GetAsync(data);
     }
 
     public async Task<OneOf<IApplication, InvalidCredentials, NotFound>> GetByCredentialsAsync(Id<IApplication> id,
@@ -113,8 +113,7 @@ public class ApplicationService : BaseService<IApplication, ApplicationDto>, IAp
                     return new InvalidCredentials();
             }
 
-        return OneOf<IApplication, InvalidCredentials, NotFound>.FromT0(
-            await GetAsync(data));
+        return await GetAsync(data);
     }
 
     public IAsyncEnumerable<IApplication> GetAllAsync(QueryOptions? options = null,
@@ -151,8 +150,7 @@ public class ApplicationService : BaseService<IApplication, ApplicationDto>, IAp
             return new NotFound();
         }
 
-        return OneOf<IApplication, NotFound>.FromT0(
-            await GetAsync(data));
+        return await GetAsync(data);
     }
 
     public async ValueTask<long> CountAsync(CancellationToken cancellationToken = default)
@@ -249,8 +247,7 @@ public class ApplicationService : BaseService<IApplication, ApplicationDto>, IAp
 
         Cache.Remove(id);
 
-        return OneOf<IApplication, NotFound>.FromT0(
-            await GetAsync(data));
+        return await GetAsync(data);
     }
 
     protected virtual Task<StorageObject> UploadIconAsync(IFileUpload file, CancellationToken cancellationToken)
