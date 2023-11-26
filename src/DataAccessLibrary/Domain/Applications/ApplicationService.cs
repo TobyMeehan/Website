@@ -46,7 +46,7 @@ public class ApplicationService : BaseService<Application, IApplication, Applica
     {
         var id = new Id<IApplication>(dto.Id);
 
-        var redirects = EntityCollection<IRedirect>.Create(dto.Redirects, MapRedirect);
+        var redirects = new EntityCollection<IRedirect>(dto.Redirects.Select(MapRedirect));
 
         var application = new Application
         {

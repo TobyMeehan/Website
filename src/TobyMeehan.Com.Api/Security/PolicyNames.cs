@@ -57,4 +57,23 @@ public class PolicyNames
             public const string Read = "operations.transaction.read";
         }
     }
+    
+    public class Download
+    {
+        public class Scope
+        {
+            public const string Create = "scope.download.create";
+            public const string Read = "scope.download.read";
+            public const string Update = "scope.download.update";
+            public const string Delete = "scope.download.delete";
+        }
+        
+        public class Operation
+        {
+            public const string Create = "operation.download.create";
+            public const string Read = "operation.download.read";
+            public const string Update = "operation.download.update";
+            public const string Delete = "operation.download.delete";
+        }
+    }
 }

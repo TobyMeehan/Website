@@ -12,6 +12,8 @@ using TobyMeehan.Com.Data.Domain.Authorizations;
 using TobyMeehan.Com.Data.Domain.Authorizations.Repositories;
 using TobyMeehan.Com.Data.Domain.Avatars;
 using TobyMeehan.Com.Data.Domain.Avatars.Repositories;
+using TobyMeehan.Com.Data.Domain.Downloads;
+using TobyMeehan.Com.Data.Domain.Downloads.Repositories;
 using TobyMeehan.Com.Data.Domain.Scopes;
 using TobyMeehan.Com.Data.Domain.Scopes.Repositories;
 using TobyMeehan.Com.Data.Domain.Tokens;
@@ -139,6 +141,9 @@ public class DataAccessLibraryBuilder
         Services.AddTransient<ITransactionRepository, TransactionRepository>();
         Services.AddTransient<IUserRepository, UserRepository>();
         Services.AddTransient<IUserRoleRepository, UserRoleRepository>();
+
+        Services.AddTransient<IDownloadRepository, DownloadRepository>();
+        Services.AddTransient<IDownloadAuthorRepository, DownloadAuthorRepository>();
         
         return this;
     }
@@ -157,6 +162,8 @@ public class DataAccessLibraryBuilder
         Services.TryAddTransient<ITransactionService, TransactionService>();
         Services.TryAddTransient<IUserService, UserService>();
         Services.TryAddTransient<IUserRoleService, UserRoleService>();
+        
+        Services.TryAddTransient<IDownloadService, DownloadService>();
         
         Services.AddSingleton(typeof(ICacheService<,>), typeof(MemoryCacheService<,>));
         

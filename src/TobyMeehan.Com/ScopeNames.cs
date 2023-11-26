@@ -9,6 +9,7 @@ public static class ScopeNames
             yield return Account.Group;
             yield return Applications.Group;
             yield return Transactions.Group;
+            yield return Downloads.Group;
         }
         
         yield return Account.Identify;
@@ -24,6 +25,13 @@ public static class ScopeNames
         yield return Transactions.Send;
         yield return Transactions.Transfer;
         yield return Transactions.Read;
+
+        yield return Downloads.Create;
+        yield return Downloads.Read;
+        yield return Downloads.Authors;
+        yield return Downloads.Files;
+        yield return Downloads.Update;
+        yield return Downloads.Delete;
     }
     
     public static class Account
@@ -50,5 +58,16 @@ public static class ScopeNames
         public const string Send = $"{Group}.send";
         public const string Transfer = $"{Group}.transfer";
         public const string Read = $"{Group}.read";
+    }
+    
+    public static class Downloads
+    {
+        public const string Group = "downloads";
+        public const string Create = $"{Group}.create";
+        public const string Read = $"{Group}.read";
+        public const string Update = $"{Group}.update";
+        public const string Files = $"{Group}.files";
+        public const string Authors = $"{Group}.authors";
+        public const string Delete = $"{Group}.delete";
     }
 }

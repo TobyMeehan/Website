@@ -45,7 +45,7 @@ public class ScopeService : BaseService<Scope, IScope, ScopeDto>, IScopeService
             Name = data.Name,
             DisplayName = data.DisplayName,
             Description = data.Description,
-            UserRoles = EntityCollection<IUserRole>.Create(data.UserRoles, MapUserRole)
+            UserRoles = new EntityCollection<IUserRole>(data.UserRoles.Select(MapUserRole))
         };
     }
 

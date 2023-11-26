@@ -4,9 +4,19 @@ using TobyMeehan.Com.Results;
 
 namespace TobyMeehan.Com.Data.Domain;
 
-public class EntityCollection<T> : IEntityCollection<T> where T : IEntity<T>
+public class EntityCollection<T, TId> : IEntityCollection<T, TId> where T : IEntity<TId>
 {
-    private readonly Dictionary<Id<T>, T> _items = new();
+    public EntityCollection() { }
+
+    public EntityCollection(IEnumerable<T> items)
+    {
+        foreach (var item in items)
+        {
+            _items.Add(item.Id, item);
+        }
+    }
+    
+    private readonly Dictionary<Id<TId>, T> _items = new();
     
     public void Add(T entity)
     {
@@ -25,26 +35,19 @@ public class EntityCollection<T> : IEntityCollection<T> where T : IEntity<T>
 
     public int Count => _items.Count;
 
-    public OneOf<T, NotFound> this[Id<T> id] => _items.TryGetValue(id, out var entity) ? entity : new NotFound();
+    public OneOf<T, NotFound> this[Id<TId> id] => _items.TryGetValue(id, out var entity) ? entity : new NotFound();
 
     public T? Find(string str)
     {
-        var id = new Id<T>(str);
+        var id = new Id<TId>(str);
 
         return _items.TryGetValue(id, out var entity) ? entity : default;
     }
+}
 
-    public static EntityCollection<T> Create(IEnumerable<T> items) => Create(items, x => x);
+public class EntityCollection<T> : EntityCollection<T, T>, IEntityCollection<T> where T : IEntity<T>
+{
+    public EntityCollection() { }
 
-    public static EntityCollection<T> Create<TObject>(IEnumerable<TObject> items, Func<TObject, T> map)
-    {
-        var collection = new EntityCollection<T>();
-
-        foreach (var item in items)
-        {
-            collection.Add(map.Invoke(item));
-        }
-
-        return collection;
-    }
+    public EntityCollection(IEnumerable<T> items) : base(items) { }
 }

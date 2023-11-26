@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using TobyMeehan.Com.Api.Security.Application;
+using TobyMeehan.Com.Api.Security.Download;
 using TobyMeehan.Com.Api.Security.Transaction;
 using TobyMeehan.Com.Api.Security.User;
 
@@ -13,11 +14,13 @@ public static class ServiceCollectionExtensions
         .AddApplicationAuthorizationHandlers()
         .AddUserAuthorizationHandlers()
         .AddTransactionAuthorizationHandlers()
+        .AddDownloadAuthorizationHandlers()
             
         .AddAuthorizationBuilder()
         .AddApplicationPolicies()
         .AddUserPolicies()
         .AddTransactionPolicies()
+        .AddDownloadPolicies()
     
     ;
 }

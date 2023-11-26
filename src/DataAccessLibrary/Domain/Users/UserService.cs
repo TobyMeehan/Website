@@ -54,7 +54,7 @@ public class UserService : BaseService<User, IUser, UserDto>, IUserService
             DisplayName = dto.DisplayName,
             Description = dto.Description,
             Balance = dto.Balance,
-            Roles = EntityCollection<IUserRole>.Create(dto.Roles, MapRole)
+            Roles = new EntityCollection<IUserRole>(dto.Roles.Select(MapRole))
         };
 
         if (dto.Avatar is { } avatar)

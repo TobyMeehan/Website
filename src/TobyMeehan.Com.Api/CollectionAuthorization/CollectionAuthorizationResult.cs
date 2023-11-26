@@ -6,20 +6,12 @@ namespace TobyMeehan.Com.Api.CollectionAuthorization;
 public class CollectionAuthorizationResult<TResource> : IEnumerable<(TResource Resource, AuthorizationResult Result)> where TResource : notnull
 {
     public CollectionAuthorizationResult(
-        AuthorizationResult collectorResult, 
         IEnumerable<(TResource, AuthorizationResult)> resourceResults)
     {
-        CollectorResult = collectorResult;
         ResourceResults = resourceResults
             .ToDictionary(key => key.Item1, value => value.Item2)
             .AsReadOnly();
     }
-    
-    public AuthorizationResult CollectorResult { get; }
-
-    public bool Succeeded => CollectorResult.Succeeded;
-
-    public AuthorizationFailure? Failure => CollectorResult.Failure;
 
     public IReadOnlyDictionary<TResource, AuthorizationResult> ResourceResults { get; }
 
@@ -38,4 +30,20 @@ public class CollectionAuthorizationResult<TResource> : IEnumerable<(TResource R
     {
         return GetEnumerator();
     }
+}
+
+public class CollectionAuthorizationResult<TResource, TCollector> : CollectionAuthorizationResult<TResource> where TResource : notnull
+{
+    public CollectionAuthorizationResult(
+        AuthorizationResult collectorResult, 
+        IEnumerable<(TResource, AuthorizationResult)> resourceResults) : base(resourceResults)
+    {
+        CollectorResult = collectorResult;
+    }
+    
+    public AuthorizationResult CollectorResult { get; }
+
+    public bool Succeeded => CollectorResult.Succeeded;
+
+    public AuthorizationFailure? Failure => CollectorResult.Failure;
 }

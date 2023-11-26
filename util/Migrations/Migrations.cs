@@ -95,3 +95,25 @@ public class M6001023 : Entities.Scopes.Transactions_Send { }
 
 [Migration(6001024)]
 public class M6001024 : Entities.Scopes.Transactions_Transfer { }
+
+[Migration(202311261736)]
+public class M1100 : Downloads { }
+
+[Migration(202311261737)]
+public class M1200 : DownloadAuthors { }
+
+[Migration(202311261738)]
+public class M6001031 : Entities.Scopes.Downloads { }
+
+[Migration(202311261739)]
+public class M6001032 : Entities.Scopes.Downloads_Authors { }
+[Migration(202311261740)]
+public class M6001033 : Entities.Scopes.Downloads_Create { }
+[Migration(202311261741)]
+public class M6001034 : Entities.Scopes.Downloads_Delete { }
+[Migration(202311261742)]
+public class M6001035 : Entities.Scopes.Downloads_Files { }
+[Migration(202311261743)]
+public class M6001036 : Entities.Scopes.Downloads_Read { }
+[Migration(202311261744)]
+public class M6001037 : Entities.Scopes.Downloads_Update { }

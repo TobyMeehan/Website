@@ -6,6 +6,56 @@ namespace TobyMeehan.Com.Api.CollectionAuthorization;
 public static class AuthorizationServiceExtensions
 {
     public static async Task<CollectionAuthorizationResult<TResource>>
+        AuthorizeAsync<TResource>(
+            this IAuthorizationService authorizationService,
+            ClaimsPrincipal user,
+            IEnumerable<TResource> resources,
+            IEnumerable<IAuthorizationRequirement> requirements
+        ) where TResource : notnull
+
+        => await AuthorizeAsync(resources, 
+            resource => authorizationService.AuthorizeAsync(user, resource, requirements));
+
+    public static async Task<CollectionAuthorizationResult<TResource>>
+        AuthorizeAsync<TResource>(
+            this IAuthorizationService authorizationService,
+            ClaimsPrincipal user,
+            IEnumerable<TResource> resources,
+            IAuthorizationRequirement requirement
+        ) where TResource : notnull
+
+        => await AuthorizeAsync(resources,
+            resource => authorizationService.AuthorizeAsync(user, resource, requirement));
+
+    public static async Task<CollectionAuthorizationResult<TResource>>
+        AuthorizeAsync<TResource>(
+            this IAuthorizationService authorizationService,
+            ClaimsPrincipal user,
+            IEnumerable<TResource> resources,
+            string policyName
+        ) where TResource : notnull
+
+        => await AuthorizeAsync(resources,
+            resource => authorizationService.AuthorizeAsync(user, resource, policyName));
+
+    private static async Task<CollectionAuthorizationResult<TResource>>
+        AuthorizeAsync<TResource>(
+            IEnumerable<TResource> resources,
+            AuthorizeDelegate authorizeDelegate) where TResource : notnull
+    {
+        var results = new List<(TResource, AuthorizationResult)>();
+
+        foreach (var resource in resources)
+        {
+            var result = await authorizeDelegate(resource);
+            
+            results.Add((resource, result));
+        }
+
+        return new CollectionAuthorizationResult<TResource>(results);
+    }
+    
+    public static async Task<CollectionAuthorizationResult<TResource, TCollector>>
         AuthorizeAsync<TResource, TCollector>(
             this IAuthorizationService authorizationService,
             ClaimsPrincipal user,
@@ -18,7 +68,7 @@ public static class AuthorizationServiceExtensions
         => await AuthorizeAsync(GetDescriptor(resources, collector), authorizeResources,
             resource => authorizationService.AuthorizeAsync(user, resource, requirements));
 
-    public static async Task<CollectionAuthorizationResult<TResource>>
+    public static async Task<CollectionAuthorizationResult<TResource, TCollector>>
         AuthorizeAsync<TResource, TCollector>(
             this IAuthorizationService authorizationService,
             ClaimsPrincipal user,
@@ -31,7 +81,7 @@ public static class AuthorizationServiceExtensions
         => await AuthorizeAsync(GetDescriptor(resources, collector), authorizeResources,
             resource => authorizationService.AuthorizeAsync(user, resource, requirement));
 
-    public static async Task<CollectionAuthorizationResult<TResource>>
+    public static async Task<CollectionAuthorizationResult<TResource, TCollector>>
         AuthorizeAsync<TResource, TCollector>(
             this IAuthorizationService authorizationService,
             ClaimsPrincipal user,
@@ -44,7 +94,7 @@ public static class AuthorizationServiceExtensions
         => await AuthorizeAsync(GetDescriptor(resources, collector), authorizeResources,
             resource => authorizationService.AuthorizeAsync(user, resource, policyName));
 
-    public static async Task<CollectionAuthorizationResult<TResource>>
+    public static async Task<CollectionAuthorizationResult<TResource, TCollector>>
         AuthorizeAsync<TResource, TCollector>(
             this IAuthorizationService authorizationService,
             ClaimsPrincipal user,
@@ -63,7 +113,7 @@ public static class AuthorizationServiceExtensions
         return new ResourceCollectionDescriptor<TResource, TCollector>(resources.ToList(), collector);
     }
     
-    public static async Task<CollectionAuthorizationResult<TResource>>
+    public static async Task<CollectionAuthorizationResult<TResource, TCollector>>
         AuthorizeAsync<TResource, TCollector>(
             this IAuthorizationService authorizationService,
             ClaimsPrincipal user,
@@ -76,7 +126,7 @@ public static class AuthorizationServiceExtensions
         => await AuthorizeAsync(GetDescriptor(resources, selector), authorizeResources,
             resource => authorizationService.AuthorizeAsync(user, resource, requirements));
 
-    public static async Task<CollectionAuthorizationResult<TResource>>
+    public static async Task<CollectionAuthorizationResult<TResource, TCollector>>
         AuthorizeAsync<TResource, TCollector>(
             this IAuthorizationService authorizationService,
             ClaimsPrincipal user,
@@ -89,7 +139,7 @@ public static class AuthorizationServiceExtensions
         => await AuthorizeAsync(GetDescriptor(resources, selector), authorizeResources,
             resource => authorizationService.AuthorizeAsync(user, resource, requirement));
 
-    public static async Task<CollectionAuthorizationResult<TResource>>
+    public static async Task<CollectionAuthorizationResult<TResource, TCollector>>
         AuthorizeAsync<TResource, TCollector>(
             this IAuthorizationService authorizationService,
             ClaimsPrincipal user,
@@ -102,7 +152,7 @@ public static class AuthorizationServiceExtensions
         => await AuthorizeAsync(GetDescriptor(resources, selector), authorizeResources,
             resource => authorizationService.AuthorizeAsync(user, resource, policyName));
     
-    public static async Task<CollectionAuthorizationResult<TResource>>
+    public static async Task<CollectionAuthorizationResult<TResource, TCollector>>
         AuthorizeAsync<TResource, TCollector>(
             this IAuthorizationService authorizationService,
             ClaimsPrincipal user,
@@ -127,7 +177,7 @@ public static class AuthorizationServiceExtensions
     
     private delegate Task<AuthorizationResult> AuthorizeDelegate(object? resource);
     
-    private static async Task<CollectionAuthorizationResult<TResource>> AuthorizeAsync<TResource, TCollector>(
+    private static async Task<CollectionAuthorizationResult<TResource, TCollector>> AuthorizeAsync<TResource, TCollector>(
         ResourceCollectionDescriptor<TResource, TCollector> descriptor,
         bool authorizeResources,
         AuthorizeDelegate authorizeDelegate) where TResource : notnull
@@ -136,7 +186,7 @@ public static class AuthorizationServiceExtensions
         
         if (!authorizeResources)
         {
-            return new CollectionAuthorizationResult<TResource>(
+            return new CollectionAuthorizationResult<TResource, TCollector>(
                 collectorResult,
                 descriptor.Resources.Select(x => (x, AuthorizationResult.Success())));
         }
@@ -150,6 +200,6 @@ public static class AuthorizationServiceExtensions
             results.Add((resource, result));
         }
 
-        return new CollectionAuthorizationResult<TResource>(collectorResult, results);
+        return new CollectionAuthorizationResult<TResource, TCollector>(collectorResult, results);
     }
 }
