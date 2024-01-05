@@ -10,8 +10,8 @@ namespace TobyMeehan.Com.Api.Models
         public string Title { get; set; }
         public string ShortDescription { get; set; }
         public string LongDescription { get; set; }
-        public EntityCollection<UserModel> Authors { get; set; }
-        public EntityCollection<DownloadFileModel> Files { get; set; }
+        public IList<UserModel> Authors { get; set; }
+        public IList<DownloadFileModel> Files { get; set; }
         public Version Version { get; set; }
     }
 }

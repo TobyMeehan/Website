@@ -54,7 +54,7 @@ namespace TobyMeehan.Com.Data.SqlKata
                     UserId = userId,
                     AppId = appId,
                     Description = description,
-                    Amout = amount,
+                    Amount = amount,
                     Sent = DateTime.Now
                 });
             }
