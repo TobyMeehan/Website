@@ -13,6 +13,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataAccessLibrary.Tests", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataAccessLibrary", "DataAccessLibrary\DataAccessLibrary.csproj", "{4D29D103-5A6E-441D-A058-568F9E8B5B34}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{105900FB-AAAA-42A0-AF7A-51D21DBC8433}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TobyMeehan.Com", "src\TobyMeehan.Com\TobyMeehan.Com.csproj", "{D273F9D7-5D27-4DFE-AEF8-4A1305A4AB12}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,11 +43,18 @@ Global
 		{4D29D103-5A6E-441D-A058-568F9E8B5B34}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4D29D103-5A6E-441D-A058-568F9E8B5B34}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4D29D103-5A6E-441D-A058-568F9E8B5B34}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D273F9D7-5D27-4DFE-AEF8-4A1305A4AB12}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D273F9D7-5D27-4DFE-AEF8-4A1305A4AB12}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D273F9D7-5D27-4DFE-AEF8-4A1305A4AB12}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D273F9D7-5D27-4DFE-AEF8-4A1305A4AB12}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {2A768BA2-E72D-4194-82DF-4CFAE99941E6}
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{D273F9D7-5D27-4DFE-AEF8-4A1305A4AB12} = {105900FB-AAAA-42A0-AF7A-51D21DBC8433}
 	EndGlobalSection
 EndGlobal
