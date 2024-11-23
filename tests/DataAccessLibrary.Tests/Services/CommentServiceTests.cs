@@ -1,0 +1,181 @@
+using Bogus;
+using FakeItEasy;
+using FluentAssertions;
+using TobyMeehan.Com.Data.Models;
+using TobyMeehan.Com.Data.Repositories;
+using TobyMeehan.Com.Data.Services;
+using TobyMeehan.Com.Domain.Downloads.Services;
+
+namespace TobyMeehan.Com.Data.Tests.Services;
+
+public class CommentServiceTests
+{
+    private readonly CommentService _sut;
+    private readonly ICommentRepository _commentRepository = A.Fake<ICommentRepository>();
+
+    public CommentServiceTests()
+    {
+        _sut = new CommentService(_commentRepository);
+    }
+
+    [Fact]
+    public async Task CreateAsync_ShouldCallRepository_WithCorrectData()
+    {
+        var faker = new Faker();
+
+        var commentId = faker.Random.Guid();
+        var downloadId = faker.Random.Guid();
+        var userId = faker.Random.Guid();
+        var content = faker.Lorem.Paragraph();
+
+        var capturedDto = A.Captured<CommentDto>();
+
+        A.CallTo(() => _commentRepository.CreateAsync(capturedDto._, A<CancellationToken>._))
+            .ReturnsLazily((CommentDto input, CancellationToken _) => new CommentDto
+            {
+                Id = commentId,
+                DownloadId = input.DownloadId,
+                UserId = input.UserId,
+                Content = input.Content,
+                CreatedAt = input.CreatedAt,
+                EditedAt = input.EditedAt
+            });
+
+        var create = new ICommentService.CreateComment(downloadId, userId, content);
+
+        await _sut.CreateAsync(create);
+
+        var captured = capturedDto.GetLastValue();
+
+        captured.DownloadId.Should().Be(downloadId);
+        captured.UserId.Should().Be(userId);
+        captured.Content.Should().Be(content);
+        captured.CreatedAt.Should().BeWithin(TimeSpan.FromSeconds(2));
+        captured.EditedAt.Should().BeNull();
+    }
+
+    [Fact]
+    public async Task CreateAsync_ShouldReturnComment_WithMappedData()
+    {
+        var faker = new Faker();
+
+        var commentId = faker.Random.Guid();
+        var downloadId = faker.Random.Guid();
+        var userId = faker.Random.Guid();
+        var content = faker.Lorem.Paragraph();
+
+        A.CallTo(() => _commentRepository.CreateAsync(A<CommentDto>._, A<CancellationToken>._))
+            .ReturnsLazily((CommentDto input, CancellationToken _) => new CommentDto
+            {
+                Id = commentId,
+                DownloadId = input.DownloadId,
+                UserId = input.UserId,
+                Content = input.Content,
+                CreatedAt = input.CreatedAt,
+                EditedAt = input.EditedAt
+            });
+
+        var create = new ICommentService.CreateComment(downloadId, userId, content);
+
+        var comment = await _sut.CreateAsync(create);
+
+        comment.Id.Should().Be(commentId);
+        comment.DownloadId.Should().Be(downloadId);
+        comment.UserId.Should().Be(userId);
+        comment.Content.Should().Be(content);
+        comment.CreatedAt.Should().BeWithin(TimeSpan.FromSeconds(2));
+        comment.EditedAt.Should().BeNull();
+    }
+
+    [Fact]
+    public async Task GetByDownload_ShouldReturnCollection_WhenCollectionExists()
+    {
+        var downloadId = Guid.NewGuid();
+
+        var faker = new Faker<CommentDto>()
+            .RuleFor(x => x.Id, f => f.Random.Guid())
+            .RuleFor(x => x.DownloadId, _ => downloadId)
+            .RuleFor(x => x.UserId, f => f.Random.Guid())
+            .RuleFor(x => x.Content, f => f.Lorem.Paragraph())
+            .RuleFor(x => x.CreatedAt, f => f.Date.Past())
+            .RuleFor(x => x.EditedAt, f => f.PickRandom(null as DateTime?, f.Date.Past()));
+
+        var collection = faker.Generate(20);
+
+        A.CallTo(() => _commentRepository.GetByDownloadAsync(downloadId, A<CancellationToken>._)).Returns(collection);
+
+        var result = await _sut.GetByDownloadAsync(downloadId);
+
+        foreach (var (i, comment) in result.Select((x, i) => (i, x)))
+        {
+            comment.Id.Should().Be(collection[i].Id);
+            comment.DownloadId.Should().Be(collection[i].DownloadId);
+            comment.UserId.Should().Be(collection[i].UserId);
+            comment.Content.Should().Be(collection[i].Content);
+            comment.CreatedAt.Should().Be(collection[i].CreatedAt);
+            comment.EditedAt.Should().Be(collection[i].EditedAt);
+        }
+    }
+
+    [Fact]
+    public async Task UpdateAsync_ShouldUpdateComment_WhenCommentExists()
+    {
+        var faker = new Faker();
+
+        var commentId = faker.Random.Guid();
+        var downloadId = faker.Random.Guid();
+        var userId = faker.Random.Guid();
+        var content = faker.Lorem.Paragraph();
+        var createdAt = faker.Date.Past();
+        var editedAt = faker.Date.Past();
+
+        var commentDto = new CommentDto
+        {
+            Id = commentId,
+            DownloadId = downloadId,
+            UserId = userId,
+            Content = content,
+            CreatedAt = createdAt,
+            EditedAt = editedAt
+        };
+
+        A.CallTo(() => _commentRepository.GetByIdAsync(commentId, A<CancellationToken>._)).Returns(commentDto);
+
+        var capturedDto = A.Captured<CommentDto>();
+
+        A.CallTo(() =>
+            _commentRepository.UpdateAsync(capturedDto.That.Matches(x => x.Id == commentId),
+                A<CancellationToken>._)).DoesNothing();
+        
+        var updatedContent = faker.Lorem.Paragraph();
+
+        var update = new ICommentService.UpdateComment(updatedContent);
+
+        var result = await _sut.UpdateAsync(commentId, update);
+        
+        var captured = capturedDto.GetLastValue();
+
+        captured.Content.Should().Be(updatedContent);
+        captured.EditedAt.Should().NotBeNull()
+            .And.NotBe(editedAt)
+            .And.BeWithin(TimeSpan.FromSeconds(2));
+
+        result.Should().NotBeNull();
+        
+        result?.Id.Should().Be(commentId);
+        result?.DownloadId.Should().Be(downloadId);
+        result?.UserId.Should().Be(userId);
+        result?.Content.Should().Be(updatedContent);
+        result?.EditedAt.Should().Be(captured.EditedAt);
+    }
+    
+    [Fact]
+    public async Task DeleteAsync_ShouldCallRepositoryMethod()
+    {
+        var commentId = Guid.NewGuid();
+
+        await _sut.DeleteAsync(commentId);
+
+        A.CallTo(() => _commentRepository.DeleteAsync(commentId, A<CancellationToken>._)).MustHaveHappened();
+    }
+}

@@ -9,5 +9,5 @@ public class Comment
     public required string Content { get; init; }
 
     public required DateTime CreatedAt { get; init; }
-    public required DateTime EditedAt { get; init; }
+    public required DateTime? EditedAt { get; init; }
 }

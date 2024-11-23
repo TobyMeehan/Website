@@ -8,7 +8,7 @@ public interface ICommentService
     Task<IReadOnlyList<Comment>> GetByDownloadAsync(Guid downloadId, CancellationToken cancellationToken = default);
 
     public record UpdateComment(string Content);
-    Task<Comment> UpdateAsync(UpdateComment update, CancellationToken cancellationToken = default);
+    Task<Comment?> UpdateAsync(Guid id, UpdateComment update, CancellationToken cancellationToken = default);
     
     Task DeleteAsync(Guid id, CancellationToken cancellationToken = default);
 }

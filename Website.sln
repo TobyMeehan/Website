@@ -17,6 +17,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{105900FB-AAA
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TobyMeehan.Com", "src\TobyMeehan.Com\TobyMeehan.Com.csproj", "{D273F9D7-5D27-4DFE-AEF8-4A1305A4AB12}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{EDDA4661-3E1B-4EB6-88B3-2184484FE589}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataAccessLibrary.Tests", "tests\DataAccessLibrary.Tests\DataAccessLibrary.Tests.csproj", "{A14A2A91-E01A-4296-9347-3528AE3060D1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -47,6 +51,10 @@ Global
 		{D273F9D7-5D27-4DFE-AEF8-4A1305A4AB12}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D273F9D7-5D27-4DFE-AEF8-4A1305A4AB12}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D273F9D7-5D27-4DFE-AEF8-4A1305A4AB12}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A14A2A91-E01A-4296-9347-3528AE3060D1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A14A2A91-E01A-4296-9347-3528AE3060D1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A14A2A91-E01A-4296-9347-3528AE3060D1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A14A2A91-E01A-4296-9347-3528AE3060D1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -56,5 +64,6 @@ Global
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{D273F9D7-5D27-4DFE-AEF8-4A1305A4AB12} = {105900FB-AAAA-42A0-AF7A-51D21DBC8433}
+		{A14A2A91-E01A-4296-9347-3528AE3060D1} = {EDDA4661-3E1B-4EB6-88B3-2184484FE589}
 	EndGlobalSection
 EndGlobal
