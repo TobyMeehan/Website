@@ -85,6 +85,25 @@ public class DownloadAuthorService : IDownloadAuthorService
         return results;
     }
 
+    public async Task<bool> IsAuthorAsync(Guid downloadId, Guid userId, CancellationToken cancellationToken = default)
+    {
+        var author = await _downloadAuthorRepository.GetAsync(downloadId, userId, cancellationToken);
+        
+        return author is not null;
+    }
+
+    public async Task<bool> IsOwnerAsync(Guid downloadId, Guid userId, CancellationToken cancellationToken = default)
+    {
+        var download = await _downloadRepository.GetByIdAsync(downloadId, cancellationToken);
+
+        if (download is null)
+        {
+            return false;
+        }
+        
+        return download.OwnerId == userId;
+    }
+
     public async Task RemoveAsync(Guid downloadId, Guid userId, CancellationToken cancellationToken = default)
     {
         await _downloadAuthorRepository.RemoveAsync(downloadId, userId, cancellationToken);

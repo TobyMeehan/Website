@@ -164,6 +164,93 @@ public class DownloadAuthorServiceTests
     }
 
     [Fact]
+    public async Task IsAuthorAsync_ShouldReturnFalse_WhenUserIsNotAnAuthor()
+    {
+        var downloadId = Guid.NewGuid();
+        var userId = Guid.NewGuid();
+        
+        A.CallTo(() => _downloadAuthorRepository.GetAsync(downloadId, userId, A<CancellationToken>._))
+            .Returns<DownloadAuthorDto?>(null);
+        
+        var result = await _sut.IsAuthorAsync(downloadId, userId);
+        
+        result.Should().BeFalse();
+    }
+
+    [Fact]
+    public async Task IsAuthorAsync_ShouldReturnTrue_WhenUserIsAuthor()
+    {
+        var faker = new Faker
+        {
+            Date =
+            {
+                LocalSystemClock = () => DateTime.UtcNow
+            }
+        };
+        
+        var downloadId = faker.Random.Guid();
+        var userId = faker.Random.Guid();
+        var createdAt = faker.Date.Past();
+
+        var author = new DownloadAuthorDto
+        {
+            DownloadId = downloadId,
+            UserId = userId,
+            CreatedAt = createdAt
+        };
+
+        A.CallTo(() => _downloadAuthorRepository.GetAsync(downloadId, userId, A<CancellationToken>._))
+            .Returns(author);
+        
+        var result = await _sut.IsAuthorAsync(downloadId, userId);
+        
+        result.Should().BeTrue();
+    }
+
+    [Fact]
+    public async Task IsOwnerAsync_ShouldReturnFalse_WhenDownloadDoesNotExist()
+    {
+        var downloadId = Guid.NewGuid();
+        var userId = Guid.NewGuid();
+        
+        A.CallTo(() => _downloadRepository.GetByIdAsync(downloadId, A<CancellationToken>._))
+            .Returns<DownloadDto?>(null);
+        
+        var result = await _sut.IsOwnerAsync(downloadId, userId);
+        
+        result.Should().BeFalse();
+    }
+
+    [Fact]
+    public async Task IsOwnerAsync_ShouldReturnFalse_WhenUserIsNotOwner()
+    {
+        var downloadId = Guid.NewGuid();
+        var ownerId = Guid.NewGuid();
+        var userId = Guid.NewGuid();
+
+        A.CallTo(() => _downloadRepository.GetByIdAsync(downloadId, A<CancellationToken>._))
+            .Returns(new DownloadDto { Id = downloadId, OwnerId = ownerId });
+        
+        var result = await _sut.IsOwnerAsync(downloadId, userId);
+        
+        result.Should().BeFalse();
+    }
+
+    [Fact]
+    public async Task IsOwnerAsync_ShouldReturnTrue_WhenUserIsOwner()
+    {
+        var downloadId = Guid.NewGuid();
+        var userId = Guid.NewGuid();
+        
+        A.CallTo(() => _downloadRepository.GetByIdAsync(downloadId, A<CancellationToken>._))
+            .Returns(new DownloadDto { Id = downloadId, OwnerId = userId });
+        
+        var result = await _sut.IsOwnerAsync(downloadId, userId);
+        
+        result.Should().BeTrue();
+    }
+
+    [Fact]
     public async Task RemoveAsync_ShouldCallRepositoryMethod()
     {
         var downloadId = Guid.NewGuid();
