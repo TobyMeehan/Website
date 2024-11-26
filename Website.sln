@@ -21,6 +21,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{EDDA4661
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataAccessLibrary.Tests", "tests\DataAccessLibrary.Tests\DataAccessLibrary.Tests.csproj", "{A14A2A91-E01A-4296-9347-3528AE3060D1}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Api.Tests", "tests\Api.Tests\Api.Tests.csproj", "{9D3E03FE-ED94-442F-AF93-29E58AA1DCD4}"
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Security.Tests", "tests\Security.Tests\Security.Tests.csproj", "{F5EC83CD-BB40-4D37-9E0F-A4A90DB01ABF}"
 EndProject
 Global
