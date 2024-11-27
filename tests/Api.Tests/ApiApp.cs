@@ -19,7 +19,7 @@ public class ApiApp : AppFixture<Program>
     private readonly PostgreSqlContainer _postgres = new PostgreSqlBuilder().Build();
     
     private readonly IUserService _userService = A.Fake<IUserService>();
-    private readonly Dictionary<string, User> _users = [];
+    public Dictionary<string, User> Users { get; set; } = [];
 
     public HttpClient UserA { get; private set; } = null!;
     public HttpClient UserB { get; private set; } = null!;
@@ -48,7 +48,7 @@ public class ApiApp : AppFixture<Program>
     {
         services.AddScoped<IUserService>(_ => _userService);
 
-        _users["UserA"] = new User
+        Users["UserA"] = new User
         {
             Id = Fake.Random.Guid(),
             Username = Fake.Internet.UserName(),
@@ -56,7 +56,7 @@ public class ApiApp : AppFixture<Program>
             ProfileUrl = Fake.Internet.Url()
         };
 
-        _users["UserB"] = new User
+        Users["UserB"] = new User
         {
             Id = Fake.Random.Guid(),
             Username = Fake.Internet.UserName(),
@@ -65,7 +65,13 @@ public class ApiApp : AppFixture<Program>
         };
         
         A.CallTo(() => _userService.GetByAccessTokenAsync(A<string>._, A<CancellationToken>._))
-            .ReturnsLazily((string token, CancellationToken _) => _users[token]);
+            .ReturnsLazily((string token, CancellationToken _) => Users[token]);
+
+        A.CallTo(() => _userService.GetByIdAsync(Users["UserA"].Id, A<CancellationToken>._)).Returns(Users["UserA"]);
+        A.CallTo(() => _userService.GetByIdAsync(Users["UserB"].Id, A<CancellationToken>._)).Returns(Users["UserB"]);
+        A.CallTo(() => _userService.GetByIdAsync(
+            A<Guid>.That.Matches(x => x != Users["UserA"].Id && x != Users["UserB"].Id), 
+            A<CancellationToken>._)).Returns<User?>(null);
     }
 
     protected override async Task SetupAsync()
