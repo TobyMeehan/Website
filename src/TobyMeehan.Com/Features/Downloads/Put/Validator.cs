@@ -23,6 +23,7 @@ public class Validator : Validator<Request>
             .IsInEnum();
 
         RuleFor(x => x.Version)
-            .Must(x => Version.TryParse(x, out _));
+            .Must(x => Version.TryParse(x, out _)).WithMessage("Not a valid version.")
+            .Unless(x => string.IsNullOrEmpty(x.Version));
     }
 }

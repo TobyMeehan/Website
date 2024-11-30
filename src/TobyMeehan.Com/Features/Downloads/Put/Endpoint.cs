@@ -46,7 +46,7 @@ public class Endpoint : Endpoint<Request, DownloadResponse, DownloadMapper>
                 req.Summary,
                 req.Description,
                 req.Visibility,
-                System.Version.Parse(req.Version)),
+                string.IsNullOrEmpty(req.Version) ? null : System.Version.Parse(req.Version)),
             ct);
 
         Response = Map.FromEntity(download!);

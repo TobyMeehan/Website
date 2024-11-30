@@ -9,5 +9,5 @@ public class Request
     public string Summary { get; set; }
     public string Description { get; set; }
     public Visibility Visibility { get; set; }
-    public string Version { get; set; }
+    public string? Version { get; set; }
 }
