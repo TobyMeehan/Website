@@ -29,6 +29,7 @@ public class CommentRepository : ICommentRepository
         return await _comments
             .Where(x => !x.Download!.DeletedAt.HasValue)
             .Where(x => x.DownloadId == downloadId)
+            .OrderByDescending(x => x.CreatedAt)
             .ToListAsync(cancellationToken);
     }
 

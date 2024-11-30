@@ -5,6 +5,8 @@ public interface ICommentService
     public record CreateComment(Guid DownloadId, Guid UserId, string Content);
     Task<Comment> CreateAsync(CreateComment create, CancellationToken cancellationToken = default);
     
+    Task<Comment?> GetByIdAsync(Guid commentId, CancellationToken cancellationToken = default);
+    
     Task<IReadOnlyList<Comment>> GetByDownloadAsync(Guid downloadId, CancellationToken cancellationToken = default);
 
     public record UpdateComment(string Content);

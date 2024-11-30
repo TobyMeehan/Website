@@ -88,6 +88,55 @@ public class CommentServiceTests
     }
 
     [Fact]
+    public async Task GetByIdAsync_ShouldReturnComment_WhenCommentExists()
+    {
+        var faker = new Faker();
+        
+        var commentId = faker.Random.Guid();
+        var downloadId = faker.Random.Guid();
+        var userId = faker.Random.Guid();
+        var content = faker.Lorem.Paragraph();
+        var createdAt = faker.Date.Past();
+        var editedAt = faker.Date.Recent();
+
+        var commentDto = new CommentDto
+        {
+            Id = commentId,
+            DownloadId = downloadId,
+            UserId = userId,
+            Content = content,
+            CreatedAt = createdAt,
+            EditedAt = editedAt
+        };
+
+        A.CallTo(() => _commentRepository.GetByIdAsync(commentId, A<CancellationToken>._)).Returns(commentDto);
+        
+        var comment = await _sut.GetByIdAsync(commentId);
+
+        comment.Should().NotBeNull();
+        
+        comment?.Id.Should().Be(commentId);
+        comment?.DownloadId.Should().Be(downloadId);
+        comment?.UserId.Should().Be(userId);
+        comment?.Content.Should().Be(content);
+        comment?.CreatedAt.Should().Be(createdAt);
+        comment?.EditedAt.Should().Be(editedAt);
+    }
+
+    [Fact]
+    public async Task GetByIdAsync_ShouldReturnNull_WhenCommentDoesNotExist()
+    {
+        var commentId = Guid.NewGuid();
+        
+        A.CallTo(() => _commentRepository.GetByIdAsync(commentId, A<CancellationToken>._))
+            .Returns<CommentDto?>(null);
+        
+        var comment = await _sut.GetByIdAsync(commentId);
+        
+        comment.Should().BeNull();
+    }
+
+    [Fact]
     public async Task GetByDownload_ShouldReturnCollection_WhenCollectionExists()
     {
         var downloadId = Guid.NewGuid();

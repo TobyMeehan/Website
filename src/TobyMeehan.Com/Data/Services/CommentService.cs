@@ -37,6 +37,26 @@ public class CommentService : ICommentService
         };
     }
 
+    public async Task<Comment?> GetByIdAsync(Guid commentId, CancellationToken cancellationToken = default)
+    {
+        var comment = await _commentRepository.GetByIdAsync(commentId, cancellationToken);
+
+        if (comment is null)
+        {
+            return null;
+        }
+
+        return new Comment
+        {
+            Id = comment.Id,
+            DownloadId = comment.DownloadId,
+            UserId = comment.UserId,
+            Content = comment.Content,
+            CreatedAt = comment.CreatedAt,
+            EditedAt = comment.EditedAt
+        };
+    }
+
     public async Task<IReadOnlyList<Comment>> GetByDownloadAsync(Guid downloadId, CancellationToken cancellationToken = default)
     {
         var comments = await _commentRepository.GetByDownloadAsync(downloadId, cancellationToken);
