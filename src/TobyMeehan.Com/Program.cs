@@ -51,10 +51,12 @@ var app = builder.Build();
 
 app.UseAuthentication();
 app.UseAuthorization();
-app.UseFastEndpoints();
 app.UseFastEndpoints(config =>
 {
     config.Errors.UseProblemDetails();
+    
+    config.Serializer.Options.Converters.Add(new JsonStringEnumConverter<Visibility>());
+    config.Serializer.Options.Converters.Add(new JsonStringEnumConverter<Verification>());
 });
 
 app.Run();
