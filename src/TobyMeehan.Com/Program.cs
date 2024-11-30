@@ -1,7 +1,9 @@
+using System.Text.Json.Serialization;
 using FastEndpoints;
 using FastEndpoints.Security;
 using Microsoft.AspNetCore.Authorization;
 using TobyMeehan.Com.Data.Configuration;
+using TobyMeehan.Com.Domain.Downloads;
 using TobyMeehan.Com.Security;
 using TobyMeehan.Com.Security.Configuration;
 
@@ -50,6 +52,10 @@ var app = builder.Build();
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseFastEndpoints();
+app.UseFastEndpoints(config =>
+{
+    config.Errors.UseProblemDetails();
+});
 
 app.Run();
 

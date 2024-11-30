@@ -21,7 +21,7 @@ public class DownloadTests(ApiApp App) : TestBase<ApiApp>
     [Fact]
     public async Task CreateDownload_InvalidRequest()
     {
-        var (response, result) = await App.UserA.POSTAsync<Create.Endpoint, Create.Request, ErrorResponse>(
+        var (response, result) = await App.UserA.POSTAsync<Create.Endpoint, Create.Request, ProblemDetails>(
             new()
             {
                 Title = null!,
@@ -32,7 +32,7 @@ public class DownloadTests(ApiApp App) : TestBase<ApiApp>
 
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         result.Errors.Should().HaveCount(4);
-        result.Errors.Keys.Should().Equal("title", "summary", "description", "visibility");
+        result.Errors.Select(x => x.Name).Should().Equal("title", "summary", "description", "visibility");
     }
 
     [Fact]
@@ -193,6 +193,33 @@ public class DownloadTests(ApiApp App) : TestBase<ApiApp>
     }
 
     [Fact, Priority(7)]
+    public async Task UpdateDownload_NullVersion()
+    {
+        var downloadId = App.Downloads[0];
+
+        var request = new Update.Request
+        {
+            Id = downloadId,
+            Title = Fake.Commerce.ProductName(),
+            Summary = Fake.Lorem.Paragraph(),
+            Description = Fake.Lorem.Paragraphs(),
+            Visibility = Visibility.Private,
+            Version = null
+        };
+        
+        var (response, data) = await App.UserA.PUTAsync<Update.Endpoint, Update.Request, DownloadResponse>(request);
+
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        
+        data.Id.Should().Be(request.Id);
+        data.Title.Should().Be(request.Title);
+        data.Summary.Should().Be(request.Summary);
+        data.Description.Should().Be(request.Description);
+        data.Visibility.Should().Be("private");
+        data.Version.Should().BeNull();
+    }
+
+    [Fact, Priority(8)]
     public async Task GetPrivateDownload_ShouldReturnForbidden()
     {
         var downloadId = App.Downloads[0];
@@ -205,7 +232,7 @@ public class DownloadTests(ApiApp App) : TestBase<ApiApp>
         response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
     }
 
-    [Fact, Priority(8)]
+    [Fact, Priority(9)]
     public async Task DeleteDownload()
     {
         var downloadId = App.Downloads[0];
