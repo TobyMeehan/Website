@@ -47,7 +47,7 @@ public class TokenEndpoint : Endpoint<TokenRequest, TokenResponse>
         Response = new TokenResponse
         {
             Token = token,
-            ExpiresIn = Convert.ToInt32((DateTime.UtcNow - expiry).TotalSeconds)
+            ExpiresIn = Convert.ToInt32((expiry - DateTime.UtcNow).TotalSeconds)
         };
     }
 }
