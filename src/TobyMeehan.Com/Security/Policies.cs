@@ -9,12 +9,15 @@ public static class Policies
     public const string ManageDownload = "policies.download.manage";
     public const string EditDownload = "policies.download.edit";
     public const string DeleteDownload = "policies.download.delete";
+    
     public const string UploadFile = "policies.download.files.upload";
-    public const string DeleteFile = "policies.download.files.delete";
+    
     public const string InviteAuthor = "policies.download.authors.invite";
     public const string KickAuthor = "policies.download.authors.kick";
     
     public const string ViewFile = "policies.file.view";
+    public const string EditFile = "policies.file.edit";
+    public const string DeleteFile = "policies.file.delete";
     
     public const string CreateComment = "policies.comment.create";
     public const string ViewComment = "policies.comment.view";
@@ -46,9 +49,12 @@ public static class Policies
             .AddPolicy(UploadFile, builder => builder
                 .RequireAuthenticatedUser()
                 .AddRequirements(Requirements.Download.Files.Upload))
+            .AddPolicy(EditFile, builder => builder
+                .RequireAuthenticatedUser()
+                .AddRequirements(Requirements.File.Edit))
             .AddPolicy(DeleteFile, builder => builder
                 .RequireAuthenticatedUser()
-                .AddRequirements(Requirements.Download.Files.Delete))
+                .AddRequirements(Requirements.File.Delete))
         
             .AddPolicy(InviteAuthor, builder => builder
                 .RequireAuthenticatedUser()

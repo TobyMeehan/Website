@@ -22,9 +22,6 @@ public sealed class Requirements
         {
             public static readonly OperationAuthorizationRequirement Upload = new()
                 { Name = Operations.Download.Files.Upload };
-
-            public static readonly OperationAuthorizationRequirement Delete = new()
-                { Name = Operations.Download.Files.Delete };
         }
 
         public sealed class Authors
@@ -41,6 +38,12 @@ public sealed class Requirements
     {
         public static readonly OperationAuthorizationRequirement View = new()
             { Name = Operations.File.View };
+
+        public static readonly OperationAuthorizationRequirement Edit = new()
+            { Name = Operations.File.Edit };
+
+        public static readonly OperationAuthorizationRequirement Delete = new()
+            { Name = Operations.File.Delete };
     }
 
     public sealed class Comment

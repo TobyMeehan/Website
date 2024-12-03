@@ -12,7 +12,6 @@ public sealed class Operations
         public sealed class Files
         {
             public const string Upload = "operation.download.files.upload";
-            public const string Delete = "operation.download.files.delete";
         }
         
         public sealed class Authors
@@ -25,6 +24,8 @@ public sealed class Operations
     public sealed class File
     {
         public const string View = "operation.file.view";
+        public const string Edit = "operation.file.edit";
+        public const string Delete = "operation.file.delete";
     }
     
     public sealed class Comment

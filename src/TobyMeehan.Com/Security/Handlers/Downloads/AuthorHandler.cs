@@ -27,7 +27,6 @@ public class AuthorHandler : AuthorizationHandler<OperationAuthorizationRequirem
             Requirements.Download.Edit.Name,
             Requirements.Download.Delete.Name,
             Requirements.Download.Files.Upload.Name,
-            Requirements.Download.Files.Delete.Name,
             Requirements.Download.Authors.Invite.Name,
             Requirements.Download.Authors.Kick.Name
         ];
