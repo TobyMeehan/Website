@@ -18,6 +18,7 @@ public static class Services
     {
         services.AddScoped<IDownloadService, DownloadService>();
         services.AddScoped<IDownloadAuthorService, DownloadAuthorService>();
+        services.AddScoped<IDownloadFileService, DownloadFileService>();
         services.AddScoped<ICommentService, CommentService>();
         
         foreach (var section in configuration.GetChildren())

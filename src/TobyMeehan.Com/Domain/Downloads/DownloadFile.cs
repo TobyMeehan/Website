@@ -10,6 +10,7 @@ public class DownloadFile
     public required long SizeInBytes { get; init; }
 
     public required Visibility Visibility { get; init; }
+    public required FileStatus Status { get; init; }
 
     public required DateTime CreatedAt { get; init; }
     public required DateTime UpdatedAt { get; init; }
