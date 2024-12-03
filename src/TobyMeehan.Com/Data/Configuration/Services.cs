@@ -1,4 +1,9 @@
+using Amazon;
+using Amazon.Runtime;
+using Amazon.S3;
 using Microsoft.EntityFrameworkCore;
+using TobyMeehan.Com.Data.CloudStorage;
+using TobyMeehan.Com.Data.CloudStorage.S3;
 using TobyMeehan.Com.Data.DataAccess;
 using TobyMeehan.Com.Data.Repositories;
 using TobyMeehan.Com.Data.Services;
@@ -26,6 +31,7 @@ public static class Services
 
                     services.AddScoped<IDownloadRepository, Repositories.EntityFramework.DownloadRepository>();
                     services.AddScoped<IDownloadAuthorRepository, Repositories.EntityFramework.DownloadAuthorRepository>();
+                    services.AddScoped<IDownloadFileRepository, Repositories.EntityFramework.DownloadFileRepository>();
                     services.AddScoped<ICommentRepository, Repositories.EntityFramework.CommentRepository>();
                     
                     break;
