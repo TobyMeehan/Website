@@ -29,6 +29,16 @@ public static class Services
                     services.AddScoped<ICommentRepository, Repositories.EntityFramework.CommentRepository>();
                     
                     break;
+                
+                case "S3":
+                    services.AddSingleton<IAmazonS3>(_ => new AmazonS3Client(
+                        new BasicAWSCredentials(section["AccessKey"], section["SecretKey"]),
+                        new AmazonS3Config { RegionEndpoint = RegionEndpoint.GetBySystemName(section["Region"]) }
+                    ));
+                    services.AddSingleton<IStorageService, S3StorageService>();
+                    services.Configure<StorageOptions>(section);
+                    
+                    break;
             }
 
         return services;
