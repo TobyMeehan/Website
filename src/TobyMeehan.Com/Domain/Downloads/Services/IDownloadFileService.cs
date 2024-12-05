@@ -22,6 +22,9 @@ public interface IDownloadFileService
     Task DeleteUploadAsync(DownloadFile file, string uploadId,
         CancellationToken cancellationToken = default);
 
+    Task<string> CreateDownloadAsync(DownloadFile file, Guid? userId,
+        CancellationToken cancellationToken = default);
+    
     Task<DownloadFile?> GetByIdAsync(Guid downloadId, Guid fileId, CancellationToken cancellationToken = default);
     
     Task<DownloadFile?> GetByFilenameAsync(Guid downloadId, string filename, 

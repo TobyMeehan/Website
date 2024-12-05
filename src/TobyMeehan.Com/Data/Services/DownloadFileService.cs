@@ -114,6 +114,23 @@ public class DownloadFileService : IDownloadFileService
             file.DownloadId.ToString(), file.Id.ToString(), uploadId, cancellationToken);
     }
 
+    public async Task<string> CreateDownloadAsync(DownloadFile file, Guid? userId,
+        CancellationToken cancellationToken = default)
+    {
+        var url = await _storageService.SignDownloadAsync(file.DownloadId.ToString(), file.Id.ToString());
+
+        var download = new FileDownloadDto
+        {
+            FileId = file.Id,
+            UserId = userId,
+            CreatedAt = DateTime.UtcNow
+        };
+        
+        await _downloadFileRepository.CreateDownloadAsync(download, cancellationToken);
+        
+        return url;
+    }
+
     public async Task<DownloadFile?> GetByIdAsync(Guid downloadId, Guid fileId, CancellationToken cancellationToken = default)
     {
         var file = await _downloadFileRepository.GetByIdAsync(downloadId, fileId, cancellationToken);

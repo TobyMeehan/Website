@@ -30,6 +30,8 @@ public class ApplicationDbContext : DbContext
         builder.Entity<DownloadFileDto>().HasIndex(x => x.Filename);
         builder.Entity<DownloadFileDto>().ToTable("files");
 
+        builder.Entity<FileDownloadDto>().ToTable("file_downloads");
+
         builder.Entity<CommentDto>().HasIndex(x => x.UserId);
         builder.Entity<CommentDto>().ToTable("comments");
     }

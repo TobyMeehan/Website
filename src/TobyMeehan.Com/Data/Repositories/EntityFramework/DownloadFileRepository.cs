@@ -48,6 +48,15 @@ public class DownloadFileRepository : IDownloadFileRepository
             .FirstOrDefaultAsync(cancellationToken);
     }
 
+    public async Task<FileDownloadDto> CreateDownloadAsync(FileDownloadDto download, CancellationToken cancellationToken)
+    {
+        _dbContext.Set<FileDownloadDto>().Add(download);
+        
+        await _dbContext.SaveChangesAsync(cancellationToken);
+
+        return download;
+    }
+
     public async Task UpdateAsync(DownloadFileDto file, CancellationToken cancellationToken)
     {
         _files.Update(file);

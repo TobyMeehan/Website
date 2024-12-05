@@ -4,6 +4,7 @@ namespace TobyMeehan.Com.Data.CloudStorage;
 
 public interface IStorageService
 {
+    Task<string> SignDownloadAsync(string prefix, string key);
     Task<string> SignSingleUploadAsync(string prefix, string key, string contentType);
     Task<UploadDto?> CreateMultipartUploadAsync(string prefix, string key, string contentType,
         CancellationToken cancellationToken);

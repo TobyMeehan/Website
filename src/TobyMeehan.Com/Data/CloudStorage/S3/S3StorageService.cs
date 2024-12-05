@@ -18,6 +18,28 @@ public class S3StorageService : IStorageService
         _options = options.Value;
     }
 
+    public async Task<string> SignDownloadAsync(string prefix, string key)
+    {
+        var objectKey = string.Join('/', prefix, key);
+
+        var request = new GetPreSignedUrlRequest
+        {
+            Verb = HttpVerb.GET,
+            BucketName = _options.Bucket,
+            Key = objectKey,
+            Expires = DateTime.UtcNow.AddHours(1)
+        };
+        
+        var url = await _s3.GetPreSignedURLAsync(request);
+
+        if (url is null)
+        {
+            throw new InvalidOperationException("Pre-signed url request failed.");
+        }
+        
+        return url;
+    }
+
     public async Task<string> SignSingleUploadAsync(string prefix, string key, string contentType)
     {
         var objectKey = string.Join('/', prefix, key);

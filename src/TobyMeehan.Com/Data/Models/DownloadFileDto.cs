@@ -21,4 +21,5 @@ public class DownloadFileDto
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 
     public DownloadDto? Download { get; set; }
+    public ICollection<FileDownloadDto> Downloads { get; set; }
 }
