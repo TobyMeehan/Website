@@ -61,5 +61,7 @@ public class Endpoint : Endpoint<Request>
         });
         
         await _downloadFileService.CompleteUploadAsync(file, req.UploadId, parts, ct);
+
+        await SendAsync(null, statusCode: 200, ct);
     }
 }
