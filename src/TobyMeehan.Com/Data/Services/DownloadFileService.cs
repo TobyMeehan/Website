@@ -137,6 +137,8 @@ public class DownloadFileService : IDownloadFileService
     {
         await _storageService.AbortMultipartUploadAsync(
             file.DownloadId.ToString(), file.Id.ToString(), uploadId, cancellationToken);
+
+        await _downloadFileRepository.DeleteAsync(file.DownloadId, file.Id, cancellationToken);
     }
 
     public async Task<string> CreateDownloadAsync(DownloadFile file, Guid? userId,
