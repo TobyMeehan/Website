@@ -45,12 +45,16 @@ builder.Services.AddScoped<IAuthorizationHandler, FileHandlers.AuthorHandler>();
 builder.Services.AddScoped<IAuthorizationHandler, CommentHandlers.PublicHandler>();
 builder.Services.AddScoped<IAuthorizationHandler, CommentHandlers.UserHandler>();
 
-builder.Services.AddFastEndpoints();
+builder.Services
+    .AddFastEndpoints()
+    .AddIdempotency();
 
 var app = builder.Build();
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.UseOutputCache();
 app.UseFastEndpoints(config =>
 {
     config.Errors.UseProblemDetails();
