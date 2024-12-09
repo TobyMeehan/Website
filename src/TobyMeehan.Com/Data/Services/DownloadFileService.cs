@@ -22,10 +22,17 @@ public class DownloadFileService : IDownloadFileService
     public async Task<(DownloadFile File, string UploadUrl)> CreateAsync(CreateDownloadFile create,
         CancellationToken cancellationToken = default)
     {
+        var existingFile = await _downloadFileRepository.GetByFilenameAsync(create.DownloadId, create.Filename, 
+                cancellationToken);
+
+        var filename = existingFile is null 
+            ? create.Filename 
+            : await GenerateFilenameAsync(create, cancellationToken);
+        
         var file = new DownloadFileDto
         {
             DownloadId = create.DownloadId,
-            Filename = create.Filename,
+            Filename = filename,
             ContentType = create.ContentType,
             SizeInBytes = create.SizeInBytes,
             Visibility = Visibility.Public,
@@ -51,6 +58,24 @@ public class DownloadFileService : IDownloadFileService
             CreatedAt = file.CreatedAt,
             UpdatedAt = file.UpdatedAt,
         }, url);
+    }
+
+    private async Task<string> GenerateFilenameAsync(CreateDownloadFile file, CancellationToken cancellationToken)
+    {
+        var (filename, extension) = (Path.GetFileNameWithoutExtension(file.Filename), Path.GetExtension(file.Filename));
+        
+        foreach (var filenameAttempt in Enumerable.Range(1, 99).Select(i => $"{filename}({i}){extension}"))
+        {
+            var existingFile = await _downloadFileRepository.GetByFilenameAsync(file.DownloadId, filenameAttempt, 
+                cancellationToken);
+
+            if (existingFile is null)
+            {
+                return filenameAttempt;
+            }
+        }
+
+        return Path.GetRandomFileName();
     }
 
     public async Task<FileUpload?> CreateUploadAsync(DownloadFile file,
