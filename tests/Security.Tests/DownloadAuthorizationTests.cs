@@ -171,7 +171,6 @@ public class DownloadAuthorizationTests : IDisposable
     [InlineData(Policies.EditDownload)]
     [InlineData(Policies.DeleteDownload)]
     [InlineData(Policies.UploadFile)]
-    [InlineData(Policies.DeleteFile)]
     [InlineData(Policies.InviteAuthor)]
     [InlineData(Policies.KickAuthor)]
     public async Task ManageDownload_ShouldFail_WhenUserIsNotAuthenticated(string policy)
@@ -191,7 +190,6 @@ public class DownloadAuthorizationTests : IDisposable
     [InlineData(Policies.EditDownload)]
     [InlineData(Policies.DeleteDownload)]
     [InlineData(Policies.UploadFile)]
-    [InlineData(Policies.DeleteFile)]
     [InlineData(Policies.InviteAuthor)]
     [InlineData(Policies.KickAuthor)]
     public async Task ManageDownload_ShouldFail_WhenUserIsNotAuthor(string policy)
@@ -222,7 +220,6 @@ public class DownloadAuthorizationTests : IDisposable
     [InlineData(Policies.EditDownload)]
     [InlineData(Policies.DeleteDownload)]
     [InlineData(Policies.UploadFile)]
-    [InlineData(Policies.DeleteFile)]
     [InlineData(Policies.InviteAuthor)]
     [InlineData(Policies.KickAuthor)]
     public async Task ManageDownload_ShouldSucceed_WhenUserIsOwner(string policy)
@@ -253,7 +250,6 @@ public class DownloadAuthorizationTests : IDisposable
     [InlineData(Policies.EditDownload)]
     [InlineData(Policies.DeleteDownload)]
     [InlineData(Policies.UploadFile)]
-    [InlineData(Policies.DeleteFile)]
     [InlineData(Policies.InviteAuthor)]
     [InlineData(Policies.KickAuthor)]
     public async Task ManageDownload_ShouldSucceed_WhenUserIsAuthor(string policy)

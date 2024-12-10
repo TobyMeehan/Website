@@ -61,6 +61,7 @@ public class FileAuthorizationTests : IDisposable
             ContentType = faker.System.MimeType(),
             SizeInBytes = faker.Random.Long(),
             Visibility = visibility ?? faker.PickRandom<Visibility>(),
+            Status = FileStatus.Created,
             CreatedAt = faker.Date.Past(),
             UpdatedAt = faker.Date.Recent(),
         };
