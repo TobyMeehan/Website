@@ -34,5 +34,22 @@ public class ApplicationDbContext : DbContext
 
         builder.Entity<CommentDto>().HasIndex(x => x.UserId);
         builder.Entity<CommentDto>().ToTable("comments");
+
+        builder.Entity<ReplyDto>().HasKey(e => new { e.ParentId, e.ReplyId });
+        
+        builder.Entity<ReplyDto>()
+            .HasOne(e => e.Parent)
+            .WithMany(e => e.Replies);
+
+        builder.Entity<ReplyDto>()
+            .ToTable("replies");
+
+        builder.Entity<DownloadCommentDto>().HasKey(e => new { e.DownloadId, e.CommentId });
+        
+        builder.Entity<DownloadCommentDto>()
+            .HasOne(e => e.Comment)
+            .WithOne(e => e.Download);
+        
+        builder.Entity<DownloadCommentDto>().ToTable("download_comments");
     }
 }

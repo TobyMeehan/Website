@@ -49,7 +49,6 @@ public class CommentAuthorizationTests : IDisposable
         return new Comment
         {
             Id = faker.Random.Guid(),
-            DownloadId = faker.Random.Guid(),
             UserId = userId ?? faker.Random.Guid(),
             Content = faker.Lorem.Paragraph(),
             CreatedAt = faker.Date.Past(),
@@ -77,11 +76,11 @@ public class CommentAuthorizationTests : IDisposable
     {
         var identity = new ClaimsIdentity();
         var principal = new ClaimsPrincipal(identity);
-        
+
         var comment = FakeComment();
-        
+
         var result = await _authorizationService.AuthorizeAsync(principal, comment, policy);
-        
+
         result.Succeeded.Should().BeFalse();
     }
 
@@ -97,13 +96,13 @@ public class CommentAuthorizationTests : IDisposable
             [
                 new Claim(ClaimTypes.NameIdentifier, userId.ToString()),
             ]);
-        
+
         var principal = new ClaimsPrincipal(identity);
-        
+
         var comment = FakeComment();
-        
+
         var result = await _authorizationService.AuthorizeAsync(principal, comment, policy);
-        
+
         result.Succeeded.Should().BeFalse();
     }
 
@@ -119,13 +118,13 @@ public class CommentAuthorizationTests : IDisposable
             [
                 new Claim(ClaimTypes.NameIdentifier, userId.ToString()),
             ]);
-        
+
         var principal = new ClaimsPrincipal(identity);
-        
+
         var comment = FakeComment(userId: userId);
-        
+
         var result = await _authorizationService.AuthorizeAsync(principal, comment, policy);
-        
+
         result.Succeeded.Should().BeTrue();
     }
 }

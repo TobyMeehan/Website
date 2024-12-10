@@ -4,6 +4,7 @@ using FluentAssertions;
 using TobyMeehan.Com.Data.Models;
 using TobyMeehan.Com.Data.Repositories;
 using TobyMeehan.Com.Data.Services;
+using TobyMeehan.Com.Domain.Downloads;
 using TobyMeehan.Com.Domain.Downloads.Services;
 
 namespace TobyMeehan.Com.Data.Tests.Services;
@@ -34,20 +35,33 @@ public class CommentServiceTests
             .ReturnsLazily((CommentDto input, CancellationToken _) => new CommentDto
             {
                 Id = commentId,
-                DownloadId = input.DownloadId,
+                Download = new DownloadCommentDto { CommentId = commentId, DownloadId = downloadId },
                 UserId = input.UserId,
                 Content = input.Content,
                 CreatedAt = input.CreatedAt,
                 EditedAt = input.EditedAt
             });
 
-        var create = new ICommentService.CreateComment(downloadId, userId, content);
+        var download = new Download
+        {
+            Id = downloadId,
+            Url = faker.Random.AlphaNumeric(11),
+            Title = faker.Commerce.ProductName(),
+            Summary = faker.Hacker.Phrase(),
+            Description = faker.Lorem.Paragraphs(),
+            Verification = faker.PickRandom<Verification>(),
+            Visibility = faker.PickRandom<Visibility>(),
+            Version = faker.System.Version(),
+            CreatedAt = faker.Date.Past(),
+            UpdatedAt = null
+        };
+        
+        var create = new ICommentService.CreateComment(userId, content);
 
-        await _sut.CreateAsync(create);
+        await _sut.CreateAsync(download, create);
 
         var captured = capturedDto.GetLastValue();
 
-        captured.DownloadId.Should().Be(downloadId);
         captured.UserId.Should().Be(userId);
         captured.Content.Should().Be(content);
         captured.CreatedAt.Should().BeWithin(TimeSpan.FromSeconds(2));
@@ -68,19 +82,32 @@ public class CommentServiceTests
             .ReturnsLazily((CommentDto input, CancellationToken _) => new CommentDto
             {
                 Id = commentId,
-                DownloadId = input.DownloadId,
+                Download = new DownloadCommentDto { CommentId = commentId, DownloadId = downloadId },
                 UserId = input.UserId,
                 Content = input.Content,
                 CreatedAt = input.CreatedAt,
                 EditedAt = input.EditedAt
             });
 
-        var create = new ICommentService.CreateComment(downloadId, userId, content);
+        var download = new Download
+        {
+            Id = downloadId,
+            Url = faker.Random.AlphaNumeric(11),
+            Title = faker.Commerce.ProductName(),
+            Summary = faker.Hacker.Phrase(),
+            Description = faker.Lorem.Paragraphs(),
+            Verification = faker.PickRandom<Verification>(),
+            Visibility = faker.PickRandom<Visibility>(),
+            Version = faker.System.Version(),
+            CreatedAt = faker.Date.Past(),
+            UpdatedAt = null
+        };
+        
+        var create = new ICommentService.CreateComment(userId, content);
 
-        var comment = await _sut.CreateAsync(create);
+        var comment = await _sut.CreateAsync(download, create);
 
         comment.Id.Should().Be(commentId);
-        comment.DownloadId.Should().Be(downloadId);
         comment.UserId.Should().Be(userId);
         comment.Content.Should().Be(content);
         comment.CreatedAt.Should().BeWithin(TimeSpan.FromSeconds(2));
@@ -91,7 +118,7 @@ public class CommentServiceTests
     public async Task GetByIdAsync_ShouldReturnComment_WhenCommentExists()
     {
         var faker = new Faker();
-        
+
         var commentId = faker.Random.Guid();
         var downloadId = faker.Random.Guid();
         var userId = faker.Random.Guid();
@@ -102,7 +129,7 @@ public class CommentServiceTests
         var commentDto = new CommentDto
         {
             Id = commentId,
-            DownloadId = downloadId,
+            Download = new DownloadCommentDto { CommentId = commentId, DownloadId = downloadId },
             UserId = userId,
             Content = content,
             CreatedAt = createdAt,
@@ -110,13 +137,12 @@ public class CommentServiceTests
         };
 
         A.CallTo(() => _commentRepository.GetByIdAsync(commentId, A<CancellationToken>._)).Returns(commentDto);
-        
+
         var comment = await _sut.GetByIdAsync(commentId);
 
         comment.Should().NotBeNull();
-        
+
         comment?.Id.Should().Be(commentId);
-        comment?.DownloadId.Should().Be(downloadId);
         comment?.UserId.Should().Be(userId);
         comment?.Content.Should().Be(content);
         comment?.CreatedAt.Should().Be(createdAt);
@@ -127,12 +153,12 @@ public class CommentServiceTests
     public async Task GetByIdAsync_ShouldReturnNull_WhenCommentDoesNotExist()
     {
         var commentId = Guid.NewGuid();
-        
+
         A.CallTo(() => _commentRepository.GetByIdAsync(commentId, A<CancellationToken>._))
             .Returns<CommentDto?>(null);
-        
+
         var comment = await _sut.GetByIdAsync(commentId);
-        
+
         comment.Should().BeNull();
     }
 
@@ -143,7 +169,6 @@ public class CommentServiceTests
 
         var faker = new Faker<CommentDto>()
             .RuleFor(x => x.Id, f => f.Random.Guid())
-            .RuleFor(x => x.DownloadId, _ => downloadId)
             .RuleFor(x => x.UserId, f => f.Random.Guid())
             .RuleFor(x => x.Content, f => f.Lorem.Paragraph())
             .RuleFor(x => x.CreatedAt, f => f.Date.Past())
@@ -158,7 +183,6 @@ public class CommentServiceTests
         foreach (var (i, comment) in result.Select((x, i) => (i, x)))
         {
             comment.Id.Should().Be(collection[i].Id);
-            comment.DownloadId.Should().Be(collection[i].DownloadId);
             comment.UserId.Should().Be(collection[i].UserId);
             comment.Content.Should().Be(collection[i].Content);
             comment.CreatedAt.Should().Be(collection[i].CreatedAt);
@@ -181,7 +205,7 @@ public class CommentServiceTests
         var commentDto = new CommentDto
         {
             Id = commentId,
-            DownloadId = downloadId,
+            Download = new DownloadCommentDto { CommentId = commentId, DownloadId = downloadId },
             UserId = userId,
             Content = content,
             CreatedAt = createdAt,
@@ -195,13 +219,13 @@ public class CommentServiceTests
         A.CallTo(() =>
             _commentRepository.UpdateAsync(capturedDto.That.Matches(x => x.Id == commentId),
                 A<CancellationToken>._)).DoesNothing();
-        
+
         var updatedContent = faker.Lorem.Paragraph();
 
         var update = new ICommentService.UpdateComment(updatedContent);
 
         var result = await _sut.UpdateAsync(commentId, update);
-        
+
         var captured = capturedDto.GetLastValue();
 
         captured.Content.Should().Be(updatedContent);
@@ -210,14 +234,13 @@ public class CommentServiceTests
             .And.BeWithin(TimeSpan.FromSeconds(2));
 
         result.Should().NotBeNull();
-        
+
         result?.Id.Should().Be(commentId);
-        result?.DownloadId.Should().Be(downloadId);
         result?.UserId.Should().Be(userId);
         result?.Content.Should().Be(updatedContent);
         result?.EditedAt.Should().Be(captured.EditedAt);
     }
-    
+
     [Fact]
     public async Task DeleteAsync_ShouldCallRepositoryMethod()
     {

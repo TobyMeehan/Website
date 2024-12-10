@@ -53,13 +53,12 @@ public class Endpoint : Endpoint<Request, CommentResponse, CommentMapper>
             return;
         }
 
-        var comment = await _commentService.CreateAsync(new ICommentService.CreateComment(
-                download.Id,
+        var comment = await _commentService.CreateAsync(download, new ICommentService.CreateComment(
                 userId,
                 req.Content),
             ct);
 
-        await SendCreatedAtAsync<GetById.Endpoint>(new { DownloadId = download.Url, CommentId = comment.Id },
+        await SendCreatedAtAsync<GetById.Endpoint>(new { CommentId = comment.Id },
             Map.FromEntity(comment), cancellation: ct);
     }
 }

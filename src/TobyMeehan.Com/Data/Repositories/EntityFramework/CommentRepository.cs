@@ -26,18 +26,28 @@ public class CommentRepository : ICommentRepository
 
     public async Task<IReadOnlyList<CommentDto>> GetByDownloadAsync(Guid downloadId, CancellationToken cancellationToken)
     {
-        return await _comments
+        return await _dbContext.Set<DownloadCommentDto>()
             .Where(x => !x.Download!.DeletedAt.HasValue)
             .Where(x => x.DownloadId == downloadId)
+            .Select(x => x.Comment!)
             .OrderByDescending(x => x.CreatedAt)
+            .ToListAsync(cancellationToken);
+    }
+
+    public async Task<IReadOnlyList<CommentDto>> GetRepliesAsync(Guid commentId, CancellationToken cancellationToken)
+    {
+        return await _dbContext.Set<ReplyDto>()
+            .Where(x => x.ParentId == commentId)
+            .Select(x => x.Reply!)
+            .OrderBy(x => x.CreatedAt)
             .ToListAsync(cancellationToken);
     }
 
     public async Task<CommentDto?> GetByIdAsync(Guid id, CancellationToken cancellationToken)
     {
         return await _comments
-            .Where(x => !x.Download!.DeletedAt.HasValue)
             .Where(x => x.Id == id)
+            .Include(x => x.Replies)
             .FirstOrDefaultAsync(cancellationToken);
     }
 
@@ -51,7 +61,6 @@ public class CommentRepository : ICommentRepository
     public async Task DeleteAsync(Guid id, CancellationToken cancellationToken)
     {
         await _comments
-            .Where(x => !x.Download!.DeletedAt.HasValue)
             .Where(x => x.Id == id)
             .ExecuteDeleteAsync(cancellationToken);
     }

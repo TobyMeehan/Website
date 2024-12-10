@@ -25,5 +25,5 @@ public class DownloadDto
 
     public ICollection<DownloadAuthorDto> Authors { get; set; } = [];
     public ICollection<DownloadFileDto> Files { get; set; } = [];
-    public ICollection<CommentDto> Comments { get; set; } = [];
+    public ICollection<DownloadCommentDto> Comments { get; set; } = [];
 }
