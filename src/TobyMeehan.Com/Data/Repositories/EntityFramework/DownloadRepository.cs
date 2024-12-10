@@ -78,6 +78,7 @@ public class DownloadRepository : IDownloadRepository
     {
         await _downloads
             .Where(x => !x.DeletedAt.HasValue)
+            .Where(x => x.Id == id)
             .ExecuteUpdateAsync(x => 
                 x.SetProperty(d => d.DeletedAt, DateTime.UtcNow), cancellationToken);
     }
