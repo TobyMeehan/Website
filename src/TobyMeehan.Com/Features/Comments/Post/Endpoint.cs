@@ -36,7 +36,7 @@ public class Endpoint : Endpoint<Request, CommentResponse, CommentMapper>
             throw new InvalidOperationException();
         }
 
-        var download = await _downloadService.GetByUrlAsync(req.DownloadId, ct);
+        var download = await _downloadService.GetByPublicIdAsync(req.DownloadId, ct);
 
         if (download is null)
         {

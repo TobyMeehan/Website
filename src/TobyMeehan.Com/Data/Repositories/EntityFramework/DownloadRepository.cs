@@ -57,11 +57,11 @@ public class DownloadRepository : IDownloadRepository
             .FirstOrDefaultAsync(cancellationToken);
     }
 
-    public async Task<DownloadDto?> GetByUrlAsync(string url, CancellationToken cancellationToken)
+    public async Task<DownloadDto?> GetByPublicIdAsync(string publicId, CancellationToken cancellationToken)
     {
         return await _downloads
             .Where(x => !x.DeletedAt.HasValue)
-            .Where(x => x.Url == url)
+            .Where(x => x.PublicId == publicId)
             .FirstOrDefaultAsync(cancellationToken);
     }
 

@@ -28,7 +28,7 @@ public class Endpoint : Endpoint<Request, Response>
 
     public override async Task HandleAsync(Request req, CancellationToken ct)
     {
-        var download = await _downloadService.GetByUrlAsync(req.DownloadId, ct);
+        var download = await _downloadService.GetByPublicIdAsync(req.DownloadId, ct);
 
         if (download is null)
         {
@@ -52,7 +52,7 @@ public class Endpoint : Endpoint<Request, Response>
         await SendAsync(new Response
         {
             Id = result.File.Id,
-            DownloadId = download.Url,
+            DownloadId = download.PublicId,
             Filename = result.File.Filename,
             ContentType = result.File.ContentType,
             Size = result.File.SizeInBytes,

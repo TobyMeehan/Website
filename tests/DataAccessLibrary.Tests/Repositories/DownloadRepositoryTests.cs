@@ -53,7 +53,7 @@ public class DownloadRepositoryTests : IAsyncLifetime
         var download = new DownloadDto
         {
             OwnerId = ownerId,
-            Url = url,
+            PublicId = url,
             Title = title,
             Summary = summary,
             Description = description,
@@ -71,7 +71,7 @@ public class DownloadRepositoryTests : IAsyncLifetime
 
         result.Id.Should().NotBeEmpty();
         result.OwnerId.Should().Be(ownerId);
-        result.Url.Should().Be(url);
+        result.PublicId.Should().Be(url);
         result.Title.Should().Be(title);
         result.Summary.Should().Be(summary);
         result.Description.Should().Be(description);
@@ -95,7 +95,7 @@ public class DownloadRepositoryTests : IAsyncLifetime
             .UseDateTimeReference(DateTime.UtcNow)
             .RuleFor(x => x.Id, f => f.Random.Guid())
             .RuleFor(x => x.OwnerId, f => f.Random.Guid())
-            .RuleFor(x => x.Url, f => f.Random.AlphaNumeric(11))
+            .RuleFor(x => x.PublicId, f => f.Random.AlphaNumeric(11))
             .RuleFor(x => x.Title, f => f.Commerce.ProductName())
             .RuleFor(x => x.Summary, f => f.Lorem.Paragraph())
             .RuleFor(x => x.Description, f => f.Lorem.Paragraphs())
@@ -129,7 +129,7 @@ public class DownloadRepositoryTests : IAsyncLifetime
             .UseDateTimeReference(DateTime.UtcNow)
             .RuleFor(x => x.Id, f => f.Random.Guid())
             .RuleFor(x => x.OwnerId, f => f.Random.Guid())
-            .RuleFor(x => x.Url, f => f.Random.AlphaNumeric(11))
+            .RuleFor(x => x.PublicId, f => f.Random.AlphaNumeric(11))
             .RuleFor(x => x.Title, f => f.Commerce.ProductName())
             .RuleFor(x => x.Summary, f => f.Lorem.Paragraph())
             .RuleFor(x => x.Description, f => f.Lorem.Paragraphs())
@@ -163,7 +163,7 @@ public class DownloadRepositoryTests : IAsyncLifetime
             .UseDateTimeReference(DateTime.UtcNow)
             .RuleFor(x => x.Id, f => f.Random.Guid())
             .RuleFor(x => x.OwnerId, f => f.Random.Guid())
-            .RuleFor(x => x.Url, f => f.Random.AlphaNumeric(11))
+            .RuleFor(x => x.PublicId, f => f.Random.AlphaNumeric(11))
             .RuleFor(x => x.Title, f => f.Commerce.ProductName())
             .RuleFor(x => x.Summary, f => f.Lorem.Paragraph())
             .RuleFor(x => x.Description, f => f.Lorem.Paragraphs())
@@ -210,7 +210,7 @@ public class DownloadRepositoryTests : IAsyncLifetime
         var faker = new Faker<DownloadDto>()
             .UseDateTimeReference(DateTime.UtcNow)
             .RuleFor(x => x.Id, f => f.Random.Guid())
-            .RuleFor(x => x.Url, f => f.Random.AlphaNumeric(11))
+            .RuleFor(x => x.PublicId, f => f.Random.AlphaNumeric(11))
             .RuleFor(x => x.Title, f => f.Commerce.ProductName())
             .RuleFor(x => x.Summary, f => f.Lorem.Paragraph())
             .RuleFor(x => x.Description, f => f.Lorem.Paragraphs())
@@ -267,7 +267,7 @@ public class DownloadRepositoryTests : IAsyncLifetime
         var faker = new Faker<DownloadDto>()
             .UseDateTimeReference(DateTime.UtcNow)
             .RuleFor(x => x.Id, f => f.Random.Guid())
-            .RuleFor(x => x.Url, f => f.Random.AlphaNumeric(11))
+            .RuleFor(x => x.PublicId, f => f.Random.AlphaNumeric(11))
             .RuleFor(x => x.Title, f => f.Commerce.ProductName())
             .RuleFor(x => x.Summary, f => f.Lorem.Paragraph())
             .RuleFor(x => x.Description, f => f.Lorem.Paragraphs())
@@ -316,7 +316,7 @@ public class DownloadRepositoryTests : IAsyncLifetime
             .UseDateTimeReference(DateTime.UtcNow)
             .RuleFor(x => x.Id, f => f.Random.Guid())
             .RuleFor(x => x.OwnerId, f => f.Random.Guid())
-            .RuleFor(x => x.Url, f => f.Random.AlphaNumeric(11))
+            .RuleFor(x => x.PublicId, f => f.Random.AlphaNumeric(11))
             .RuleFor(x => x.Title, f => f.Commerce.ProductName())
             .RuleFor(x => x.Summary, f => f.Lorem.Paragraph())
             .RuleFor(x => x.Description, f => f.Lorem.Paragraphs())
@@ -403,7 +403,7 @@ public class DownloadRepositoryTests : IAsyncLifetime
         {
             Id = downloadId,
             OwnerId = ownerId,
-            Url = url,
+            PublicId = url,
             Title = title,
             Summary = summary,
             Description = description,
@@ -470,7 +470,7 @@ public class DownloadRepositoryTests : IAsyncLifetime
         {
             Id = downloadId,
             OwnerId = ownerId,
-            Url = url,
+            PublicId = url,
             Title = title,
             Summary = summary,
             Description = description,
@@ -499,7 +499,7 @@ public class DownloadRepositoryTests : IAsyncLifetime
         
         result?.Id.Should().Be(downloadId);
         result?.OwnerId.Should().Be(ownerId);
-        result?.Url.Should().Be(url);
+        result?.PublicId.Should().Be(url);
         result?.Title.Should().Be(title);
         result?.Summary.Should().Be(summary);
         result?.Description.Should().Be(description);
@@ -535,7 +535,7 @@ public class DownloadRepositoryTests : IAsyncLifetime
         {
             Id = downloadId,
             OwnerId = ownerId,
-            Url = url,
+            PublicId = url,
             Title = title,
             Summary = summary,
             Description = description,
@@ -556,7 +556,7 @@ public class DownloadRepositoryTests : IAsyncLifetime
         
         var repository = scope.ServiceProvider.GetRequiredService<DownloadRepository>();
 
-        var result = await repository.GetByUrlAsync(url, default);
+        var result = await repository.GetByPublicIdAsync(url, default);
         
         result.Should().BeNull();
     }
@@ -574,7 +574,7 @@ public class DownloadRepositoryTests : IAsyncLifetime
         
         var repository = scope.ServiceProvider.GetRequiredService<DownloadRepository>();
         
-        var result = await repository.GetByUrlAsync(url, default);
+        var result = await repository.GetByPublicIdAsync(url, default);
         
         result.Should().BeNull();
     }
@@ -606,7 +606,7 @@ public class DownloadRepositoryTests : IAsyncLifetime
         {
             Id = downloadId,
             OwnerId = ownerId,
-            Url = url,
+            PublicId = url,
             Title = title,
             Summary = summary,
             Description = description,
@@ -629,13 +629,13 @@ public class DownloadRepositoryTests : IAsyncLifetime
         
         var repository = scope.ServiceProvider.GetRequiredService<DownloadRepository>();
 
-        var result = await repository.GetByUrlAsync(url, default);
+        var result = await repository.GetByPublicIdAsync(url, default);
 
         result.Should().NotBeNull();
         
         result?.Id.Should().Be(downloadId);
         result?.OwnerId.Should().Be(ownerId);
-        result?.Url.Should().Be(url);
+        result?.PublicId.Should().Be(url);
         result?.Title.Should().Be(title);
         result?.Summary.Should().Be(summary);
         result?.Description.Should().Be(description);
@@ -673,7 +673,7 @@ public class DownloadRepositoryTests : IAsyncLifetime
         {
             Id = downloadId,
             OwnerId = ownerId,
-            Url = url,
+            PublicId = url,
             Title = title,
             Summary = summary,
             Description = description,
@@ -749,7 +749,7 @@ public class DownloadRepositoryTests : IAsyncLifetime
         {
             Id = downloadId,
             OwnerId = ownerId,
-            Url = url,
+            PublicId = url,
             Title = title,
             Summary = summary,
             Description = description,

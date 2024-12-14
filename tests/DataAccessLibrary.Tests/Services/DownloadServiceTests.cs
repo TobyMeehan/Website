@@ -38,7 +38,7 @@ public class DownloadServiceTests
             {
                 Id = downloadId,
                 OwnerId = input.OwnerId,
-                Url = input.Url,
+                PublicId = input.PublicId,
                 Title = input.Title,
                 Summary = input.Summary,
                 Description = input.Description,
@@ -56,7 +56,7 @@ public class DownloadServiceTests
         var captured = capturedDto.GetLastValue();
 
         captured.OwnerId.Should().Be(ownerId);
-        captured.Url.Should().NotBeNull();
+        captured.PublicId.Should().NotBeNull();
         captured.Title.Should().Be(title);
         captured.Summary.Should().Be(summary);
         captured.Description.Should().Be(description);
@@ -84,7 +84,7 @@ public class DownloadServiceTests
             {
                 Id = downloadId,
                 OwnerId = input.OwnerId,
-                Url = input.Url,
+                PublicId = input.PublicId,
                 Title = input.Title,
                 Summary = input.Summary,
                 Description = input.Description,
@@ -100,7 +100,7 @@ public class DownloadServiceTests
         var download = await _sut.CreateAsync(create);
 
         download.Id.Should().Be(downloadId);
-        download.Url.Should().NotBeNull();
+        download.PublicId.Should().NotBeNull();
         download.Title.Should().Be(title);
         download.Summary.Should().Be(summary);
         download.Description.Should().Be(description);
@@ -117,7 +117,7 @@ public class DownloadServiceTests
         var faker = new Faker<DownloadDto>()
             .RuleFor(x => x.Id, f => f.Random.Guid())
             .RuleFor(x => x.OwnerId, f => f.Random.Guid())
-            .RuleFor(x => x.Url, f => f.Random.AlphaNumeric(11))
+            .RuleFor(x => x.PublicId, f => f.Random.AlphaNumeric(11))
             .RuleFor(x => x.Title, f => f.Commerce.ProductName())
             .RuleFor(x => x.Summary, f => f.Lorem.Paragraph())
             .RuleFor(x => x.Description, f => f.Lorem.Paragraphs())
@@ -138,7 +138,7 @@ public class DownloadServiceTests
         foreach (var (i, download) in result.Select((x, i) => (i, x)))
         {
             download.Id.Should().Be(collection[i].Id);
-            download.Url.Should().Be(collection[i].Url);
+            download.PublicId.Should().Be(collection[i].PublicId);
             download.Title.Should().Be(collection[i].Title);
             download.Summary.Should().Be(collection[i].Summary);
             download.Description.Should().Be(collection[i].Description);
@@ -158,7 +158,7 @@ public class DownloadServiceTests
         var faker = new Faker<DownloadDto>()
             .RuleFor(x => x.Id, f => f.Random.Guid())
             .RuleFor(x => x.OwnerId, f => f.PickRandom(userId, f.Random.Guid()))
-            .RuleFor(x => x.Url, f => f.Random.AlphaNumeric(11))
+            .RuleFor(x => x.PublicId, f => f.Random.AlphaNumeric(11))
             .RuleFor(x => x.Title, f => f.Commerce.ProductName())
             .RuleFor(x => x.Summary, f => f.Lorem.Paragraph())
             .RuleFor(x => x.Description, f => f.Lorem.Paragraphs())
@@ -179,7 +179,7 @@ public class DownloadServiceTests
         foreach (var (i, download) in result.Select((x, i) => (i, x)))
         {
             download.Id.Should().Be(collection[i].Id);
-            download.Url.Should().Be(collection[i].Url);
+            download.PublicId.Should().Be(collection[i].PublicId);
             download.Title.Should().Be(collection[i].Title);
             download.Summary.Should().Be(collection[i].Summary);
             download.Description.Should().Be(collection[i].Description);
@@ -212,7 +212,7 @@ public class DownloadServiceTests
         var downloadDto = new DownloadDto
         {
             Id = downloadId,
-            Url = url,
+            PublicId = url,
             Title = title,
             Summary = summary,
             Description = description,
@@ -233,7 +233,7 @@ public class DownloadServiceTests
         download.Should().NotBeNull();
 
         download?.Id.Should().Be(downloadId);
-        download?.Url.Should().Be(url);
+        download?.PublicId.Should().Be(url);
         download?.Title.Should().Be(title);
         download?.Summary.Should().Be(summary);
         download?.Description.Should().Be(description);
@@ -276,7 +276,7 @@ public class DownloadServiceTests
         var downloadDto = new DownloadDto
         {
             Id = downloadId,
-            Url = url,
+            PublicId = url,
             Title = title,
             Summary = summary,
             Description = description,
@@ -287,14 +287,14 @@ public class DownloadServiceTests
             UpdatedAt = updatedAt,
         };
 
-        A.CallTo(() => _downloadRepository.GetByUrlAsync(url, A<CancellationToken>._)).Returns(downloadDto);
+        A.CallTo(() => _downloadRepository.GetByPublicIdAsync(url, A<CancellationToken>._)).Returns(downloadDto);
 
-        var download = await _sut.GetByUrlAsync(url);
+        var download = await _sut.GetByPublicIdAsync(url);
 
         download.Should().NotBeNull();
 
         download?.Id.Should().Be(downloadId);
-        download?.Url.Should().Be(url);
+        download?.PublicId.Should().Be(url);
         download?.Title.Should().Be(title);
         download?.Summary.Should().Be(summary);
         download?.Description.Should().Be(description);
@@ -312,10 +312,10 @@ public class DownloadServiceTests
 
         var url = faker.Random.AlphaNumeric(11);
 
-        A.CallTo(() => _downloadRepository.GetByUrlAsync(url, A<CancellationToken>._))
+        A.CallTo(() => _downloadRepository.GetByPublicIdAsync(url, A<CancellationToken>._))
             .Returns<DownloadDto?>(null);
 
-        var download = await _sut.GetByUrlAsync(url);
+        var download = await _sut.GetByPublicIdAsync(url);
 
         download.Should().BeNull();
     }
@@ -339,7 +339,7 @@ public class DownloadServiceTests
         var downloadDto = new DownloadDto
         {
             Id = downloadId,
-            Url = url,
+            PublicId = url,
             Title = title,
             Summary = summary,
             Description = description,
@@ -360,7 +360,7 @@ public class DownloadServiceTests
             .ReturnsLazily((DownloadDto input, CancellationToken _) => new DownloadDto
             {
                 Id = downloadId,
-                Url = input.Url,
+                PublicId = input.PublicId,
                 Title = input.Title,
                 Summary = input.Summary,
                 Description = input.Description,
@@ -392,7 +392,7 @@ public class DownloadServiceTests
         result.Should().NotBeNull();
 
         result?.Id.Should().Be(downloadId);
-        result?.Url.Should().Be(url);
+        result?.PublicId.Should().Be(url);
         result?.Title.Should().Be(updatedTitle);
         result?.Summary.Should().Be(updatedSummary);
         result?.Description.Should().Be(updatedDescription);
@@ -422,7 +422,7 @@ public class DownloadServiceTests
         var downloadDto = new DownloadDto
         {
             Id = downloadId,
-            Url = url,
+            PublicId = url,
             Title = title,
             Summary = summary,
             Description = description,
@@ -472,7 +472,7 @@ public class DownloadServiceTests
         var downloadDto = new DownloadDto
         {
             Id = downloadId,
-            Url = url,
+            PublicId = url,
             Title = title,
             Summary = summary,
             Description = description,

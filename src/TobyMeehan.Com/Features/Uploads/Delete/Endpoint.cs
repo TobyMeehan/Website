@@ -27,7 +27,7 @@ public class Endpoint : Endpoint<UploadRequest>
 
     public override async Task HandleAsync(UploadRequest req, CancellationToken ct)
     {
-        var download = await _downloadService.GetByUrlAsync(req.DownloadId, ct);
+        var download = await _downloadService.GetByPublicIdAsync(req.DownloadId, ct);
 
         if (download is null)
         {

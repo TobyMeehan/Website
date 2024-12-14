@@ -36,7 +36,7 @@ public class Endpoint : Endpoint<Request, DownloadResponse, DownloadMapper>
             req.Description,
             req.Visibility), ct);
 
-        await SendCreatedAtAsync<GetById.Endpoint>(new { Id = download.Url }, Map.FromEntity(download),
+        await SendCreatedAtAsync<GetById.Endpoint>(new { Id = download.PublicId }, Map.FromEntity(download),
             cancellation: ct);
     }
 }

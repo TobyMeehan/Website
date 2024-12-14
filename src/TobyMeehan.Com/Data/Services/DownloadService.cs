@@ -17,14 +17,14 @@ public class DownloadService : IDownloadService
     public async Task<Download> CreateAsync(IDownloadService.CreateDownload create,
         CancellationToken cancellationToken = default)
     {
-        var url = new string(Random.Shared.GetItems(
+        var publicId = new string(Random.Shared.GetItems(
             "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789".AsSpan(),
             length: 11));
 
         var download = new DownloadDto
         {
             OwnerId = create.UserId,
-            Url = url,
+            PublicId = publicId,
             Title = create.Title,
             Summary = create.Summary,
             Description = create.Description,
@@ -37,7 +37,7 @@ public class DownloadService : IDownloadService
         return new Download
         {
             Id = download.Id,
-            Url = download.Url,
+            PublicId = download.PublicId,
             Title = download.Title,
             Summary = download.Summary,
             Description = download.Description,
@@ -56,7 +56,7 @@ public class DownloadService : IDownloadService
         return downloads.Select(download => new Download
         {
             Id = download.Id,
-            Url = download.Url,
+            PublicId = download.PublicId,
             Title = download.Title,
             Summary = download.Summary,
             Description = download.Description,
@@ -76,7 +76,7 @@ public class DownloadService : IDownloadService
         return downloads.Select(download => new Download
         {
             Id = download.Id,
-            Url = download.Url,
+            PublicId = download.PublicId,
             Title = download.Title,
             Summary = download.Summary,
             Description = download.Description,
@@ -100,7 +100,7 @@ public class DownloadService : IDownloadService
         return new Download
         {
             Id = download.Id,
-            Url = download.Url,
+            PublicId = download.PublicId,
             Title = download.Title,
             Summary = download.Summary,
             Description = download.Description,
@@ -112,9 +112,9 @@ public class DownloadService : IDownloadService
         };
     }
 
-    public async Task<Download?> GetByUrlAsync(string url, CancellationToken cancellationToken = default)
+    public async Task<Download?> GetByPublicIdAsync(string publicId, CancellationToken cancellationToken = default)
     {
-        var download = await _downloadRepository.GetByUrlAsync(url, cancellationToken);
+        var download = await _downloadRepository.GetByPublicIdAsync(publicId, cancellationToken);
 
         if (download is null)
         {
@@ -124,7 +124,7 @@ public class DownloadService : IDownloadService
         return new Download
         {
             Id = download.Id,
-            Url = download.Url,
+            PublicId = download.PublicId,
             Title = download.Title,
             Summary = download.Summary,
             Description = download.Description,
@@ -164,7 +164,7 @@ public class DownloadService : IDownloadService
         return new Download
         {
             Id = download.Id,
-            Url = download.Url,
+            PublicId = download.PublicId,
             Title = download.Title,
             Summary = download.Summary,
             Description = download.Description,

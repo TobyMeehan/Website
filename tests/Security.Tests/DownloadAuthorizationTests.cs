@@ -57,7 +57,7 @@ public class DownloadAuthorizationTests : IDisposable
         return new Download
         {
             Id = faker.Random.Guid(),
-            Url = faker.Random.AlphaNumeric(11),
+            PublicId = faker.Random.AlphaNumeric(11),
             Title = faker.Hacker.Phrase(),
             Summary = faker.Lorem.Paragraph(),
             Description = faker.Lorem.Paragraphs(),

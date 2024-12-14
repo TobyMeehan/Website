@@ -31,7 +31,7 @@ public class Endpoint : Endpoint<Request, DownloadAuthorResponse, DownloadAuthor
 
     public override async Task HandleAsync(Request req, CancellationToken ct)
     {
-        var download = await _downloadService.GetByUrlAsync(req.DownloadId, ct);
+        var download = await _downloadService.GetByPublicIdAsync(req.DownloadId, ct);
 
         if (download is null)
         {
@@ -57,7 +57,7 @@ public class Endpoint : Endpoint<Request, DownloadAuthorResponse, DownloadAuthor
 
         var author = await _downloadAuthorService.AddAsync(download.Id, req.UserId, ct);
 
-        await SendCreatedAtAsync<GetById.Endpoint>(new { DownloadId = download.Url, req.UserId },
+        await SendCreatedAtAsync<GetById.Endpoint>(new { DownloadId = download.PublicId, req.UserId },
             Map.FromEntity(author), cancellation: ct);
     }
 }

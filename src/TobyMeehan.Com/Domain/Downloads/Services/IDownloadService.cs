@@ -15,7 +15,7 @@ public interface IDownloadService
     Task<IReadOnlyList<Download>> GetByUserAsync(Guid userId, CancellationToken cancellationToken = default);
 
     Task<Download?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
-    Task<Download?> GetByUrlAsync(string url, CancellationToken cancellationToken = default);
+    Task<Download?> GetByPublicIdAsync(string publicId, CancellationToken cancellationToken = default);
 
     public record UpdateDownload(
         string Title,

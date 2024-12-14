@@ -45,7 +45,7 @@ public class CommentServiceTests
         var download = new Download
         {
             Id = downloadId,
-            Url = faker.Random.AlphaNumeric(11),
+            PublicId = faker.Random.AlphaNumeric(11),
             Title = faker.Commerce.ProductName(),
             Summary = faker.Hacker.Phrase(),
             Description = faker.Lorem.Paragraphs(),
@@ -92,7 +92,7 @@ public class CommentServiceTests
         var download = new Download
         {
             Id = downloadId,
-            Url = faker.Random.AlphaNumeric(11),
+            PublicId = faker.Random.AlphaNumeric(11),
             Title = faker.Commerce.ProductName(),
             Summary = faker.Hacker.Phrase(),
             Description = faker.Lorem.Paragraphs(),

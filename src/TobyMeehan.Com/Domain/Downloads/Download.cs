@@ -4,7 +4,7 @@ public class Download
 {
     public required Guid Id { get; init; }
 
-    public required string Url { get; init; }
+    public required string PublicId { get; init; }
     public required string Title { get; init; }
     public required string Summary { get; init; }
     public required string Description { get; init; }

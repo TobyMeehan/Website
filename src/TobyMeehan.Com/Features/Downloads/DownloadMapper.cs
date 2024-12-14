@@ -9,7 +9,7 @@ public class DownloadMapper : ResponseMapper<DownloadResponse, Download>
     {
         return new DownloadResponse
         {
-            Id = download.Url,
+            Id = download.PublicId,
             Title = download.Title,
             Summary = download.Summary,
             Description = download.Description,

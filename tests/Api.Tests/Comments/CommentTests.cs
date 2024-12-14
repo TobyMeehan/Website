@@ -30,7 +30,7 @@ public class CommentTests : TestBase<ApiApp>
             Description: Fake.Lorem.Paragraphs(),
             Visibility: Fake.PickRandom<Visibility>()));
         
-        _app.Downloads.Add(download.Url);
+        _app.Downloads.Add(download.PublicId);
     }
 
     [Fact]

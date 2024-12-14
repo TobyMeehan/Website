@@ -74,7 +74,7 @@ public class DownloadTests(ApiApp App) : TestBase<ApiApp>
 
             var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
 
-            var download = await dbContext.Set<DownloadDto>().FirstOrDefaultAsync(x => x.Url == data.Id);
+            var download = await dbContext.Set<DownloadDto>().FirstOrDefaultAsync(x => x.PublicId == data.Id);
 
             download.Should().NotBeNull();
 
@@ -116,7 +116,7 @@ public class DownloadTests(ApiApp App) : TestBase<ApiApp>
 
         var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
 
-        var download = await dbContext.Set<DownloadDto>().FirstOrDefaultAsync(x => x.Url == data.Id);
+        var download = await dbContext.Set<DownloadDto>().FirstOrDefaultAsync(x => x.PublicId == data.Id);
 
         download.Should().NotBeNull();
 

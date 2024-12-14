@@ -25,7 +25,7 @@ public class Endpoint : Endpoint<Request, DownloadResponse, DownloadMapper>
 
     public override async Task HandleAsync(Request req, CancellationToken ct)
     {
-        var download = await _downloadService.GetByUrlAsync(req.Id, ct);
+        var download = await _downloadService.GetByPublicIdAsync(req.Id, ct);
 
         if (download is null)
         {

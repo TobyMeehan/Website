@@ -8,7 +8,7 @@ public class DownloadDto
     public Guid Id { get; set; }
     public Guid OwnerId { get; set; }
 
-    [MaxLength(20)] public string Url { get; set; } = null!;
+    [MaxLength(20)] public string PublicId { get; set; } = null!;
     
     [MaxLength(40)] public string Title { get; set; } = null!;
     [MaxLength(400)] public string Summary { get; set; } = null!;
