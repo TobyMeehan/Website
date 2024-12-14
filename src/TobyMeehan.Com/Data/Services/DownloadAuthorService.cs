@@ -21,6 +21,19 @@ public class DownloadAuthorService : IDownloadAuthorService
     public async Task<DownloadAuthor> AddAsync(Guid downloadId, Guid userId,
         CancellationToken cancellationToken = default)
     {
+        var download = await _downloadRepository.GetByIdAsync(downloadId, cancellationToken);
+
+        if (userId == download?.OwnerId)
+        {
+            return new DownloadAuthor
+            {
+                DownloadId = download.Id,
+                UserId = download.OwnerId,
+                IsOwner = true,
+                CreatedAt = download.CreatedAt
+            };
+        }
+        
         var author = await _downloadAuthorRepository.GetAsync(downloadId, userId, cancellationToken);
 
         if (author is not null)
