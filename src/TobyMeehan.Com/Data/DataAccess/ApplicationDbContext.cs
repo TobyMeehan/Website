@@ -16,7 +16,6 @@ public class ApplicationDbContext : DbContext
     
     protected override void OnModelCreating(ModelBuilder builder)
     {
-        builder.Entity<DownloadDto>().Ignore(x => x.Version);
         builder.Entity<DownloadDto>().ToTable("downloads");
 
         builder.Entity<DownloadAuthorDto>().HasKey(e => new { e.UserId, e.DownloadId });
