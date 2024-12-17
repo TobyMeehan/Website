@@ -8,9 +8,9 @@ public class DownloadFileDto
     public Guid Id { get; set; }
     public Guid DownloadId { get; set; }
 
-    [MaxLength(40)]
+    [MaxLength(100)]
     public string Filename { get; set; } = null!;
-    [MaxLength(40)]
+    [MaxLength(255)]
     public string ContentType { get; set; } = null!;
     public long SizeInBytes { get; set; }
 
