@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using TobyMeehan.Com.Data.DataAccess;
 using TobyMeehan.Com.Data.Models;
+using TobyMeehan.Com.Domain.Downloads;
 
 namespace TobyMeehan.Com.Data.Repositories.EntityFramework;
 
@@ -14,27 +15,32 @@ public class DownloadFileRepository : IDownloadFileRepository
         _dbContext = dbContext;
         _files = _dbContext.Set<DownloadFileDto>();
     }
-    
+
     public async Task<DownloadFileDto> CreateAsync(DownloadFileDto file, CancellationToken cancellationToken)
     {
         _files.Add(file);
-        
+
         await _dbContext.SaveChangesAsync(cancellationToken);
 
         return file;
     }
 
-    public async Task<DownloadFileDto?> GetByFilenameAsync(Guid downloadId, string filename, CancellationToken cancellationToken)
+    public async Task<DownloadFileDto?> GetByFilenameAsync(Guid downloadId, string filename,
+        CancellationToken cancellationToken)
     {
         return await _files
+            .Where(x => x.Status == FileStatus.Created ||
+                        (x.Status == FileStatus.Reserved && DateTime.UtcNow - x.CreatedAt < TimeSpan.FromHours(1)))
             .Where(x => x.DownloadId == downloadId)
             .Where(x => x.Filename == filename)
             .FirstOrDefaultAsync(cancellationToken);
     }
 
-    public async Task<IReadOnlyList<DownloadFileDto>> GetByDownloadAsync(Guid downloadId, CancellationToken cancellationToken)
+    public async Task<IReadOnlyList<DownloadFileDto>> GetByDownloadAsync(Guid downloadId,
+        CancellationToken cancellationToken)
     {
         return await _files
+            .Where(x => x.Status == FileStatus.Created)
             .Where(x => x.DownloadId == downloadId)
             .OrderByDescending(x => x.CreatedAt)
             .ToListAsync(cancellationToken);
@@ -48,10 +54,11 @@ public class DownloadFileRepository : IDownloadFileRepository
             .FirstOrDefaultAsync(cancellationToken);
     }
 
-    public async Task<FileDownloadDto> CreateDownloadAsync(FileDownloadDto download, CancellationToken cancellationToken)
+    public async Task<FileDownloadDto> CreateDownloadAsync(FileDownloadDto download,
+        CancellationToken cancellationToken)
     {
         _dbContext.Set<FileDownloadDto>().Add(download);
-        
+
         await _dbContext.SaveChangesAsync(cancellationToken);
 
         return download;
@@ -60,7 +67,7 @@ public class DownloadFileRepository : IDownloadFileRepository
     public async Task UpdateAsync(DownloadFileDto file, CancellationToken cancellationToken)
     {
         _files.Update(file);
-        
+
         await _dbContext.SaveChangesAsync(cancellationToken);
     }
 

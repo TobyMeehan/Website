@@ -22,13 +22,13 @@ public class DownloadFileService : IDownloadFileService
     public async Task<(DownloadFile File, string UploadUrl)> CreateAsync(CreateDownloadFile create,
         CancellationToken cancellationToken = default)
     {
-        var existingFile = await _downloadFileRepository.GetByFilenameAsync(create.DownloadId, create.Filename, 
-                cancellationToken);
+        var existingFile = await _downloadFileRepository.GetByFilenameAsync(create.DownloadId, create.Filename,
+            cancellationToken);
 
-        var filename = existingFile is null 
-            ? create.Filename 
+        var filename = existingFile is null
+            ? create.Filename
             : await GenerateFilenameAsync(create, cancellationToken);
-        
+
         var file = new DownloadFileDto
         {
             DownloadId = create.DownloadId,
@@ -63,10 +63,10 @@ public class DownloadFileService : IDownloadFileService
     private async Task<string> GenerateFilenameAsync(CreateDownloadFile file, CancellationToken cancellationToken)
     {
         var (filename, extension) = (Path.GetFileNameWithoutExtension(file.Filename), Path.GetExtension(file.Filename));
-        
+
         foreach (var filenameAttempt in Enumerable.Range(1, 99).Select(i => $"{filename}({i}){extension}"))
         {
-            var existingFile = await _downloadFileRepository.GetByFilenameAsync(file.DownloadId, filenameAttempt, 
+            var existingFile = await _downloadFileRepository.GetByFilenameAsync(file.DownloadId, filenameAttempt,
                 cancellationToken);
 
             if (existingFile is null)
@@ -98,6 +98,20 @@ public class DownloadFileService : IDownloadFileService
         };
     }
 
+    public async Task CompleteUploadAsync(DownloadFile file, CancellationToken cancellationToken = default)
+    {
+        var dto = await _downloadFileRepository.GetByIdAsync(file.DownloadId, file.Id, cancellationToken);
+
+        if (dto is null)
+        {
+            return;
+        }
+
+        dto.Status = FileStatus.Created;
+
+        await _downloadFileRepository.UpdateAsync(dto, cancellationToken);
+    }
+
     public async Task<string> SignUploadPartAsync(DownloadFile file, string uploadId, int partNumber,
         CancellationToken cancellationToken = default)
     {
@@ -107,7 +121,8 @@ public class DownloadFileService : IDownloadFileService
         return url;
     }
 
-    public async Task<IReadOnlyList<FileUploadPart>> GetUploadPartsAsync(DownloadFile file, string uploadId, CancellationToken cancellationToken = default)
+    public async Task<IReadOnlyList<FileUploadPart>> GetUploadPartsAsync(DownloadFile file, string uploadId,
+        CancellationToken cancellationToken = default)
     {
         var parts = await _storageService.GetUploadPartsAsync(file.DownloadId.ToString(), file.Id.ToString(), uploadId,
             cancellationToken);
@@ -130,6 +145,8 @@ public class DownloadFileService : IDownloadFileService
                 SizeInBytes = x.SizeInBytes,
                 ETag = x.ETag
             }), cancellationToken);
+
+        await CompleteUploadAsync(file, cancellationToken);
     }
 
     public async Task DeleteUploadAsync(DownloadFile file, string uploadId,
@@ -152,13 +169,14 @@ public class DownloadFileService : IDownloadFileService
             UserId = userId,
             CreatedAt = DateTime.UtcNow
         };
-        
+
         await _downloadFileRepository.CreateDownloadAsync(download, cancellationToken);
-        
+
         return url;
     }
 
-    public async Task<DownloadFile?> GetByIdAsync(Guid downloadId, Guid fileId, CancellationToken cancellationToken = default)
+    public async Task<DownloadFile?> GetByIdAsync(Guid downloadId, Guid fileId,
+        CancellationToken cancellationToken = default)
     {
         var file = await _downloadFileRepository.GetByIdAsync(downloadId, fileId, cancellationToken);
 
@@ -166,7 +184,7 @@ public class DownloadFileService : IDownloadFileService
         {
             return null;
         }
-        
+
         return new DownloadFile
         {
             Id = file.Id,
@@ -254,13 +272,14 @@ public class DownloadFileService : IDownloadFileService
 
     public async Task DeleteAsync(Guid downloadId, Guid fileId, CancellationToken cancellationToken = default)
     {
-        var storageResult = await _storageService.DeleteAsync(downloadId.ToString(), fileId.ToString(), cancellationToken);
+        var storageResult =
+            await _storageService.DeleteAsync(downloadId.ToString(), fileId.ToString(), cancellationToken);
 
         if (!storageResult)
         {
             return;
         }
-        
+
         await _downloadFileRepository.DeleteAsync(downloadId, fileId, cancellationToken);
     }
 }

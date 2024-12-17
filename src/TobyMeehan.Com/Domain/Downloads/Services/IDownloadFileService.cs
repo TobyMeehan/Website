@@ -10,6 +10,8 @@ public interface IDownloadFileService
     
     Task<FileUpload?> CreateUploadAsync(DownloadFile file, CancellationToken cancellationToken = default);
     
+    Task CompleteUploadAsync(DownloadFile file, CancellationToken cancellationToken = default);
+    
     Task<string> SignUploadPartAsync(DownloadFile file, string uploadId, int partNumber,
         CancellationToken cancellationToken = default);
     
