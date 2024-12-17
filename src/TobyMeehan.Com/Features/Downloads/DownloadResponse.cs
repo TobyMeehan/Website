@@ -9,6 +9,6 @@ public class DownloadResponse
     public required string Visibility { get; set; }
     public required string Verification { get; set; }
     public required string? Version { get; set; }
-    public required DateTime CreatedAt { get; set; }
+    public required DateTime? CreatedAt { get; set; }
     public required DateTime? UpdatedAt { get; set; }
 }

@@ -31,8 +31,7 @@ public class DownloadRepository : IDownloadRepository
             .Where(x => !x.DeletedAt.HasValue)
             .Where(x => x.Visibility == Visibility.Public)
             .OrderByDescending(x => x.Files.SelectMany(f => f.Downloads).Count())
-            .ThenByDescending(x => x.UpdatedAt)
-            .ThenByDescending(x => x.CreatedAt)
+            .ThenByDescending(x => x.UpdatedAt ?? x.CreatedAt ?? DateTime.UnixEpoch)
             .ThenBy(x => x.Title)
             .ToListAsync(cancellationToken);
     }
@@ -43,8 +42,7 @@ public class DownloadRepository : IDownloadRepository
             .Where(x => !x.DeletedAt.HasValue)
             .Where(x => x.OwnerId == userId || x.Authors.Any(a => a.UserId == userId))
             .OrderByDescending(x => x.Files.SelectMany(f => f.Downloads).Count())
-            .ThenByDescending(x => x.UpdatedAt)
-            .ThenByDescending(x => x.CreatedAt)
+            .ThenByDescending(x => x.UpdatedAt ?? x.CreatedAt ?? DateTime.UnixEpoch)
             .ThenBy(x => x.Title)
             .ToListAsync(cancellationToken);
     }

@@ -103,7 +103,7 @@ public class DownloadRepositoryTests : IAsyncLifetime
             .RuleFor(x => x.Verification, f => f.PickRandom<Verification>())
             .RuleFor(x => x.Version, f => f.System.Version().ToString())
             .RuleFor(x => x.CreatedAt, f => f.Date.Past())
-            .RuleFor(x => x.DeletedAt, (f, x) => f.Date.Between(x.CreatedAt, DateTime.UtcNow));
+            .RuleFor(x => x.DeletedAt, (f, x) => f.Date.Between(x.CreatedAt ?? f.Date.Past(), DateTime.UtcNow));
 
         var provider = GetServiceCollection().BuildServiceProvider(true);
 
@@ -219,7 +219,7 @@ public class DownloadRepositoryTests : IAsyncLifetime
             .RuleFor(x => x.Version, f => f.PickRandom(null, f.System.Version().ToString()))
             .RuleFor(x => x.CreatedAt, f => f.Date.Past())
             .RuleFor(x => x.UpdatedAt, f => f.PickRandom(null as DateTime?, f.Date.Recent()))
-            .RuleFor(x => x.DeletedAt, (f, x) => f.Date.Between(x.CreatedAt, DateTime.UtcNow))
+            .RuleFor(x => x.DeletedAt, (f, x) => f.Date.Between(x.CreatedAt ?? f.Date.Recent(), DateTime.UtcNow))
             .RuleSet("owned", r => r
                 .RuleFor(x => x.OwnerId, _ => userId))
             .RuleSet("author", r => r

@@ -7,5 +7,5 @@ public class DownloadAuthor
 
     public required bool IsOwner { get; init; }
 
-    public required DateTime CreatedAt { get; init; }
+    public required DateTime? CreatedAt { get; init; }
 }
