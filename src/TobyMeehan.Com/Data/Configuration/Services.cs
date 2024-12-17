@@ -8,6 +8,7 @@ using TobyMeehan.Com.Data.DataAccess;
 using TobyMeehan.Com.Data.Repositories;
 using TobyMeehan.Com.Data.Services;
 using TobyMeehan.Com.Domain.Downloads.Services;
+using TobyMeehan.Com.Domain.Thavyra.Services;
 
 namespace TobyMeehan.Com.Data.Configuration;
 
@@ -44,6 +45,14 @@ public static class Services
                     ));
                     services.AddSingleton<IStorageService, S3StorageService>();
                     services.Configure<StorageOptions>(section);
+                    
+                    break;
+                
+                case "Thavyra":
+                    services.AddHttpClient<IUserService, UserService>(options =>
+                    {
+                        options.BaseAddress = new Uri(section["BaseAddress"]!);
+                    });
                     
                     break;
             }
