@@ -1,28 +1,27 @@
-using FakeItEasy;
-using FastEndpoints;
+using System.Security.Claims;
+using FastEndpoints.Security;
 using FastEndpoints.Testing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
 using Testcontainers.PostgreSql;
 using TobyMeehan.Com.Data.DataAccess;
 using TobyMeehan.Com.Domain.Thavyra;
 using TobyMeehan.Com.Domain.Thavyra.Services;
-using TobyMeehan.Com.Features.Token.Post;
-using TokenRequest = TobyMeehan.Com.Features.Token.Post.TokenRequest;
-using TokenResponse = TobyMeehan.Com.Features.Token.Post.TokenResponse;
+using TobyMeehan.Com.Security.Configuration;
 
 namespace Api.Tests;
 
 public class ApiApp : AppFixture<Program>
 {
     private readonly PostgreSqlContainer _postgres = new PostgreSqlBuilder().Build();
-    
-    private readonly IUserService _userService = A.Fake<IUserService>();
-    public Dictionary<string, User> Users { get; set; } = [];
 
-    public HttpClient UserA { get; private set; } = null!;
-    public HttpClient UserB { get; private set; } = null!;
+    public User UserA { get; private set; }
+    public User UserB { get; private set; }
+    
+    public HttpClient ClientA { get; private set; } = null!;
+    public HttpClient ClientB { get; private set; } = null!;
 
     public List<string> Downloads { get; set; } = [];
 
@@ -46,32 +45,7 @@ public class ApiApp : AppFixture<Program>
 
     protected override void ConfigureServices(IServiceCollection services)
     {
-        services.AddScoped<IUserService>(_ => _userService);
-
-        Users["UserA"] = new User
-        {
-            Id = Fake.Random.Guid(),
-            Username = Fake.Internet.UserName(),
-            AvatarUrl = Fake.Internet.Avatar(),
-            ProfileUrl = Fake.Internet.Url()
-        };
-
-        Users["UserB"] = new User
-        {
-            Id = Fake.Random.Guid(),
-            Username = Fake.Internet.UserName(),
-            AvatarUrl = Fake.Internet.Avatar(),
-            ProfileUrl = Fake.Internet.Url()
-        };
-        
-        A.CallTo(() => _userService.GetByAccessTokenAsync(A<string>._, A<CancellationToken>._))
-            .ReturnsLazily((string token, CancellationToken _) => Users[token]);
-
-        A.CallTo(() => _userService.GetByIdAsync(Users["UserA"].Id, A<CancellationToken>._)).Returns(Users["UserA"]);
-        A.CallTo(() => _userService.GetByIdAsync(Users["UserB"].Id, A<CancellationToken>._)).Returns(Users["UserB"]);
-        A.CallTo(() => _userService.GetByIdAsync(
-            A<Guid>.That.Matches(x => x != Users["UserA"].Id && x != Users["UserB"].Id), 
-            A<CancellationToken>._)).Returns<User?>(null);
+        services.AddSingleton<IUserService>(_ => new InMemoryUserService());
     }
 
     protected override async Task SetupAsync()
@@ -82,30 +56,62 @@ public class ApiApp : AppFixture<Program>
         
         await context.Database.EnsureCreatedAsync();
 
-        var userATokenResponse = await Client.POSTAsync<TokenEndpoint, TokenRequest, TokenResponse>(new()
+        var userService = scope.ServiceProvider.GetRequiredService<IUserService>() as InMemoryUserService;
+        var jwtOptions = scope.ServiceProvider.GetRequiredService<IOptions<JwtOptions>>().Value;
+        
+        UserA = new User
         {
-            AccessToken = "UserA"
+            Id = Fake.Random.Guid(),
+            Username = Fake.Internet.UserName(),
+            AvatarUrl = Fake.Internet.Avatar(),
+            ProfileUrl = Fake.Internet.Url()
+        };
+        
+        userService?.AddUser(UserA);
+        
+        var userAToken = JwtBearer.CreateToken(options =>
+        {
+            options.SigningKey = jwtOptions.Key!;
+            options.ExpireAt = DateTime.UtcNow.AddHours(1);
+            options.User[ClaimTypes.NameIdentifier] = UserA.Id.ToString();
+        });
+        
+        ClientA = CreateClient(c =>
+        {
+            c.DefaultRequestHeaders.Authorization = new("Bearer", userAToken);
         });
 
-        UserA = CreateClient(c =>
+        UserB = new User
         {
-            c.DefaultRequestHeaders.Authorization = new("Bearer", userATokenResponse.Result.Token);
+            Id = Fake.Random.Guid(),
+            Username = Fake.Internet.UserName(),
+            AvatarUrl = Fake.Internet.Avatar(),
+            ProfileUrl = Fake.Internet.Url()
+        };
+        
+        userService?.AddUser(UserB);
+
+        var userBToken = JwtBearer.CreateToken(options =>
+        {
+            options.SigningKey = jwtOptions.Key!;
+            options.ExpireAt = DateTime.UtcNow.AddHours(1);
+            options.User[ClaimTypes.NameIdentifier] = UserB.Id.ToString();
         });
 
-        var userBTokenResponse = await Client.POSTAsync<TokenEndpoint, TokenRequest, TokenResponse>(new()
+        ClientB = CreateClient(c =>
         {
-            AccessToken = "UserB"
-        });
-
-        UserB = CreateClient(c =>
-        {
-            c.DefaultRequestHeaders.Authorization = new("Bearer", userBTokenResponse.Result.Token);
+            c.DefaultRequestHeaders.Authorization = new("Bearer",  userBToken);
         });
     }
 
     protected override async Task TearDownAsync()
     {
-        UserA.Dispose();
+        var userService = Services.GetRequiredService<IUserService>() as InMemoryUserService;
+        
+        userService?.Clear();
+        
+        ClientA?.Dispose();
+        ClientB?.Dispose();
         
         await _postgres.StopAsync();
     }

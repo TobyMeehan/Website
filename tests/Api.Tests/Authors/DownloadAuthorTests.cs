@@ -13,6 +13,7 @@ using KickAuthor = TobyMeehan.Com.Features.Authors.Delete;
 
 namespace Api.Tests.Authors;
 
+[Collection(ApiDefinition.Name)]
 public class DownloadAuthorTests : TestBase<ApiApp>
 {
     private readonly ApiApp _app;
@@ -26,7 +27,7 @@ public class DownloadAuthorTests : TestBase<ApiApp>
     public async Task CreateDownload_ShouldAddOwnerAuthor()
     {
         var (response1, download) =
-            await _app.UserA.POSTAsync<CreateDownload.Endpoint, CreateDownload.Request, DownloadResponse>(new()
+            await _app.ClientA.POSTAsync<CreateDownload.Endpoint, CreateDownload.Request, DownloadResponse>(new()
             {
                 Title = Fake.Commerce.ProductName(),
                 Summary = Fake.Commerce.ProductDescription(),
@@ -39,7 +40,7 @@ public class DownloadAuthorTests : TestBase<ApiApp>
         _app.Downloads.Add(download.Id);
 
         var (response2, authors) =
-            await _app.UserA.GETAsync<GetAuthors.Endpoint, GetAuthors.Request, List<DownloadAuthorResponse>>(new()
+            await _app.ClientA.GETAsync<GetAuthors.Endpoint, GetAuthors.Request, List<DownloadAuthorResponse>>(new()
             {
                 DownloadId = download.Id
             });
@@ -47,14 +48,14 @@ public class DownloadAuthorTests : TestBase<ApiApp>
         response2.StatusCode.Should().Be(HttpStatusCode.OK);
 
         authors.Should().HaveCount(1);
-        authors[0].Id.Should().Be(_app.Users["UserA"].Id);
+        authors[0].Id.Should().Be(_app.UserA.Id);
         authors[0].IsOwner.Should().BeTrue();
     }
 
     [Fact, Priority(2)]
     public async Task GetAuthors_Single()
     {
-        var (response, authors) = await _app.UserA.GETAsync<GetAuthors.Endpoint, GetAuthors.Request, List<DownloadAuthorResponse>>(new()
+        var (response, authors) = await _app.ClientA.GETAsync<GetAuthors.Endpoint, GetAuthors.Request, List<DownloadAuthorResponse>>(new()
         {
             DownloadId = _app.Downloads[0]
         });
@@ -62,14 +63,14 @@ public class DownloadAuthorTests : TestBase<ApiApp>
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         
         authors.Should().HaveCount(1);
-        authors[0].Id.Should().Be(_app.Users["UserA"].Id);
+        authors[0].Id.Should().Be(_app.UserA.Id);
         authors[0].IsOwner.Should().BeTrue();
     }
 
     [Fact, Priority(3)]
     public async Task GetAuthor_NotFound()
     {
-        var response = await _app.UserA.GETAsync<GetAuthor.Endpoint, GetAuthor.Request>(new()
+        var response = await _app.ClientA.GETAsync<GetAuthor.Endpoint, GetAuthor.Request>(new()
         {
             DownloadId = _app.Downloads[0],
             UserId = Guid.NewGuid()
@@ -81,25 +82,25 @@ public class DownloadAuthorTests : TestBase<ApiApp>
     [Fact, Priority(4)]
     public async Task GetAuthor_ShouldReturnOwner()
     {
-        var (response, author) = await _app.UserA.GETAsync<GetAuthor.Endpoint, GetAuthor.Request, DownloadAuthorResponse>(new()
+        var (response, author) = await _app.ClientA.GETAsync<GetAuthor.Endpoint, GetAuthor.Request, DownloadAuthorResponse>(new()
         {
             DownloadId = _app.Downloads[0],
-            UserId = _app.Users["UserA"].Id
+            UserId = _app.UserA.Id
         });
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         
-        author.Id.Should().Be(_app.Users["UserA"].Id);
+        author.Id.Should().Be(_app.UserA.Id);
         author.IsOwner.Should().BeTrue();
     }
 
     [Fact, Priority(5)]
     public async Task AddAuthor_DownloadNotFound()
     {
-        var response = await _app.UserA.POSTAsync<AddAuthor.Endpoint, AddAuthor.Request>(new()
+        var response = await _app.ClientA.POSTAsync<AddAuthor.Endpoint, AddAuthor.Request>(new()
         {
             DownloadId = Guid.NewGuid().ToString(),
-            UserId = _app.Users["UserB"].Id
+            UserId = _app.UserB.Id
         });
 
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
@@ -108,10 +109,10 @@ public class DownloadAuthorTests : TestBase<ApiApp>
     [Fact, Priority(6)]
     public async Task AddAuthor_Forbidden_WhenUserIsNotOwner()
     {
-        var response = await _app.UserB.POSTAsync<AddAuthor.Endpoint, AddAuthor.Request>(new()
+        var response = await _app.ClientB.POSTAsync<AddAuthor.Endpoint, AddAuthor.Request>(new()
         {
             DownloadId = _app.Downloads[0],
-            UserId = _app.Users["UserB"].Id
+            UserId = _app.UserB.Id
         });
 
         response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
@@ -120,7 +121,7 @@ public class DownloadAuthorTests : TestBase<ApiApp>
     [Fact, Priority(7)]
     public async Task AddAuthor_UserDoesNotExist()
     {
-        var (response, error) = await _app.UserA.POSTAsync<AddAuthor.Endpoint, AddAuthor.Request, ErrorResponse>(new()
+        var (response, error) = await _app.ClientA.POSTAsync<AddAuthor.Endpoint, AddAuthor.Request, ProblemDetails>(new()
         {
             DownloadId = _app.Downloads[0],
             UserId = Guid.NewGuid()
@@ -128,31 +129,31 @@ public class DownloadAuthorTests : TestBase<ApiApp>
 
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         error.Errors.Should().HaveCount(1);
-        error.Errors.Keys.Should().Equal("userId");
+        error.Errors.Should().Contain(x => x.Name == "userId");
     }
 
     [Fact, Priority(8)]
     public async Task AddAuthor()
     {
         var (response, data) =
-            await _app.UserA.POSTAsync<AddAuthor.Endpoint, AddAuthor.Request, DownloadAuthorResponse>(new()
+            await _app.ClientA.POSTAsync<AddAuthor.Endpoint, AddAuthor.Request, DownloadAuthorResponse>(new()
             {
                 DownloadId = _app.Downloads[0],
-                UserId = _app.Users["UserB"].Id
+                UserId = _app.UserB.Id
             });
 
         response.StatusCode.Should().Be(HttpStatusCode.Created);
-        data.Id.Should().Be(_app.Users["UserB"].Id);
+        data.Id.Should().Be(_app.UserB.Id);
         data.IsOwner.Should().BeFalse();
     }
 
     [Fact, Priority(9)]
     public async Task KickAuthor()
     {
-        var response = await _app.UserA.DELETEAsync<KickAuthor.Endpoint, KickAuthor.Request>(new()
+        var response = await _app.ClientA.DELETEAsync<KickAuthor.Endpoint, KickAuthor.Request>(new()
         {
             DownloadId = _app.Downloads[0],
-            UserId = _app.Users["UserB"].Id
+            UserId = _app.UserB.Id
         });
         
         response.StatusCode.Should().Be(HttpStatusCode.NoContent);

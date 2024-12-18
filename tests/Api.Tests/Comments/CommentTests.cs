@@ -10,6 +10,7 @@ using Create = TobyMeehan.Com.Features.Comments.Post;
 
 namespace Api.Tests.Comments;
 
+[Collection(ApiDefinition.Name)]
 public class CommentTests : TestBase<ApiApp>
 {
     private readonly ApiApp _app;
@@ -18,13 +19,13 @@ public class CommentTests : TestBase<ApiApp>
     {
         _app = app;
     }
-    
+
     protected override async Task SetupAsync()
     {
         var downloadService = _app.Services.GetRequiredService<IDownloadService>();
 
         var download = await downloadService.CreateAsync(new IDownloadService.CreateDownload(
-            _app.Users["UserA"].Id,
+            _app.UserA.Id,
             Title: Fake.Commerce.ProductName(),
             Summary: Fake.Commerce.ProductDescription(),
             Description: Fake.Lorem.Paragraphs(),
@@ -42,7 +43,7 @@ public class CommentTests : TestBase<ApiApp>
             Content = ""
         };
 
-        var (response, error) = await _app.UserA.POSTAsync<Create.Endpoint, Create.Request, ErrorResponse>(request);
+        var (response, error) = await _app.ClientA.POSTAsync<Create.Endpoint, Create.Request, ProblemDetails>(request);
 
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
 
@@ -60,7 +61,7 @@ public class CommentTests : TestBase<ApiApp>
                 Content = Fake.Lorem.Paragraph()
             };
         
-            var (response, data) = await _app.UserA.POSTAsync<Create.Endpoint, Create.Request, CommentResponse>(request);
+            var (response, data) = await _app.ClientA.POSTAsync<Create.Endpoint, Create.Request, CommentResponse>(request);
 
             response.StatusCode.Should().Be(HttpStatusCode.Created);
         

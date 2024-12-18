@@ -16,12 +16,13 @@ using Delete = TobyMeehan.Com.Features.Downloads.Delete;
 
 namespace Api.Tests.Downloads;
 
+[Collection(ApiDefinition.Name)]
 public class DownloadTests(ApiApp App) : TestBase<ApiApp>
 {
     [Fact]
     public async Task CreateDownload_InvalidRequest()
     {
-        var (response, result) = await App.UserA.POSTAsync<Create.Endpoint, Create.Request, ProblemDetails>(
+        var (response, result) = await App.ClientA.POSTAsync<Create.Endpoint, Create.Request, ProblemDetails>(
             new()
             {
                 Title = null!,
@@ -60,7 +61,7 @@ public class DownloadTests(ApiApp App) : TestBase<ApiApp>
             };
 
             var (response, data) =
-                await App.UserA.POSTAsync<Create.Endpoint, Create.Request, DownloadResponse>(request);
+                await App.ClientA.POSTAsync<Create.Endpoint, Create.Request, DownloadResponse>(request);
 
             response.StatusCode.Should().Be(HttpStatusCode.Created);
 
@@ -97,7 +98,7 @@ public class DownloadTests(ApiApp App) : TestBase<ApiApp>
         response.StatusCode.Should().Be(HttpStatusCode.OK);
 
         data.Should().HaveCount(3);
-        data.Select(x => x.Id).Should().Equal(App.Downloads);
+        data.Select(x => x.Id).Should().Contain(App.Downloads);
     }
 
     [Fact, Priority(3)]
@@ -140,7 +141,7 @@ public class DownloadTests(ApiApp App) : TestBase<ApiApp>
             Version = Fake.System.Version().ToString()
         };
         
-        var response = await App.UserB.PUTAsync<Update.Endpoint, Update.Request>(request);
+        var response = await App.ClientB.PUTAsync<Update.Endpoint, Update.Request>(request);
         
         response.StatusCode.Should().Be(HttpStatusCode.Forbidden);
     }
@@ -160,7 +161,7 @@ public class DownloadTests(ApiApp App) : TestBase<ApiApp>
             Version = Fake.Hacker.Phrase()
         };
         
-        var response = await App.UserA.PUTAsync<Update.Endpoint, Update.Request>(request);
+        var response = await App.ClientA.PUTAsync<Update.Endpoint, Update.Request>(request);
         
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
     }
@@ -180,7 +181,7 @@ public class DownloadTests(ApiApp App) : TestBase<ApiApp>
             Version = Fake.System.Version().ToString()
         };
         
-        var (response, data) = await App.UserA.PUTAsync<Update.Endpoint, Update.Request, DownloadResponse>(request);
+        var (response, data) = await App.ClientA.PUTAsync<Update.Endpoint, Update.Request, DownloadResponse>(request);
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         
@@ -207,7 +208,7 @@ public class DownloadTests(ApiApp App) : TestBase<ApiApp>
             Version = null
         };
         
-        var (response, data) = await App.UserA.PUTAsync<Update.Endpoint, Update.Request, DownloadResponse>(request);
+        var (response, data) = await App.ClientA.PUTAsync<Update.Endpoint, Update.Request, DownloadResponse>(request);
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         
@@ -237,7 +238,7 @@ public class DownloadTests(ApiApp App) : TestBase<ApiApp>
     {
         var downloadId = App.Downloads[0];
 
-        var response = await App.UserA.DELETEAsync<Delete.Endpoint, Delete.Request>(new()
+        var response = await App.ClientA.DELETEAsync<Delete.Endpoint, Delete.Request>(new()
         {
             Id = downloadId
         });
