@@ -2,5 +2,5 @@ namespace TobyMeehan.Com.Features.Comments.GetByDownload;
 
 public class Request
 {
-    public string DownloadId { get; set; }
+    public string DownloadId { get; set; } = null!;
 }

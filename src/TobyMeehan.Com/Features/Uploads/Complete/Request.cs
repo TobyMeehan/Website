@@ -8,6 +8,6 @@ public class Request : UploadRequest
     {
         public int PartNumber { get; set; }
         public long Size { get; set; }
-        public string ETag { get; set; }
+        public string ETag { get; set; } = null!;
     }
 }
