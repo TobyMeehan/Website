@@ -23,7 +23,7 @@ jobs:
       run: dotnet build --no-restore
 
     - name: Update Database
-      working-directory: ./util/Migrations
+      working-directory: ./src/TobyMeehan.Com
       env: 
         ConnectionStrings__Postgres: ${{ secrets.MIGRATION_CONNECTION_STRING }}
       run: |
