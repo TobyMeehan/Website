@@ -25,7 +25,8 @@ jobs:
     - name: Update Database
       working-directory: ./src/TobyMeehan.Com
       env: 
-        ConnectionStrings__Postgres: ${{ secrets.MIGRATION_CONNECTION_STRING }}
+        Data__Postgres__ConnectionString: ${{ secrets.MIGRATION_CONNECTION_STRING }}
+        Data__S3__Configuration__ServiceUrl: https://tobymeehan.com/shrek
       run: |
         dotnet tool install --global dotnet-ef
         dotnet tool restore
