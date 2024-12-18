@@ -21,7 +21,7 @@ public static class Services
         services.AddScoped<IDownloadAuthorService, DownloadAuthorService>();
         services.AddScoped<IDownloadFileService, DownloadFileService>();
         services.AddScoped<ICommentService, CommentService>();
-        
+
         foreach (var section in configuration.GetChildren())
             switch (section.Key)
             {
@@ -32,28 +32,45 @@ public static class Services
                     });
 
                     services.AddScoped<IDownloadRepository, Repositories.EntityFramework.DownloadRepository>();
-                    services.AddScoped<IDownloadAuthorRepository, Repositories.EntityFramework.DownloadAuthorRepository>();
+                    services
+                        .AddScoped<IDownloadAuthorRepository, Repositories.EntityFramework.DownloadAuthorRepository>();
                     services.AddScoped<IDownloadFileRepository, Repositories.EntityFramework.DownloadFileRepository>();
                     services.AddScoped<ICommentRepository, Repositories.EntityFramework.CommentRepository>();
-                    
+
                     break;
-                
+
                 case "S3":
-                    services.AddSingleton<IAmazonS3>(_ => new AmazonS3Client(
-                        new BasicAWSCredentials(section["AccessKey"], section["SecretKey"]),
-                        new AmazonS3Config { RegionEndpoint = RegionEndpoint.GetBySystemName(section["Region"]) }
-                    ));
+
+                    AWSCredentials credentials = section.GetSection("Credentials").Exists()
+                        ? new BasicAWSCredentials(section["Credentials:AccessKey"], section["Credentials:SecretKey"])
+                        : new AnonymousAWSCredentials();
+
+                    var config = new AmazonS3Config();
+
+                    if (section.GetSection("Configuration:Region").Exists())
+                    {
+                        config.RegionEndpoint = RegionEndpoint.GetBySystemName(section["Configuration:Region"]);
+                    }
+
+                    if (section.GetSection("Configuration:ServiceUrl").Exists())
+                    {
+                        config.ServiceURL = section["Configuration:ServiceUrl"];
+                    }
+                    
+                    var client = new AmazonS3Client(credentials, config);
+
+                    services.AddSingleton<IAmazonS3>(client);
                     services.AddSingleton<IStorageService, S3StorageService>();
                     services.Configure<StorageOptions>(section);
-                    
+
                     break;
-                
+
                 case "Thavyra":
                     services.AddHttpClient<IUserService, UserService>(options =>
                     {
                         options.BaseAddress = new Uri(section["BaseAddress"]!);
                     });
-                    
+
                     break;
             }
 
