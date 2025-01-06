@@ -24,6 +24,7 @@ public class Endpoint : Endpoint<Request, Response>
     public override void Configure()
     {
         Post("/downloads/{DownloadId}/downloads");
+        AllowAnonymous();
     }
 
     public override async Task HandleAsync(Request req, CancellationToken ct)
